@@ -10,6 +10,7 @@ function paint(ctx,o,debris){
  const r=(x,y,w,h,color)=>{ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h));};
  const poly=(points,color)=>{ctx.fillStyle=color;ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fill();};
  function flame(at,small=false){let pulse=.5+.5*Math.sin(time*43),len=(small?12:23)+Math.floor(pulse*(small?5:15));poly([[-7,at],[7,at],[5,at+7],[3,at+len-4],[0,at+len],[-3,at+len-7],[-5,at+7]],'#e84d35');poly([[-4,at],[4,at],[3,at+9],[0,at+len*.8],[-3,at+8]],'#ffbd54');r(-2,at,4,small?8:12,'#fff4b0');r(-1,at,2,5,'#ecffff');}
+ if(root.WorldSprites?.state.ready){root.WorldSprites.body(ctx,{...o,debris});ctx.restore();return;}
  function booster(){
   // Отдельный разгонный блок: широкий цилиндр, кольца, четыре устойчивые опоры.
   poly([[-15,-36],[15,-36],[19,-29],[19,-11],[12,-5],[-12,-5],[-19,-11],[-19,-29]],c.dark);
@@ -35,3 +36,4 @@ function paint(ctx,o,debris){
 }
 root.RocketVehicle={draw,drawDebris};
 })(typeof window!=='undefined'?window:globalThis);
+

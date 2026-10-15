@@ -1,0 +1,110 @@
+{
+  "satellite-0": {
+    "period": 9.66643893412244,
+    "samples": 17,
+    "minDelta": 373630,
+    "sumDelta": 12295881
+  },
+  "parachute-0": {
+    "period": 2.3271056693257726,
+    "samples": 17,
+    "minDelta": 616391,
+    "sumDelta": 22105646
+  },
+  "flame-0": {
+    "period": 0.14612058853906015,
+    "samples": 17,
+    "minDelta": 19920,
+    "sumDelta": 605264
+  },
+  "satellite-1": {
+    "period": 9.66643893412244,
+    "samples": 17,
+    "minDelta": 391803,
+    "sumDelta": 11791412
+  },
+  "parachute-1": {
+    "period": 2.3271056693257726,
+    "samples": 17,
+    "minDelta": 789855,
+    "sumDelta": 29325384
+  },
+  "flame-1": {
+    "period": 0.14612058853906015,
+    "samples": 17,
+    "minDelta": 19920,
+    "sumDelta": 605264
+  },
+  "satellite-2": {
+    "period": 9.66643893412244,
+    "samples": 17,
+    "minDelta": 442590,
+    "sumDelta": 12545020
+  },
+  "parachute-2": {
+    "period": 2.3271056693257726,
+    "samples": 17,
+    "minDelta": 717030,
+    "sumDelta": 25298800
+  },
+  "flame-2": {
+    "period": 0.14612058853906015,
+    "samples": 17,
+    "minDelta": 19920,
+    "sumDelta": 605264
+  },
+  "satellite-3": {
+    "period": 9.66643893412244,
+    "samples": 17,
+    "minDelta": 411764,
+    "sumDelta": 10918528
+  },
+  "parachute-3": {
+    "period": 2.3271056693257726,
+    "samples": 17,
+    "minDelta": 586549,
+    "sumDelta": 21715664
+  },
+  "flame-3": {
+    "period": 0.14612058853906015,
+    "samples": 17,
+    "minDelta": 19920,
+    "sumDelta": 605264
+  },
+  "satellite-4": {
+    "period": 9.66643893412244,
+    "samples": 17,
+    "minDelta": 490247,
+    "sumDelta": 14027334
+  },
+  "parachute-4": {
+    "period": 2.3271056693257726,
+    "samples": 17,
+    "minDelta": 790320,
+    "sumDelta": 27706694
+  },
+  "flame-4": {
+    "period": 0.14612058853906015,
+    "samples": 17,
+    "minDelta": 21500,
+    "sumDelta": 643808
+  },
+  "satellite-5": {
+    "period": 9.66643893412244,
+    "samples": 17,
+    "minDelta": 594246,
+    "sumDelta": 16640972
+  },
+  "parachute-5": {
+    "period": 2.3271056693257726,
+    "samples": 17,
+    "minDelta": 693535,
+    "sumDelta": 25331774
+  },
+  "flame-5": {
+    "period": 0.14612058853906015,
+    "samples": 17,
+    "minDelta": 21500,
+    "sumDelta": 643808
+  }
+}

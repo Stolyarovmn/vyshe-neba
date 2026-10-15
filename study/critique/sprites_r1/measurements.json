@@ -1,0 +1,62 @@
+{
+  "booster_1978": {
+    "size": [
+      218,
+      221
+    ],
+    "alpha_partial": 2731,
+    "opaque_boundary_pixels": 2401,
+    "pale_boundary_pixels": 0,
+    "pale_boundary_fraction": 0.0
+  },
+  "satellite_1978": {
+    "size": [
+      222,
+      258
+    ],
+    "alpha_partial": 3622,
+    "opaque_boundary_pixels": 2396,
+    "pale_boundary_pixels": 21,
+    "pale_boundary_fraction": 0.009
+  },
+  "panel_1978": {
+    "size": [
+      164,
+      92
+    ],
+    "alpha_partial": 1281,
+    "opaque_boundary_pixels": 940,
+    "pale_boundary_pixels": 0,
+    "pale_boundary_fraction": 0.0
+  },
+  "canopy": {
+    "size": [
+      390,
+      265
+    ],
+    "alpha_partial": 4696,
+    "opaque_boundary_pixels": 3209,
+    "pale_boundary_pixels": 0,
+    "pale_boundary_fraction": 0.0
+  },
+  "terrain_moon": {
+    "size": [
+      729,
+      174
+    ],
+    "alpha_partial": 5318,
+    "opaque_boundary_pixels": 4017,
+    "pale_boundary_pixels": 151,
+    "pale_boundary_fraction": 0.038
+  },
+  "pad_moon_2060": {
+    "size": [
+      242,
+      132
+    ],
+    "alpha_partial": 3399,
+    "opaque_boundary_pixels": 2194,
+    "pale_boundary_pixels": 0,
+    "pale_boundary_fraction": 0.0
+  }
+}

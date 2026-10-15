@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>Выше неба — deterministic ref2game QA</title>
+<style>body{margin:0;background:#102b40}canvas{max-width:100vw}</style><canvas id="c" width="1920" height="1080"></canvas>
+<script>window.__GAME_ASSETS__=new Proxy({},{get:(_,key)=>'../outputs/rocket/dist/assets/'+key});</script>
+<script src="world-sprites.js"></script>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+window.SCENE={state:{era:0,t:0},QA(){const frames=Array.from({length:12},(_,i)=>({era:3,t:i/20,on:true}));return{
+states:WorldSprites.years.map((year,era)=>['era-'+year,{era,t:.25,on:true}]),
+anim:{attachments:{on:frames,off:frames.map(s=>({...s,on:false})),box:[730,190,440,650],min:.001}},
+};},render(t){const s=this.state;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#16374d';ctx.fillRect(0,0,1920,1080);window.__ANCHORS=[];window.__TRACE_WORLD=true;
+ctx.save();ctx.translate(900,600);ctx.scale(3,3);
+WorldSprites.body(ctx,{era:s.era,stageId:'booster',thrust:s.on,time:s.on?t:0});
+WorldSprites.parachute(ctx,s.era,s.on?t:0);
+ctx.restore();ctx.save();ctx.translate(930,760);WorldSprites.hazard(ctx,{kind:'satellite'},s.era,s.on?t:0,3);ctx.restore();
+for(let i=0;i<5;i++)WorldSprites.item(ctx,['coin','ring','fuel','repair','magnet'][i],300+i*300,930,2,s.era,s.on?t:0);
+}};
+WorldSprites.ready.then(()=>{window.__ready=WorldSprites.state.ready;SCENE.render(0);});
+</script>

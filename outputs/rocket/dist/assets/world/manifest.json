@@ -1,0 +1,1603 @@
+{
+  "version": 1,
+  "eras": [
+    1978,
+    1986,
+    1998,
+    2015,
+    2035,
+    2060
+  ],
+  "altitudeUnit": "world units; 1 world unit = 10 game meters",
+  "selection": "Technology uses base era; nature has no era. Existing Journey.objectKind controls hazard altitude.",
+  "sprites": {
+    "balloon_1978": {
+      "width": 183,
+      "height": 337,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "balloon_1978_envelope": {
+      "width": 183,
+      "height": 177,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.0,
+        0.0,
+        1.0,
+        0.5252225519287834
+      ]
+    },
+    "balloon_1978_pod": {
+      "width": 53,
+      "height": 98,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.3442622950819672,
+        0.7032640949554896,
+        0.6338797814207651,
+        0.9940652818991098
+      ]
+    },
+    "balloon_1986": {
+      "width": 201,
+      "height": 353,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "balloon_1986_envelope": {
+      "width": 199,
+      "height": 193,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.0,
+        0.0,
+        0.9900497512437811,
+        0.546742209631728
+      ]
+    },
+    "balloon_1986_pod": {
+      "width": 56,
+      "height": 100,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.36318407960199006,
+        0.71671388101983,
+        0.6417910447761194,
+        1.0
+      ]
+    },
+    "balloon_1998": {
+      "width": 208,
+      "height": 386,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "balloon_1998_envelope": {
+      "width": 207,
+      "height": 204,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.0,
+        0.0,
+        0.9951923076923077,
+        0.5284974093264249
+      ]
+    },
+    "balloon_1998_pod": {
+      "width": 70,
+      "height": 112,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.34134615384615385,
+        0.7072538860103627,
+        0.6778846153846154,
+        0.9974093264248705
+      ]
+    },
+    "balloon_2015": {
+      "width": 250,
+      "height": 437,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "balloon_2015_envelope": {
+      "width": 250,
+      "height": 235,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.0,
+        0.0,
+        1.0,
+        0.5377574370709383
+      ]
+    },
+    "balloon_2015_pod": {
+      "width": 95,
+      "height": 126,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.352,
+        0.7116704805491991,
+        0.732,
+        1.0
+      ]
+    },
+    "balloon_2035": {
+      "width": 244,
+      "height": 426,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "balloon_2035_envelope": {
+      "width": 244,
+      "height": 332,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.0,
+        0.0,
+        1.0,
+        0.7793427230046949
+      ]
+    },
+    "balloon_2035_pod": {
+      "width": 84,
+      "height": 58,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.3319672131147541,
+        0.8615023474178404,
+        0.6762295081967213,
+        0.9976525821596244
+      ]
+    },
+    "balloon_2060": {
+      "width": 313,
+      "height": 410,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "balloon_2060_envelope": {
+      "width": 313,
+      "height": 224,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.0,
+        0.0,
+        1.0,
+        0.5463414634146342
+      ]
+    },
+    "balloon_2060_pod": {
+      "width": 150,
+      "height": 116,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "box": [
+        0.3003194888178914,
+        0.7170731707317073,
+        0.7795527156549521,
+        1.0
+      ]
+    },
+    "booster_1978": {
+      "width": 218,
+      "height": 221,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "booster_1986": {
+      "width": 230,
+      "height": 222,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "booster_1998": {
+      "width": 228,
+      "height": 222,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "booster_2015": {
+      "width": 229,
+      "height": 222,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "booster_2035": {
+      "width": 219,
+      "height": 224,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "booster_2060": {
+      "width": 244,
+      "height": 224,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "canopy": {
+      "width": 390,
+      "height": 265,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "canopy_1978": {
+      "width": 252,
+      "height": 192,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "canopy_1986": {
+      "width": 251,
+      "height": 194,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "canopy_1998": {
+      "width": 243,
+      "height": 195,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "canopy_2015": {
+      "width": 249,
+      "height": 195,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "canopy_2035": {
+      "width": 248,
+      "height": 193,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "canopy_2060": {
+      "width": 257,
+      "height": 198,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "capsule_1978": {
+      "width": 167,
+      "height": 211,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "capsule_1986": {
+      "width": 166,
+      "height": 212,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "capsule_1998": {
+      "width": 178,
+      "height": 216,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "capsule_2015": {
+      "width": 179,
+      "height": 216,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "capsule_2035": {
+      "width": 186,
+      "height": 216,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "capsule_2060": {
+      "width": 186,
+      "height": 222,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "city_1978": {
+      "width": 243,
+      "height": 135,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "city_1986": {
+      "width": 251,
+      "height": 167,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "city_1998": {
+      "width": 232,
+      "height": 220,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "city_2015": {
+      "width": 239,
+      "height": 257,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "city_2035": {
+      "width": 242,
+      "height": 236,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "city_2060": {
+      "width": 256,
+      "height": 270,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "city_early": {
+      "width": 720,
+      "height": 151,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "city_future": {
+      "width": 733,
+      "height": 223,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "cloud_0": {
+      "width": 361,
+      "height": 230,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "cloud_1": {
+      "width": 363,
+      "height": 177,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "cloud_2": {
+      "width": 385,
+      "height": 266,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "cloud_3": {
+      "width": 313,
+      "height": 202,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "coin_1978": {
+      "width": 153,
+      "height": 156,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "coin_1986": {
+      "width": 157,
+      "height": 157,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "coin_1998": {
+      "width": 157,
+      "height": 157,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "coin_2015": {
+      "width": 157,
+      "height": 157,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "coin_2035": {
+      "width": 158,
+      "height": 159,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "coin_2060": {
+      "width": 156,
+      "height": 160,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "core_1978": {
+      "width": 206,
+      "height": 425,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "core_1986": {
+      "width": 223,
+      "height": 426,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "core_1998": {
+      "width": 197,
+      "height": 435,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "core_2015": {
+      "width": 197,
+      "height": 437,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "core_2035": {
+      "width": 202,
+      "height": 440,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "core_2060": {
+      "width": 205,
+      "height": 441,
+      "anchor": [
+        0.5,
+        1
+      ],
+      "exhaust": [
+        0.5,
+        1
+      ]
+    },
+    "earth": {
+      "width": 320,
+      "height": 321,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "fuel_1978": {
+      "width": 167,
+      "height": 195,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "fuel_1986": {
+      "width": 158,
+      "height": 193,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "fuel_1998": {
+      "width": 157,
+      "height": 199,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "fuel_2015": {
+      "width": 164,
+      "height": 190,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "fuel_2035": {
+      "width": 167,
+      "height": 200,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "fuel_2060": {
+      "width": 165,
+      "height": 203,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_experimental_1978": {
+      "width": 238,
+      "height": 130,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_experimental_1986": {
+      "width": 228,
+      "height": 115,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_experimental_1998": {
+      "width": 256,
+      "height": 135,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_experimental_2015": {
+      "width": 268,
+      "height": 114,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_experimental_2035": {
+      "width": 262,
+      "height": 113,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_experimental_2060": {
+      "width": 276,
+      "height": 93,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_fighter_1978": {
+      "width": 233,
+      "height": 141,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_fighter_1986": {
+      "width": 250,
+      "height": 141,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_fighter_1998": {
+      "width": 224,
+      "height": 166,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_fighter_2015": {
+      "width": 253,
+      "height": 146,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_fighter_2035": {
+      "width": 253,
+      "height": 143,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "high_fighter_2060": {
+      "width": 279,
+      "height": 181,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_multiwing_1978": {
+      "width": 265,
+      "height": 176,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_multiwing_1986": {
+      "width": 229,
+      "height": 169,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_multiwing_1998": {
+      "width": 243,
+      "height": 174,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_multiwing_2015": {
+      "width": 256,
+      "height": 175,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_multiwing_2035": {
+      "width": 268,
+      "height": 210,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_multiwing_2060": {
+      "width": 269,
+      "height": 188,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_primary_1978": {
+      "width": 242,
+      "height": 174,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_primary_1986": {
+      "width": 231,
+      "height": 173,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_primary_1998": {
+      "width": 245,
+      "height": 185,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_primary_2015": {
+      "width": 223,
+      "height": 170,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_primary_2035": {
+      "width": 243,
+      "height": 172,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "low_primary_2060": {
+      "width": 245,
+      "height": 155,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "magnet_1978": {
+      "width": 161,
+      "height": 171,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "magnet_1986": {
+      "width": 173,
+      "height": 178,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "magnet_1998": {
+      "width": 165,
+      "height": 182,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "magnet_2015": {
+      "width": 172,
+      "height": 177,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "magnet_2035": {
+      "width": 194,
+      "height": 180,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "magnet_2060": {
+      "width": 195,
+      "height": 178,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_cargo_1978": {
+      "width": 281,
+      "height": 151,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_cargo_1986": {
+      "width": 253,
+      "height": 132,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_cargo_1998": {
+      "width": 274,
+      "height": 169,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_cargo_2015": {
+      "width": 264,
+      "height": 142,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_cargo_2035": {
+      "width": 312,
+      "height": 157,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_cargo_2060": {
+      "width": 252,
+      "height": 138,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_passenger_1978": {
+      "width": 271,
+      "height": 134,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_passenger_1986": {
+      "width": 251,
+      "height": 147,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_passenger_1998": {
+      "width": 255,
+      "height": 160,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_passenger_2015": {
+      "width": 261,
+      "height": 133,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_passenger_2035": {
+      "width": 249,
+      "height": 167,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "medium_passenger_2060": {
+      "width": 259,
+      "height": 135,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "moon": {
+      "width": 310,
+      "height": 311,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "pack": {
+      "width": 247,
+      "height": 190,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "pack_1978": {
+      "width": 218,
+      "height": 176,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "pack_1986": {
+      "width": 211,
+      "height": 176,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "pack_1998": {
+      "width": 207,
+      "height": 177,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "pack_2015": {
+      "width": 211,
+      "height": 178,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "pack_2035": {
+      "width": 213,
+      "height": 180,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "pack_2060": {
+      "width": 223,
+      "height": 179,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "pad_mars_1978": {
+      "width": 246,
+      "height": 123,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.13008130081300814
+      ]
+    },
+    "pad_mars_1986": {
+      "width": 235,
+      "height": 123,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.12195121951219512
+      ]
+    },
+    "pad_mars_1998": {
+      "width": 232,
+      "height": 125,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.112
+      ]
+    },
+    "pad_mars_2015": {
+      "width": 233,
+      "height": 125,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.12
+      ]
+    },
+    "pad_mars_2035": {
+      "width": 239,
+      "height": 132,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.10606060606060606
+      ]
+    },
+    "pad_mars_2060": {
+      "width": 242,
+      "height": 134,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.11194029850746269
+      ]
+    },
+    "pad_mars_early": {
+      "width": 667,
+      "height": 218,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.44495412844036697
+      ]
+    },
+    "pad_mars_future": {
+      "width": 704,
+      "height": 264,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.3333333333333333
+      ]
+    },
+    "pad_moon_1978": {
+      "width": 246,
+      "height": 123,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.13821138211382114
+      ]
+    },
+    "pad_moon_1986": {
+      "width": 235,
+      "height": 123,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.12195121951219512
+      ]
+    },
+    "pad_moon_1998": {
+      "width": 231,
+      "height": 125,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.12
+      ]
+    },
+    "pad_moon_2015": {
+      "width": 233,
+      "height": 123,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.12195121951219512
+      ]
+    },
+    "pad_moon_2035": {
+      "width": 239,
+      "height": 132,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.10606060606060606
+      ]
+    },
+    "pad_moon_2060": {
+      "width": 242,
+      "height": 132,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.10606060606060606
+      ]
+    },
+    "pad_moon_early": {
+      "width": 675,
+      "height": 220,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.44545454545454544
+      ]
+    },
+    "pad_moon_future": {
+      "width": 691,
+      "height": 257,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.29961089494163423
+      ]
+    },
+    "panel_1978": {
+      "width": 164,
+      "height": 92,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "panel_1986": {
+      "width": 214,
+      "height": 108,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "panel_1998": {
+      "width": 241,
+      "height": 131,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "panel_2015": {
+      "width": 282,
+      "height": 132,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "panel_2035": {
+      "width": 282,
+      "height": 161,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "panel_2060": {
+      "width": 240,
+      "height": 169,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "repair_1978": {
+      "width": 200,
+      "height": 159,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "repair_1986": {
+      "width": 197,
+      "height": 156,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "repair_1998": {
+      "width": 190,
+      "height": 162,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "repair_2015": {
+      "width": 203,
+      "height": 166,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "repair_2035": {
+      "width": 207,
+      "height": 162,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "repair_2060": {
+      "width": 208,
+      "height": 164,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "ring_1978": {
+      "width": 175,
+      "height": 222,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "ring_1986": {
+      "width": 168,
+      "height": 219,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "ring_1998": {
+      "width": 167,
+      "height": 219,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "ring_2015": {
+      "width": 185,
+      "height": 219,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "ring_2035": {
+      "width": 171,
+      "height": 219,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "ring_2060": {
+      "width": 178,
+      "height": 219,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "rock_0": {
+      "width": 341,
+      "height": 340,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "rock_1": {
+      "width": 306,
+      "height": 307,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "rock_2": {
+      "width": 304,
+      "height": 303,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "rock_3": {
+      "width": 304,
+      "height": 328,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "satellite_1978": {
+      "width": 222,
+      "height": 258,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "panelJoints": [
+        [
+          0.08,
+          0.5
+        ],
+        [
+          0.92,
+          0.5
+        ]
+      ]
+    },
+    "satellite_1986": {
+      "width": 203,
+      "height": 273,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "panelJoints": [
+        [
+          0.08,
+          0.5
+        ],
+        [
+          0.92,
+          0.5
+        ]
+      ]
+    },
+    "satellite_1998": {
+      "width": 214,
+      "height": 270,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "panelJoints": [
+        [
+          0.08,
+          0.5
+        ],
+        [
+          0.92,
+          0.5
+        ]
+      ]
+    },
+    "satellite_2015": {
+      "width": 166,
+      "height": 215,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "panelJoints": [
+        [
+          0.08,
+          0.5
+        ],
+        [
+          0.92,
+          0.5
+        ]
+      ]
+    },
+    "satellite_2035": {
+      "width": 250,
+      "height": 303,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "panelJoints": [
+        [
+          0.08,
+          0.5
+        ],
+        [
+          0.92,
+          0.5
+        ]
+      ]
+    },
+    "satellite_2060": {
+      "width": 251,
+      "height": 265,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "panelJoints": [
+        [
+          0.08,
+          0.5
+        ],
+        [
+          0.92,
+          0.5
+        ]
+      ]
+    },
+    "terrain_mars": {
+      "width": 728,
+      "height": 185,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.24864864864864866
+      ]
+    },
+    "terrain_moon": {
+      "width": 729,
+      "height": 174,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "landingAnchor": [
+        0.5,
+        0.20114942528735633
+      ]
+    }
+  }
+}

@@ -32,7 +32,7 @@ function draw(ctx,cam,r,p,art){
  for(let sy=0;sy<600;sy+=3){let wy=cam.y+(468-sy)/z,c=local?(mars?[24,13,21]:[3,8,24]):color(wy);rect(0,sy,960,3,`rgb(${c})`);}
  let bottom=cam.y-132/z,top=cam.y+468/z,left=cam.x-528/z,right=cam.x+432/z;
  for(let iy=Math.floor(bottom/150)-1;iy<=Math.ceil(top/150)+1;iy++)for(let ix=Math.floor(left/160)-1;ix<=Math.ceil(right/160)+1;ix++)for(let n=0;n<4;n++){
-  let wy=iy*150+hash(ix*7+n,iy*11+3)*150;if(!local&&wy<6200)continue;let q=project(ix*160+hash(ix*3+n+19,iy*17)*160,wy),v=145+Math.floor(hash(ix+n,iy)*75);rect(q.x,q.y,2,2,`rgb(${v-15},${v},${Math.min(255,v+25)})`);
+  let wy=iy*150+hash(ix*7+n,iy*11+3)*150;if(!local&&wy<6200)continue;let q=project(ix*160+hash(ix*3+n+19,iy*17)*160,wy),v=145+Math.floor(hash(ix+n,iy)*75)+Math.round(Math.sin((r.time||0)*1.7+hash(ix,iy+n)*6.28)*12);rect(q.x,q.y,2,2,`rgb(${v-15},${v},${Math.min(255,v+25)})`);
  }
  if(!local){let map=earthAtlas(art,p.base||0);if(map){
    let skyHeight=TOP-BASE_FLOOR;
@@ -45,16 +45,23 @@ function draw(ctx,cam,r,p,art){
    }
   }
   let floor=project(0,BOTTOM+2).y;if(floor<600){rect(0,floor,960,600-floor,'#28332d');for(let row=Math.floor((BOTTOM-bottom)/18);row>=0;row--)for(let col=Math.floor(left/24);col<=Math.ceil(right/24);col++){let q=project(col*24,BOTTOM-row*18);rect(q.x,q.y,12*z,3*z,hash(col,row)>.5?'#41473b':'#1d2927');}}
-  if(r.y>3000){let t=clamp((r.y-3000)/15000,0,1),radius=t*(12+t*54);if(radius>0){let x=790,y=100+Math.sin(r.y*.00011)*28;ctx.fillStyle='#929dab';ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();for(let i=0;i<7;i++){let a=i*2.4,d=radius*.65*hash(i,43);ctx.fillStyle='#65758c';ctx.beginPath();ctx.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,Math.max(.3,radius*.14*hash(i,24)),0,Math.PI*2);ctx.fill();}}}
+  if(r.y>3000){let t=clamp((r.y-3000)/15000,0,1),radius=t*(12+t*54);if(radius>0){let x=790,y=100+Math.sin(r.y*.00011)*28;if(!root.WorldSprites?.sprite(ctx,'moon',x,y,radius*2,radius*2)){ctx.fillStyle='#929dab';ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();}}}
+  if(root.WorldSprites?.state.ready&&r.y<900){let q=project(0,160);for(const side of [-1,1])root.WorldSprites.sprite(ctx,root.WorldSprites.id('city',p.base||0),q.x+side*480*z,q.y,440*z,undefined,{ay:1,alpha:.25});}
  }else{
   let ground=project(0,0).y,pal=mars?['#bd7951','#9c573d','#713f35','#db9c68']:['#a4a9ad','#858f9c','#616d80','#d7d5c2'];
-  if(ground<700){rect(0,ground,960,Math.max(0,680-ground),pal[1]);for(let sx=-12;sx<972;sx+=12){let wx=cam.x+(sx-528)/z,rough=Math.sin(wx*.03)*3+hash(Math.floor(wx/12),34)*5;rect(sx,ground-rough*z,13,10*z,pal[0]);}
-   for(let iy=0;iy<12;iy++)for(let ix=Math.floor(left/95)-1;ix<=Math.ceil(right/95)+1;ix++){if(hash(ix,iy+119)>.6)continue;let q=project(ix*95+hash(ix,iy)*50,-25-iy*40-hash(iy,ix)*15),rw=(6+hash(ix+9,iy)*22)*z;ctx.fillStyle=pal[2];ctx.beginPath();ctx.ellipse(q.x,q.y,rw,rw*.3,0,0,Math.PI*2);ctx.fill();rect(q.x-rw*.7,q.y+rw*.15,rw*1.4,2*z,pal[3]);}
-   let q=project(0,0);rect(q.x-80*z,q.y-4*z,160*z,7*z,pal[2]);for(let side of [-1,1]){rect(q.x+side*75*z,q.y-27*z,4*z,24*z,pal[0]);rect(q.x+side*75*z-3*z,q.y-29*z,10*z,5*z,'#8fe4ce');}
+  if(ground<700){
+   if(root.WorldSprites?.state.ready){
+    rect(0,ground+38*z,960,Math.max(0,680-ground),pal[2]);
+    const span=340; // Overlap padded alpha edges: no empty vertical tile seams.
+    for(let ix=Math.floor(left/span)-1;ix<=Math.ceil(right/span)+1;ix++){const q=project(ix*span,0),terrain=mars?'terrain_mars':'terrain_moon';root.WorldSprites.sprite(ctx,terrain,q.x,q.y,360*z,undefined,{ax:0,ay:root.WorldSprites.manifest.sprites[terrain].landingAnchor[1]});}
+    const q=project(0,0),name=root.WorldSprites.id(mars?'pad_mars':'pad_moon',p.base||0);root.WorldSprites.sprite(ctx,name,q.x,q.y,170*z,undefined,{ay:root.WorldSprites.manifest.sprites[name].landingAnchor[1]});
+    for(const side of [-1,1]){let blink=Math.floor((r.time||0)*3)%4===0;rect(q.x+side*72*z,q.y-10*z,2*z,2*z,blink?'#c9efcf':'#586f73');}
+   }else{rect(0,ground,960,Math.max(0,680-ground),pal[1]);let q=project(0,0);rect(q.x-80*z,q.y-4*z,160*z,7*z,pal[2]);}
   }
-  ctx.fillStyle=mars?'#a9b7ac':'#477cb9';ctx.beginPath();ctx.arc(780,105,33,0,Math.PI*2);ctx.fill();rect(761,93,21,9,'#9dc7c2');rect(783,110,20,6,'#78a8a8');
+  if(!root.WorldSprites?.sprite(ctx,'earth',780,105,66,66)){ctx.fillStyle='#477cb9';ctx.beginPath();ctx.arc(780,105,33,0,Math.PI*2);ctx.fill();}
  }
  ctx.restore();
 }
 root.WorldArt={draw,color};
 })(typeof window!=='undefined'?window:globalThis);
+

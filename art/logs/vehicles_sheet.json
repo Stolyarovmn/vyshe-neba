@@ -1,0 +1,35 @@
+{
+  "name": "vehicles_sheet",
+  "tool": "imagegen",
+  "source_path": "/workspace/scratch/684fa65e1f5f/generated_images/exec-899c6844-fd3c-4295-9f32-fdc22956c0e6.png",
+  "source_sha256": "03c47f2d59d11fea0b2c5ce662fcbf5e9434364aa9177a79d6b5fa304202b9a2",
+  "raw": "art/raw/vehicles_sheet.png",
+  "final": "art/gen/vehicles_sheet.png",
+  "actual_size": [
+    1536,
+    1024
+  ],
+  "alpha": {
+    "ok": true,
+    "kind": "ok",
+    "has_alpha_channel": true,
+    "clear_frac": 0.5841,
+    "soft_edge_ratio": 2.632
+  },
+  "request": {
+    "name": "vehicles_sheet",
+    "tool": "imagegen",
+    "arguments": {
+      "prompt": "STYLE BIBLE (verbatim):\nVYSHE NEBA — CANONICAL STYLE BIBLE\n\nStyle family: cohesive HD pixel-art / pixel-look game art with deliberate pixel clusters, clear silhouettes, restrained detail and a finished indie-game presentation. It must look designed, not like a filtered 3D render or generic AI illustration.\n\nShape language: large readable masses first, functional construction second, sparse small accents last. Silhouettes must remain legible at actual gameplay size and when reduced by the camera. Avoid meaningless micro-detail, decorative noise and accidental extra parts.\n\nShading: stepped pixel shading is the default. Use a small, intentional tonal ramp per material; add extra tones, controlled dithering or a limited gradient only when they clearly improve material readability. No pillow shading and no soft airbrushed volume on solid small sprites.\n\nPalette temperature: shadows are cool dark blue-gray; lit neutrals are warm off-white/metal; saturated reds, golds and cyans are accents, not mandatory identifiers. Materials may use their own palettes as long as value hierarchy and world coherence are preserved.\n\nLine: prefer dark chromatic selective outlines instead of pure black. The outer contour is usually visually about one logical pixel at runtime, may lighten or disappear on the lit side, and may deepen on the shadow side. Interior lines are sparse and functional.\n\nTexture: intentional pixel clusters, stepped diagonals and broad quiet regions. Avoid random single-pixel noise. Dithering is a deliberate material or transition tool, never a blanket texture.\n\nDetail hierarchy: keep most of the surface calm. Concentrate detail around functional mechanisms, focal points, material changes and attachment areas. Readability at gameplay size has priority over master-image detail.\n\nLighting sentence — use verbatim on every generation: One consistent key light comes from the upper-left, with warm light on upper-left planes and cool blue-gray shadow on lower-right planes; use no baked cast shadow.\n\nProjection: gameplay aircraft and moving hazards use a consistent strict side to slight 3/4 side view chosen for silhouette readability; do not mix top-down, isometric or frontal projections inside one asset family unless a specific gameplay need requires it.\n\nAlpha and composition: isolated runtime sprites use a clean transparent background, complete uncropped silhouette and enough padding for rotation or moving attachments. Solid sprite edges should be crisp and free of accidental semi-transparent fringe.\n\nSystem separation: the image contains the physical object and its materials. Code owns scale, final palette normalization, alpha cleanup, dynamic light response, glow, bloom, cast shadow, propeller motion, turbines, exhaust, afterburner, heat haze, contrails, navigation lights, particles, smoke, motion blur, trails and all other motion or effects.\n\nExclusions: no text, letters, numbers, logos, watermark, pseudo-writing, scenery, UI, baked glow, bloom, light rays, cast shadow, motion blur, particles, smoke trails, speed lines or frozen effects unless the requested asset explicitly requires an environmental element.\n\nArtistic freedom: these rules define the shared language, not a template. A deliberate deviation is allowed when it clearly produces a stronger silhouette, better material, better readability, stronger character or more coherent result. Do not preserve a rule at the expense of visibly better art; do not use “artistic freedom” to excuse technical defects or accidental generator artifacts.\n\nINPUT IMAGES:\nImage 1: style reference: match style, palette, rendering and light; do not copy composition.\n\nASSET:\nExactly 18 isolated modular rocket parts, regular 6 columns by 3 rows, wide transparent gutters and complete silhouettes. Columns evolve across stylized eras 1978,1986,1998,2015,2035,2060: riveted analog to advanced aerospace; not historical reconstruction. Row 1: six upright compact crew capsules, pointed nose, flat docking base, dark windows. Row 2: six upright main rocket core stages with nose cone, fins and complete engine bell, twice capsule height. Row 3: six short wide cylindrical detachable booster blocks with flat top, engine bells and mechanical landing struts. Upright strict side view. Warm ivory metals and natural accents; varied engineering, calm surfaces. Physical objects only, no text, effects, scene, flames, glow, shadows. Each item 15 percent cell padding. Follow style bible rather than black outlines and inconsistent lighting of reference.\n\nBACKGROUND:\nReal transparent alpha outside the asset; clean edges, no painted checkerboard, no extra ground or cast shadow.\n\nTarget canvas/aspect: 1536x1024. Keep important content within safe margins.",
+      "referenced_image_paths": [
+        "/workspace/scratch/684fa65e1f5f/vyshe-neba/outputs/rocket/dist/assets/rocket.png"
+      ],
+      "transparent_background": true
+    },
+    "requested_size": "1536x1024",
+    "prompt_file": "/workspace/scratch/684fa65e1f5f/vyshe-neba/art/prompts/vehicles_sheet.txt",
+    "pixel": true,
+    "note": "Prepared only. Codex must inspect references, call built-in imagegen directly, and import the returned local image."
+  },
+  "imported_at": "2026-10-15T21:38:31.591837+00:00"
+}

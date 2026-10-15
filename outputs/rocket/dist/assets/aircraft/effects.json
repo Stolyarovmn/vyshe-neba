@@ -1,28 +1,1094 @@
 {
-  "version": 1,
-  "coordinateSpace": "normalized sprite bounds, x right, y down",
   "profiles": {
-    "front_prop": {"propellers":[[0.93,0.52,0.20]],"engines":[],"fans":[],"navLights":[[0.20,0.25,"white"],[0.48,0.25,"red"]],"contrailPoints":[],"engineType":"piston"},
-    "twin_prop": {"propellers":[[0.69,0.60,0.16],[0.87,0.54,0.16]],"engines":[],"fans":[],"navLights":[[0.18,0.25,"white"],[0.48,0.28,"red"]],"contrailPoints":[[0.61,0.60],[0.79,0.55]],"engineType":"piston"},
-    "four_prop": {"propellers":[[0.46,0.62,0.13],[0.60,0.59,0.13],[0.73,0.56,0.13],[0.84,0.54,0.13]],"engines":[],"fans":[],"navLights":[[0.15,0.23,"white"],[0.48,0.25,"red"]],"contrailPoints":[[0.42,0.62],[0.58,0.59],[0.71,0.56],[0.82,0.54]],"engineType":"turboprop"},
-    "civil_jet": {"propellers":[],"engines":[[0.48,0.68],[0.66,0.64]],"fans":[[0.58,0.68],[0.76,0.64]],"navLights":[[0.14,0.25,"white"],[0.50,0.28,"red"],[0.82,0.42,"green"]],"contrailPoints":[[0.48,0.68],[0.66,0.64]],"engineType":"civilJet"},
-    "heavy_jet": {"propellers":[],"engines":[[0.43,0.67],[0.58,0.64],[0.70,0.61],[0.79,0.58]],"fans":[[0.50,0.67],[0.64,0.64],[0.75,0.61],[0.84,0.58]],"navLights":[[0.13,0.23,"white"],[0.50,0.27,"red"],[0.84,0.43,"green"]],"contrailPoints":[[0.43,0.67],[0.58,0.64],[0.70,0.61],[0.79,0.58]],"engineType":"civilJet"},
-    "early_jet": {"propellers":[],"engines":[[0.08,0.55]],"fans":[],"navLights":[[0.22,0.24,"white"],[0.48,0.30,"red"]],"contrailPoints":[[0.08,0.55]],"engineType":"earlyJet"},
-    "fighter_jet": {"propellers":[],"engines":[[0.07,0.55]],"fans":[],"navLights":[[0.22,0.22,"white"],[0.48,0.31,"red"],[0.72,0.47,"green"]],"contrailPoints":[[0.07,0.55]],"engineType":"fighterJet"},
-    "fighter_ab": {"propellers":[],"engines":[[0.07,0.49],[0.08,0.61]],"fans":[],"navLights":[[0.21,0.20,"white"],[0.48,0.30,"red"],[0.74,0.47,"green"]],"contrailPoints":[[0.07,0.49],[0.08,0.61]],"engineType":"modernAfterburner"},
-    "rocket_warm": {"propellers":[],"engines":[[0.06,0.55]],"fans":[],"navLights":[[0.24,0.23,"white"]],"contrailPoints":[[0.06,0.55]],"engineType":"rocketWarm"},
-    "rocket_blue": {"propellers":[],"engines":[[0.06,0.50],[0.08,0.61]],"fans":[],"navLights":[[0.24,0.20,"white"],[0.50,0.30,"red"]],"contrailPoints":[[0.06,0.50],[0.08,0.61]],"engineType":"plasmaBlue"}
+    "low_primary_1978": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.94,
+          0.59,
+          0.23
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_1986": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.94,
+          0.59,
+          0.23
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_1998": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.94,
+          0.59,
+          0.23
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_2015": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.94,
+          0.59,
+          0.23
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_2035": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.94,
+          0.59,
+          0.23
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_2060": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.94,
+          0.59,
+          0.23
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_1978": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.93,
+          0.52,
+          0.25
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_1986": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.93,
+          0.52,
+          0.25
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_1998": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.93,
+          0.52,
+          0.25
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_2015": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.93,
+          0.52,
+          0.25
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_2035": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.8,
+          0.12,
+          0.16
+        ],
+        [
+          0.95,
+          0.65,
+          0.16
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_2060": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.51,
+          0.25,
+          0.16
+        ],
+        [
+          0.9,
+          0.25,
+          0.16
+        ],
+        [
+          0.57,
+          0.75,
+          0.16
+        ],
+        [
+          0.95,
+          0.75,
+          0.16
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_passenger_1978": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.51,
+          0.78,
+          0.2
+        ],
+        [
+          0.72,
+          0.7,
+          0.2
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ]
+    },
+    "medium_passenger_1986": {
+      "engineType": "civilJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.38,
+          0.79
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ],
+      "fans": [
+        [
+          0.52,
+          0.79
+        ]
+      ]
+    },
+    "medium_passenger_1998": {
+      "engineType": "civilJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.38,
+          0.79
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ],
+      "fans": [
+        [
+          0.52,
+          0.79
+        ]
+      ]
+    },
+    "medium_passenger_2015": {
+      "engineType": "civilJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.38,
+          0.79
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ],
+      "fans": [
+        [
+          0.52,
+          0.79
+        ]
+      ]
+    },
+    "medium_passenger_2035": {
+      "engineType": "civilJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.38,
+          0.79
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ],
+      "fans": [
+        [
+          0.52,
+          0.79
+        ]
+      ]
+    },
+    "medium_passenger_2060": {
+      "engineType": "civilJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.38,
+          0.79
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ],
+      "fans": [
+        [
+          0.52,
+          0.79
+        ]
+      ]
+    },
+    "medium_cargo_1978": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.51,
+          0.78,
+          0.2
+        ],
+        [
+          0.72,
+          0.7,
+          0.2
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ]
+    },
+    "medium_cargo_1986": {
+      "engineType": "piston",
+      "propellers": [
+        [
+          0.51,
+          0.78,
+          0.2
+        ],
+        [
+          0.72,
+          0.7,
+          0.2
+        ]
+      ],
+      "engines": [],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ]
+    },
+    "medium_cargo_1998": {
+      "engineType": "civilJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.38,
+          0.79
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ],
+      "fans": [
+        [
+          0.52,
+          0.79
+        ]
+      ]
+    },
+    "medium_cargo_2015": {
+      "engineType": "civilJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.38,
+          0.79
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ],
+      "fans": [
+        [
+          0.52,
+          0.79
+        ]
+      ]
+    },
+    "medium_cargo_2035": {
+      "engineType": "civilJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.38,
+          0.79
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ],
+      "fans": [
+        [
+          0.52,
+          0.79
+        ]
+      ]
+    },
+    "medium_cargo_2060": {
+      "engineType": "civilJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.38,
+          0.79
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.37,
+          0.8
+        ]
+      ],
+      "fans": [
+        [
+          0.52,
+          0.79
+        ]
+      ]
+    },
+    "high_fighter_1978": {
+      "engineType": "earlyJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_fighter_1986": {
+      "engineType": "fighterJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_fighter_1998": {
+      "engineType": "fighterJet",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_fighter_2015": {
+      "engineType": "modernAfterburner",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_fighter_2035": {
+      "engineType": "modernAfterburner",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_fighter_2060": {
+      "engineType": "modernAfterburner",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_experimental_1978": {
+      "engineType": "rocketWarm",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_experimental_1986": {
+      "engineType": "rocketWarm",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_experimental_1998": {
+      "engineType": "modernAfterburner",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_experimental_2015": {
+      "engineType": "modernAfterburner",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_experimental_2035": {
+      "engineType": "modernAfterburner",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    },
+    "high_experimental_2060": {
+      "engineType": "plasmaBlue",
+      "propellers": [],
+      "engines": [
+        [
+          0.05,
+          0.5
+        ]
+      ],
+      "navLights": [
+        [
+          0.34,
+          0.8,
+          "red"
+        ],
+        [
+          0.38,
+          0.24,
+          "green"
+        ]
+      ],
+      "contrailPoints": [
+        [
+          0.04,
+          0.53
+        ]
+      ]
+    }
   },
   "sprites": {
-    "low_primary_1978":"front_prop","low_multiwing_1978":"front_prop",
-    "low_primary_1986":"front_prop","low_multiwing_1986":"front_prop",
-    "low_primary_1998":"front_prop","low_multiwing_1998":"front_prop",
-    "low_primary_2015":"front_prop","low_multiwing_2015":"front_prop",
-    "low_primary_2035":"front_prop","low_multiwing_2035":"front_prop",
-    "low_primary_2060":"front_prop","low_multiwing_2060":"front_prop",
-    "medium_passenger_1978":"front_prop","medium_passenger_1986":"twin_prop","medium_passenger_1998":"twin_prop","medium_passenger_2015":"civil_jet","medium_passenger_2035":"civil_jet","medium_passenger_2060":"civil_jet",
-    "medium_cargo_1978":"front_prop","medium_cargo_1986":"twin_prop","medium_cargo_1998":"twin_prop","medium_cargo_2015":"four_prop","medium_cargo_2035":"civil_jet","medium_cargo_2060":"heavy_jet",
-    "high_fighter_1978":"front_prop","high_fighter_1986":"front_prop","high_fighter_1998":"early_jet","high_fighter_2015":"fighter_jet","high_fighter_2035":"fighter_ab","high_fighter_2060":"fighter_ab",
-    "high_experimental_1978":"front_prop","high_experimental_1986":"early_jet","high_experimental_1998":"rocket_warm","high_experimental_2015":"rocket_warm","high_experimental_2035":"fighter_ab","high_experimental_2060":"rocket_blue"
+    "low_primary_1978": "low_primary_1978",
+    "low_primary_1986": "low_primary_1986",
+    "low_primary_1998": "low_primary_1998",
+    "low_primary_2015": "low_primary_2015",
+    "low_primary_2035": "low_primary_2035",
+    "low_primary_2060": "low_primary_2060",
+    "low_multiwing_1978": "low_multiwing_1978",
+    "low_multiwing_1986": "low_multiwing_1986",
+    "low_multiwing_1998": "low_multiwing_1998",
+    "low_multiwing_2015": "low_multiwing_2015",
+    "low_multiwing_2035": "low_multiwing_2035",
+    "low_multiwing_2060": "low_multiwing_2060",
+    "medium_passenger_1978": "medium_passenger_1978",
+    "medium_passenger_1986": "medium_passenger_1986",
+    "medium_passenger_1998": "medium_passenger_1998",
+    "medium_passenger_2015": "medium_passenger_2015",
+    "medium_passenger_2035": "medium_passenger_2035",
+    "medium_passenger_2060": "medium_passenger_2060",
+    "medium_cargo_1978": "medium_cargo_1978",
+    "medium_cargo_1986": "medium_cargo_1986",
+    "medium_cargo_1998": "medium_cargo_1998",
+    "medium_cargo_2015": "medium_cargo_2015",
+    "medium_cargo_2035": "medium_cargo_2035",
+    "medium_cargo_2060": "medium_cargo_2060",
+    "high_fighter_1978": "high_fighter_1978",
+    "high_fighter_1986": "high_fighter_1986",
+    "high_fighter_1998": "high_fighter_1998",
+    "high_fighter_2015": "high_fighter_2015",
+    "high_fighter_2035": "high_fighter_2035",
+    "high_fighter_2060": "high_fighter_2060",
+    "high_experimental_1978": "high_experimental_1978",
+    "high_experimental_1986": "high_experimental_1986",
+    "high_experimental_1998": "high_experimental_1998",
+    "high_experimental_2015": "high_experimental_2015",
+    "high_experimental_2035": "high_experimental_2035",
+    "high_experimental_2060": "high_experimental_2060"
   }
 }
