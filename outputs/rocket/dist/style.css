@@ -1,0 +1,11 @@
+*{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;background:#080f19;overflow:hidden;overscroll-behavior:none;touch-action:none}#game{position:fixed;left:50%;top:50%;width:min(100vw,160vh);aspect-ratio:8/5;transform:translate(-50%,-50%);transform-origin:center;box-shadow:0 0 100px #19394544;background:#080f19}canvas{width:100%;height:100%;display:block;image-rendering:auto;outline:none;touch-action:none;-webkit-user-drag:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}#touch{display:none;position:absolute;bottom:9px;right:12px;gap:5px;pointer-events:none}#touch button,#fullscreenToggle{pointer-events:auto;touch-action:none;border:2px solid #6b9b9e;background:#142c39ed;color:#e1e9d3;font:bold 12px monospace;padding:6px;box-shadow:2px 2px #050e18;min-height:34px;min-width:34px}#touch button:disabled{opacity:.35}#fullscreenToggle{position:absolute;left:70.5%;top:3.5%;font-size:20px;line-height:1;padding:3px}html:fullscreen,html:-webkit-full-screen{width:100%;height:100%;background:#080f19}@media(pointer:coarse){#touch.flight{display:flex}}@media(prefers-reduced-motion:reduce){#game{box-shadow:none}}
+
+#fullscreenToggle{left:88%;top:2%;border:0;background:#0b1b29c9;box-shadow:none;display:grid;place-items:center}#touch button{border:0;background:#0b1b29c9;box-shadow:none}#touch button:disabled{display:none}#touch svg,#fullscreenToggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter}
+
+/* Чистая типографика и одинаковая пластика экранных пиктограмм. */
+body,button{font-family:"Segoe UI",Arial,sans-serif;font-weight:600;text-shadow:none}
+#touch button,#fullscreenToggle{font-family:"Segoe UI",Arial,sans-serif;font-weight:600;text-shadow:none}
+#touch svg,#fullscreenToggle svg{stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* Все экранные кнопки используют одну округлую форму. */
+#touch button,#fullscreenToggle{border-radius:11px;border:1px solid #8fb3bd40;background:#102735d9;color:#e9e7d6}#touch button:active,#fullscreenToggle:active{background:#284c5de8;border-color:#9ddfd0aa}

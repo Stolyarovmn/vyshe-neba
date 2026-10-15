@@ -1,0 +1,16 @@
+{
+  "name": "vyshe-neba",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Выше неба — пиксельная игра про ракету и развитие космодрома",
+  "scripts": {
+    "build": "node outputs/rocket/build.cjs",
+    "test": "node outputs/rocket/verify.cjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
