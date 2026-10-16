@@ -1,0 +1,27 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=path.join(__dirname,'dist'),src=fs.readFileSync(path.join(root,'infrastructure.js'),'utf8');
+new vm.Script(src,{filename:'infrastructure.js'});
+const noop=()=>{};
+const ctx=new Proxy({roundRect:noop,beginPath:noop,fill:noop,stroke:noop,moveTo:noop,lineTo:noop,arc:noop,drawImage:noop,save:noop,restore:noop,setTransform:noop,fillRect:noop,fillText:noop,translate:noop,scale:noop,rotate:noop},{get:(o,k)=>k in o?o[k]:0,set:(o,k,v)=>(o[k]=v,true)});
+const canvas={getContext:()=>ctx,addEventListener:noop,getBoundingClientRect:()=>({left:0,top:0,right:960,width:960,height:600})};
+const profile={location:'earth',base:0,coins:100000,stats:{flights:0,earned:0},upgrades:{fuel:0,engine:0,legs:0,reserve:0,hull:0,magnet:0,fins:0,parachute:0,booster:0}};
+const engine={__infraHooked:false,UPGRADES:Object.keys(profile.upgrades).map(id=>[id,id,'',100,1.1,20]),upgradeLimit:()=>20,rocket:()=>({stages:[{fuel:100,maxFuel:100}],stageIndex:0,fuel:100,maxFuel:100,time:0,boostHeat:0,boosting:false}),step:(r,p,input,dt)=>{r.time+=dt;r.boostHeat+=(r.boosting?.24:-.18)*dt;return input;},landing:()=>({safe:false,perfect:false,pad:true}),rebuildCost:()=>100,price:()=>100,purchase:()=>false};
+const content={shop:[['x','X','',100]],missions:[['m','M','',100,()=>true]]};
+const game={profile,screen:'home',rocket:null,result:null,objects:[],camera:{zoom:1},project:(x,y)=>({x:480+x,y:468-y}),save:noop};
+let rafCb=null;
+const sandbox={window:{Game:game,RocketEngine:engine,GameContent:content,visualViewport:{width:960,height:600},addEventListener:noop},document:{getElementById:()=>canvas},Image:class{constructor(){this.complete=false;this.naturalWidth=0;}},performance:{now:()=>0},requestAnimationFrame:cb=>{rafCb=cb;},matchMedia:()=>({matches:false}),innerWidth:960,innerHeight:600,console,Math};
+sandbox.window.window=sandbox.window;sandbox.window.document=sandbox.document;
+vm.runInNewContext(src,sandbox,{filename:'infrastructure.js'});
+const I=sandbox.window.BaseInfrastructure;assert(I,'BaseInfrastructure export missing');
+assert.equal(I.definitions.length,14,'expected 14 infrastructure objects');
+assert.equal(new Set(I.definitions.map(x=>x.id)).size,14,'object ids must be unique');
+assert.equal(I.slots.length,16,'expected 16 placement slots');
+for(const d of I.definitions){assert(d.cost>0,d.id+' cost');assert(d.zone.length,d.id+' zones');assert(I.purchase(d.id),'purchase failed: '+d.id);assert(I.state().layout[d.id],'no auto placement: '+d.id);}
+assert.equal(I.state().owned.length,14,'all objects should persist as owned');
+if(rafCb)rafCb(16);
+const r=engine.rocket(profile);assert(r.maxFuel>100,'fuel complex must increase starting fuel');
+assert(engine.rebuildCost(profile)<100,'rescue/recovery must lower rebuild cost');
+assert(engine.price(profile,'engine')<100,'factory must lower upgrade price');
+assert(content.shop[0][3]<100,'logistics must lower consumable price');
+assert(content.missions[0][3]>100,'control center must increase contract reward');
+console.log('Infrastructure QA: 14 objects, placement, persistence and economic hooks OK.');
