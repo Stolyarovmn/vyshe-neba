@@ -1,0 +1,30 @@
+{
+  "id": "flight_simulator",
+  "asset_code": "W04",
+  "type": "workshop_placeable",
+  "runtime_footprint_lp": [172, 160],
+  "placement_anchor_lp": {"x": 86, "y": 156, "kind": "bottom-center"},
+  "placement_sockets": ["floor", "floor_front"],
+  "value": "Capability",
+  "cost_tier": "XL",
+  "era_sprites": [
+    {"era":"E0","year":1978,"file":"e0_1978.png","lineage":"open gimbal chair + mechanical instruments"},
+    {"era":"E1","year":1986,"file":"e1_1986.png","lineage":"training cockpit + twin powered supports"},
+    {"era":"E2","year":1998,"file":"e2_1998.png","lineage":"CRT cockpit + heavy motion platform"},
+    {"era":"E3","year":2015,"file":"e3_2015.png","lineage":"panoramic cockpit + electric actuators"},
+    {"era":"E4","year":2035,"file":"e4_2035.png","lineage":"VR robotic capsule + multi-actuator platform"},
+    {"era":"E5","year":2060,"file":"e5_2060.png","lineage":"adaptive simulation cell + precision multi-axis support"}
+  ],
+  "parts": [
+    {"id":"base","motion":"static","pivot_status":"not required"},
+    {"id":"pod","motion":"rigid-body","pivot_intent":"gimbal center","measured_pivot":null},
+    {"id":"actuator_left","motion":"linear","pivot_intent":"base-left to pod","measured_pivot":null},
+    {"id":"actuator_right","motion":"linear","pivot_intent":"base-right to pod","measured_pivot":null},
+    {"id":"canopy","motion":"state","pivot_intent":"hinge","measured_pivot":null}
+  ],
+  "status": {
+    "anchor_art": "approved_and_normalized",
+    "runtime_sprite": "ready_as_static_anchor",
+    "rig_parts": "pending_isolated_part_generation_and_measured_pivots"
+  }
+}
