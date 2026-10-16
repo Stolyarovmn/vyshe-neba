@@ -1,0 +1,330 @@
+{
+  "version": 1,
+  "prep": "tools/ref2game/prep.py",
+  "sprites": {
+    "low_primary_1978": {
+      "source": "art/gen/low_primary_1978.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_primary_1978.png",
+      "size": [
+        247,
+        177
+      ],
+      "preparedSha256": "2744c59b7181d657e3a50e0914c9e4f09265d63437686ab294746c745c3b548d"
+    },
+    "low_primary_1986": {
+      "source": "art/gen/low_primary_1986.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_primary_1986.png",
+      "size": [
+        236,
+        178
+      ],
+      "preparedSha256": "0dcdaa44c15b14df4e6f2216466bd0b947b0971f3ce7d98deaeeba6ac20414d2"
+    },
+    "low_primary_1998": {
+      "source": "art/gen/low_primary_1998.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_primary_1998.png",
+      "size": [
+        247,
+        187
+      ],
+      "preparedSha256": "3f99214021ed80f0fe14852ffbb2a3eaf0b243d8c49e84324d7163ea8c026de8"
+    },
+    "low_primary_2015": {
+      "source": "art/gen/low_primary_2015.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_primary_2015.png",
+      "size": [
+        226,
+        177
+      ],
+      "preparedSha256": "82a6c436c4054f6b21fe61c785dca5368cdeb8a437825150be180e032c2f5efc"
+    },
+    "low_primary_2035": {
+      "source": "art/gen/low_primary_2035.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_primary_2035.png",
+      "size": [
+        248,
+        177
+      ],
+      "preparedSha256": "3694039acf5f0bdae31e8c755ba7817ef471a3ac6b2ece9717d28bc49c49f5f2"
+    },
+    "low_primary_2060": {
+      "source": "art/gen/low_primary_2060.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_primary_2060.png",
+      "size": [
+        245,
+        155
+      ],
+      "preparedSha256": "576782a54ea9506b3405b70d007ffccb6f5fd5f17399c3e15dff0d542e4f9253"
+    },
+    "low_multiwing_1978": {
+      "source": "art/gen/low_multiwing_1978.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_multiwing_1978.png",
+      "size": [
+        262,
+        189
+      ],
+      "preparedSha256": "3bcf20603343337ed8c4b053aa86d8d04a2b57ea668a01a0b3eadf359e618dbb"
+    },
+    "low_multiwing_1986": {
+      "source": "art/gen/low_multiwing_1986.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_multiwing_1986.png",
+      "size": [
+        232,
+        189
+      ],
+      "preparedSha256": "fc46c26fe9c2eebb818997e4dff125afaa519cf49a39e70ff803a5ce8fd7fa63"
+    },
+    "low_multiwing_1998": {
+      "source": "art/gen/low_multiwing_1998.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_multiwing_1998.png",
+      "size": [
+        247,
+        189
+      ],
+      "preparedSha256": "0ed776587f183e03084351065d73b6a375ba463c661ea89c45d8196337a13579"
+    },
+    "low_multiwing_2015": {
+      "source": "art/gen/low_multiwing_2015.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_multiwing_2015.png",
+      "size": [
+        256,
+        190
+      ],
+      "preparedSha256": "5188891174bdd5c0fc48a697dd28cd1e433214d2920fa0b15e081fddd1c46341"
+    },
+    "low_multiwing_2035": {
+      "source": "art/gen/low_multiwing_2035.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_multiwing_2035.png",
+      "size": [
+        272,
+        211
+      ],
+      "preparedSha256": "1e7607b795412d8ef954e35b51bbd3248d2190818eb55d81bd9fd6ed9f7950a4"
+    },
+    "low_multiwing_2060": {
+      "source": "art/gen/low_multiwing_2060.png",
+      "prepared": "outputs/rocket/dist/assets/world/low_multiwing_2060.png",
+      "size": [
+        261,
+        199
+      ],
+      "preparedSha256": "9f1f4b57e625ea6ce87a5d5b9682b1248e5265d0230dfaff627922579970c996"
+    },
+    "medium_passenger_1978": {
+      "source": "art/gen/medium_passenger_1978.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_passenger_1978.png",
+      "size": [
+        740,
+        327
+      ],
+      "preparedSha256": "9d8dac832f76d3c7924e6f3948beed45f71cd2b8081e203ddbbdc3edd2d71d8a"
+    },
+    "medium_passenger_1986": {
+      "source": "art/gen/medium_passenger_1986.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_passenger_1986.png",
+      "size": [
+        251,
+        147
+      ],
+      "preparedSha256": "3d73719405b3c42e7088e7c34fa3e31d6436169b75f14b024b120e2b2ab8a20e"
+    },
+    "medium_passenger_1998": {
+      "source": "art/gen/medium_passenger_1998.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_passenger_1998.png",
+      "size": [
+        255,
+        160
+      ],
+      "preparedSha256": "1df8d2fbcbded0367cfeb260d43a5d723ff1ba00d50eb24f632ab55cba2c6822"
+    },
+    "medium_passenger_2015": {
+      "source": "art/gen/medium_passenger_2015.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_passenger_2015.png",
+      "size": [
+        261,
+        133
+      ],
+      "preparedSha256": "79f368efb1ebb83cd0c3d00b4f0a82c6e9f5ef25197654743f2666afb17abd4d"
+    },
+    "medium_passenger_2035": {
+      "source": "art/gen/medium_passenger_2035.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_passenger_2035.png",
+      "size": [
+        249,
+        167
+      ],
+      "preparedSha256": "21925ff6974085178b1e9c9554de8c4344b4c52bfbc03e353f18d29d3f3b30da"
+    },
+    "medium_passenger_2060": {
+      "source": "art/gen/medium_passenger_2060.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_passenger_2060.png",
+      "size": [
+        259,
+        135
+      ],
+      "preparedSha256": "b59983fa9abda7a34127a65765bf6c33f547bfb45c70004a195fa18e5498e834"
+    },
+    "medium_cargo_1978": {
+      "source": "art/gen/medium_cargo_1978.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_cargo_1978.png",
+      "size": [
+        741,
+        363
+      ],
+      "preparedSha256": "2c9f9905f183ed331956fe0d4f3b7fabd3f9ebaefbce62fdfd5c3ad5e6c4e9fe"
+    },
+    "medium_cargo_1986": {
+      "source": "art/gen/medium_cargo_1986.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_cargo_1986.png",
+      "size": [
+        650,
+        333
+      ],
+      "preparedSha256": "48779407cf78b60786a7c09206702463a0b29ea60ee8ea6c62fa33a4bdac652f"
+    },
+    "medium_cargo_1998": {
+      "source": "art/gen/medium_cargo_1998.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_cargo_1998.png",
+      "size": [
+        274,
+        169
+      ],
+      "preparedSha256": "930402a8a8cc844f2e94c2f065896da6bd8b733bc6a274de2a13588b37ec9e6c"
+    },
+    "medium_cargo_2015": {
+      "source": "art/gen/medium_cargo_2015.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_cargo_2015.png",
+      "size": [
+        264,
+        142
+      ],
+      "preparedSha256": "b549befd0f0988bfdd8423b9d3b10cd2f38eaf73b477212c95eef6b9e1c1a77c"
+    },
+    "medium_cargo_2035": {
+      "source": "art/gen/medium_cargo_2035.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_cargo_2035.png",
+      "size": [
+        312,
+        157
+      ],
+      "preparedSha256": "4623830c7c05895deb566c7fc5dce9d822a97741976b6814c1f74126f561a7b3"
+    },
+    "medium_cargo_2060": {
+      "source": "art/gen/medium_cargo_2060.png",
+      "prepared": "outputs/rocket/dist/assets/world/medium_cargo_2060.png",
+      "size": [
+        252,
+        138
+      ],
+      "preparedSha256": "ceeb15cd36561c281278cda1432fb6f5ff4515faaf0ae4f6fd2c01755fc4adf5"
+    },
+    "high_fighter_1978": {
+      "source": "art/gen/high_fighter_1978.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_fighter_1978.png",
+      "size": [
+        233,
+        141
+      ],
+      "preparedSha256": "88d06f47c896b4d3a4d010c317b7fa0e40c799540085c1b907a656969b2e0c17"
+    },
+    "high_fighter_1986": {
+      "source": "art/gen/high_fighter_1986.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_fighter_1986.png",
+      "size": [
+        250,
+        141
+      ],
+      "preparedSha256": "a0a344622dc95be957602eeab738680026f49f92f0c3970ac27acce6acf564b3"
+    },
+    "high_fighter_1998": {
+      "source": "art/gen/high_fighter_1998.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_fighter_1998.png",
+      "size": [
+        224,
+        166
+      ],
+      "preparedSha256": "93ab0c6fb0fe9c4341cd4c8fcfe371e6a8aaad53faf4ebc3d7f98dd8f149f38c"
+    },
+    "high_fighter_2015": {
+      "source": "art/gen/high_fighter_2015.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_fighter_2015.png",
+      "size": [
+        253,
+        146
+      ],
+      "preparedSha256": "75942a50b4e29f45724832b3d1e3353b26f6fdc04d1984c658220c92afc62fbc"
+    },
+    "high_fighter_2035": {
+      "source": "art/gen/high_fighter_2035.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_fighter_2035.png",
+      "size": [
+        253,
+        143
+      ],
+      "preparedSha256": "67846cc4e7c7d5acc0b38da29b06578909251bd403d881f5d9f3cd3594fdb8eb"
+    },
+    "high_fighter_2060": {
+      "source": "art/gen/high_fighter_2060.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_fighter_2060.png",
+      "size": [
+        279,
+        181
+      ],
+      "preparedSha256": "7e3cfd2d57e2338a5ea9d5e1a5054410c27bc8dda2df1dae073215e8b8ca0921"
+    },
+    "high_experimental_1978": {
+      "source": "art/gen/high_experimental_1978.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_experimental_1978.png",
+      "size": [
+        238,
+        130
+      ],
+      "preparedSha256": "65dbb7c0795b178f0d70d11b680c344ee184592faa0746db2e30ac4a089eff6c"
+    },
+    "high_experimental_1986": {
+      "source": "art/gen/high_experimental_1986.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_experimental_1986.png",
+      "size": [
+        228,
+        115
+      ],
+      "preparedSha256": "54687ce9f352d9007e88c3c903d2ad7305acbb433a49c21bac010a76e5aae309"
+    },
+    "high_experimental_1998": {
+      "source": "art/gen/high_experimental_1998.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_experimental_1998.png",
+      "size": [
+        256,
+        135
+      ],
+      "preparedSha256": "c82227a938f173d3e221ae22bb04c23e8ff76103cf90c6c0ddc824824930a06b"
+    },
+    "high_experimental_2015": {
+      "source": "art/gen/high_experimental_2015.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_experimental_2015.png",
+      "size": [
+        268,
+        114
+      ],
+      "preparedSha256": "6a434d4357bb70ea60c9b99b5b5e066510a3c8c3683bf11d21569735469ef9c4"
+    },
+    "high_experimental_2035": {
+      "source": "art/gen/high_experimental_2035.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_experimental_2035.png",
+      "size": [
+        262,
+        113
+      ],
+      "preparedSha256": "2c592270df46d9c3676abf171837d51752368e094f8a90cd63a4bc5f916d924e"
+    },
+    "high_experimental_2060": {
+      "source": "art/gen/high_experimental_2060.png",
+      "prepared": "outputs/rocket/dist/assets/world/high_experimental_2060.png",
+      "size": [
+        276,
+        93
+      ],
+      "preparedSha256": "5e019b92d24b8bd16e4bef15cfdd0f2cb4af46a5d56327b44e1207eb7da42f58"
+    }
+  }
+}

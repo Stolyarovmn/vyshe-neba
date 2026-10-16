@@ -6,3 +6,8 @@ work/
 .DS_Store
 Thumbs.db
 outputs/rocket/Космодром.png
+outputs/Космодром.png
+outputs/Выше неба.html
+__pycache__/
+*.pyc
+

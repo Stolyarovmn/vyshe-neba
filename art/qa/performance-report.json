@@ -1,0 +1,18 @@
+{
+  "viewport": [
+    1440,
+    900
+  ],
+  "frames": 241,
+  "elapsedMs": 4011.3000000000466,
+  "fps": 60.08027322812983,
+  "p95FrameMs": 16.700000000000728,
+  "screen": "flight",
+  "height": 1154.6597125813548,
+  "canvas": [
+    1920,
+    1200
+  ],
+  "errors": [],
+  "meets55fps": true
+}

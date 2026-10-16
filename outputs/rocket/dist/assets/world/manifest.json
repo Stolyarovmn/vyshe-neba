@@ -796,24 +796,24 @@
       ]
     },
     "low_multiwing_1978": {
-      "width": 265,
-      "height": 176,
+      "width": 262,
+      "height": 189,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "low_multiwing_1986": {
-      "width": 229,
-      "height": 169,
+      "width": 232,
+      "height": 189,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "low_multiwing_1998": {
-      "width": 243,
-      "height": 174,
+      "width": 247,
+      "height": 189,
       "anchor": [
         0.5,
         0.5
@@ -821,63 +821,63 @@
     },
     "low_multiwing_2015": {
       "width": 256,
-      "height": 175,
+      "height": 190,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "low_multiwing_2035": {
-      "width": 268,
-      "height": 210,
+      "width": 272,
+      "height": 211,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "low_multiwing_2060": {
-      "width": 269,
-      "height": 188,
+      "width": 261,
+      "height": 199,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "low_primary_1978": {
-      "width": 242,
-      "height": 174,
+      "width": 247,
+      "height": 177,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "low_primary_1986": {
-      "width": 231,
-      "height": 173,
+      "width": 236,
+      "height": 178,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "low_primary_1998": {
-      "width": 245,
-      "height": 185,
+      "width": 247,
+      "height": 187,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "low_primary_2015": {
-      "width": 223,
-      "height": 170,
+      "width": 226,
+      "height": 177,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "low_primary_2035": {
-      "width": 243,
-      "height": 172,
+      "width": 248,
+      "height": 177,
       "anchor": [
         0.5,
         0.5
@@ -940,16 +940,16 @@
       ]
     },
     "medium_cargo_1978": {
-      "width": 281,
-      "height": 151,
+      "width": 741,
+      "height": 363,
       "anchor": [
         0.5,
         0.5
       ]
     },
     "medium_cargo_1986": {
-      "width": 253,
-      "height": 132,
+      "width": 650,
+      "height": 333,
       "anchor": [
         0.5,
         0.5
@@ -988,8 +988,8 @@
       ]
     },
     "medium_passenger_1978": {
-      "width": 271,
-      "height": 134,
+      "width": 740,
+      "height": 327,
       "anchor": [
         0.5,
         0.5

@@ -31,9 +31,9 @@ function draw(ctx,cam,r,p,art){
  ctx.save();ctx.globalAlpha=1;ctx.imageSmoothingEnabled=false;
  for(let sy=0;sy<600;sy+=3){let wy=cam.y+(468-sy)/z,c=local?(mars?[24,13,21]:[3,8,24]):color(wy);rect(0,sy,960,3,`rgb(${c})`);}
  let bottom=cam.y-132/z,top=cam.y+468/z,left=cam.x-528/z,right=cam.x+432/z;
- for(let iy=Math.floor(bottom/150)-1;iy<=Math.ceil(top/150)+1;iy++)for(let ix=Math.floor(left/160)-1;ix<=Math.ceil(right/160)+1;ix++)for(let n=0;n<4;n++){
+ const stars=()=>{for(let iy=Math.floor(bottom/150)-1;iy<=Math.ceil(top/150)+1;iy++)for(let ix=Math.floor(left/160)-1;ix<=Math.ceil(right/160)+1;ix++)for(let n=0;n<4;n++){
   let wy=iy*150+hash(ix*7+n,iy*11+3)*150;if(!local&&wy<6200)continue;let q=project(ix*160+hash(ix*3+n+19,iy*17)*160,wy),v=145+Math.floor(hash(ix+n,iy)*75)+Math.round(Math.sin((r.time||0)*1.7+hash(ix,iy+n)*6.28)*12);rect(q.x,q.y,2,2,`rgb(${v-15},${v},${Math.min(255,v+25)})`);
- }
+ }};
  if(!local){let map=earthAtlas(art,p.base||0);if(map){
    let skyHeight=TOP-BASE_FLOOR;
    for(let band=Math.floor((left-LEFT)/WIDTH);band<=Math.floor((right-LEFT)/WIDTH);band++){
@@ -45,9 +45,12 @@ function draw(ctx,cam,r,p,art){
    }
   }
   let floor=project(0,BOTTOM+2).y;if(floor<600){rect(0,floor,960,600-floor,'#28332d');for(let row=Math.floor((BOTTOM-bottom)/18);row>=0;row--)for(let col=Math.floor(left/24);col<=Math.ceil(right/24);col++){let q=project(col*24,BOTTOM-row*18);rect(q.x,q.y,12*z,3*z,hash(col,row)>.5?'#41473b':'#1d2927');}}
+  // Stars follow the opaque atmosphere layer, but precede physical celestial bodies.
+  stars();
   if(r.y>3000){let t=clamp((r.y-3000)/15000,0,1),radius=t*(12+t*54);if(radius>0){let x=790,y=100+Math.sin(r.y*.00011)*28;if(!root.WorldSprites?.sprite(ctx,'moon',x,y,radius*2,radius*2)){ctx.fillStyle='#929dab';ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();}}}
   if(root.WorldSprites?.state.ready&&r.y<900){let q=project(0,160);for(const side of [-1,1])root.WorldSprites.sprite(ctx,root.WorldSprites.id('city',p.base||0),q.x+side*480*z,q.y,440*z,undefined,{ay:1,alpha:.25});}
  }else{
+  stars();
   let ground=project(0,0).y,pal=mars?['#bd7951','#9c573d','#713f35','#db9c68']:['#a4a9ad','#858f9c','#616d80','#d7d5c2'];
   if(ground<700){
    if(root.WorldSprites?.state.ready){

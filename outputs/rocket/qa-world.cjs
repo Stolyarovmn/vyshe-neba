@@ -4,7 +4,7 @@ const chromium=require('./browser.cjs');
 const page=await b.newPage({viewport:{width:1440,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
 await page.addInitScript(()=>{window.requestAnimationFrame=()=>0;});
 await page.goto(pathToFileURL(path.resolve(__dirname,'../Выше неба.html')).href);
-await page.evaluate(()=>WorldSprites.ready);await page.waitForFunction(()=>AircraftTraffic.state.zipReady&&AircraftTraffic.state.dataReady);
+await page.evaluate(()=>WorldSprites.ready);await page.waitForFunction(()=>AircraftTraffic.state.zipReady&&AircraftTraffic.state.dataReady,null,{polling:50});
 assert.equal(await page.evaluate(()=>WorldSprites.qa().count),164);
 const anchors=await page.evaluate(()=>Object.entries(WorldSprites.manifest.sprites).filter(([n])=>n.startsWith('pad_')||n.startsWith('terrain_')).every(([n,m])=>m.landingAnchor&&m.landingAnchor[1]>=0&&m.landingAnchor[1]<1));assert(anchors,'Landing surfaces carry measured contact anchors');assert.equal(await page.evaluate(()=>AircraftTraffic.qa().spriteCount),36);
 const out=path.resolve(__dirname,'../../work/world');fs.mkdirSync(out,{recursive:true});
