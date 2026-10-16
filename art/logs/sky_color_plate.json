@@ -1,7 +1,7 @@
 {
   "name": "sky_color_plate",
   "tool": "imagegen",
-  "source_path": "/workspace/scratch/684fa65e1f5f/generated_images/exec-9522a1c4-5260-478f-a550-6d5f3942e090.png",
+  "source_path": "/workspace/scratch/684fa65e1f5f/vyshe-neba/art/raw/sky_color_plate.png",
   "source_sha256": "04296685a9ca266436ed131cb7c83ccb2d54eae89bfd8e618fbbe535963be2b8",
   "raw": "art/raw/sky_color_plate.png",
   "final": "art/gen/sky_color_plate.png",
@@ -26,5 +26,5 @@
     "pixel": true,
     "note": "Prepared only. Codex must inspect references, call built-in imagegen directly, and import the returned local image."
   },
-  "imported_at": "2026-10-16T00:45:53.374248+00:00"
+  "imported_at": "2026-10-16T05:45:55.894752+00:00"
 }

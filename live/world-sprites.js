@@ -47,11 +47,24 @@ function hazard(ctx,o,era,time,z){if(!state.ready)return false;let kind=o.kind;
  sprite(ctx,base+'_pod',px,py,(c[2]-c[0])*w,(c[3]-c[1])*h,{angle:Math.sin(time*1.6+(o.phase||0))*.05});ctx.restore();return true;
  }
  if(kind==='satellite'){
-  for(const side of [-1,1]){const joint=manifest.sprites[id('satellite',era)].panelJoints[side<0?0:1];ctx.save();ctx.translate((joint[0]-.5)*38*z,(joint[1]-.5)*40*z);ctx.rotate(side*(.08+.11*Math.sin(time*.65)));ctx.scale(side,1);sprite(ctx,id('panel',era),23*z,0,46*z,undefined);ctx.restore();}
+  const m=manifest.sprites[id('satellite',era)],height=38*z*m.height/m.width;
+  for(const side of [-1,1]){const joint=m.panelJoints[side<0?0:1];ctx.save();ctx.translate((joint[0]-.5)*38*z,(joint[1]-.5)*height);ctx.rotate(side*(.08+.11*Math.sin(time*.65)));ctx.scale(side,1);sprite(ctx,id('panel',era),0,0,46*z,undefined,{ax:m.panelRoot[0],ay:m.panelRoot[1]});ctx.restore();}
   sprite(ctx,id('satellite',era),0,0,38*z,undefined);ctx.save();ctx.fillStyle=Math.floor(time*3)%4===0?'#e8f3d2':'#5c6a74';ctx.fillRect(-z,-16*z,2*z,2*z);ctx.restore();return true;}
  return false;}
 function fragment(ctx,stage,era,variant,w,h){const name=id(stage==='booster'?'booster':'core',era),im=images.get(name);if(!im)return false;
  const sx=im.width*(variant?.5:.2),sy=im.height*.6,sw=im.width*.2,sh=sw*h/w;ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(im,sx,sy,sw,sh,-w/2,-h/2,w,h);ctx.restore();return true;}
 function cloud(ctx,index,x,y,w,alpha){return sprite(ctx,'cloud_'+Math.abs(index%4),x,y,w,undefined,{alpha});}
-root.WorldSprites={ready,state,years,sprite,item,fragment,body,parachute,hazard,cloud,id,get manifest(){return manifest;},qa(){return{...state,count:images.size};}};
+function terrain(ctx,name,x,ground,z,bottom){const im=images.get(name),m=manifest.sprites[name];if(!im||!m)return false;
+ const f=360*z/im.width,sx=24,sw=im.width-48,width=sw*f,top=ground-m.landingAnchor[1]*im.height*f;
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ // Reuse only painted interior rock for depth, never a flat programmer-colour band.
+ const sy=Math.floor(im.height*.63),sh=Math.floor(im.height*.25),rowH=sh*f;
+ for(let y=ground+28*z;y<bottom;y+=rowH)ctx.drawImage(im,sx,sy,sw,sh,x,y,width+z,rowH+z);
+ // Omit the painted end caps; neighbouring interior slices overlap by a logical pixel.
+ ctx.drawImage(im,sx,0,sw,im.height-8,x,top,width+z,(im.height-8)*f);ctx.restore();return width;}
+function baseDrone(ctx,index,x,y,w,time){const part=manifest.baseDrones?.parts[index];if(!part)return false;const f=w/part.size[0];
+ sprite(ctx,part.name,x,y,w);ctx.save();ctx.translate(x-w/2,y-part.size[1]*f/2);
+ for(const [i,[sx,sy,r]]of part.fans.entries()){ctx.save();ctx.translate(sx*f,sy*f);ctx.scale(1,.28);ctx.rotate(time*37+i*1.7);ctx.strokeStyle='#97aeb9';ctx.lineWidth=Math.max(.35,f*12);ctx.beginPath();for(let k=0;k<3;k++){const a=k*Math.PI*2/3;ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*r*f,Math.sin(a)*r*f);}ctx.stroke();ctx.restore();}
+ ctx.restore();return true;}
+root.WorldSprites={ready,state,years,sprite,item,fragment,body,parachute,hazard,cloud,terrain,baseDrone,id,get manifest(){return manifest;},qa(){return{...state,count:images.size};}};
 })(typeof window!=='undefined'?window:globalThis);

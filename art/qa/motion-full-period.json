@@ -2,8 +2,8 @@
   "satellite-0": {
     "period": 9.66643893412244,
     "samples": 17,
-    "minDelta": 373630,
-    "sumDelta": 12295881
+    "minDelta": 334651,
+    "sumDelta": 11261824
   },
   "parachute-0": {
     "period": 2.3271056693257726,
@@ -20,8 +20,8 @@
   "satellite-1": {
     "period": 9.66643893412244,
     "samples": 17,
-    "minDelta": 391803,
-    "sumDelta": 11791412
+    "minDelta": 367706,
+    "sumDelta": 10957696
   },
   "parachute-1": {
     "period": 2.3271056693257726,
@@ -38,8 +38,8 @@
   "satellite-2": {
     "period": 9.66643893412244,
     "samples": 17,
-    "minDelta": 442590,
-    "sumDelta": 12545020
+    "minDelta": 418466,
+    "sumDelta": 12176738
   },
   "parachute-2": {
     "period": 2.3271056693257726,
@@ -56,8 +56,8 @@
   "satellite-3": {
     "period": 9.66643893412244,
     "samples": 17,
-    "minDelta": 411764,
-    "sumDelta": 10918528
+    "minDelta": 387777,
+    "sumDelta": 10507836
   },
   "parachute-3": {
     "period": 2.3271056693257726,
@@ -74,8 +74,8 @@
   "satellite-4": {
     "period": 9.66643893412244,
     "samples": 17,
-    "minDelta": 490247,
-    "sumDelta": 14027334
+    "minDelta": 492492,
+    "sumDelta": 13453650
   },
   "parachute-4": {
     "period": 2.3271056693257726,
@@ -92,8 +92,8 @@
   "satellite-5": {
     "period": 9.66643893412244,
     "samples": 17,
-    "minDelta": 594246,
-    "sumDelta": 16640972
+    "minDelta": 567199,
+    "sumDelta": 15819356
   },
   "parachute-5": {
     "period": 2.3271056693257726,

@@ -45,3 +45,13 @@ Compared phase0 versus phase2 using per-aircraft cell crops excluding captions. 
 5. **No new mechanics:** closed cargo1978 lower pod remains closed and receives no propeller. Invisible2060 transport fans and experimental1998 nozzle remain omitted. This is appropriate restraint, not missing requested gameplay.
 
 No runtime code edited by this reviewer. The source candidate JSON and prior round reports remain the measurement provenance.
+
+## Factual QA addendum — native exports and full blink cycle
+
+No additional art critique round. Native phase PNGs now verified at **960×900** backing-canvas pixels via `toDataURL()` export: the diagnostic aspect limitation above is resolved. Source landmark uncertainty remains unchanged.
+
+`outputs/rocket/qa-aircraft.cjs` now tests the complete1,040ms navigation-light cycle at0,259,260,519,520,779,780,1,039 and1,040ms. It intercepts actual nav-colored2×2 `fillRect` commands, reads actual `globalAlpha` and canvas transform, and independently compares their centers against measured source positions transformed with the body. Propeller/exhaust changes cannot satisfy these assertions. All36 profiles, both facings and3 scales are covered in1,944 additional draws; the original648 transform draws and1,764 traced origins remain unchanged.
+
+Expected states are bright(alpha1) at0,259,1,040ms and dim(alpha.22) at the other samples. This covers both sides of each260ms boundary and repeat at1,040ms; invisible/unassigned lights have zero expected calls. Light-center quantization intentionally permits0.5px per local axis, giving√0.5≈0.7071px maximum Euclidean distance from an unrounded measured center (plus0.0001px normalization tolerance). Source-pick uncertainty is a separate limitation, not included or reduced by this numerical test.
+
+Validation: build passed; navigation-cycle QA passed with zero page errors. Full per-profile/per-sample results are under `navigationBlink` in `work/aircraft/report.json`. This establishes emitted draw-state timing/position coverage; it does not claim photometric flicker perception or long-running human motion acceptance.

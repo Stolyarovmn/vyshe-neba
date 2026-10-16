@@ -1,0 +1,30 @@
+[
+  {
+    "part": 0,
+    "width": 26,
+    "fixedBodyChangedChannels": [
+      12,
+      703,
+      700,
+      697,
+      698,
+      702,
+      707,
+      710
+    ]
+  },
+  {
+    "part": 1,
+    "width": 30,
+    "fixedBodyChangedChannels": [
+      21,
+      890,
+      892,
+      898,
+      890,
+      886,
+      887,
+      885
+    ]
+  }
+]

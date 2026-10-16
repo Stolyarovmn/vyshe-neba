@@ -227,6 +227,22 @@
         1.0
       ]
     },
+    "base_drone_0": {
+      "width": 606,
+      "height": 354,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "base_drone_1": {
+      "width": 738,
+      "height": 365,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
     "booster_1978": {
       "width": 218,
       "height": 221,
@@ -1476,14 +1492,19 @@
       ],
       "panelJoints": [
         [
-          0.08,
-          0.5
+          0.21621621621621623,
+          0.5658914728682171
         ],
         [
-          0.92,
-          0.5
+          0.7612612612612613,
+          0.5697674418604651
         ]
-      ]
+      ],
+      "panelRoot": [
+        0.06707317073170732,
+        0.4673913043478261
+      ],
+      "jointClassification": "authored sidewall overlap; not observed painted hinges"
     },
     "satellite_1986": {
       "width": 203,
@@ -1494,14 +1515,19 @@
       ],
       "panelJoints": [
         [
-          0.08,
-          0.5
+          0.1724137931034483,
+          0.5567765567765568
         ],
         [
-          0.92,
-          0.5
+          0.6502463054187192,
+          0.5567765567765568
         ]
-      ]
+      ],
+      "panelRoot": [
+        0.0514018691588785,
+        0.5925925925925926
+      ],
+      "jointClassification": "authored sidewall overlap; not observed painted hinges"
     },
     "satellite_1998": {
       "width": 214,
@@ -1512,14 +1538,19 @@
       ],
       "panelJoints": [
         [
-          0.08,
-          0.5
+          0.1308411214953271,
+          0.6333333333333333
         ],
         [
-          0.92,
-          0.5
+          0.780373831775701,
+          0.5407407407407407
         ]
-      ]
+      ],
+      "panelRoot": [
+        0.049586776859504134,
+        0.6030534351145038
+      ],
+      "jointClassification": "authored sidewall overlap; not observed painted hinges"
     },
     "satellite_2015": {
       "width": 166,
@@ -1530,14 +1561,19 @@
       ],
       "panelJoints": [
         [
-          0.08,
-          0.5
+          0.08433734939759036,
+          0.5488372093023256
         ],
         [
-          0.92,
-          0.5
+          0.9036144578313253,
+          0.5488372093023256
         ]
-      ]
+      ],
+      "panelRoot": [
+        0.03900709219858156,
+        0.5909090909090909
+      ],
+      "jointClassification": "authored sidewall overlap; not observed painted hinges"
     },
     "satellite_2035": {
       "width": 250,
@@ -1548,14 +1584,19 @@
       ],
       "panelJoints": [
         [
-          0.08,
-          0.5
+          0.264,
+          0.5676567656765676
         ],
         [
-          0.92,
-          0.5
+          0.752,
+          0.46534653465346537
         ]
-      ]
+      ],
+      "panelRoot": [
+        0.0425531914893617,
+        0.5987654320987654
+      ],
+      "jointClassification": "authored sidewall overlap; not observed painted hinges"
     },
     "satellite_2060": {
       "width": 251,
@@ -1566,14 +1607,19 @@
       ],
       "panelJoints": [
         [
-          0.08,
-          0.5
+          0.24701195219123506,
+          0.4981132075471698
         ],
         [
-          0.92,
-          0.5
+          0.8007968127490039,
+          0.5358490566037736
         ]
-      ]
+      ],
+      "panelRoot": [
+        0.05,
+        0.5621301775147929
+      ],
+      "jointClassification": "authored sidewall overlap; not observed painted hinges"
     },
     "terrain_mars": {
       "width": 728,
@@ -1599,5 +1645,474 @@
         0.20114942528735633
       ]
     }
+  },
+  "base": {
+    "version": 1,
+    "source": "art/gen/base_static_sheet.png",
+    "sourceSHA256": "2c3fae4d551fc898aad23527b037d2706a0360184bdd225d31c928a85742f6e5",
+    "comparisonSource": "outputs/rocket/dist/assets/base-eras.png",
+    "comparisonSHA256": "556ca6c212fdcfc18a4841f545fadc917671c76028ffd0c16b6b65a6a18076c2",
+    "size": [
+      1774,
+      887
+    ],
+    "grid": {
+      "columns": 3,
+      "rows": 2,
+      "cellSize": [
+        591.3333333333334,
+        443.5
+      ],
+      "runtimeSourceInset": 2,
+      "runtimeCellDestinationSize": [
+        1280,
+        800
+      ]
+    },
+    "coordinateSystem": "x/y in native source pixels local to the nominal era cell, origin top-left; manual visual measurement uncertainty includes <=1px integer-crop rounding",
+    "worldMapping": {
+      "x": "-650 + (x-2)*1280/(1774/3-4)",
+      "y": "600 - (y-2)*800/(887/2-4)"
+    },
+    "usage": "Observed hardware centres are measured; authored points are proposed emitters attached to observed fixtures/mast tips, not claims that an original lamp lens exists there. Emit subtle code light, never add physical poles. Check assembled scene before shipping.",
+    "eras": [
+      {
+        "year": 1978,
+        "cell": [
+          0,
+          0
+        ],
+        "sourceCellOrigin": [
+          0.0,
+          0.0
+        ],
+        "lamps": [
+          {
+            "id": "lamp-0",
+            "x": 197,
+            "y": 220,
+            "uncertaintyPixels": 2,
+            "evidence": "observed_hanging_lamp_housing",
+            "emitterAuthored": false,
+            "suggestedColor": "#ffd6a0"
+          },
+          {
+            "id": "lamp-1",
+            "x": 439,
+            "y": 245,
+            "uncertaintyPixels": 2,
+            "evidence": "observed_curved_pole_lamp_housing",
+            "emitterAuthored": false,
+            "suggestedColor": "#ffd6a0"
+          }
+        ],
+        "beacons": [
+          {
+            "id": "beacon-0",
+            "x": 166,
+            "y": 91,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          }
+        ]
+      },
+      {
+        "year": 1986,
+        "cell": [
+          1,
+          0
+        ],
+        "sourceCellOrigin": [
+          591.3333333333334,
+          0.0
+        ],
+        "lamps": [
+          {
+            "id": "lamp-0",
+            "x": 197,
+            "y": 220,
+            "uncertaintyPixels": 2,
+            "evidence": "observed_hanging_lamp_housing",
+            "emitterAuthored": false,
+            "suggestedColor": "#ffd6a0"
+          },
+          {
+            "id": "lamp-1",
+            "x": 439,
+            "y": 245,
+            "uncertaintyPixels": 2,
+            "evidence": "observed_curved_pole_lamp_housing",
+            "emitterAuthored": false,
+            "suggestedColor": "#ffd6a0"
+          }
+        ],
+        "beacons": [
+          {
+            "id": "beacon-0",
+            "x": 149,
+            "y": 119,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-1",
+            "x": 166,
+            "y": 91,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-2",
+            "x": 179,
+            "y": 130,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          }
+        ]
+      },
+      {
+        "year": 1998,
+        "cell": [
+          2,
+          0
+        ],
+        "sourceCellOrigin": [
+          1182.6666666666667,
+          0.0
+        ],
+        "lamps": [
+          {
+            "id": "lamp-0",
+            "x": 141,
+            "y": 188,
+            "uncertaintyPixels": 3,
+            "evidence": "authored_on_observed_tower_service_fixture",
+            "emitterAuthored": true,
+            "suggestedColor": "#ffd6a0"
+          },
+          {
+            "id": "lamp-1",
+            "x": 445,
+            "y": 211,
+            "uncertaintyPixels": 3,
+            "evidence": "authored_on_observed_service_pole_cap",
+            "emitterAuthored": true,
+            "suggestedColor": "#ffd6a0"
+          }
+        ],
+        "beacons": [
+          {
+            "id": "beacon-0",
+            "x": 165,
+            "y": 76,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-1",
+            "x": 188,
+            "y": 84,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-2",
+            "x": 201,
+            "y": 50,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          }
+        ]
+      },
+      {
+        "year": 2015,
+        "cell": [
+          0,
+          1
+        ],
+        "sourceCellOrigin": [
+          0.0,
+          443.5
+        ],
+        "lamps": [
+          {
+            "id": "lamp-0",
+            "x": 123,
+            "y": 292,
+            "uncertaintyPixels": 3,
+            "evidence": "observed_wall_fixture",
+            "emitterAuthored": false,
+            "suggestedColor": "#ffd6a0"
+          },
+          {
+            "id": "lamp-1",
+            "x": 418,
+            "y": 258,
+            "uncertaintyPixels": 3,
+            "evidence": "observed_curved_service_lamp_housing",
+            "emitterAuthored": false,
+            "suggestedColor": "#ffd6a0"
+          }
+        ],
+        "beacons": [
+          {
+            "id": "beacon-0",
+            "x": 192,
+            "y": 23,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-1",
+            "x": 224,
+            "y": 38,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-2",
+            "x": 167,
+            "y": 69,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          }
+        ]
+      },
+      {
+        "year": 2035,
+        "cell": [
+          1,
+          1
+        ],
+        "sourceCellOrigin": [
+          591.3333333333334,
+          443.5
+        ],
+        "lamps": [
+          {
+            "id": "lamp-0",
+            "x": 150,
+            "y": 284,
+            "uncertaintyPixels": 3,
+            "evidence": "authored_on_observed_wall_service_fixture",
+            "emitterAuthored": true,
+            "suggestedColor": "#ffd6a0"
+          },
+          {
+            "id": "lamp-1",
+            "x": 440,
+            "y": 212,
+            "uncertaintyPixels": 4,
+            "evidence": "authored_on_observed_service_column_cap",
+            "emitterAuthored": true,
+            "suggestedColor": "#ffd6a0"
+          }
+        ],
+        "beacons": [
+          {
+            "id": "beacon-0",
+            "x": 191,
+            "y": 19,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-1",
+            "x": 212,
+            "y": 8,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-2",
+            "x": 168,
+            "y": 53,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          }
+        ]
+      },
+      {
+        "year": 2060,
+        "cell": [
+          2,
+          1
+        ],
+        "sourceCellOrigin": [
+          1182.6666666666667,
+          443.5
+        ],
+        "lamps": [
+          {
+            "id": "lamp-0",
+            "x": 151,
+            "y": 283,
+            "uncertaintyPixels": 3,
+            "evidence": "authored_on_observed_wall_service_fixture",
+            "emitterAuthored": true,
+            "suggestedColor": "#ffd6a0"
+          },
+          {
+            "id": "lamp-1",
+            "x": 440,
+            "y": 214,
+            "uncertaintyPixels": 4,
+            "evidence": "authored_on_observed_service_column_cap",
+            "emitterAuthored": true,
+            "suggestedColor": "#ffd6a0"
+          }
+        ],
+        "beacons": [
+          {
+            "id": "beacon-0",
+            "x": 190,
+            "y": 19,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-1",
+            "x": 211,
+            "y": 8,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          },
+          {
+            "id": "beacon-2",
+            "x": 168,
+            "y": 53,
+            "uncertaintyPixels": 2,
+            "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+            "emitterAuthored": true,
+            "suggestedColor": "#ff6858"
+          }
+        ]
+      }
+    ]
+  },
+  "baseDrones": {
+    "version": 1,
+    "classification": "Noninteractive replacement for the original 2060 background drones; no new gameplay",
+    "source": "base_drone_static_v2_sheet",
+    "sliceCommand": "python3 tools/ref2game/slice.py art/gen/base_drone_static_v2_sheet.png base_drone_0,base_drone_1 --order x",
+    "notes": "Fan-well centres visually measured in prepared source pixels, uncertainty +/-4 source px. Fan radii and decorative trajectories are authored code geometry. Transparent RGB haze is not visible when correctly alpha composited.",
+    "parts": [
+      {
+        "name": "base_drone_0",
+        "sourceSHA256": "2a80be22d7d62a89a35990cc154d4ed294f9af41dfa58963de8f02f7f137df1b",
+        "size": [
+          606,
+          354
+        ],
+        "fans": [
+          [
+            301,
+            25,
+            45
+          ],
+          [
+            68,
+            115,
+            40
+          ],
+          [
+            530,
+            143,
+            40
+          ]
+        ]
+      },
+      {
+        "name": "base_drone_1",
+        "sourceSHA256": "8473786b3463d531ccabac22e5dc55392043a66b7accb5b98069c2d736481524",
+        "size": [
+          738,
+          365
+        ],
+        "fans": [
+          [
+            396,
+            28,
+            46
+          ],
+          [
+            134,
+            56,
+            37
+          ],
+          [
+            656,
+            57,
+            37
+          ],
+          [
+            81,
+            130,
+            39
+          ],
+          [
+            658,
+            154,
+            39
+          ]
+        ]
+      }
+    ],
+    "placements": [
+      [
+        296,
+        236,
+        26,
+        0
+      ],
+      [
+        385,
+        232,
+        30,
+        1
+      ],
+      [
+        475,
+        176,
+        22,
+        0
+      ],
+      [
+        544,
+        159,
+        20,
+        1
+      ]
+    ]
   }
 }

@@ -1,0 +1,38 @@
+{
+  "launch": {
+    "y": 180.16439763799656,
+    "vy": 61.53474772655821,
+    "thrust": true
+  },
+  "coast": {
+    "y": 211.28553242513968,
+    "vy": 3.2858798380341465,
+    "thrust": false
+  },
+  "moonArrival": {
+    "body": "moon",
+    "mode": 2,
+    "y": 1400,
+    "screen": "flight"
+  },
+  "moonLanding": {
+    "safe": true,
+    "location": "moon"
+  },
+  "marsArrival": {
+    "body": "mars",
+    "mode": 4,
+    "y": 1400
+  },
+  "marsLanding": {
+    "safe": true,
+    "location": "mars"
+  },
+  "world": {
+    "ready": true,
+    "errors": [],
+    "draws": 0,
+    "count": 166
+  },
+  "pageErrors": []
+}
