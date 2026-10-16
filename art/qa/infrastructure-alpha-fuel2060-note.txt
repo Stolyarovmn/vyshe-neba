@@ -1,0 +1,1 @@
+fuel/2060 alpha residual identified at one corner (alpha=4) after runtime resampling; replacement prepared with transparent outer border.
