@@ -1,0 +1,19 @@
+{
+  "id":"W02_engine_test_stand",
+  "event":"engine_test_run",
+  "states":["OFF","IDLE","NOTICE","WORK","FINISH","COOLDOWN"],
+  "work_timeline":[
+    {"phase":"clamp","duration_s":0.45,"motion":["clamp_left closes","clamp_right closes"]},
+    {"phase":"spool","duration_s":0.35,"motion":["mount preloads","instrument wakes"]},
+    {"phase":"burn","duration_s":1.2,"motion":["engine/mount vibration only","instrument reacts"],"code_fx":["flame","heat_haze","dynamic_light"]},
+    {"phase":"shutdown","duration_s":0.35,"motion":["vibration decays","instrument settles"]},
+    {"phase":"release","duration_s":0.45,"motion":["clamp_left opens","clamp_right opens"]}
+  ],
+  "mode_feedback":{"THRUST":"stronger/longer thrust trace","ECONOMY":"stable low-consumption trace","COOLING":"faster thermal decay trace"},
+  "rules":[
+    "Never animate by moving the whole stand.",
+    "Flame, heat haze, light and live instrument traces are code-owned.",
+    "Clamp and mount pivots must be measured from approved isolated parts before gameplay animation is enabled.",
+    "The static era PNG remains fallback/preview art until the rig pass is complete."
+  ]
+}
