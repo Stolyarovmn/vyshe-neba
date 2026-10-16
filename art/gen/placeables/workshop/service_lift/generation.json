@@ -1,0 +1,15 @@
+{
+  "asset": "w01_service_lift",
+  "source": "OpenAI built-in image generation",
+  "gen_id": "bc1bd963-9c1d-4272-9a2c-1773991ac279",
+  "source_size": [1536, 1024],
+  "layout": [3, 2],
+  "transparent_background_requested": true,
+  "post": {
+    "alpha_zero_lte": 12,
+    "alpha_opaque_snap_gte": 248,
+    "palette": "PNG8 <=256 colors, no dithering",
+    "slice": "six fixed 512x512 cells"
+  },
+  "note": "Imported from the approved conversation generation. The style bible and production manifest remain the canonical rules."
+}
