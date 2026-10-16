@@ -14,3 +14,9 @@ The generated sources and original imagegen sheets are retained in `art/gen` and
 `live/world-sprites.js` owns physical sprite selection, articulated attachments and effects; build copies it and `live/aircraft.js` to runtime. Game and background integration remain in `outputs/rocket/dist/game.js` and `world-art.js` until the existing game is fully migrated. `npm run build` generates the standalone HTML locally; run `node outputs/rocket/qa-world.cjs` for assembled scene QA.
 
 See `art/PROGRESS.md` for acceptance status and remaining work.
+
+## Buyable / placeable infrastructure
+
+`art/placeables/PRODUCTION_MANIFEST.md` is the canonical production contract for buyable and placeable base/workshop infrastructure. It defines the 17 object families, E0–E5 engineering lineage, target LP footprints, socket classes, articulated parts, event-driven motion contracts, relative economy tiers and generation/QA workflow.
+
+Placeable artwork must follow `art/style_bible.txt` and the ref2game workflow. Design pivots in the manifest are intent only; runtime pivots must be measured from the approved imported artwork before rigging.
