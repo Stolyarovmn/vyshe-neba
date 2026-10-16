@@ -2,21 +2,29 @@
   "id": "service_lift",
   "asset_code": "W01",
   "type": "workshop_placeable",
-  "atlas_layout": {
-    "cols": 3,
-    "rows": 2,
-    "cell_px": [512, 512],
+  "master_source": {
+    "size_px": [1536, 1024],
+    "layout": {"cols": 3, "rows": 2, "cell_px": [512, 512]},
     "reading_order": ["E0", "E1", "E2", "E3", "E4", "E5"]
   },
-  "runtime_footprint_lp": [190, 230],
+  "runtime": {
+    "canvas_lp": [190, 230],
+    "fit_envelope_lp": [178, 218],
+    "placement_anchor_lp": {"x": 95, "y": 224, "kind": "bottom-center baseline"},
+    "bottom_padding_lp": 6,
+    "resample": "nearest-neighbor",
+    "format": "PNG8 indexed",
+    "colors_max": 32,
+    "dither": "none"
+  },
   "placement_sockets": ["rocket_left", "rocket_right", "floor_back"],
   "era_sprites": [
-    {"era":"E0","year":1978,"name":"Гаражная мечта","lineage":"chain hoist + welded frame","file":"e0_1978.png","source_cell":{"col":0,"row":0,"x":0,"y":0,"w":512,"h":512},"visible_bbox_source_px":[46,104,448,438],"placement_anchor_source_px":{"x":246.5,"y":437,"kind":"bottom-center of measured visible bbox"}},
-    {"era":"E1","year":1986,"name":"Своя мастерская","lineage":"hydraulic lift","file":"e1_1986.png","source_cell":{"col":1,"row":0,"x":512,"y":0,"w":512,"h":512},"visible_bbox_source_px":[6,52,479,438],"placement_anchor_source_px":{"x":242.0,"y":437,"kind":"bottom-center of measured visible bbox"}},
-    {"era":"E2","year":1998,"name":"Испытательный центр","lineage":"bridge service frame","file":"e2_1998.png","source_cell":{"col":2,"row":0,"x":1024,"y":0,"w":512,"h":512},"visible_bbox_source_px":[6,33,489,447],"placement_anchor_source_px":{"x":247.0,"y":446,"kind":"bottom-center of measured visible bbox"}},
-    {"era":"E3","year":2015,"name":"Космический порт","lineage":"modular service rig","file":"e3_2015.png","source_cell":{"col":0,"row":1,"x":0,"y":512,"w":512,"h":512},"visible_bbox_source_px":[17,25,512,445],"placement_anchor_source_px":{"x":264.0,"y":444,"kind":"bottom-center of measured visible bbox"}},
-    {"era":"E4","year":2035,"name":"Орбитальная эра","lineage":"dual robotic arms","file":"e4_2035.png","source_cell":{"col":1,"row":1,"x":512,"y":512,"w":512,"h":512},"visible_bbox_source_px":[0,10,512,448],"placement_anchor_source_px":{"x":255.5,"y":447,"kind":"bottom-center of measured visible bbox"}},
-    {"era":"E5","year":2060,"name":"Горизонт будущего","lineage":"ring service system","file":"e5_2060.png","source_cell":{"col":2,"row":1,"x":1024,"y":512,"w":512,"h":512},"visible_bbox_source_px":[0,3,503,444],"placement_anchor_source_px":{"x":251.0,"y":443,"kind":"bottom-center of measured visible bbox"}}
+    {"era":"E0","year":1978,"name":"Гаражная мечта","lineage":"chain hoist + welded frame","file":"e0_1978.png","master_cell":{"col":0,"row":0},"master_visible_bbox_px":[47,104,447,437],"runtime_visible_size_lp":[178,148],"runtime_offset_lp":[6,76]},
+    {"era":"E1","year":1986,"name":"Своя мастерская","lineage":"hydraulic lift","file":"e1_1986.png","master_cell":{"col":1,"row":0},"master_visible_bbox_px":[6,52,479,438],"runtime_visible_size_lp":[178,145],"runtime_offset_lp":[6,79]},
+    {"era":"E2","year":1998,"name":"Испытательный центр","lineage":"bridge service frame","file":"e2_1998.png","master_cell":{"col":2,"row":0},"master_visible_bbox_px":[6,33,489,447],"runtime_visible_size_lp":[178,153],"runtime_offset_lp":[6,71]},
+    {"era":"E3","year":2015,"name":"Космический порт","lineage":"modular service rig","file":"e3_2015.png","master_cell":{"col":0,"row":1},"master_visible_bbox_px":[17,25,498,445],"runtime_visible_size_lp":[178,155],"runtime_offset_lp":[6,69]},
+    {"era":"E4","year":2035,"name":"Орбитальная эра","lineage":"dual robotic arms","file":"e4_2035.png","master_cell":{"col":1,"row":1},"master_visible_bbox_px":[0,11,512,448],"runtime_visible_size_lp":[178,152],"runtime_offset_lp":[6,72]},
+    {"era":"E5","year":2060,"name":"Горизонт будущего","lineage":"ring service system","file":"e5_2060.png","master_cell":{"col":2,"row":1},"master_visible_bbox_px":[0,4,503,444],"runtime_visible_size_lp":[178,156],"runtime_offset_lp":[6,68]}
   ],
   "animation": {
     "policy": "rigged_parts_only; do not animate by bobbing/rotating/scaling the whole sprite",
@@ -38,7 +46,17 @@
       "E5": "requires articulated manipulators around the ring; ring itself stays static except code-owned indicator light states"
     }
   },
-  "alpha_cleanup": {"threshold_zero_lte":12,"opaque_snap_gte":248,"other_alpha_preserved":true},
-  "status": {"anchor_art":"approved_for_slice","runtime_sprite":"ready_as_static_anchor","rig_parts":"pending_separate_generation_and_measured_pivots"},
-  "palette_normalization": {"format":"PNG8 indexed","colors_max":256,"dither":"none","reason":"pixel-look normalization and repository/runtime size reduction","visual_qa":"passed by self-review contact sheet"}
+  "alpha_cleanup": {"threshold_zero_lte":12,"opaque_snap_gte":248,"other_alpha_preserved_before_runtime_quantization":true},
+  "status": {
+    "master_anchor_art":"approved_and_sliced",
+    "runtime_sprite":"ready_as_static_anchor",
+    "rig_parts":"pending_separate_generation_and_measured_pivots"
+  },
+  "qa": {
+    "same_runtime_canvas_all_eras": true,
+    "same_placement_baseline_all_eras": true,
+    "aspect_ratio_preserved": true,
+    "whole_sprite_fake_animation_forbidden": true,
+    "visual_contact_sheet_self_review": "passed"
+  }
 }
