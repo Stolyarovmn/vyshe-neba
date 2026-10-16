@@ -6,5 +6,5 @@
   "era_layout": {"cols":3,"rows":2,"reading_order":["E0","E1","E2","E3","E4","E5"]},
   "palette_policy": "design-bible material ramps, <=32 indexed colors per exported PNG, no dithering",
   "fx_policy": "no baked beam/glow/dynamic screen data",
-  "source_scripts": ["art/scripts/placeables/w06_hull_diagnostics_base.py","art/scripts/placeables/w06_hull_diagnostics_enhance.py"]
+  "geometry_provenance": "rail, anchor and scanner-head pivots are measured from the authored runtime pixels and stored in manifest.json"
 }
