@@ -1,0 +1,14 @@
+{
+  "id":"manufacturing_cell","asset_code":"W05","type":"workshop_placeable","runtime_canvas_px":[176,134],"runtime_footprint_lp":[176,134],"placement_anchor_px":{"x":88,"y":130,"kind":"shared bottom-center registration"},"placement_sockets":["floor_back","wall"],"value":"Economy / Capability","cost_target":"L",
+  "era_sprites":[
+    {"era":"E0","year":1978,"file":"e0_1978.png","lineage":"manual workbench + lathe","runtime_visible_bbox_px":[4,5,172,130]},
+    {"era":"E1","year":1986,"file":"e1_1986.png","lineage":"industrial lathe/mill","runtime_visible_bbox_px":[12,4,148,130]},
+    {"era":"E2","year":1998,"file":"e2_1998.png","lineage":"CNC with motorized carriage","runtime_visible_bbox_px":[6,5,169,130]},
+    {"era":"E3","year":2015,"file":"e3_2015.png","lineage":"enclosed machining center","runtime_visible_bbox_px":[14,4,162,130]},
+    {"era":"E4","year":2035,"file":"e4_2035.png","lineage":"robotic manufacturing cell","runtime_visible_bbox_px":[6,4,169,130]},
+    {"era":"E5","year":2060,"file":"e5_2060.png","lineage":"autonomous fabricator with multiple workheads","runtime_visible_bbox_px":[18,4,159,130]}
+  ],
+  "parts":[{"id":"machine","motion":"static","pivot_intent":"bottom-center"},{"id":"workhead","motion":"linear","pivot_intent":"tool rail"},{"id":"spindle","motion":"rotary","pivot_intent":"spindle axis"},{"id":"door","motion":"state","pivot_intent":"hinge"},{"id":"part","motion":"payload","pivot_intent":"work area center"}],
+  "animation_status":"static era anchors ready; isolated moving-part pass still required where physical motion exists",
+  "normalization":{"resample":"nearest-neighbor","palette":"PNG8 indexed <=32 colors","dither":"none","alpha_zero_lte":12}
+}

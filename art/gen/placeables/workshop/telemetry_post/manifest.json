@@ -1,0 +1,14 @@
+{
+  "id":"telemetry_post","asset_code":"W03","type":"workshop_placeable","runtime_canvas_px":[156,124],"runtime_footprint_lp":[156,124],"placement_anchor_px":{"x":78,"y":120,"kind":"shared bottom-center registration"},"placement_sockets":["wall","floor_back"],"value":"Information","cost_target":"M",
+  "era_sprites":[
+    {"era":"E0","year":1978,"file":"e0_1978.png","lineage":"paper recorder/reels + analog instruments","runtime_visible_bbox_px":[4,12,152,120]},
+    {"era":"E1","year":1986,"file":"e1_1986.png","lineage":"oscilloscopes + heavy console","runtime_visible_bbox_px":[12,4,145,120]},
+    {"era":"E2","year":1998,"file":"e2_1998.png","lineage":"CRT monitors + telemetry rack","runtime_visible_bbox_px":[14,4,141,120]},
+    {"era":"E3","year":2015,"file":"e3_2015.png","lineage":"digital telemetry desk","runtime_visible_bbox_px":[10,4,147,120]},
+    {"era":"E4","year":2035,"file":"e4_2035.png","lineage":"projection surface over compact console","runtime_visible_bbox_px":[12,4,143,120]},
+    {"era":"E5","year":2060,"file":"e5_2060.png","lineage":"spatial interactive trajectory model","runtime_visible_bbox_px":[15,4,141,120]}
+  ],
+  "parts":[{"id":"desk","motion":"static","pivot_intent":"bottom-center"},{"id":"display","motion":"state","pivot_intent":"screen center"},{"id":"recorder","motion":"rotary","pivot_intent":"recorder axle"},{"id":"indicator","motion":"state","pivot_intent":"panel center"}],
+  "animation_status":"static era anchors ready; isolated moving-part pass still required where physical motion exists",
+  "normalization":{"resample":"nearest-neighbor","palette":"PNG8 indexed <=32 colors","dither":"none","alpha_zero_lte":12}
+}
