@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """One-time structural repair for malformed B01 indexed PNG atlases.
 
-The affected files contain valid pixel/IDAT data, but the PLTE length field was
-written as 768 bytes even when the actual palette contained fewer than 256 RGB
-entries. That makes decoders consume the following tRNS/IDAT header as palette
-bytes. This script changes only PNG chunk structure (PLTE length/CRC); it does
-not decode/re-quantize/resample pixel data.
+The affected files contain valid pixel/IDAT payloads, but their PNG chunk
+structure was written incorrectly: PLTE declares 768 bytes even when the actual
+palette is shorter, and one or more chunk CRC fields are stale. This script
+repairs only chunk metadata (PLTE length + CRC fields). It does not decode and
+re-encode, quantize, resize, or alter chunk payload bytes.
 """
 from __future__ import annotations
 
@@ -68,6 +68,43 @@ def validate_chunks(data: bytes):
     return chunks
 
 
+def normalize_chunk_crcs(data: bytes):
+    """Recalculate CRC fields without touching any chunk payload bytes."""
+    if not data.startswith(PNG_SIG):
+        raise ValueError("not PNG")
+    buf = bytearray(data)
+    pos = 8
+    repairs = []
+    saw_iend = False
+    while pos + 12 <= len(buf):
+        n = u32(buf[pos : pos + 4])
+        typ = bytes(buf[pos + 4 : pos + 8])
+        end = pos + 12 + n
+        if end > len(buf):
+            raise ValueError(f"broken chunk {typ!r} at {pos}: len={n}, remaining={len(buf)-pos}")
+        payload = bytes(buf[pos + 8 : pos + 8 + n])
+        crc_off = pos + 8 + n
+        got = u32(buf[crc_off : crc_off + 4])
+        want = zlib.crc32(typ + payload) & 0xFFFFFFFF
+        if got != want:
+            buf[crc_off : crc_off + 4] = p32(want)
+            repairs.append({
+                "type": typ.decode("ascii", "replace"),
+                "offset": pos,
+                "crc_before": f"{got:08x}",
+                "crc_after": f"{want:08x}",
+            })
+        pos = end
+        if typ == b"IEND":
+            saw_iend = True
+            break
+    if not saw_iend:
+        raise ValueError("missing IEND")
+    if pos != len(buf):
+        raise ValueError(f"trailing bytes after IEND: {len(buf)-pos}")
+    return bytes(buf), repairs
+
+
 def find_next_chunk_start(data: bytes, plte_type_offset: int) -> int:
     # Indexed runtime art is transparent; tRNS is normally next. Fall back to
     # IDAT for a fully opaque indexed image. Chunk type is preceded by 4-byte len.
@@ -98,7 +135,17 @@ def repair_png(data: bytes):
     # If already valid, keep bytes exactly unchanged.
     try:
         validate_chunks(data)
-        return data, {"changed": False, "reason": "already_valid"}
+        with Image.open(io.BytesIO(data)) as im:
+            im.load()
+            size = list(im.size)
+            mode = im.mode
+        return data, {
+            "changed": False,
+            "reason": "already_valid",
+            "decoded_mode": mode,
+            "decoded_size": size,
+            "crc_repairs": [],
+        }
     except ValueError as initial_error:
         pass
 
@@ -119,16 +166,20 @@ def repair_png(data: bytes):
         raise ValueError("recovered PLTE boundary is inconsistent")
 
     payload = data[payload_start:payload_end]
-    expected_crc = zlib.crc32(b"PLTE" + payload) & 0xFFFFFFFF
-    stored_crc = u32(data[crc_offset:crc_offset + 4])
+    expected_plte_crc = zlib.crc32(b"PLTE" + payload) & 0xFFFFFFFF
+    stored_plte_crc = u32(data[crc_offset:crc_offset + 4])
 
     repaired = bytearray(data)
     repaired[plte_start:plte_type] = p32(actual_len)
-    repaired[crc_offset:crc_offset + 4] = p32(expected_crc)
-    repaired = bytes(repaired)
+    repaired[crc_offset:crc_offset + 4] = p32(expected_plte_crc)
 
+    # Once PLTE's true length is restored, every subsequent chunk boundary is
+    # deterministic. Repair stale CRC fields only; never alter payload bytes.
+    repaired, crc_repairs = normalize_chunk_crcs(bytes(repaired))
     chunks = validate_chunks(repaired)
-    # Full decoder gate: structure alone is not enough.
+
+    # Full decoder gate: structure alone is not enough. If IDAT payload data is
+    # actually damaged, Pillow load() will fail and the repair is rejected.
     with Image.open(io.BytesIO(repaired)) as im:
         im.load()
         size = list(im.size)
@@ -141,8 +192,9 @@ def repair_png(data: bytes):
         "declared_plte_len_before": declared_len,
         "plte_len_after": actual_len,
         "palette_entries": actual_len // 3,
-        "plte_crc_before": f"{stored_crc:08x}",
-        "plte_crc_after": f"{expected_crc:08x}",
+        "plte_crc_before": f"{stored_plte_crc:08x}",
+        "plte_crc_after": f"{expected_plte_crc:08x}",
+        "crc_repairs": crc_repairs,
         "decoded_mode": mode,
         "decoded_size": size,
         "chunks": chunks,
@@ -171,7 +223,11 @@ def main():
             report["files"][str(rel)] = info
             if after != before:
                 path.write_bytes(after)
-                print(f"REPAIRED {rel}: PLTE {info['declared_plte_len_before']} -> {info['plte_len_after']} bytes, {info['palette_entries']} colors")
+                print(
+                    f"REPAIRED {rel}: PLTE {info['declared_plte_len_before']} -> "
+                    f"{info['plte_len_after']} bytes, {info['palette_entries']} colors; "
+                    f"CRC fields repaired={len(info['crc_repairs'])}"
+                )
             else:
                 print(f"VALID {rel}")
 
