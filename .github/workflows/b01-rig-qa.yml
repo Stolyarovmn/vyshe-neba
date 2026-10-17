@@ -1,0 +1,27 @@
+name: B01 rig QA
+
+on:
+  push:
+    branches: [2d_workshop-placeables-w01]
+    paths:
+      - 'art/gen/placeables/base/weather_complex/parts/**'
+      - 'outputs/rocket/dist/assets/placeables/base/weather_complex/parts/**'
+      - 'outputs/rocket/dist/b01-rig-qa.*'
+      - 'outputs/rocket/qa-b01-rig.cjs'
+      - 'outputs/rocket/verify.cjs'
+      - '.github/workflows/b01-rig-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rig-qa:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify B01 measured cut-out rig
+        run: node outputs/rocket/qa-b01-rig.cjs
