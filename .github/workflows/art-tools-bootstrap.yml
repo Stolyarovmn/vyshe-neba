@@ -41,6 +41,13 @@ jobs:
           mkdir -p "$RUNNER_TEMP/art-tools"
           cp "$RUNNER_TEMP/pixel-snapper/bin/spritefusion-pixel-snapper" "$RUNNER_TEMP/art-tools/"
 
+      - name: Upload Pixel Snapper immediately
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-pixel-snapper-linux-x64
+          path: ${{ runner.temp }}/art-tools/spritefusion-pixel-snapper
+          retention-days: 1
+
       - name: Restore Aseprite build cache
         uses: actions/cache@v4
         with:
