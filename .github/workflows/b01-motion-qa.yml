@@ -1,0 +1,47 @@
+name: B01 motion sheet QA
+
+on:
+  push:
+    branches: [2d_workshop-placeables-w01]
+    paths:
+      - 'outputs/rocket/dist/weather-complex-rig.js'
+      - 'outputs/rocket/dist/assets/placeables/base/weather_complex/**'
+      - 'outputs/rocket/qa-b01-rig.cjs'
+      - 'tools/art_pipeline/b01_motion_sheet.py'
+      - '.github/workflows/b01-motion-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  motion-sheet:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pillow
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-pil
+
+      - name: Run B01 causal rig regression QA
+        run: node outputs/rocket/qa-b01-rig.cjs
+
+      - name: Render B01 E0-E5 motion sheets
+        run: |
+          set -euxo pipefail
+          OUT="$RUNNER_TEMP/b01-motion-qa"
+          python3 tools/art_pipeline/b01_motion_sheet.py \
+            --root outputs/rocket/dist/assets/placeables/base/weather_complex/parts \
+            --output-dir "$OUT"
+          test -s "$OUT/b01_motion_sheet.png"
+          test -s "$OUT/motion_qa.json"
+
+      - name: Upload B01 motion QA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: b01-motion-qa
+          path: ${{ runner.temp }}/b01-motion-qa/
+          retention-days: 3
