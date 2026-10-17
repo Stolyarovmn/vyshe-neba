@@ -4,12 +4,13 @@
 Recovery is deliberately conservative:
 - recover the real PLTE boundary;
 - repair stale chunk CRCs / terminal IEND metadata;
-- if zlib fails only after yielding the complete expected scanline stream,
-  recompress exactly those same scanline bytes into a fresh IDAT.
+- recover exactly the raster-sized prefix of the old zlib scanline stream only
+  when every PNG filter byte is valid;
+- recompress those same filtered scanline bytes into a fresh IDAT.
 
-No image resampling, palette remapping, quantization, drawing, or regenerated
-pixel content is allowed. The downstream motion QA must also reconstruct every
-approved era anchor pixel-exactly from the recovered atlases.
+No image resampling, palette remapping, quantization, drawing, or generated
+pixel content is allowed. Downstream motion QA must reconstruct every approved
+era anchor pixel-exactly before repaired atlases may be committed.
 """
 from __future__ import annotations
 
@@ -81,7 +82,6 @@ def validate_chunks(data: bytes):
 
 
 def parsed_payloads(data: bytes):
-    """Return validated chunks as (type,payload)."""
     validate_chunks(data)
     pos = 8
     out = []
@@ -97,7 +97,7 @@ def parsed_payloads(data: bytes):
 
 
 def normalize_chunk_crcs(data: bytes):
-    """Repair stale CRCs and a malformed terminal IEND, preserving payloads."""
+    """Repair stale CRCs and malformed terminal IEND; preserve all payloads."""
     if not data.startswith(PNG_SIG):
         raise ValueError("not PNG")
     buf = bytearray(data)
@@ -108,7 +108,6 @@ def normalize_chunk_crcs(data: bytes):
         n = u32(buf[pos : pos + 4])
         typ = bytes(buf[pos + 4 : pos + 8])
         end = pos + 12 + n
-
         if end > len(buf):
             if len(buf) - pos == 12:
                 before = bytes(buf[pos : pos + 12])
@@ -124,7 +123,6 @@ def normalize_chunk_crcs(data: bytes):
                 saw_iend = True
                 break
             raise ValueError(f"broken chunk {typ!r} at {pos}: len={n}, remaining={len(buf)-pos}")
-
         payload = bytes(buf[pos + 8 : pos + 8 + n])
         crc_off = pos + 8 + n
         got = u32(buf[crc_off : crc_off + 4])
@@ -170,8 +168,8 @@ def find_next_chunk_start(data: bytes, plte_type_offset: int) -> int:
     return min(candidates)
 
 
-def recover_complete_scanlines(data: bytes):
-    """Recover raw PNG scanlines only if the old zlib stream yielded all bytes."""
+def recover_raster_scanlines(data: bytes):
+    """Recover only a complete, filter-valid raster prefix from old IDAT."""
     chunks = parsed_payloads(data)
     ihdr = next(payload for typ, payload in chunks if typ == b"IHDR")
     width, height, bit_depth, color_type, compression, filter_method, interlace = struct.unpack(
@@ -182,7 +180,8 @@ def recover_complete_scanlines(data: bytes):
             f"unsupported recovery layout: bit_depth={bit_depth} color_type={color_type} "
             f"compression={compression} filter={filter_method} interlace={interlace}"
         )
-    expected = (width + 1) * height
+    row_stride = width + 1
+    expected = row_stride * height
     old_idat = b"".join(payload for typ, payload in chunks if typ == b"IDAT")
     if not old_idat:
         raise ValueError("missing IDAT payload")
@@ -191,8 +190,6 @@ def recover_complete_scanlines(data: bytes):
     raw = bytearray()
     zerr = None
     error_offset = None
-    # Byte-wise feed is intentional: if only the trailer/checksum is damaged,
-    # all decompressed scanline bytes emitted before the error remain available.
     for i, value in enumerate(old_idat):
         try:
             raw.extend(d.decompress(bytes((value,))))
@@ -207,13 +204,18 @@ def recover_complete_scanlines(data: bytes):
             zerr = str(exc)
             error_offset = len(old_idat)
 
-    if len(raw) != expected:
+    if len(raw) < expected:
         raise ValueError(
-            f"IDAT recovery rejected: recovered {len(raw)} raw scanline bytes, expected {expected}; "
+            f"IDAT recovery rejected: recovered only {len(raw)} raw bytes, expected at least {expected}; "
             f"zlib_error={zerr!r} at compressed offset {error_offset}"
         )
 
-    new_idat = zlib.compress(bytes(raw), level=9)
+    raster = bytes(raw[:expected])
+    bad_filters = [(row, raster[row * row_stride]) for row in range(height) if raster[row * row_stride] > 4]
+    if bad_filters:
+        raise ValueError(f"IDAT recovery rejected: invalid PNG filter bytes, first={bad_filters[:8]}")
+
+    new_idat = zlib.compress(raster, level=9)
     rebuilt = bytearray(PNG_SIG)
     wrote_idat = False
     for typ, payload in chunks:
@@ -227,19 +229,22 @@ def recover_complete_scanlines(data: bytes):
     return bytes(rebuilt), {
         "performed": True,
         "expected_scanline_bytes": expected,
-        "recovered_scanline_bytes": len(raw),
+        "decompressed_stream_bytes": len(raw),
+        "recovered_scanline_bytes": len(raster),
+        "extra_stream_bytes_discarded": len(raw) - expected,
+        "all_filter_bytes_valid": True,
         "old_idat_bytes": len(old_idat),
         "new_idat_bytes": len(new_idat),
         "zlib_error": zerr,
         "zlib_error_offset": error_offset,
-        "raw_scanline_sha256": sha256_bytes(bytes(raw)),
+        "zlib_eof": bool(d.eof),
+        "raw_scanline_sha256": sha256_bytes(raster),
     }
 
 
 def repair_png(data: bytes):
     if not data.startswith(PNG_SIG):
         raise ValueError("not PNG")
-
     try:
         validate_chunks(data)
         with Image.open(io.BytesIO(data)) as im:
@@ -272,7 +277,6 @@ def repair_png(data: bytes):
     crc_offset = payload_end
     if crc_offset + 4 != next_start:
         raise ValueError("recovered PLTE boundary is inconsistent")
-
     payload = data[payload_start:payload_end]
     expected_plte_crc = zlib.crc32(b"PLTE" + payload) & 0xFFFFFFFF
     stored_plte_crc = u32(data[crc_offset:crc_offset + 4])
@@ -290,7 +294,7 @@ def repair_png(data: bytes):
             size = list(im.size)
             mode = im.mode
     except OSError as decode_error:
-        repaired, idat_recovery = recover_complete_scanlines(repaired)
+        repaired, idat_recovery = recover_raster_scanlines(repaired)
         validate_chunks(repaired)
         with Image.open(io.BytesIO(repaired)) as im:
             im.load()
@@ -301,7 +305,6 @@ def repair_png(data: bytes):
     if size != [288, 244]:
         raise ValueError(f"decoded size {size} != [288,244]")
     chunks = validate_chunks(repaired)
-
     return repaired, {
         "changed": True,
         "declared_plte_len_before": declared_len,
@@ -324,8 +327,8 @@ def main():
     ap.add_argument("--report", default="")
     args = ap.parse_args()
     repo = Path(args.repo_root)
-
     report = {"asset_id": "B01", "asset": "weather_complex", "files": {}, "result": "pass"}
+
     for rel_root in ROOTS:
         for part in PARTS:
             rel = rel_root / f"{part}_eras.png"
@@ -344,7 +347,8 @@ def main():
                     f"RECOVERED {rel}: PLTE {info['declared_plte_len_before']} -> "
                     f"{info['plte_len_after']} bytes, {info['palette_entries']} colors; "
                     f"structural repairs={len(info['crc_repairs'])}; "
-                    f"IDAT scanline recovery={idat.get('performed', False)}"
+                    f"IDAT raster recovery={idat.get('performed', False)}; "
+                    f"extra_stream={idat.get('extra_stream_bytes_discarded', 0)}"
                 )
             else:
                 print(f"VALID {rel}")
