@@ -1,0 +1,33 @@
+{
+  "asset_id": "W04",
+  "asset": "flight_simulator",
+  "native_source_size": [1254, 1254],
+  "target_canvas": [172, 160],
+  "registration_target": [86, 156],
+  "prompt_file": "art/prompts/w04_flight_simulator.md",
+  "style_bible": "art/style_bible.txt",
+  "production_manifest": "art/placeables/PRODUCTION_MANIFEST.md",
+  "required_skill": "ref2game",
+  "pixel_snapper": {
+    "repository": "Hugo-Dz/spritefusion-pixel-snapper",
+    "revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+    "package_version": "1.0.0",
+    "colors": 32,
+    "pixel_size": 8
+  },
+  "aseprite": {
+    "repository": "aseprite/aseprite",
+    "version": "1.3.18.6",
+    "dithering": "none",
+    "color_mode": "indexed"
+  },
+  "eras": [
+    {"era":"E0","year":1978,"source_gen_id":"155ad5c7-2e21-4bb6-811b-e42ed21ee5e7","source_sha256":"cb7a4d1bf4b2795a1aa5f6c738787efe2305b7d2f7c641c1d6593ddc07a0be55"},
+    {"era":"E1","year":1986,"source_gen_id":"77e671d8-6aa9-4aee-8389-7b3bf26271f2","source_sha256":"35b9beb93b3486d47853333a4ab4ca062f3824f87c1c5b29730c6d57136255f2"},
+    {"era":"E2","year":1998,"source_gen_id":"57f0cda3-c37e-489e-bdc5-404c89c935a9","source_sha256":"932ff90c6f50678181cd135ae9d7d520802bf1326ed0bb5aee1567e4c9657034"},
+    {"era":"E3","year":2015,"source_gen_id":"c0dbb3e2-65b1-4b2a-8358-3deeb36a45f4","source_sha256":"87a09280146786d2c19805f4ccaed3dad03f1765f7ba76652eacdae9e1f4de3c"},
+    {"era":"E4","year":2035,"source_gen_id":"ac153f0a-25ca-4f5a-9865-4949c355fb4a","source_sha256":"07f21f78ff80ca9a1981809f986fbca8badf213704c0d138b644a937c48c3280"},
+    {"era":"E5","year":2060,"source_gen_id":"b2916572-5c28-4dbe-9461-e3dd65786da8","source_sha256":"5a2ec522ef5ab65c6fa85d09438c4dcad19d61ba254885b4114e6659af52b930"}
+  ],
+  "note": "Native generator PNG bytes are the authoritative image provenance. Runtime sprites are not approved until official Pixel Snapper, canonical LP registration, Aseprite indexed/no-dither export and QA succeed. Mechanism pivots remain pending until isolated-part measurement."
+}
