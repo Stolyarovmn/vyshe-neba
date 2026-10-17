@@ -20,6 +20,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Diagnose B01 atlas checkout bytes
+        run: |
+          set -euxo pipefail
+          P=outputs/rocket/dist/assets/placeables/base/weather_complex/parts/body_eras.png
+          file "$P"
+          wc -c "$P"
+          xxd -l 32 "$P"
+          git check-attr -a -- "$P" || true
+          SHA=$(git rev-parse HEAD:"$P")
+          echo "blob=$SHA"
+          git cat-file -s "$SHA"
+          git cat-file blob "$SHA" | xxd -l 32
+
       - name: Install Pillow
         run: |
           set -euxo pipefail
