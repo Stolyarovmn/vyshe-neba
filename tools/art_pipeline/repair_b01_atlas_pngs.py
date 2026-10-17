@@ -3,9 +3,9 @@
 
 The affected files contain valid pixel/IDAT payloads, but their PNG chunk
 structure was written incorrectly: PLTE declares 768 bytes even when the actual
-palette is shorter, and one or more chunk CRC fields are stale. This script
-repairs only chunk metadata (PLTE length + CRC fields). It does not decode and
-re-encode, quantize, resize, or alter chunk payload bytes.
+palette is shorter, one or more chunk CRC fields are stale, and the terminal
+12-byte IEND record can be malformed. This script repairs only PNG structure;
+it does not decode/re-encode, quantize, resize, or alter IDAT payload bytes.
 """
 from __future__ import annotations
 
@@ -39,6 +39,11 @@ def p32(value: int) -> bytes:
     return struct.pack(">I", value)
 
 
+def canonical_iend() -> bytes:
+    typ = b"IEND"
+    return p32(0) + typ + p32(zlib.crc32(typ) & 0xFFFFFFFF)
+
+
 def validate_chunks(data: bytes):
     if not data.startswith(PNG_SIG):
         raise ValueError("not PNG")
@@ -69,7 +74,7 @@ def validate_chunks(data: bytes):
 
 
 def normalize_chunk_crcs(data: bytes):
-    """Recalculate CRC fields without touching any chunk payload bytes."""
+    """Repair stale CRCs and a malformed terminal IEND, preserving payloads."""
     if not data.startswith(PNG_SIG):
         raise ValueError("not PNG")
     buf = bytearray(data)
@@ -80,8 +85,26 @@ def normalize_chunk_crcs(data: bytes):
         n = u32(buf[pos : pos + 4])
         typ = bytes(buf[pos + 4 : pos + 8])
         end = pos + 12 + n
+
         if end > len(buf):
+            # After a valid preceding chunk, exactly 12 trailing bytes can only
+            # be the terminal zero-length IEND record in this asset family.
+            # Replace that record canonically; IDAT payload bytes stay untouched.
+            if len(buf) - pos == 12:
+                before = bytes(buf[pos : pos + 12])
+                buf[pos : pos + 12] = canonical_iend()
+                repairs.append({
+                    "type": "IEND",
+                    "offset": pos,
+                    "action": "replace_malformed_terminal_chunk",
+                    "bytes_before": before.hex(),
+                    "bytes_after": bytes(buf[pos : pos + 12]).hex(),
+                })
+                pos += 12
+                saw_iend = True
+                break
             raise ValueError(f"broken chunk {typ!r} at {pos}: len={n}, remaining={len(buf)-pos}")
+
         payload = bytes(buf[pos + 8 : pos + 8 + n])
         crc_off = pos + 8 + n
         got = u32(buf[crc_off : crc_off + 4])
@@ -91,6 +114,7 @@ def normalize_chunk_crcs(data: bytes):
             repairs.append({
                 "type": typ.decode("ascii", "replace"),
                 "offset": pos,
+                "action": "replace_crc",
                 "crc_before": f"{got:08x}",
                 "crc_after": f"{want:08x}",
             })
@@ -173,13 +197,12 @@ def repair_png(data: bytes):
     repaired[plte_start:plte_type] = p32(actual_len)
     repaired[crc_offset:crc_offset + 4] = p32(expected_plte_crc)
 
-    # Once PLTE's true length is restored, every subsequent chunk boundary is
-    # deterministic. Repair stale CRC fields only; never alter payload bytes.
+    # Once PLTE's true length is restored, subsequent boundaries are
+    # deterministic. Repair only CRC fields and the terminal IEND record.
     repaired, crc_repairs = normalize_chunk_crcs(bytes(repaired))
     chunks = validate_chunks(repaired)
 
-    # Full decoder gate: structure alone is not enough. If IDAT payload data is
-    # actually damaged, Pillow load() will fail and the repair is rejected.
+    # Full decoder gate: if IDAT payload data is actually damaged, load() fails.
     with Image.open(io.BytesIO(repaired)) as im:
         im.load()
         size = list(im.size)
@@ -226,7 +249,7 @@ def main():
                 print(
                     f"REPAIRED {rel}: PLTE {info['declared_plte_len_before']} -> "
                     f"{info['plte_len_after']} bytes, {info['palette_entries']} colors; "
-                    f"CRC fields repaired={len(info['crc_repairs'])}"
+                    f"structural repairs={len(info['crc_repairs'])}"
                 )
             else:
                 print(f"VALID {rel}")
