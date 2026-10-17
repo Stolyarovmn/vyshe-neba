@@ -1,0 +1,135 @@
+name: Pixel art production
+
+on:
+  push:
+    branches: [2d_workshop-placeables-w01]
+    paths:
+      - 'art/raw/placeables/**'
+      - 'tools/art_pipeline/**'
+      - '.github/workflows/art-pipeline.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  process-w07-e0:
+    runs-on: ubuntu-24.04
+    env:
+      ASEPRITE_VERSION: '1.3.18.6'
+      PIXEL_SNAPPER_VERSION: '0.2.0'
+      RAW: art/raw/placeables/workshop/avionics_bench/e0_1978_presnap.png
+      OUTDIR: art/gen/placeables/workshop/avionics_bench
+      RUNTIME_DIR: outputs/rocket/dist/assets/placeables/workshop/avionics_bench
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build unzip libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev libfontconfig1-dev python3-pil
+
+      - name: Restore Aseprite build cache
+        id: ase-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/vyshe-neba/aseprite
+          key: aseprite-${{ runner.os }}-x64-${{ env.ASEPRITE_VERSION }}-skia-m124
+
+      - name: Build Aseprite from official source
+        if: steps.ase-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euxo pipefail
+          WORK="$RUNNER_TEMP/aseprite-build"
+          mkdir -p "$WORK" ~/.cache/vyshe-neba/aseprite
+          curl -L --fail --retry 3 -o "$WORK/aseprite.zip" "https://github.com/aseprite/aseprite/releases/download/v${ASEPRITE_VERSION}/Aseprite-v${ASEPRITE_VERSION}-Source.zip"
+          unzip -q "$WORK/aseprite.zip" -d "$WORK/src"
+          ASE_SRC=$(find "$WORK/src" -maxdepth 2 -type f -name CMakeLists.txt -printf '%h\n' | while read d; do test -f "$d/src/app/CMakeLists.txt" && echo "$d"; done | head -1)
+          curl -L --fail --retry 3 -o "$WORK/skia.zip" 'https://github.com/aseprite/skia/releases/download/m124-08a5439a6b/Skia-Linux-Release-x64.zip'
+          unzip -q "$WORK/skia.zip" -d "$WORK/skia"
+          SKIA_LIB=$(find "$WORK/skia" -name libskia.a | head -1)
+          SKIA_DIR=$(find "$WORK/skia" -path '*/include/core/SkCanvas.h' -printf '%h\n' | sed 's#/include/core$##' | head -1)
+          test -n "$ASE_SRC" && test -f "$SKIA_LIB" && test -d "$SKIA_DIR"
+          cmake -S "$ASE_SRC" -B "$WORK/build" -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS:STRING=-stdlib=libstdc++ \
+            -DCMAKE_EXE_LINKER_FLAGS:STRING=-stdlib=libstdc++ \
+            -DLAF_BACKEND=skia \
+            -DSKIA_DIR="$SKIA_DIR" \
+            -DSKIA_LIBRARY_DIR="$(dirname "$SKIA_LIB")" \
+            -DSKIA_LIBRARY="$SKIA_LIB"
+          cmake --build "$WORK/build" --target aseprite -j2
+          cp "$WORK/build/bin/aseprite" ~/.cache/vyshe-neba/aseprite/aseprite
+          chmod +x ~/.cache/vyshe-neba/aseprite/aseprite
+
+      - name: Install SpriteFusion Pixel Snapper
+        run: |
+          set -euxo pipefail
+          mkdir -p "$RUNNER_TEMP/bin"
+          curl -L --fail --retry 3 -o "$RUNNER_TEMP/bin/spritefusion-pixel-snapper" \
+            "https://github.com/mediapixelkr/ComfyUI-SpriteFusion-PixelSnapper/releases/download/v${PIXEL_SNAPPER_VERSION}/spritefusion-pixel-snapper-linux-x86_64"
+          echo '2a9131cf7e20f74b840f09cd056903532f772ccbc2fdc9ea5f50a611ae93c35d  '"$RUNNER_TEMP/bin/spritefusion-pixel-snapper" | sha256sum -c -
+          chmod +x "$RUNNER_TEMP/bin/spritefusion-pixel-snapper"
+          "$RUNNER_TEMP/bin/spritefusion-pixel-snapper" --version
+
+      - name: Pixel-snap W07 E0
+        run: |
+          set -euxo pipefail
+          mkdir -p "$RUNNER_TEMP/w07" "$OUTDIR" "$RUNTIME_DIR"
+          "$RUNNER_TEMP/bin/spritefusion-pixel-snapper" "$RAW" "$RUNNER_TEMP/w07/snapped.png" 32 \
+            --pixel-size 2 --grid-mode uniform --cell-method center_weighted
+
+      - name: Normalize to runtime canvas
+        run: |
+          python3 tools/art_pipeline/normalize_sprite.py \
+            --input "$RUNNER_TEMP/w07/snapped.png" \
+            --output "$RUNNER_TEMP/w07/normalized.png" \
+            --width 156 --height 118 --anchor-x 78 --anchor-y 114
+
+      - name: Aseprite indexed export
+        run: |
+          ~/.cache/vyshe-neba/aseprite/aseprite -b "$RUNNER_TEMP/w07/normalized.png" \
+            --dithering-algorithm none --color-mode indexed \
+            --save-as "$OUTDIR/e0_1978.png"
+          cp "$OUTDIR/e0_1978.png" "$RUNTIME_DIR/e0_1978.png"
+
+      - name: QA final sprite
+        run: |
+          python3 tools/art_pipeline/qa_sprite.py \
+            --input "$OUTDIR/e0_1978.png" --width 156 --height 118 --max-colors 32 \
+            --report "$OUTDIR/e0_1978.qa.json"
+
+      - name: Record tool provenance
+        run: |
+          cat > "$OUTDIR/e0_1978.pipeline.json" <<JSON
+          {
+            "asset": "W07 avionics_bench",
+            "era": "E0",
+            "year": 1978,
+            "source_gen_id": "712018a0-7db5-4f5e-ad17-27634e8f1881",
+            "spritefusion_pixel_snapper": "v${PIXEL_SNAPPER_VERSION}",
+            "pixel_size": 2,
+            "grid_mode": "uniform",
+            "cell_method": "center_weighted",
+            "colors": 32,
+            "aseprite": "v${ASEPRITE_VERSION}",
+            "aseprite_dithering": "none",
+            "target_canvas": [156, 118],
+            "anchor": [78, 114]
+          }
+          JSON
+
+      - name: Commit verified output
+        run: |
+          set -euxo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$OUTDIR/e0_1978.png" "$OUTDIR/e0_1978.qa.json" "$OUTDIR/e0_1978.pipeline.json" "$RUNTIME_DIR/e0_1978.png"
+          if git diff --cached --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git commit -m 'Process W07 E0 with Pixel Snapper and Aseprite [skip art-pipeline]'
+          git push origin HEAD:${GITHUB_REF_NAME}
