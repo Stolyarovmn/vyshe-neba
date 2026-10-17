@@ -1,6 +1,8 @@
 name: Art tools bootstrap
 
-# refresh canonical tool artifact: 2026-10-17
+# Canonical production tools for the 2D asset pipeline.
+# Aseprite is built as the official upstream CLI configuration (LAF_BACKEND=none):
+# our pipeline only needs batch/indexed/no-dither export, not the GUI/Skia backend.
 on:
   push:
     branches: [2d_workshop-placeables-w01]
@@ -23,12 +25,12 @@ jobs:
       - name: Install build dependencies
         run: |
           set -euxo pipefail
-          sudo apt-get update
+          sudo apt-get update -qq
           sudo apt-get install -y \
             clang cmake ninja-build unzip curl \
+            libpixman-1-dev libfreetype6-dev libharfbuzz-dev zlib1g-dev \
             libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev \
-            libfontconfig1-dev libfreetype6-dev libharfbuzz-dev \
-            libjpeg-dev libpng-dev libwebp-dev zlib1g-dev
+            libfontconfig1-dev libjpeg-dev libpng-dev libwebp-dev
           cargo --version
 
       - name: Build official SpriteFusion Pixel Snapper
@@ -48,20 +50,22 @@ jobs:
           path: ${{ runner.temp }}/art-tools/spritefusion-pixel-snapper
           retention-days: 1
 
-      - name: Restore Aseprite build cache
+      - name: Restore Aseprite CLI build cache
         uses: actions/cache@v4
         with:
-          path: ${{ runner.temp }}/aseprite-build
-          key: aseprite-${{ runner.os }}-${{ runner.arch }}-1.3.18.6-skia-m124-08a5439a6b-v2
+          path: ${{ runner.temp }}/aseprite-cli-build
+          key: aseprite-${{ runner.os }}-${{ runner.arch }}-1.3.18.6-cli-none-v1
 
-      - name: Build Aseprite from official source
+      - name: Build official Aseprite CLI from source
         run: |
           set -euxo pipefail
-          WORK="$RUNNER_TEMP/aseprite-build"
+          WORK="$RUNNER_TEMP/aseprite-cli-build"
           mkdir -p "$WORK"
           if [[ ! -f "$WORK/aseprite.zip" ]]; then
-            curl -L --fail --retry 3 -o "$WORK/aseprite.zip" "https://github.com/aseprite/aseprite/releases/download/v${ASEPRITE_VERSION}/Aseprite-v${ASEPRITE_VERSION}-Source.zip"
+            curl -L --fail --retry 3 -o "$WORK/aseprite.zip" \
+              "https://github.com/aseprite/aseprite/releases/download/v${ASEPRITE_VERSION}/Aseprite-v${ASEPRITE_VERSION}-Source.zip"
           fi
+          rm -rf "$WORK/src"
           mkdir -p "$WORK/src"
           unzip -q -o "$WORK/aseprite.zip" -d "$WORK/src"
           ASE_SRC="$WORK/src"
@@ -69,23 +73,19 @@ jobs:
             ASE_SRC=$(find "$WORK/src" -maxdepth 2 -type f -name CMakeLists.txt -printf '%h\n' | while read -r d; do [[ -f "$d/src/app/CMakeLists.txt" ]] && echo "$d"; done | head -1)
           fi
           test -n "$ASE_SRC" && test -f "$ASE_SRC/src/app/CMakeLists.txt"
-          if [[ ! -f "$WORK/skia.zip" ]]; then
-            curl -L --fail --retry 3 -o "$WORK/skia.zip" 'https://github.com/aseprite/skia/releases/download/m124-08a5439a6b/Skia-Linux-Release-x64.zip'
-          fi
-          mkdir -p "$WORK/skia"
-          unzip -q -o "$WORK/skia.zip" -d "$WORK/skia"
-          SKIA_LIB=$(find "$WORK/skia" -name libskia.a -print -quit)
-          SKIA_CANVAS=$(find "$WORK/skia" -path '*/include/core/SkCanvas.h' -print -quit)
-          SKIA_DIR=$(dirname "$(dirname "$(dirname "$SKIA_CANVAS")")")
-          test -f "$SKIA_LIB" && test -d "$SKIA_DIR"
+
+          # Upstream Aseprite CI uses LAF_BACKEND=none for the CLI matrix.
+          # This intentionally avoids the GUI-only Skia backend and its bundled static libraries.
+          rm -rf "$WORK/build"
+          export CC=clang
+          export CXX=clang++
           cmake -S "$ASE_SRC" -B "$WORK/build" -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_C_COMPILER=clang \
-            -DCMAKE_CXX_COMPILER=clang++ \
-            -DLAF_BACKEND=skia \
-            -DSKIA_DIR="$SKIA_DIR" \
-            -DSKIA_LIBRARY_DIR="$(dirname "$SKIA_LIB")" \
-            -DSKIA_LIBRARY="$SKIA_LIB"
+            -DLAF_BACKEND=none \
+            -DENABLE_SCRIPTING=OFF \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_NEWS=OFF \
+            -DENABLE_UPDATER=OFF
           cmake --build "$WORK/build" --target aseprite -j2
           cp "$WORK/build/bin/aseprite" "$RUNNER_TEMP/art-tools/aseprite"
           chmod +x "$RUNNER_TEMP/art-tools/aseprite"
@@ -95,7 +95,7 @@ jobs:
         run: |
           cat > "$RUNNER_TEMP/art-tools/PROVENANCE.txt" <<EOF
           spritefusion-pixel-snapper revision=$PIXEL_SNAPPER_REV
-          aseprite version=$ASEPRITE_VERSION source=official
+          aseprite version=$ASEPRITE_VERSION source=official backend=none purpose=batch-cli
           runner=$RUNNER_OS/$RUNNER_ARCH
           EOF
           sha256sum "$RUNNER_TEMP/art-tools/spritefusion-pixel-snapper" "$RUNNER_TEMP/art-tools/aseprite" > "$RUNNER_TEMP/art-tools/SHA256SUMS"
