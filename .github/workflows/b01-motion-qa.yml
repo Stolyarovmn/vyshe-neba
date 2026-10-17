@@ -26,12 +26,29 @@ jobs:
           P=outputs/rocket/dist/assets/placeables/base/weather_complex/parts/body_eras.png
           file "$P"
           wc -c "$P"
-          xxd -l 32 "$P"
+          xxd -l 40 "$P"
           git check-attr -a -- "$P" || true
           SHA=$(git rev-parse HEAD:"$P")
           echo "blob=$SHA"
           git cat-file -s "$SHA"
-          git cat-file blob "$SHA" | xxd -l 32
+          git cat-file blob "$SHA" | xxd -l 40
+          python3 - "$P" <<'PY'
+          import struct,sys,zlib
+          p=sys.argv[1]
+          b=open(p,'rb').read()
+          assert b[:8]==b'\x89PNG\r\n\x1a\n'
+          pos=8
+          while pos+12<=len(b):
+              n=struct.unpack('>I',b[pos:pos+4])[0]
+              typ=b[pos+4:pos+8]
+              dat=b[pos+8:pos+8+n]
+              got=struct.unpack('>I',b[pos+8+n:pos+12+n])[0]
+              want=zlib.crc32(typ+dat)&0xffffffff
+              print(typ.decode('ascii','replace'),n,'crc',('OK' if got==want else f'BAD got={got:08x} want={want:08x}'))
+              pos+=12+n
+              if typ==b'IEND': break
+          print('parsed_bytes',pos,'file_bytes',len(b))
+          PY
 
       - name: Install Pillow
         run: |
