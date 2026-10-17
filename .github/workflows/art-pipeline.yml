@@ -72,7 +72,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/bin"
           curl -L --fail --retry 3 -o "$RUNNER_TEMP/bin/spritefusion-pixel-snapper" \
             "https://github.com/mediapixelkr/ComfyUI-SpriteFusion-PixelSnapper/releases/download/v${PIXEL_SNAPPER_VERSION}/spritefusion-pixel-snapper-linux-x86_64"
-          echo '2a9131cf7e20f74b840f09cd056903532f772ccbc2fdc9ea5f50a611ae93c35d  '"$RUNNER_TEMP/bin/spritefusion-pixel-snapper" | sha256sum -c -
+          echo '87ba0a101c10572282cb948825173642f82240654218823642f77ac16d24b64c  '"$RUNNER_TEMP/bin/spritefusion-pixel-snapper" | sha256sum -c -
           chmod +x "$RUNNER_TEMP/bin/spritefusion-pixel-snapper"
           "$RUNNER_TEMP/bin/spritefusion-pixel-snapper" --version
 
