@@ -1,0 +1,119 @@
+{
+  "asset_id": "B01",
+  "asset": "weather_complex",
+  "footprint_lp": [96, 122],
+  "registration_target": [48, 118],
+  "prompt_file": "art/prompts/b01_weather_complex.md",
+  "style_bible": "art/style_bible.txt",
+  "production_manifest": "art/placeables/PRODUCTION_MANIFEST.md",
+  "production_pipeline": "art/docs/ASSET_PRODUCTION_PIPELINE.md",
+  "required_skill": "ref2game",
+  "source_archive": {
+    "provider": "google_drive",
+    "folder_id": "14v5ev_BCpRTOlLhbELSfdVshzoDJeZ8S",
+    "folder_url": "https://drive.google.com/drive/folders/14v5ev_BCpRTOlLhbELSfdVshzoDJeZ8S",
+    "rejected_folder_id": "1WjuMlsQA_i_pLR5k-EgdCQHA35obCfEL"
+  },
+  "structural_reference": {
+    "kind": "code_drawn_control_reference",
+    "sha256": "0a8feeacc3b50b2287e63443cad40f14c649a62325f15486bb5921b91b21e067",
+    "purpose": "force subject geometry when imagegen inherited an unrelated W04 visual context; never runtime art"
+  },
+  "processing_target": {
+    "spritefusion_pixel_snapper": {
+      "repository": "Hugo-Dz/spritefusion-pixel-snapper",
+      "revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+      "colors": 32,
+      "pixel_size_baseline": 10
+    },
+    "aseprite": {
+      "repository": "aseprite/aseprite",
+      "version": "1.3.18.6",
+      "dithering": "none",
+      "color_mode": "indexed"
+    }
+  },
+  "eras": [
+    {
+      "era": "E0", "year": 1978,
+      "source_gen_id": "943ecfd0-1d0b-4fd2-9ff4-1ac5882c134a",
+      "source_size": [1024,1536],
+      "source_sha256": "02bf3b102e870f1bebc6c826246d4e658d2f9a38abaa0bca8c8a82db9b2bd542",
+      "drive_file_id": "1pZnJVdKaLbdGO80jMbS_POP4eIrYMMzI",
+      "drive_url": "https://drive.google.com/file/d/1pZnJVdKaLbdGO80jMbS_POP4eIrYMMzI/view?usp=drivesdk",
+      "lineage": "welded base + tubular mast + cup anemometer + wind vane + analog indicator"
+    },
+    {
+      "era": "E1", "year": 1986,
+      "source_gen_id": "d50705ca-6c92-477d-8878-b7d3b224c811",
+      "source_size": [1155,1362],
+      "source_sha256": "37b2d4772b54afd4df22b1a69fdbc5c97b71cfdb821dd475142303305bb500e2",
+      "drive_file_id": "1w6O5fpctIwFGGGxGLLfm2znjneP2wKqN",
+      "drive_url": "https://drive.google.com/file/d/1w6O5fpctIwFGGGxGLLfm2znjneP2wKqN/view?usp=drivesdk",
+      "lineage": "industrial mast + retained cup/vane + compact mechanical weather radar"
+    },
+    {
+      "era": "E2", "year": 1998,
+      "source_gen_id": "74bf5561-1fcf-42bb-a81f-fd983844738c",
+      "source_size": [1309,1202],
+      "source_sha256": "403e787f19ea90fba5a57dc619ba4fb6f10e2c7490b0bc65ad18a839a3b82cb3",
+      "drive_file_id": "1AxEZY4B-NB4WNzfkznQk9w3Pivx8wE5y",
+      "drive_url": "https://drive.google.com/file/d/1AxEZY4B-NB4WNzfkznQk9w3Pivx8wE5y/view?usp=drivesdk",
+      "lineage": "motorized radar dish + CRT-era electronics + retained weather sensors"
+    },
+    {
+      "era": "E3", "year": 2015,
+      "source_gen_id": "a7f81016-ac11-4032-99fe-3e8189209d88",
+      "source_size": [1024,1536],
+      "source_sha256": "bf78a9d1f4254e6a20a63b3bb9cfc607b4d620963c91c8816ffec4cfca0d807c",
+      "drive_file_id": "14PioZguDesJU62pwPA7BL8WD6bBveQSR",
+      "drive_url": "https://drive.google.com/file/d/14PioZguDesJU62pwPA7BL8WD6bBveQSR/view?usp=drivesdk",
+      "lineage": "modular digital station + compact powered sensor head"
+    },
+    {
+      "era": "E4", "year": 2035,
+      "source_gen_id": "9dd95019-558c-4049-9e8b-4fd79be7bddc",
+      "source_size": [1284,1225],
+      "source_sha256": "f0318bd0e18949efa119ba8ee2d85f0b773f66b2516922503e711ebeee690b81",
+      "drive_file_id": "1aqBJmS7cESySouL55ArTRCvscn5wtVdC",
+      "drive_url": "https://drive.google.com/file/d/1aqBJmS7cESySouL55ArTRCvscn5wtVdC/view?usp=drivesdk",
+      "lineage": "lidar/optical head + autonomous compact electronics"
+    },
+    {
+      "era": "E5", "year": 2060,
+      "source_gen_id": "2aee0086-136d-4f0f-829d-aa9c1c0914f7",
+      "source_size": [1154,1363],
+      "source_sha256": "209f7d31025def98f9cd6940c0afc0b8fb01e443c86e40a02fdce6df3c7c865c",
+      "drive_file_id": "1HM3GZwNygmDehhgDGMOnTjZtr58TRz6I",
+      "drive_url": "https://drive.google.com/file/d/1HM3GZwNygmDehhgDGMOnTjZtr58TRz6I/view?usp=drivesdk",
+      "lineage": "integrated multispectral atmospheric head + lightweight physical sensor network"
+    }
+  ],
+  "lineage_qa": {
+    "drive_file_id": "1Y_6p9x5Y2k-WeDaAI931dYJ8GVL4J9gd",
+    "drive_url": "https://drive.google.com/file/d/1Y_6p9x5Y2k-WeDaAI931dYJ8GVL4J9gd/view?usp=drivesdk",
+    "result": "accepted_for_processing",
+    "note": "E2 is intentionally the heaviest physical radar era; E3-E4 compact again. Runtime normalization must preserve one common family scale/registration rather than independently filling every canvas."
+  },
+  "rejected_sources": [
+    {
+      "source_gen_id": "83517b3d-8e0b-40f7-83b8-1b4a6af7bc4f",
+      "source_sha256": "0fcaf03ddfb130e4024894a791334a7b2a430a61737fb704375b6732ab89badd",
+      "drive_file_id": "1t03TDtWqa6t7jFNbWCmJWqoTNcwj421S",
+      "reason": "wrong subject: inherited W04 flight-simulator board"
+    },
+    {
+      "source_gen_id": "5be52fb3-364e-40d0-ab10-3a3072a5cf2f",
+      "source_sha256": "bfa93ac89b775ad730d1c008365bb2f8987c43fe05fc5e690d046256f5180d2e",
+      "drive_file_id": "1CBGzwh9lUg4nFfUFR55pQC6dRXKAXlzQ",
+      "reason": "wrong subject: second W04 board produced instead of B01"
+    },
+    {
+      "source_gen_id": "e227e138-3b06-4ebe-8302-19aed4ee3fc4",
+      "source_sha256": "d6ba45cef06d0e6eed3dc9d064778deee09f0c9ec13c56e58cf10ad5ab21e518",
+      "drive_file_id": "1HvRM4HWp3vvo9dFBS0nxSLhFlbiJMpxv",
+      "reason": "valid E4 concept but overbuilt and visually noisier than selected lidar-head candidate"
+    }
+  ],
+  "status": "high_quality_originals_and_lineage_QA_complete; Pixel Snapper + canonical normalization + Aseprite + runtime QA pending"
+}
