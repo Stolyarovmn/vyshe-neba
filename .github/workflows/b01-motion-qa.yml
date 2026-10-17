@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Diagnose B01 atlas checkout bytes
+      - name: Diagnose B01 atlas PNG structure
         run: |
           set -euxo pipefail
           P=outputs/rocket/dist/assets/placeables/base/weather_complex/parts/body_eras.png
@@ -31,22 +31,33 @@ jobs:
           SHA=$(git rev-parse HEAD:"$P")
           echo "blob=$SHA"
           git cat-file -s "$SHA"
-          git cat-file blob "$SHA" | xxd -l 40
           python3 - "$P" <<'PY'
           import struct,sys,zlib
           p=sys.argv[1]
           b=open(p,'rb').read()
           assert b[:8]==b'\x89PNG\r\n\x1a\n'
+          for sig in (b'IHDR',b'PLTE',b'tRNS',b'IDAT',b'IEND'):
+              hits=[]; start=0
+              while True:
+                  i=b.find(sig,start)
+                  if i<0: break
+                  hits.append(i); start=i+1
+              print(sig.decode(), 'offsets', hits)
           pos=8
           while pos+12<=len(b):
               n=struct.unpack('>I',b[pos:pos+4])[0]
               typ=b[pos+4:pos+8]
+              if pos+12+n>len(b):
+                  print('BROKEN_CHUNK', 'offset',pos,'type',typ,'declared_len',n,'remaining',len(b)-pos)
+                  break
               dat=b[pos+8:pos+8+n]
               got=struct.unpack('>I',b[pos+8+n:pos+12+n])[0]
               want=zlib.crc32(typ+dat)&0xffffffff
-              print(typ.decode('ascii','replace'),n,'crc',('OK' if got==want else f'BAD got={got:08x} want={want:08x}'))
+              print('CHUNK','offset',pos,'type',typ.decode('ascii','replace'),'len',n,'crc',('OK' if got==want else f'BAD got={got:08x} want={want:08x}'))
               pos+=12+n
               if typ==b'IEND': break
+          for off in range(780,900,32):
+              print(f'HEX@{off}',b[off:off+32].hex())
           print('parsed_bytes',pos,'file_bytes',len(b))
           PY
 
