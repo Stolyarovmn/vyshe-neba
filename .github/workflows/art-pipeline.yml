@@ -4,7 +4,7 @@ on:
   push:
     branches: [2d_workshop-placeables-w01]
     paths:
-      - 'art/raw/placeables/**'
+      - 'art/raw/placeables/workshop/flight_simulator/**'
       - 'tools/art_pipeline/**'
       - '.github/workflows/art-pipeline.yml'
   workflow_dispatch:
@@ -13,25 +13,55 @@ permissions:
   contents: write
 
 jobs:
-  process-w07-e0:
+  process-w04:
     runs-on: ubuntu-24.04
     env:
       ASEPRITE_VERSION: '1.3.18.6'
-      PIXEL_SNAPPER_VERSION: '0.2.0'
-      RAW: art/raw/placeables/workshop/avionics_bench/e0_1978_presnap.png
-      OUTDIR: art/gen/placeables/workshop/avionics_bench
-      RUNTIME_DIR: outputs/rocket/dist/assets/placeables/workshop/avionics_bench
+      PIXEL_SNAPPER_REV: 'ae20461f60fb39e75d15f184bab1ebec1219511c'
+      RAW_DIR: art/raw/placeables/workshop/flight_simulator
+      OUTDIR: art/gen/placeables/workshop/flight_simulator
+      RUNTIME_DIR: outputs/rocket/dist/assets/placeables/workshop/flight_simulator
+      COLORS: '32'
+      PIXEL_SIZE: '8'
+      WIDTH: '172'
+      HEIGHT: '160'
+      REG_X: '86'
+      REG_Y: '156'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Check W04 source set
+        id: inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=0
+          for stem in e0_1978 e1_1986 e2_1998 e3_2015 e4_2035 e5_2060; do
+            for ext in png json; do
+              if [[ ! -f "$RAW_DIR/${stem}_presnap.${ext}" ]]; then
+                echo "missing: $RAW_DIR/${stem}_presnap.${ext}"
+                missing=1
+              fi
+            done
+          done
+          if [[ "$missing" -eq 0 ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'W04 raw set is incomplete; workflow exits without producing runtime art.'
+          fi
+
       - name: Install build dependencies
+        if: steps.inputs.outputs.ready == 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build unzip libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev libfontconfig1-dev python3-pil
+          sudo apt-get install -y clang cmake ninja-build unzip libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev libfontconfig1-dev python3-pil jq
+          cargo --version
 
       - name: Restore Aseprite build cache
+        if: steps.inputs.outputs.ready == 'true'
         id: ase-cache
         uses: actions/cache@v4
         with:
@@ -39,7 +69,7 @@ jobs:
           key: aseprite-${{ runner.os }}-x64-${{ env.ASEPRITE_VERSION }}-skia-m124
 
       - name: Build Aseprite from official source
-        if: steps.ase-cache.outputs.cache-hit != 'true'
+        if: steps.inputs.outputs.ready == 'true' && steps.ase-cache.outputs.cache-hit != 'true'
         run: |
           set -euxo pipefail
           WORK="$RUNNER_TEMP/aseprite-build"
@@ -47,7 +77,10 @@ jobs:
           curl -L --fail --retry 3 -o "$WORK/aseprite.zip" "https://github.com/aseprite/aseprite/releases/download/v${ASEPRITE_VERSION}/Aseprite-v${ASEPRITE_VERSION}-Source.zip"
           unzip -q "$WORK/aseprite.zip" -d "$WORK/src"
           ASE_SRC="$WORK/src"
-          test -f "$ASE_SRC/src/app/CMakeLists.txt"
+          if [[ ! -f "$ASE_SRC/src/app/CMakeLists.txt" ]]; then
+            ASE_SRC=$(find "$WORK/src" -maxdepth 2 -type f -name CMakeLists.txt -printf '%h\n' | while read -r d; do [[ -f "$d/src/app/CMakeLists.txt" ]] && echo "$d"; done | head -1)
+          fi
+          test -n "$ASE_SRC" && test -f "$ASE_SRC/src/app/CMakeLists.txt"
           curl -L --fail --retry 3 -o "$WORK/skia.zip" 'https://github.com/aseprite/skia/releases/download/m124-08a5439a6b/Skia-Linux-Release-x64.zip'
           unzip -q "$WORK/skia.zip" -d "$WORK/skia"
           SKIA_LIB=$(find "$WORK/skia" -name libskia.a -print -quit)
@@ -66,72 +99,92 @@ jobs:
           cp "$WORK/build/bin/aseprite" ~/.cache/vyshe-neba/aseprite/aseprite
           chmod +x ~/.cache/vyshe-neba/aseprite/aseprite
 
-      - name: Install SpriteFusion Pixel Snapper
+      - name: Install official SpriteFusion Pixel Snapper
+        if: steps.inputs.outputs.ready == 'true'
         run: |
           set -euxo pipefail
-          mkdir -p "$RUNNER_TEMP/bin"
-          curl -L --fail --retry 3 -o "$RUNNER_TEMP/bin/spritefusion-pixel-snapper" \
-            "https://github.com/mediapixelkr/ComfyUI-SpriteFusion-PixelSnapper/releases/download/v${PIXEL_SNAPPER_VERSION}/spritefusion-pixel-snapper-linux-x86_64"
-          echo '87ba0a101c10572282cb948825173642f82240654218823642f77ac16d24b64c  '"$RUNNER_TEMP/bin/spritefusion-pixel-snapper" | sha256sum -c -
-          chmod +x "$RUNNER_TEMP/bin/spritefusion-pixel-snapper"
-          "$RUNNER_TEMP/bin/spritefusion-pixel-snapper" --version
+          cargo install --git https://github.com/Hugo-Dz/spritefusion-pixel-snapper \
+            --rev "$PIXEL_SNAPPER_REV" --locked \
+            --root "$RUNNER_TEMP/pixel-snapper" spritefusion-pixel-snapper
+          "$RUNNER_TEMP/pixel-snapper/bin/spritefusion-pixel-snapper" --version
 
-      - name: Pixel-snap W07 E0
+      - name: Process W04 E0-E5
+        if: steps.inputs.outputs.ready == 'true'
+        shell: bash
         run: |
           set -euxo pipefail
-          mkdir -p "$RUNNER_TEMP/w07" "$OUTDIR" "$RUNTIME_DIR"
-          "$RUNNER_TEMP/bin/spritefusion-pixel-snapper" "$RAW" "$RUNNER_TEMP/w07/snapped.png" 32 \
-            --pixel-size 2 --grid-mode uniform --cell-method center_weighted
+          SNAP="$RUNNER_TEMP/pixel-snapper/bin/spritefusion-pixel-snapper"
+          ASE=~/.cache/vyshe-neba/aseprite/aseprite
+          WORK="$RUNNER_TEMP/w04"
+          mkdir -p "$WORK" "$OUTDIR" "$RUNTIME_DIR"
 
-      - name: Normalize to runtime canvas
-        run: |
-          python3 tools/art_pipeline/normalize_sprite.py \
-            --input "$RUNNER_TEMP/w07/snapped.png" \
-            --output "$RUNNER_TEMP/w07/normalized.png" \
-            --width 156 --height 118 --anchor-x 78 --anchor-y 114
+          entries=(
+            'e0_1978:E0:1978'
+            'e1_1986:E1:1986'
+            'e2_1998:E2:1998'
+            'e3_2015:E3:2015'
+            'e4_2035:E4:2035'
+            'e5_2060:E5:2060'
+          )
 
-      - name: Aseprite indexed export
-        run: |
-          ~/.cache/vyshe-neba/aseprite/aseprite -b "$RUNNER_TEMP/w07/normalized.png" \
-            --dithering-algorithm none --color-mode indexed \
-            --save-as "$OUTDIR/e0_1978.png"
-          cp "$OUTDIR/e0_1978.png" "$RUNTIME_DIR/e0_1978.png"
+          for entry in "${entries[@]}"; do
+            IFS=: read -r stem era year <<< "$entry"
+            raw="$RAW_DIR/${stem}_presnap.png"
+            meta="$RAW_DIR/${stem}_presnap.json"
+            snapped="$WORK/${stem}_snapped.png"
+            normalized="$WORK/${stem}_normalized.png"
+            final="$OUTDIR/${stem}.png"
 
-      - name: QA final sprite
-        run: |
-          python3 tools/art_pipeline/qa_sprite.py \
-            --input "$OUTDIR/e0_1978.png" --width 156 --height 118 --max-colors 32 \
-            --report "$OUTDIR/e0_1978.qa.json"
+            "$SNAP" "$raw" "$snapped" "$COLORS" --pixel-size "$PIXEL_SIZE"
 
-      - name: Record tool provenance
-        run: |
-          cat > "$OUTDIR/e0_1978.pipeline.json" <<JSON
+            python3 tools/art_pipeline/normalize_sprite.py \
+              --input "$snapped" --output "$normalized" \
+              --width "$WIDTH" --height "$HEIGHT" \
+              --anchor-x "$REG_X" --anchor-y "$REG_Y"
+
+            "$ASE" -b "$normalized" \
+              --dithering-algorithm none --color-mode indexed \
+              --save-as "$final"
+
+            python3 tools/art_pipeline/qa_sprite.py \
+              --input "$final" --width "$WIDTH" --height "$HEIGHT" \
+              --max-colors "$COLORS" --report "$OUTDIR/${stem}.qa.json"
+
+            cp "$final" "$RUNTIME_DIR/${stem}.png"
+
+            source_gen_id=$(jq -r '.source_gen_id' "$meta")
+            source_sha256=$(sha256sum "$raw" | awk '{print $1}')
+            cat > "$OUTDIR/${stem}.pipeline.json" <<JSON
           {
-            "asset": "W07 avionics_bench",
-            "era": "E0",
-            "year": 1978,
-            "source_gen_id": "712018a0-7db5-4f5e-ad17-27634e8f1881",
-            "spritefusion_pixel_snapper": "v${PIXEL_SNAPPER_VERSION}",
-            "pixel_size": 2,
-            "grid_mode": "uniform",
-            "cell_method": "center_weighted",
-            "colors": 32,
-            "aseprite": "v${ASEPRITE_VERSION}",
+            "asset": "W04 flight_simulator",
+            "era": "$era",
+            "year": $year,
+            "source_gen_id": "$source_gen_id",
+            "source_sha256": "$source_sha256",
+            "spritefusion_pixel_snapper_rev": "$PIXEL_SNAPPER_REV",
+            "spritefusion_pixel_snapper_package": "1.0.0",
+            "pixel_size": $PIXEL_SIZE,
+            "colors": $COLORS,
+            "aseprite": "$ASEPRITE_VERSION",
             "aseprite_dithering": "none",
-            "target_canvas": [156, 118],
-            "anchor": [78, 114]
+            "target_canvas": [$WIDTH, $HEIGHT],
+            "registration_target": [$REG_X, $REG_Y],
+            "mechanism_pivots": "pending_measured_rig_pass"
           }
           JSON
+          done
 
-      - name: Commit verified output
+      - name: Commit verified W04 outputs
+        if: steps.inputs.outputs.ready == 'true'
         run: |
           set -euxo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$OUTDIR/e0_1978.png" "$OUTDIR/e0_1978.qa.json" "$OUTDIR/e0_1978.pipeline.json" "$RUNTIME_DIR/e0_1978.png"
+          git add "$OUTDIR" "$RUNTIME_DIR"
           if git diff --cached --quiet; then
             echo 'No generated changes.'
             exit 0
           fi
-          git commit -m 'Process W07 E0 with Pixel Snapper and Aseprite [skip art-pipeline]'
-          git push origin HEAD:${GITHUB_REF_NAME}
+          git commit -m 'Process W04 with official Pixel Snapper and Aseprite [skip art-pipeline]'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
