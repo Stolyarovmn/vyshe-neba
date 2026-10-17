@@ -18,7 +18,7 @@
       "repository": "Hugo-Dz/spritefusion-pixel-snapper",
       "revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
       "colors": 32,
-      "pixel_size_baseline": "pending E0 visual QA"
+      "pixel_size_baseline": "pending snapped E0 gameplay-size QA"
     },
     "aseprite": {
       "repository": "aseprite/aseprite",
@@ -37,8 +37,9 @@
       "drive_file_id": "15myLTFVhAt6djvC2lFwDAQfLiIPcBI86",
       "drive_url": "https://drive.google.com/file/d/15myLTFVhAt6djvC2lFwDAQfLiIPcBI86/view?usp=drivesdk",
       "lineage": "heavy welded tracking pedestal + real azimuth axis + early parabolic directional dish + physical elevation yoke/feed",
-      "review": "pending"
+      "review": "accepted_as_E0_anchor",
+      "review_note": "Strong readable radar silhouette and physically plausible pedestal/azimuth/elevation/feed chain. Keep the dish/yoke ancestry through later eras; do not accumulate the E0 service-platform micro-detail in future variants."
     }
   ],
-  "status": "E0 original archived and provenance recorded; E0 review pending before part-sheet/E1 generation"
+  "status": "E0 anchor approved and archived; E0 isolated part-sheet is next before E1 generation"
 }
