@@ -62,7 +62,7 @@ jobs:
             -DSKIA_DIR="$SKIA_DIR" \
             -DSKIA_LIBRARY_DIR="$(dirname "$SKIA_LIB")" \
             -DSKIA_LIBRARY="$SKIA_LIB"
-          cmake --build "$WORK/build" --target aseprite -j2
+          cmake --build "$WORK/build" --target aseprite -j"$(nproc)"
           cp "$WORK/build/bin/aseprite" ~/.cache/vyshe-neba/aseprite/aseprite
           chmod +x ~/.cache/vyshe-neba/aseprite/aseprite
 
