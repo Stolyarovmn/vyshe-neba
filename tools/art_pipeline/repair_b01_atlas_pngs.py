@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""One-time structural repair for malformed B01 indexed PNG atlases.
+"""One-time structural recovery for malformed B01 indexed PNG atlases.
 
-The affected files contain valid pixel/IDAT payloads, but their PNG chunk
-structure was written incorrectly: PLTE declares 768 bytes even when the actual
-palette is shorter, one or more chunk CRC fields are stale, and the terminal
-12-byte IEND record can be malformed. This script repairs only PNG structure;
-it does not decode/re-encode, quantize, resize, or alter IDAT payload bytes.
+Recovery is deliberately conservative:
+- recover the real PLTE boundary;
+- repair stale chunk CRCs / terminal IEND metadata;
+- if zlib fails only after yielding the complete expected scanline stream,
+  recompress exactly those same scanline bytes into a fresh IDAT.
+
+No image resampling, palette remapping, quantization, drawing, or regenerated
+pixel content is allowed. The downstream motion QA must also reconstruct every
+approved era anchor pixel-exactly from the recovered atlases.
 """
 from __future__ import annotations
 
@@ -39,9 +43,12 @@ def p32(value: int) -> bytes:
     return struct.pack(">I", value)
 
 
+def make_chunk(typ: bytes, payload: bytes) -> bytes:
+    return p32(len(payload)) + typ + payload + p32(zlib.crc32(typ + payload) & 0xFFFFFFFF)
+
+
 def canonical_iend() -> bytes:
-    typ = b"IEND"
-    return p32(0) + typ + p32(zlib.crc32(typ) & 0xFFFFFFFF)
+    return make_chunk(b"IEND", b"")
 
 
 def validate_chunks(data: bytes):
@@ -73,6 +80,22 @@ def validate_chunks(data: bytes):
     return chunks
 
 
+def parsed_payloads(data: bytes):
+    """Return validated chunks as (type,payload)."""
+    validate_chunks(data)
+    pos = 8
+    out = []
+    while pos + 12 <= len(data):
+        n = u32(data[pos : pos + 4])
+        typ = data[pos + 4 : pos + 8]
+        payload = data[pos + 8 : pos + 8 + n]
+        out.append((typ, payload))
+        pos += 12 + n
+        if typ == b"IEND":
+            break
+    return out
+
+
 def normalize_chunk_crcs(data: bytes):
     """Repair stale CRCs and a malformed terminal IEND, preserving payloads."""
     if not data.startswith(PNG_SIG):
@@ -87,9 +110,6 @@ def normalize_chunk_crcs(data: bytes):
         end = pos + 12 + n
 
         if end > len(buf):
-            # After a valid preceding chunk, exactly 12 trailing bytes can only
-            # be the terminal zero-length IEND record in this asset family.
-            # Replace that record canonically; IDAT payload bytes stay untouched.
             if len(buf) - pos == 12:
                 before = bytes(buf[pos : pos + 12])
                 buf[pos : pos + 12] = canonical_iend()
@@ -130,8 +150,6 @@ def normalize_chunk_crcs(data: bytes):
 
 
 def find_next_chunk_start(data: bytes, plte_type_offset: int) -> int:
-    # Indexed runtime art is transparent; tRNS is normally next. Fall back to
-    # IDAT for a fully opaque indexed image. Chunk type is preceded by 4-byte len.
     candidates = []
     for typ in (b"tRNS", b"IDAT"):
         start = plte_type_offset + 4
@@ -152,11 +170,76 @@ def find_next_chunk_start(data: bytes, plte_type_offset: int) -> int:
     return min(candidates)
 
 
+def recover_complete_scanlines(data: bytes):
+    """Recover raw PNG scanlines only if the old zlib stream yielded all bytes."""
+    chunks = parsed_payloads(data)
+    ihdr = next(payload for typ, payload in chunks if typ == b"IHDR")
+    width, height, bit_depth, color_type, compression, filter_method, interlace = struct.unpack(
+        ">IIBBBBB", ihdr
+    )
+    if (bit_depth, color_type, compression, filter_method, interlace) != (8, 3, 0, 0, 0):
+        raise ValueError(
+            f"unsupported recovery layout: bit_depth={bit_depth} color_type={color_type} "
+            f"compression={compression} filter={filter_method} interlace={interlace}"
+        )
+    expected = (width + 1) * height
+    old_idat = b"".join(payload for typ, payload in chunks if typ == b"IDAT")
+    if not old_idat:
+        raise ValueError("missing IDAT payload")
+
+    d = zlib.decompressobj()
+    raw = bytearray()
+    zerr = None
+    error_offset = None
+    # Byte-wise feed is intentional: if only the trailer/checksum is damaged,
+    # all decompressed scanline bytes emitted before the error remain available.
+    for i, value in enumerate(old_idat):
+        try:
+            raw.extend(d.decompress(bytes((value,))))
+        except zlib.error as exc:
+            zerr = str(exc)
+            error_offset = i
+            break
+    if zerr is None:
+        try:
+            raw.extend(d.flush())
+        except zlib.error as exc:
+            zerr = str(exc)
+            error_offset = len(old_idat)
+
+    if len(raw) != expected:
+        raise ValueError(
+            f"IDAT recovery rejected: recovered {len(raw)} raw scanline bytes, expected {expected}; "
+            f"zlib_error={zerr!r} at compressed offset {error_offset}"
+        )
+
+    new_idat = zlib.compress(bytes(raw), level=9)
+    rebuilt = bytearray(PNG_SIG)
+    wrote_idat = False
+    for typ, payload in chunks:
+        if typ == b"IDAT":
+            if not wrote_idat:
+                rebuilt += make_chunk(b"IDAT", new_idat)
+                wrote_idat = True
+            continue
+        rebuilt += make_chunk(typ, payload)
+
+    return bytes(rebuilt), {
+        "performed": True,
+        "expected_scanline_bytes": expected,
+        "recovered_scanline_bytes": len(raw),
+        "old_idat_bytes": len(old_idat),
+        "new_idat_bytes": len(new_idat),
+        "zlib_error": zerr,
+        "zlib_error_offset": error_offset,
+        "raw_scanline_sha256": sha256_bytes(bytes(raw)),
+    }
+
+
 def repair_png(data: bytes):
     if not data.startswith(PNG_SIG):
         raise ValueError("not PNG")
 
-    # If already valid, keep bytes exactly unchanged.
     try:
         validate_chunks(data)
         with Image.open(io.BytesIO(data)) as im:
@@ -169,8 +252,9 @@ def repair_png(data: bytes):
             "decoded_mode": mode,
             "decoded_size": size,
             "crc_repairs": [],
+            "idat_recovery": {"performed": False},
         }
-    except ValueError as initial_error:
+    except (ValueError, OSError) as initial_error:
         pass
 
     plte_type = data.find(b"PLTE", 8)
@@ -196,19 +280,27 @@ def repair_png(data: bytes):
     repaired = bytearray(data)
     repaired[plte_start:plte_type] = p32(actual_len)
     repaired[crc_offset:crc_offset + 4] = p32(expected_plte_crc)
-
-    # Once PLTE's true length is restored, subsequent boundaries are
-    # deterministic. Repair only CRC fields and the terminal IEND record.
     repaired, crc_repairs = normalize_chunk_crcs(bytes(repaired))
-    chunks = validate_chunks(repaired)
+    validate_chunks(repaired)
 
-    # Full decoder gate: if IDAT payload data is actually damaged, load() fails.
-    with Image.open(io.BytesIO(repaired)) as im:
-        im.load()
-        size = list(im.size)
-        mode = im.mode
+    idat_recovery = {"performed": False}
+    try:
+        with Image.open(io.BytesIO(repaired)) as im:
+            im.load()
+            size = list(im.size)
+            mode = im.mode
+    except OSError as decode_error:
+        repaired, idat_recovery = recover_complete_scanlines(repaired)
+        validate_chunks(repaired)
+        with Image.open(io.BytesIO(repaired)) as im:
+            im.load()
+            size = list(im.size)
+            mode = im.mode
+        idat_recovery["decoder_error_before_recovery"] = str(decode_error)
+
     if size != [288, 244]:
         raise ValueError(f"decoded size {size} != [288,244]")
+    chunks = validate_chunks(repaired)
 
     return repaired, {
         "changed": True,
@@ -218,6 +310,7 @@ def repair_png(data: bytes):
         "plte_crc_before": f"{stored_plte_crc:08x}",
         "plte_crc_after": f"{expected_plte_crc:08x}",
         "crc_repairs": crc_repairs,
+        "idat_recovery": idat_recovery,
         "decoded_mode": mode,
         "decoded_size": size,
         "chunks": chunks,
@@ -246,26 +339,27 @@ def main():
             report["files"][str(rel)] = info
             if after != before:
                 path.write_bytes(after)
+                idat = info["idat_recovery"]
                 print(
-                    f"REPAIRED {rel}: PLTE {info['declared_plte_len_before']} -> "
+                    f"RECOVERED {rel}: PLTE {info['declared_plte_len_before']} -> "
                     f"{info['plte_len_after']} bytes, {info['palette_entries']} colors; "
-                    f"structural repairs={len(info['crc_repairs'])}"
+                    f"structural repairs={len(info['crc_repairs'])}; "
+                    f"IDAT scanline recovery={idat.get('performed', False)}"
                 )
             else:
                 print(f"VALID {rel}")
 
-    # Art/gen and runtime copies must remain byte-identical per part.
     for part in PARTS:
         a = (repo / ROOTS[0] / f"{part}_eras.png").read_bytes()
         b = (repo / ROOTS[1] / f"{part}_eras.png").read_bytes()
         if a != b:
-            raise SystemExit(f"QA_FAIL: art/gen and runtime {part} atlases differ after repair")
+            raise SystemExit(f"QA_FAIL: art/gen and runtime {part} atlases differ after recovery")
 
     if args.report:
         rp = Path(args.report)
         rp.parent.mkdir(parents=True, exist_ok=True)
         rp.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    print("B01 atlas structural repair PASS: all atlases decode, chunk CRCs valid, art/gen == runtime")
+    print("B01 atlas recovery PASS: all atlases fully decode; art/gen == runtime")
 
 
 if __name__ == "__main__":
