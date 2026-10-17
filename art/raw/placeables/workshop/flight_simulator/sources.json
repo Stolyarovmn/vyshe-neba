@@ -1,13 +1,19 @@
 {
   "asset_id": "W04",
   "asset": "flight_simulator",
-  "native_source_size": [1254, 1254],
+  "native_source_size": [1300, 1209],
   "target_canvas": [172, 160],
   "registration_target": [86, 156],
   "prompt_file": "art/prompts/w04_flight_simulator.md",
   "style_bible": "art/style_bible.txt",
   "production_manifest": "art/placeables/PRODUCTION_MANIFEST.md",
+  "production_pipeline": "art/docs/ASSET_PRODUCTION_PIPELINE.md",
   "required_skill": "ref2game",
+  "source_archive": {
+    "provider": "google_drive",
+    "folder_id": "1cUhp5jgedXm58YlrGlf0SfdzX_ZDivg2",
+    "folder_url": "https://drive.google.com/drive/folders/1cUhp5jgedXm58YlrGlf0SfdzX_ZDivg2"
+  },
   "pixel_snapper": {
     "repository": "Hugo-Dz/spritefusion-pixel-snapper",
     "revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
@@ -22,12 +28,85 @@
     "color_mode": "indexed"
   },
   "eras": [
-    {"era":"E0","year":1978,"source_gen_id":"155ad5c7-2e21-4bb6-811b-e42ed21ee5e7","source_sha256":"cb7a4d1bf4b2795a1aa5f6c738787efe2305b7d2f7c641c1d6593ddc07a0be55"},
-    {"era":"E1","year":1986,"source_gen_id":"77e671d8-6aa9-4aee-8389-7b3bf26271f2","source_sha256":"35b9beb93b3486d47853333a4ab4ca062f3824f87c1c5b29730c6d57136255f2"},
-    {"era":"E2","year":1998,"source_gen_id":"57f0cda3-c37e-489e-bdc5-404c89c935a9","source_sha256":"932ff90c6f50678181cd135ae9d7d520802bf1326ed0bb5aee1567e4c9657034"},
-    {"era":"E3","year":2015,"source_gen_id":"c0dbb3e2-65b1-4b2a-8358-3deeb36a45f4","source_sha256":"87a09280146786d2c19805f4ccaed3dad03f1765f7ba76652eacdae9e1f4de3c"},
-    {"era":"E4","year":2035,"source_gen_id":"ac153f0a-25ca-4f5a-9865-4949c355fb4a","source_sha256":"07f21f78ff80ca9a1981809f986fbca8badf213704c0d138b644a937c48c3280"},
-    {"era":"E5","year":2060,"source_gen_id":"b2916572-5c28-4dbe-9461-e3dd65786da8","source_sha256":"5a2ec522ef5ab65c6fa85d09438c4dcad19d61ba254885b4114e6659af52b930"}
+    {
+      "era": "E0", "year": 1978,
+      "source_gen_id": "ae46f076-6bbc-47ee-a0c9-49bdf476f1af",
+      "source_sha256": "7e773738a0a91c92642be3fdd7653d174b3fe868f6fc3e4927cea0f3ff006458",
+      "drive_file_id": "1NYBfC7ZeuMiIXGlx6HuhSnYZUjxihTQb",
+      "drive_url": "https://drive.google.com/file/d/1NYBfC7ZeuMiIXGlx6HuhSnYZUjxihTQb/view?usp=drivesdk"
+    },
+    {
+      "era": "E1", "year": 1986,
+      "source_gen_id": "6f1957c4-82ea-4ef1-ad11-c638bbe3a1e5",
+      "source_sha256": "a9efff983b42c2c3e3c0f167b0e30cd2e7661ec7281675e46b6e549d5926e08f",
+      "drive_file_id": "14ciwrBfmEhXD7bKH68EJ7aRhJxi8wtlQ",
+      "drive_url": "https://drive.google.com/file/d/14ciwrBfmEhXD7bKH68EJ7aRhJxi8wtlQ/view?usp=drivesdk"
+    },
+    {
+      "era": "E2", "year": 1998,
+      "source_gen_id": "a12d3343-355a-473b-a0e8-afbb371019b0",
+      "source_sha256": "451a86d998229110e4cb75b4b4c83a87d6fa28220eaba8ab1dd638ef420a4369",
+      "drive_file_id": "1FpNCtswDxpPmV61vuOBSkBAAGL7A4F-K",
+      "drive_url": "https://drive.google.com/file/d/1FpNCtswDxpPmV61vuOBSkBAAGL7A4F-K/view?usp=drivesdk"
+    },
+    {
+      "era": "E3", "year": 2015,
+      "source_gen_id": "2e962835-c849-4d05-b5a9-f025910a774b",
+      "source_sha256": "be5d5f6e21e6993bb7030b866faf131dd6c059328d517d9020c11ef0186f06ca",
+      "drive_file_id": "1ztr70UqXZUuPhm78gGNr6rXluZ02TIgb",
+      "drive_url": "https://drive.google.com/file/d/1ztr70UqXZUuPhm78gGNr6rXluZ02TIgb/view?usp=drivesdk"
+    },
+    {
+      "era": "E4", "year": 2035,
+      "source_gen_id": "23bc0c91-67e8-4fe0-bcd3-91e3f3afec80",
+      "source_sha256": "233e2a32282a90569496dfd97d050321597c95f17021c9d0d7a858c1e6371dc0",
+      "drive_file_id": "1aEluJIkp86K0nONj5j1Amn530DBkJDD-",
+      "drive_url": "https://drive.google.com/file/d/1aEluJIkp86K0nONj5j1Amn530DBkJDD-/view?usp=drivesdk"
+    },
+    {
+      "era": "E5", "year": 2060,
+      "source_gen_id": "45c1101a-c5b7-48d7-abb0-8ce385227130",
+      "source_sha256": "39791fbfe36dc116f5c1d859b30acb04ef31aaa340d97c1706574b6b84fe74c9",
+      "drive_file_id": "14pOeaaKu4N6OY9wQaVdNrMQQiFdLc6-J",
+      "drive_url": "https://drive.google.com/file/d/14pOeaaKu4N6OY9wQaVdNrMQQiFdLc6-J/view?usp=drivesdk"
+    }
   ],
-  "note": "Native generator PNG bytes are the authoritative image provenance. Runtime sprites are not approved until official Pixel Snapper, canonical LP registration, Aseprite indexed/no-dither export and QA succeed. Mechanism pivots remain pending until isolated-part measurement."
+  "e0_rig_source_parts": {
+    "base": {
+      "source_gen_id": "3899f8ff-3247-4995-ac8d-e28a5397b897",
+      "source_sha256": "4c8b14dc8a09e0facb76bf26047b98c50d2719b77d95f3e00a006b8125cb32be",
+      "drive_file_id": "1CZixTbpq2PxCxCZrHL8BfYVOrfMX8g0d",
+      "drive_url": "https://drive.google.com/file/d/1CZixTbpq2PxCxCZrHL8BfYVOrfMX8g0d/view?usp=drivesdk"
+    },
+    "pod": {
+      "source_gen_id": "4adb5e9e-79ab-476c-bd76-f8b0e7afcf81",
+      "source_sha256": "32338012feaed4c8b96924ed6eec9856c597bdb409da59374989dd1b0658f5b9",
+      "drive_file_id": "1QPiWlisFiGqTtXlHhKQnztYyauJByWv7",
+      "drive_url": "https://drive.google.com/file/d/1QPiWlisFiGqTtXlHhKQnztYyauJByWv7/view?usp=drivesdk"
+    },
+    "actuator_pair": {
+      "source_gen_id": "4b1d0bc1-fb65-4c2a-82fd-494757cf296c",
+      "source_sha256": "8be4d887b3d72f1cea3413e20504fbb82b0052184f508be9d5e0f7a0874bdbae",
+      "drive_file_id": "1s6XgGMu1l3y0k7XRvIYtqSYh1Mip2_Ew",
+      "drive_url": "https://drive.google.com/file/d/1s6XgGMu1l3y0k7XRvIYtqSYh1Mip2_Ew/view?usp=drivesdk",
+      "split_runtime_parts": ["actuator_left", "actuator_right"]
+    },
+    "canopy": {
+      "status": "absent_in_E0_by_lineage",
+      "runtime_cell": "transparent"
+    }
+  },
+  "rejected_sources": [
+    {
+      "source_gen_id": "0692a1d7-9a14-4e4a-ac42-cc1357ef801f",
+      "drive_file_id": "1760VF4fDcx8R-uRqfu8e1NgRgs3YPoCI",
+      "reason": "mixed unrelated workbench/base into part sheet and baked presentation background"
+    },
+    {
+      "source_gen_id": "04f209d8-8641-4d03-b69b-ec374ed023d4",
+      "drive_file_id": "1P7UXREdIJ0Yt5mvrmOTV9uK0dt5Od2pT",
+      "reason": "pod contaminated with ground rails/base geometry; unsafe for measured cut-out rig"
+    }
+  ],
+  "note": "Google Drive stores authoritative full-resolution source bytes. Runtime sprites remain gated on official Pixel Snapper, canonical LP registration, Aseprite indexed/no-dither export and QA. E0 canopy is intentionally absent; mechanism pivots remain pending until processed part measurement and rest-pose reconstruction."
 }
