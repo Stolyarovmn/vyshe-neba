@@ -1,0 +1,8 @@
+{
+  "asset_id":"W04","asset":"flight_simulator","era":"E4","year":2035,
+  "source_gen_id":"23bc0c91-67e8-4fe0-bcd3-91e3f3afec80","source_size":[1300,1209],
+  "source_sha256":"233e2a32282a90569496dfd97d050321597c95f17021c9d0d7a858c1e6371dc0",
+  "source_storage":{"provider":"google_drive","drive_file_id":"1aEluJIkp86K0nONj5j1Amn530DBkJDD-","drive_url":"https://drive.google.com/file/d/1aEluJIkp86K0nONj5j1Amn530DBkJDD-/view?usp=drivesdk"},
+  "transport_png":"e4_2035_presnap.png","target_canvas":[172,160],"registration_target":[86,156],
+  "required_pipeline":["ref2game","SpriteFusion Pixel Snapper","Aseprite"]
+}
