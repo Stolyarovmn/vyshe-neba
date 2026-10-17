@@ -6,22 +6,35 @@
   "tool": {
     "repository": "Hugo-Dz/spritefusion-pixel-snapper",
     "revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
-    "version": "0.2.2",
+    "version": "1.0.0",
+    "binary_sha256": "cfa317e2ff737cbf2c0e9ffa062310241d539131023da401b3420c4c00ec9018",
     "colors": 32,
     "family_pixel_size": 15
   },
   "target_canvas": [96, 122],
   "registration_target": [48, 118],
-  "normalization": "nearest-neighbor/common family scale; bottom-center; no per-era rescale",
+  "normalization": "nearest-neighbor/common family scale; bottom-center; no per-era rescale; canonical normalize_sprite.py alpha threshold 8 and padding 2",
   "visible_bbox_by_era": {
-    "E0_1978": [76, 94],
-    "E1_1986": [84, 80],
-    "E2_1998": [86, 101],
-    "E3_2015": [65, 94],
-    "E4_2035": [72, 80],
-    "E5_2060": [63, 75]
+    "E0_1978": [61, 101],
+    "E1_1986": [65, 95],
+    "E2_1998": [86, 79],
+    "E3_2015": [62, 100],
+    "E4_2035": [63, 77],
+    "E5_2060": [83, 94]
   },
-  "decision": "One family-wide pixel size of 15 is the smallest safe processing value selected for production. All six eras fit the canonical 96x122 canvas without per-era scaling and preserve bottom-center registration.",
+  "placement_by_era": {
+    "E0_1978": [18, 17],
+    "E1_1986": [16, 23],
+    "E2_1998": [5, 39],
+    "E3_2015": [17, 18],
+    "E4_2035": [16, 41],
+    "E5_2060": [6, 24]
+  },
+  "candidate_check": {
+    "pixel_size_14": "rejected: E2 visible width exceeds canonical 92 LP envelope after required 2 LP side padding",
+    "pixel_size_15": "accepted: all six eras fit one common 96x122 LP canvas and bottom-center registration without per-era scaling"
+  },
+  "decision": "One family-wide pixel size of 15 remains the smallest safe production value when evaluated with the pinned upstream revision and actual 1.0.0 binary. Previous 0.2.2 metadata was stale and has been replaced.",
   "next_gate": "Aseprite 1.3.18.6 indexed/no-dither, then automatic and visual runtime QA",
   "runtime_published": false
 }
