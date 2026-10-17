@@ -1,104 +1,161 @@
 # «Выше неба» — Reproducible 2D Asset Production Pipeline
 
-Этот документ фиксирует production-процесс, который дал наиболее качественный результат для workshop assets, и делает его воспроизводимым для следующих спрайтов.
+Этот документ фиксирует production-процесс 2D-ассетов проекта и правила, которые дали наиболее качественный и воспроизводимый результат. Он обязателен для workshop/base placeables и используется вместе с `ref2game` при каждом запросе по игре и ассетам.
 
 ## 1. Источники истины и порядок приоритета
 
 1. **`ref2game`** — обязательный workflow для каждого запроса по 2D-игре и ассетам.
-2. **`art/style_bible.txt`** — канонический визуальный язык. Его правила и обязательная lighting sentence добавляются к каждому generation prompt.
+2. **`art/style_bible.txt`** — канонический визуальный язык. Он добавляется к каждому production generation prompt без пересказа.
 3. **`art/placeables/PRODUCTION_MANIFEST.md`** — gameplay role, footprint, sockets, parts, motion contract и era lineage.
-4. **Утверждённый anchor-art в `art/gen/`** — источник фактической геометрии.
-5. **Runtime metadata** — только измеренные по утверждённому арту anchor/pivot. Координаты не угадываются заранее.
+4. **Google Drive `vyshe-neba/art-originals/`** — канонический архив нетронутых полноразмерных image-generation originals.
+5. **Утверждённый art в `art/gen/`** — фактическая runtime-геометрия после production processing.
+6. **Runtime metadata** — только измеренные по утверждённому art anchor/pivot. Координаты не угадываются заранее.
 
-При конфликте технического шаблона и явно более сильного художественного решения допускается осознанное отклонение, но нельзя использовать artistic freedom для маскировки технических дефектов, случайных деталей, неправильной механики или нарушенной читаемости.
+При конфликте технического шаблона и явно более сильного художественного решения допускается осознанное отклонение, но artistic freedom нельзя использовать для маскировки технических дефектов, случайной механики, плохой читаемости или нарушения lineage.
 
-## 2. Главный принцип: один generation call = один самостоятельный asset
+## 2. Главный production pipeline
 
-Запрещено просить image generation одновременно нарисовать production-board вида «6 эпох + части + анимации + подписи + UI».
+Главное правило `ref2game`: **один generation call = один самостоятельный asset или один part sheet**. Не просить генератор одновременно делать «6 эпох + части + анимации + подписи + UI».
 
-Правильная последовательность:
+Канонический поток:
 
 ```text
-E0 full anchor
-→ review
-→ E0 part sheet
+ref2game
+→ style bible + production manifest
+→ E0: one isolated asset
+→ save untouched high-quality original to Google Drive
+→ write source provenance in GitHub
+→ review E0
+→ E0 part sheet when needed
 → E1 from approved E0
+→ archive E1 original
 → E2 from approved E1 + E0 reference
-→ E3
-→ E4
-→ E5
+→ archive E2 original
+→ E3 → archive original
+→ E4 → archive original
+→ E5 → archive original
 → SpriteFusion Pixel Snapper
 → normalize to canonical LP canvas
-→ Aseprite indexed export
-→ measure real pivots
-→ pack atlases from approved files
+→ Aseprite indexed/no-dither export
+→ automatic + visual QA
+→ measure real pivots on approved parts
+→ pack era atlases from approved files
 → rig in code
 → motion sheet
-→ QA
+→ event/state integration
+→ final QA
 ```
 
-Каждая эпоха генерируется отдельной картинкой. Финальный era-atlas **собирается** из утверждённых файлов; image generator не рисует atlas целиком.
+Финальный era-atlas **собирается нами** из утверждённых E0–E5. Image generator не должен рисовать production atlas целиком.
 
-## 3. Prompt contract
+## 3. Generation / prompt contract
 
-Каждый prompt начинается с конкретного объекта, кода и эпохи, например:
+Каждый prompt начинается с конкретного объекта и эпохи, например:
 
 ```text
 W04 / flight_simulator / E0 1978
 Create ONE isolated workshop flight simulator, and nothing else.
 ```
 
-Далее обязательно фиксируются:
+Production prompt обязательно фиксирует:
 
-- одна функциональная сущность;
-- конкретная эпоха и её инженерная логика из production manifest;
-- перечень реально существующих частей, которые позднее должны отделяться для rig;
+- одну функциональную сущность;
+- конкретную эпоху и инженерную логику из manifest;
+- физически читаемые moving parts;
 - прозрачный фон;
 - полный не обрезанный silhouette с padding;
 - отсутствие людей, текста, логотипов, UI и pseudo-writing;
 - отсутствие baked FX;
-- одна согласованная projection/camera внутри asset family;
-- полный `art/style_bible.txt`, добавленный **дословно**; сокращённая или пересказанная версия не является production prompt.
+- одну согласованную projection/camera внутри asset family;
+- `art/style_bible.txt`, добавленный дословно.
 
 Обязательная lighting sentence:
 
 > One consistent key light comes from the upper-left, with warm light on upper-left planes and cool blue-gray shadow on lower-right planes; use no baked cast shadow.
 
-### Что рисует AI
+### AI рисует
 
-AI рисует только физический объект и его материалы: корпус, раму, кресло, актуаторы, механические приборы, дверцы, кабели, крепления, инструмент и другие реальные детали.
+Физическую конструкцию: корпус, раму, кресло, актуаторы, механические приборы, дверцы, кабели, крепления, инструменты и другие реальные детали.
 
-### Что принадлежит коду
+### Код управляет
 
-Код владеет движением, состояниями, screen data, glow/bloom, динамическим светом, cast shadow, частицами, дымом, sparks, beams, trajectories, vibration, heat haze, motion blur и другими временными эффектами.
+Движением, состояниями, screen data, glow/bloom, динамическим светом, cast shadow, частицами, дымом, sparks, beams, trajectories, vibration, heat haze и другими временными FX.
 
-Нельзя изображать работу механизма bob/rotate/scale всего PNG, если у объекта есть реальные moving parts.
+Нельзя изображать работу механизма bob/rotate/scale всего PNG, если у него существуют реальные движущиеся части.
 
-## 4. Почему качественный raw получился лучше ранних листов
+## 4. Почему качественный результат воспроизводим
 
-Качественный результат получен не за счёт более длинного prompt, а за счёт ограничения задачи:
+Качество получилось не за счёт огромного prompt, а за счёт ограничения задачи:
 
-1. генератору дали **один объект**, а не infographic/sprite board;
-2. была явно описана инженерная функция и конструкция;
-3. движущиеся части требовались физически читаемыми;
-4. фон был полностью исключён;
-5. визуальный язык брался из canonical style bible;
-6. lighting и projection были фиксированы;
-7. мелкая декоративная случайность была запрещена, а detail концентрировался вокруг функциональных узлов;
-8. era evolution строится последовательно от уже утверждённой предыдущей эпохи.
+- один asset за call, а не infographic/board;
+- понятная инженерная функция;
+- moving parts читаются физически;
+- прозрачный фон и отсутствие UI;
+- canonical style bible;
+- одинаковые lighting/projection rules;
+- detail концентрируется вокруг функции, а не случайного micro-noise;
+- каждая следующая эпоха развивается от утверждённой предыдущей;
+- destructive processing начинается только после сохранения original.
 
-## 5. Raw provenance
+## 5. Original source archive: Google Drive
 
-Непосредственный результат image generation никогда не считается runtime art.
+Google Drive является каноническим долговременным хранилищем полноразмерных original image-generation files.
 
-Raw сохраняется в:
+Структура:
 
 ```text
-art/raw/placeables/<zone>/<asset>/eN_YEAR_presnap.png
-art/raw/placeables/<zone>/<asset>/eN_YEAR_presnap.json
+vyshe-neba/
+  art-originals/
+    workshop/
+      W03_telemetry_post/
+      W04_flight_simulator/
+      W05_manufacturing_cell/
+      ...
+    base/
+      B01_weather_complex/
+      ...
 ```
 
-JSON должен содержать минимум (for current W04, `source_size` records the untouched generator output and `source_sha256` identifies its exact bytes):
+Правила:
+
+1. Каждый production generation output сохраняется **до** Pixel Snapper, crop, resize, quantize, alpha cleanup и Aseprite.
+2. Сохраняется максимальное доступное качество и исходное разрешение.
+3. Если генератор вернул PNG, original остаётся PNG; не перекодировать в JPEG.
+4. Original не перезаписывается производной версией.
+5. Имя содержит asset id, era/year и source generation id.
+6. Перед upload вычисляется SHA-256 exact original bytes.
+7. Drive file id/URL, SHA-256, original size и source generation id записываются в GitHub provenance.
+8. Любой original, который использовался как reference для следующей эпохи, архивируется обязательно.
+9. Значимые rejected candidates могут храниться в `_rejected/` с причиной отклонения; approved и rejected не смешиваются.
+10. GitHub не обязан содержать многомегабайтный original PNG, если это мешает connector/API/code review.
+
+Текущий W04 archive path:
+
+```text
+vyshe-neba/art-originals/workshop/W04_flight_simulator/
+```
+
+W03 и W05 high-quality originals уже архивированы. Для W04 уже сохранены high-quality source/reference files; отдельные выбранные E0–E5 originals должны быть добавлены и связаны provenance до статуса `ready`.
+
+## 6. GitHub: что хранится в репозитории
+
+GitHub является источником production-инструкций, reproducibility metadata, QA и runtime output.
+
+```text
+art/docs/ASSET_PRODUCTION_PIPELINE.md
+art/style_bible.txt
+art/placeables/PRODUCTION_MANIFEST.md
+art/prompts/<asset>_eN.txt
+art/raw/placeables/<zone>/<asset>/eN_YEAR_presnap.json
+art/gen/placeables/<zone>/<asset>/eN_YEAR.png
+art/gen/placeables/<zone>/<asset>/eN_YEAR.qa.json
+art/gen/placeables/<zone>/<asset>/eN_YEAR.pipeline.json
+outputs/.../assets/placeables/.../eN_YEAR.png
+```
+
+High-quality raw PNG может дополнительно храниться в `art/raw/`, если размер позволяет, но это optional. Канонический source binary находится в Google Drive.
+
+Минимальный provenance JSON:
 
 ```json
 {
@@ -109,29 +166,34 @@ JSON должен содержать минимум (for current W04, `source_si
   "source_gen_id": "...",
   "source_size": [1254, 1254],
   "source_sha256": "...",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "...",
+    "drive_url": "...",
+    "original_filename": "W04_E0_1978_<source_gen_id>.png"
+  },
+  "prompt_file": "art/prompts/w04_flight_simulator_e0.txt",
   "target_canvas": [172, 160],
   "registration_target": [86, 156],
-  "prompt_file": "art/prompts/w04_flight_simulator_e0.txt",
   "required_pipeline": ["SpriteFusion Pixel Snapper", "Aseprite"]
 }
 ```
 
-Для воспроизводимости SHA-256 raw PNG, source generation id, prompt file, exact tool revisions and pipeline parameters are mandatory. The generator output is provenance; it is never silently replaced by a different image.
+## 7. SpriteFusion Pixel Snapper
 
-## 6. SpriteFusion Pixel Snapper
+Используется официальный upstream:
 
-Используется официальный проект:
+```text
+Hugo-Dz/spritefusion-pixel-snapper
+```
 
-`Hugo-Dz/spritefusion-pixel-snapper`
+Pinned revision:
 
-Назначение этапа:
+```text
+ae20461f60fb39e75d15f184bab1ebec1219511c
+```
 
-- привязать AI-generated pixel-look к строгой pixel grid;
-- устранить плавающий размер pixel clusters;
-- ограничить палитру;
-- сделать масштабирование nearest-neighbor предсказуемым.
-
-Production baseline uses the official upstream pinned to an exact revision:
+Установка:
 
 ```bash
 cargo install --git https://github.com/Hugo-Dz/spritefusion-pixel-snapper \
@@ -139,50 +201,57 @@ cargo install --git https://github.com/Hugo-Dz/spritefusion-pixel-snapper \
   --locked spritefusion-pixel-snapper
 ```
 
-The pinned upstream reports package version `1.0.0`. Only upstream-supported CLI options are used: `COLORS`, `--pixel-size`, and optionally `--palette`. Fork-only options such as `--grid-mode` or `--cell-method` are forbidden in the canonical pipeline.
+Назначение:
 
-`--pixel-size` is selected so Pixel Snapper emits roughly one logical pixel per target LP. For the current native W04 generations (`1254×1254` source, `172×160 LP` target), the family baseline is:
+- привязка AI pixel-look к строгой pixel grid;
+- устранение плавающего размера pixel clusters;
+- palette reduction;
+- предсказуемая nearest-neighbor дальнейшая обработка.
+
+Используются только upstream-supported options: `COLORS`, `--pixel-size`, optionally `--palette`. Fork-only параметры запрещены в canonical pipeline.
+
+Для текущего W04 baseline:
 
 ```bash
 spritefusion-pixel-snapper input.png snapped.png 32 --pixel-size 8
 ```
 
-`pixel-size` является параметром конкретной asset family и записывается в `*.pipeline.json`. Значение нельзя менять молча между эпохами одной линии. Если автоматическое или baseline-значение уничтожает значимые детали, делаются несколько QA-кандидатов и выбирается наименьший grid, при котором silhouette и functional detail читаются на gameplay size.
+`pixel-size` — параметр asset family и записывается в `*.pipeline.json`. Его нельзя менять молча между эпохами одной lineage.
 
-## 7. Нормализация canvas
+## 8. Normalize to canonical LP canvas
 
-После snap объект помещается в канонический LP canvas конкретного placeable.
+После snap объект помещается в канонический logical-pixel canvas.
 
 Правила:
 
 - aspect ratio сохраняется;
-- ресэмплинг только nearest-neighbor для runtime pixel art;
-- ground object использует bottom-center registration, если manifest не говорит иначе;
+- runtime resampling только nearest-neighbor;
+- ground object по умолчанию bottom-center registration;
 - scale/registration одинаковы во всей era family;
-- final visible envelope должен укладываться в target footprint;
-- padding сохраняется для moving attachments и rotation.
+- final visible bbox помещается в target footprint;
+- padding сохраняется для moving parts.
 
 Для W04:
 
 ```text
 canvas: 172×160 LP
-registration target: bottom-center `(86,156)`
-
-This is a placement/registration target, not a measured mechanism pivot. Final moving-part pivots remain `null/pending` until the approved cut-out parts are imported and measured.
+registration target: (86,156) bottom-center
 ```
 
-## 8. Aseprite
+Это placement registration, а не measured mechanism pivot. Moving-part pivots остаются `null/pending` до part-sheet pass и измерения по фактическому арту.
 
-Используется официальный `aseprite/aseprite`, собранный из исходников в CI; бинарник в репозиторий не коммитится.
+## 9. Aseprite
 
-Production-задачи Aseprite:
+Используется официальный `aseprite/aseprite`, собранный из официальных исходников. Бинарник в репозиторий не коммитится.
+
+Production-задачи:
 
 - Indexed Color export;
-- no-dither palette conversion;
+- no-dither conversion;
 - layer/frame organization;
 - animation tags;
 - part-sheet cleanup;
-- visual QA at 1:1 logical-pixel scale;
+- visual QA на 1:1 logical-pixel scale;
 - sprite-sheet/PNG sequence export.
 
 Baseline batch export:
@@ -194,19 +263,24 @@ aseprite -b normalized.png \
   --save-as final.png
 ```
 
-Для rig-pass физические части хранятся отдельными слоями/спрайтами. Скрытые области moving parts должны быть дорисованы полностью, чтобы поворот не открывал пустоты.
+Moving parts для rig должны существовать как отдельные полные детали, включая скрытые области, которые становятся видны при движении.
 
-## 9. Measured rig
+## 10. Measured rig and animation contract
 
 После утверждения anchor-art:
 
-1. создаётся isolated part sheet;
-2. каждая moving part проверяется как полная деталь;
-3. rest pose реконструируется из частей;
-4. pivot/joint координаты измеряются по фактической геометрии;
-5. только после этого координаты попадают в runtime metadata.
+```text
+isolated part sheet
+→ validate every moving part
+→ reconstruct rest pose
+→ measure actual joints/pivots
+→ write runtime metadata
+→ rig in code
+→ render motion sheet
+→ inspect frame-by-frame
+```
 
-До измерения pivot должен быть `null`/`pending`, а не приблизительным числом.
+До измерения pivot запрещено записывать приблизительным числом.
 
 Для W04 минимальный rig:
 
@@ -218,46 +292,56 @@ actuator_right
 canopy
 ```
 
-Training motion: `pod` следует simulated trajectory, актуаторы решают положение относительно base/pod, canopy физически открывается на enter/exit. Idle полностью спокойный.
+`pod` двигается через реальную геометрию актуаторов, canopy физически открывается/закрывается. Whole-sprite fake motion запрещён.
 
-## 10. QA gates
+Живые placeables работают по causal state model:
 
-Ассет не получает статус `ready`, пока не пройдены следующие проверки.
+```text
+OFF → IDLE → NOTICE → WORK → FINISH → COOLDOWN → IDLE
+```
+
+`WORK` запускается игровым событием, а не вечным декоративным loop.
+
+## 11. QA gates
+
+Ассет не получает статус `ready`, пока не пройдены automatic, visual и rig checks.
 
 ### Automatic
 
-- точный canvas WxH;
-- alpha присутствует;
-- нет случайного fringe вокруг silhouette;
-- palette <= заданного лимита (production baseline: 32 цвета);
-- no dithering, если он не был осознанно разрешён style rule;
-- visible bbox находится внутри canvas;
-- anchor находится в canvas;
-- SHA/provenance записаны.
+- exact canvas WxH;
+- binary/valid alpha;
+- no fringe;
+- palette не превышает установленный limit;
+- no accidental dithering;
+- bbox inside canvas;
+- registration inside canvas;
+- source SHA/provenance recorded;
+- Google Drive source link/id recorded;
+- pipeline/tool revisions recorded.
 
 ### Visual
 
-- silhouette читается в реальном gameplay size;
-- одна и та же инженерная родословная E0→E5;
-- scale и registration не прыгают между эпохами;
-- нет текста/pseudo-text/logo/UI;
-- нет baked screen data/particles/glow/shadow;
+- silhouette читается на gameplay size;
+- E0→E5 — одна инженерная lineage;
+- scale/registration не прыгают;
+- no text/pseudo-text/logo/UI;
+- no baked screen data/particles/glow/cast shadow;
 - moving parts конструктивно возможны;
-- будущее не сводится к «cyan + hologram»;
-- поверхность не забита бессмысленным micro-detail;
-- материал, свет и projection соответствуют style bible.
+- future era не сводится к «cyan + hologram»;
+- нет бессмысленного micro-detail;
+- materials/light/projection соответствуют style bible.
 
 ### Rig
 
 - rest reconstruction совпадает с anchor-art;
-- pivots измерены;
+- pivots действительно измерены;
 - moving parts не растягиваются и не открывают пустоты;
 - whole-sprite fake motion отсутствует;
-- motion sheet просмотрен покадрово.
+- motion sheet проверен покадрово.
 
-## 11. GitHub CI
+## 12. GitHub CI
 
-Canonical pipeline живёт в:
+Canonical automation:
 
 ```text
 .github/workflows/art-pipeline.yml
@@ -265,7 +349,7 @@ tools/art_pipeline/normalize_sprite.py
 tools/art_pipeline/qa_sprite.py
 ```
 
-CI должен использовать pinned версии инструментов и создавать рядом с итогом:
+CI должен использовать pinned tool revisions и создавать:
 
 ```text
 eN_YEAR.png
@@ -273,13 +357,13 @@ eN_YEAR.qa.json
 eN_YEAR.pipeline.json
 ```
 
-`pipeline.json` фиксирует source gen id/SHA, pinned Pixel Snapper revision, Aseprite version, pixel size, palette limit, canvas and registration target. Mechanism pivots are recorded separately only after measured rig QA.
+`pipeline.json` фиксирует source gen id/SHA, Drive source reference, Pixel Snapper revision, Aseprite version, pixel size, palette limit, canvas и registration target.
 
-Workflow может коммитить runtime output только после успешного QA. Raw input и failed candidates остаются provenance/reference, но не копируются в runtime assets.
+Workflow может публиковать runtime output только после QA. Failed candidate никогда не становится runtime asset только потому, что pipeline технически смог его обработать.
 
-## 12. Current W04 reference pass
+## 13. W04 / flight_simulator reference lineage
 
-The high-quality W04 lineage was generated as **six independent calls**, not as a 3×2 AI board. Canonical source generation ids are:
+W04 строится шестью независимыми generation calls:
 
 | era | year | source gen id | design stage |
 |---|---:|---|---|
@@ -290,33 +374,48 @@ The high-quality W04 lineage was generated as **six independent calls**, not as 
 | E4 | 2035 | `ac153f0a-25ca-4f5a-9865-4949c355fb4a` | compact VR/robotic capsule |
 | E5 | 2060 | `b2916572-5c28-4dbe-9461-e3dd65786da8` | adaptive multi-axis simulation cell |
 
-This lineage follows the W04 manifest: `base`, `pod`, `actuator_left`, `actuator_right`, `canopy`. Runtime work animation must solve the pod pose through the real actuators; it must not rotate/bob the entire sprite.
+Manifest parts: `base`, `pod`, `actuator_left`, `actuator_right`, `canopy`.
 
-## 13. Definition of Done
+Перед финальным статусом W04 каждый реально выбранный E0–E5 source должен иметь exact original на Google Drive и GitHub provenance с SHA + Drive id/URL.
+
+## 14. Definition of Done
 
 Placeable/era считается завершённым только когда:
 
 ```text
 prompt saved
-+ raw generation saved with provenance
++ untouched high-quality original archived to Google Drive
++ source generation id recorded
++ source SHA-256 recorded
++ Drive file id/URL recorded in GitHub provenance
 + Pixel Snapper completed
 + normalized to canonical LP canvas
-+ Aseprite indexed export completed
++ Aseprite indexed/no-dither export completed
 + automatic QA passed
 + visual QA passed
 + runtime PNG committed
 ```
 
-Rigged object считается завершённым дополнительно только после:
+Rigged object дополнительно требует:
 
 ```text
 part sheet approved
++ complete moving parts
 + pivots measured
 + rest reconstruction passed
-+ motion sheet passed
++ motion sheet passed frame-by-frame
 + event/state contract wired in code
 ```
 
-## 14. Правило для всех следующих ассетов
+## 15. Обязательное правило для всех следующих ассетов
 
-Этот pipeline обязателен для дальнейшей 2D-ветки. Любой новый workshop/base placeable начинается с `ref2game`, style bible и production manifest, генерируется по одной эпохе/одному asset за call, а затем проходит Pixel Snapper → Aseprite → measured QA. Нельзя объявлять raw AI image готовым runtime sprite.
+Любой новый workshop/base asset начинается с `ref2game`, `art/style_bible.txt` и `art/placeables/PRODUCTION_MANIFEST.md`, генерируется по одной эпохе/одному asset за call, **сразу сохраняет нетронутый high-quality original в Google Drive**, затем проходит SpriteFusion Pixel Snapper → normalize → Aseprite → QA → measured rig.
+
+Нельзя:
+
+- объявлять raw AI image готовым runtime sprite;
+- удалять original после получения runtime derivative;
+- заменять original обработанной копией;
+- угадывать pivots;
+- симулировать сложную механику движением целого PNG;
+- генерировать production E0–E5 atlas одним AI board.
