@@ -1,0 +1,7 @@
+{
+  "asset_id":"B01","asset":"weather_complex","era":"E2","year":1998,
+  "source_gen_id":"74bf5561-1fcf-42bb-a81f-fd983844738c","source_size":[1309,1202],"source_sha256":"403e787f19ea90fba5a57dc619ba4fb6f10e2c7490b0bc65ad18a839a3b82cb3",
+  "source_storage":{"provider":"google_drive","drive_file_id":"1AxEZY4B-NB4WNzfkznQk9w3Pivx8wE5y","drive_url":"https://drive.google.com/file/d/1AxEZY4B-NB4WNzfkznQk9w3Pivx8wE5y/view?usp=drivesdk","original_filename":"B01_E2_1998_74bf5561-1fcf-42bb-a81f-fd983844738c.png"},
+  "prompt_file":"art/prompts/b01_weather_complex.md","target_canvas":[96,122],"registration_target":[48,118],
+  "pixel_snapper":{"revision":"ae20461f60fb39e75d15f184bab1ebec1219511c","colors":32,"pixel_size":15},"aseprite_version":"1.3.18.6"
+}
