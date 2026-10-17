@@ -1,0 +1,70 @@
+name: B01 atlas PNG structural repair
+
+on:
+  push:
+    branches: [2d_workshop-placeables-w01]
+    paths:
+      - 'tools/art_pipeline/repair_b01_atlas_pngs.py'
+      - '.github/workflows/b01-atlas-repair.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Pillow
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-pil
+
+      - name: Repair malformed B01 indexed atlases losslessly
+        run: |
+          set -euxo pipefail
+          REPORT="$RUNNER_TEMP/b01-atlas-repair.json"
+          python3 tools/art_pipeline/repair_b01_atlas_pngs.py \
+            --repo-root . \
+            --report "$REPORT"
+          test -s "$REPORT"
+
+      - name: Verify repaired B01 rig and motion renderer
+        run: |
+          set -euxo pipefail
+          node outputs/rocket/qa-b01-rig.cjs
+          python3 tools/art_pipeline/b01_motion_sheet.py \
+            --root outputs/rocket/dist/assets/placeables/base/weather_complex/parts \
+            --output-dir "$RUNNER_TEMP/b01-motion-after-repair"
+          test -s "$RUNNER_TEMP/b01-motion-after-repair/b01_motion_sheet.png"
+          test -s "$RUNNER_TEMP/b01-motion-after-repair/motion_qa.json"
+
+      - name: Commit repaired atlas bytes
+        run: |
+          set -euxo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            art/gen/placeables/base/weather_complex/parts/*_eras.png \
+            outputs/rocket/dist/assets/placeables/base/weather_complex/parts/*_eras.png
+          if git diff --cached --quiet; then
+            echo 'No atlas repair changes required.'
+            exit 0
+          fi
+          git commit -m 'Repair B01 indexed atlas PNG structure [skip atlas-repair]'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+
+      - name: Upload repair and motion verification artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: b01-atlas-repair-verification
+          path: |
+            ${{ runner.temp }}/b01-atlas-repair.json
+            ${{ runner.temp }}/b01-motion-after-repair/
+          retention-days: 3
