@@ -3,13 +3,20 @@
   "asset": "flight_simulator",
   "era": "E0",
   "year": 1978,
-  "source_gen_id": "155ad5c7-2e21-4bb6-811b-e42ed21ee5e7",
-  "source_size": [1254, 1254],
-  "source_sha256": "cb7a4d1bf4b2795a1aa5f6c738787efe2305b7d2f7c641c1d6593ddc07a0be55",
-  "target_canvas": [172, 160],
-  "registration_target": [86, 156],
-  "pixel_snapper": {"revision": "ae20461f60fb39e75d15f184bab1ebec1219511c", "pixel_size": 8, "colors": 32},
-  "aseprite": {"version": "1.3.18.6", "dithering": "none"},
+  "source_gen_id": "ae46f076-6bbc-47ee-a0c9-49bdf476f1af",
+  "source_size": [1300,1209],
+  "source_sha256": "7e773738a0a91c92642be3fdd7653d174b3fe868f6fc3e4927cea0f3ff006458",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1NYBfC7ZeuMiIXGlx6HuhSnYZUjxihTQb",
+    "drive_url": "https://drive.google.com/file/d/1NYBfC7ZeuMiIXGlx6HuhSnYZUjxihTQb/view?usp=drivesdk"
+  },
+  "transport_png": "e0_1978_presnap.png",
+  "transport_size": [344,320],
+  "target_canvas": [172,160],
+  "registration_target": [86,156],
+  "pixel_snapper": {"revision":"ae20461f60fb39e75d15f184bab1ebec1219511c","pixel_size":8,"colors":32},
+  "aseprite": {"version":"1.3.18.6","dithering":"none"},
   "prompt_file": "art/prompts/w04_flight_simulator.md",
-  "required_pipeline": ["ref2game", "SpriteFusion Pixel Snapper", "Aseprite"]
+  "required_pipeline": ["ref2game","SpriteFusion Pixel Snapper","Aseprite"]
 }
