@@ -115,5 +115,5 @@
       "reason": "valid E4 concept but overbuilt and visually noisier than selected lidar-head candidate"
     }
   ],
-  "status": "high_quality_originals_and_lineage_QA_complete; Pixel Snapper + canonical normalization + Aseprite + runtime QA pending"
+  "status": "anchor_art_processing_and_runtime_QA_complete; part sheets + measured pivots + rig + motion QA pending"
 }
