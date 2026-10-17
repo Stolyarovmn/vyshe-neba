@@ -1,0 +1,34 @@
+{
+  "id":"landing_guidance",
+  "asset_code":"B03",
+  "type":"base_placeable",
+  "unit":"one beacon; purchase places symmetric pair",
+  "runtime_footprint_lp":[46,82],
+  "placement_anchor_lp":{"x":23,"y":78,"kind":"bottom-center-design-target"},
+  "placement_sockets":["pad_left","pad_right"],
+  "value":"Information / Capability",
+  "cost_tier":"M",
+  "mechanic":"show predicted touchdown point, safe corridor and approach state; never steer the rocket",
+  "parts":[
+    {"id":"base","motion":"static","pivot_status":"not required"},
+    {"id":"head","motion":"aiming-pan-tilt","pivot_intent":"physical yoke/azimuth center","measured_pivot":null},
+    {"id":"lamp","motion":"state","pivot_status":"not required"}
+  ],
+  "era_sources":[
+    {"era":"E0","year":1978,"source_gen_id":"7b0172e8-a316-4f42-bf91-7355d46037d3","lineage":"tripod + sight + lamp"},
+    {"era":"E1","year":1986,"source_gen_id":"2b9f0c48-61ff-41f7-ae32-492d5b4f77b1","lineage":"sectional radio beacon"},
+    {"era":"E2","year":1998,"source_gen_id":"2e6ea56a-e6d0-467d-9c2f-7f5c05b77aa7","lineage":"motorized tracker"},
+    {"era":"E3","year":2015,"source_gen_id":"716145c1-1810-44b0-bf93-84b2a83e0c35","lineage":"laser-optical beacon"},
+    {"era":"E4","year":2035,"source_gen_id":"20567340-51da-4294-a5a4-20a619603295","lineage":"autonomous tracker"},
+    {"era":"E5","year":2060,"source_gen_id":"71cc3874-4fdc-4bc4-86fc-caa8c7d1eaec","lineage":"compact directional multispectral beacon"}
+  ],
+  "status":{
+    "high_quality_originals":"approved_and_archived_on_google_drive",
+    "lineage_qa":"passed",
+    "pixel_snapper":"pending",
+    "aseprite":"pending",
+    "runtime_sprites":"pending",
+    "rig_parts":"pending_after_anchor_processing",
+    "mechanism_pivots":"pending_measured_parts"
+  }
+}
