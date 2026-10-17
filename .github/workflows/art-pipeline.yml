@@ -66,7 +66,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/vyshe-neba/aseprite
-          key: aseprite-${{ runner.os }}-x64-${{ env.ASEPRITE_VERSION }}-skia-m124
+          key: aseprite-${{ runner.os }}-x64-${{ env.ASEPRITE_VERSION }}-skia-m124-runtime-v2
 
       - name: Build Aseprite from official source
         if: steps.inputs.outputs.ready == 'true' && steps.ase-cache.outputs.cache-hit != 'true'
@@ -81,6 +81,7 @@ jobs:
             ASE_SRC=$(find "$WORK/src" -maxdepth 2 -type f -name CMakeLists.txt -printf '%h\n' | while read -r d; do [[ -f "$d/src/app/CMakeLists.txt" ]] && echo "$d"; done | head -1)
           fi
           test -n "$ASE_SRC" && test -f "$ASE_SRC/src/app/CMakeLists.txt"
+          test -f "$ASE_SRC/data/gui.xml"
           curl -L --fail --retry 3 -o "$WORK/skia.zip" 'https://github.com/aseprite/skia/releases/download/m124-08a5439a6b/Skia-Linux-Release-x64.zip'
           unzip -q "$WORK/skia.zip" -d "$WORK/skia"
           SKIA_LIB=$(find "$WORK/skia" -name libskia.a -print -quit)
@@ -96,8 +97,15 @@ jobs:
             -DSKIA_LIBRARY_DIR="$(dirname "$SKIA_LIB")" \
             -DSKIA_LIBRARY="$SKIA_LIB"
           cmake --build "$WORK/build" --target aseprite -j"$(nproc)"
+          rm -rf ~/.cache/vyshe-neba/aseprite/data
           cp "$WORK/build/bin/aseprite" ~/.cache/vyshe-neba/aseprite/aseprite
+          cp -a "$ASE_SRC/data" ~/.cache/vyshe-neba/aseprite/data
           chmod +x ~/.cache/vyshe-neba/aseprite/aseprite
+          test -f ~/.cache/vyshe-neba/aseprite/data/gui.xml
+          (
+            cd ~/.cache/vyshe-neba/aseprite
+            ./aseprite --version
+          )
 
       - name: Install official SpriteFusion Pixel Snapper
         if: steps.inputs.outputs.ready == 'true'
