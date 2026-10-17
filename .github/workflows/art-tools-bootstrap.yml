@@ -23,7 +23,11 @@ jobs:
         run: |
           set -euxo pipefail
           sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build unzip libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev libfontconfig1-dev
+          sudo apt-get install -y \
+            clang cmake ninja-build unzip curl \
+            libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev \
+            libfontconfig1-dev libfreetype6-dev libharfbuzz-dev \
+            libjpeg-dev libpng-dev libwebp-dev zlib1g-dev
           cargo --version
 
       - name: Build official SpriteFusion Pixel Snapper
@@ -36,20 +40,32 @@ jobs:
           mkdir -p "$RUNNER_TEMP/art-tools"
           cp "$RUNNER_TEMP/pixel-snapper/bin/spritefusion-pixel-snapper" "$RUNNER_TEMP/art-tools/"
 
+      - name: Restore Aseprite build cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/aseprite-build
+          key: aseprite-${{ runner.os }}-${{ runner.arch }}-1.3.18.6-skia-m124-08a5439a6b-v2
+
       - name: Build Aseprite from official source
         run: |
           set -euxo pipefail
           WORK="$RUNNER_TEMP/aseprite-build"
           mkdir -p "$WORK"
-          curl -L --fail --retry 3 -o "$WORK/aseprite.zip" "https://github.com/aseprite/aseprite/releases/download/v${ASEPRITE_VERSION}/Aseprite-v${ASEPRITE_VERSION}-Source.zip"
-          unzip -q "$WORK/aseprite.zip" -d "$WORK/src"
+          if [[ ! -f "$WORK/aseprite.zip" ]]; then
+            curl -L --fail --retry 3 -o "$WORK/aseprite.zip" "https://github.com/aseprite/aseprite/releases/download/v${ASEPRITE_VERSION}/Aseprite-v${ASEPRITE_VERSION}-Source.zip"
+          fi
+          mkdir -p "$WORK/src"
+          unzip -q -o "$WORK/aseprite.zip" -d "$WORK/src"
           ASE_SRC="$WORK/src"
           if [[ ! -f "$ASE_SRC/src/app/CMakeLists.txt" ]]; then
             ASE_SRC=$(find "$WORK/src" -maxdepth 2 -type f -name CMakeLists.txt -printf '%h\n' | while read -r d; do [[ -f "$d/src/app/CMakeLists.txt" ]] && echo "$d"; done | head -1)
           fi
           test -n "$ASE_SRC" && test -f "$ASE_SRC/src/app/CMakeLists.txt"
-          curl -L --fail --retry 3 -o "$WORK/skia.zip" 'https://github.com/aseprite/skia/releases/download/m124-08a5439a6b/Skia-Linux-Release-x64.zip'
-          unzip -q "$WORK/skia.zip" -d "$WORK/skia"
+          if [[ ! -f "$WORK/skia.zip" ]]; then
+            curl -L --fail --retry 3 -o "$WORK/skia.zip" 'https://github.com/aseprite/skia/releases/download/m124-08a5439a6b/Skia-Linux-Release-x64.zip'
+          fi
+          mkdir -p "$WORK/skia"
+          unzip -q -o "$WORK/skia.zip" -d "$WORK/skia"
           SKIA_LIB=$(find "$WORK/skia" -name libskia.a -print -quit)
           SKIA_CANVAS=$(find "$WORK/skia" -path '*/include/core/SkCanvas.h' -print -quit)
           SKIA_DIR=$(dirname "$(dirname "$(dirname "$SKIA_CANVAS")")")
@@ -62,7 +78,7 @@ jobs:
             -DSKIA_DIR="$SKIA_DIR" \
             -DSKIA_LIBRARY_DIR="$(dirname "$SKIA_LIB")" \
             -DSKIA_LIBRARY="$SKIA_LIB"
-          cmake --build "$WORK/build" --target aseprite -j"$(nproc)"
+          cmake --build "$WORK/build" --target aseprite -j2
           cp "$WORK/build/bin/aseprite" "$RUNNER_TEMP/art-tools/aseprite"
           chmod +x "$RUNNER_TEMP/art-tools/aseprite"
           "$RUNNER_TEMP/art-tools/aseprite" --version
