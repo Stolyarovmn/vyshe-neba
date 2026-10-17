@@ -6,6 +6,7 @@ on:
     paths:
       - 'art/gen/placeables/base/weather_complex/parts/**'
       - 'outputs/rocket/dist/assets/placeables/base/weather_complex/parts/**'
+      - 'outputs/rocket/dist/weather-complex-rig.js'
       - 'outputs/rocket/dist/b01-rig-qa.*'
       - 'outputs/rocket/qa-b01-rig.cjs'
       - 'outputs/rocket/verify.cjs'
