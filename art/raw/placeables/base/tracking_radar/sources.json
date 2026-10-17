@@ -49,8 +49,32 @@
       "source_size": [1536, 1024],
       "source_sha256": "2d41daa6e959ce542655f2bf0f3dbecb3a0d5350b7c6537e8c0a5df2378ee4f4",
       "drive_file_id": "1bXjrXqSXwh8XzFffm-QOx7Lw0483zEti",
-      "reason": "Part separation is mechanically useful, but candidate failed source gate: soft environmental gradient/background and semi-transparent fringe; rendering drifted toward photoreal CGI rather than canonical HD pixel/pixel-look. No destructive cleanup permitted as a substitute for regeneration."
+      "reason": "Mechanically useful separation, but source gate failed: soft environmental gradient/background and semi-transparent fringe; style drift toward photoreal CGI."
+    },
+    {
+      "kind": "E0_part_sheet",
+      "source_gen_id": "4979b559-60d1-40be-b13f-60656cab415d",
+      "source_size": [1536, 1024],
+      "source_sha256": "1b07d682cc729fe861192e4c757f561bdce915be141043f147a4011d2a9db085",
+      "drive_file_id": "1xmdeJPNcqiGZ9wONq4nX0C3oMNaLJE22",
+      "reason": "Wrong-subject generation: produced the full infrastructure era catalog instead of B02 E0 parts."
+    },
+    {
+      "kind": "E0_part_sheet",
+      "source_gen_id": "2157de10-f9c9-4396-951c-4aa86b123f8b",
+      "source_size": [1536, 1024],
+      "source_sha256": "6bed53ec75ee20c871e390fccbb08a75077f91984a6c7b25faafac04f716a7e8",
+      "drive_file_id": "1Ta7YfArImPGLt-GW2QQvFTFlAF4_OFkI",
+      "reason": "Wrong-subject generation despite explicit B02 reference binding; produced the full infrastructure era catalog."
+    },
+    {
+      "kind": "E0_part_sheet",
+      "source_gen_id": "32c657d0-c526-4c31-ad5b-1ade64319f3a",
+      "source_size": [1536, 1024],
+      "source_sha256": "563983df1c8aa0c7a64da10213abab6dfa1c77ce831e4e6bb11697709af34c6c",
+      "drive_file_id": "1N2vxKgsLsHLl_fe3Ma0kvgzmUy_kccDc",
+      "reason": "Wrong-subject generation: produced a reduced infrastructure catalog rather than B02 E0 parts."
     }
   ],
-  "status": "E0 anchor approved and archived; E0 part-sheet regeneration required before E1 generation"
+  "status": "E0 anchor approved and archived; E0 part-sheet regeneration blocked by current imagegen context binding; do not advance B02 to E1 until a valid isolated part sheet exists"
 }
