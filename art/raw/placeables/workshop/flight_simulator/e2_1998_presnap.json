@@ -1,0 +1,8 @@
+{
+  "asset_id":"W04","asset":"flight_simulator","era":"E2","year":1998,
+  "source_gen_id":"a12d3343-355a-473b-a0e8-afbb371019b0","source_size":[1300,1209],
+  "source_sha256":"451a86d998229110e4cb75b4b4c83a87d6fa28220eaba8ab1dd638ef420a4369",
+  "source_storage":{"provider":"google_drive","drive_file_id":"1FpNCtswDxpPmV61vuOBSkBAAGL7A4F-K","drive_url":"https://drive.google.com/file/d/1FpNCtswDxpPmV61vuOBSkBAAGL7A4F-K/view?usp=drivesdk"},
+  "transport_png":"e2_1998_presnap.png","target_canvas":[172,160],"registration_target":[86,156],
+  "required_pipeline":["ref2game","SpriteFusion Pixel Snapper","Aseprite"]
+}
