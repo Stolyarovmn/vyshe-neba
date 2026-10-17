@@ -29,7 +29,7 @@ If imagegen starts inheriting an unrelated prior asset family, use a code-drawn 
 - Placement registration target: `(48,118)` bottom-center (design target; not a moving-part pivot)
 - Palette baseline: <= `32` colors after processing
 - SpriteFusion Pixel Snapper: official `Hugo-Dz/spritefusion-pixel-snapper`, pinned revision `ae20461f60fb39e75d15f184bab1ebec1219511c`
-- Family Pixel Snapper baseline: `--pixel-size 10` (must be visually QA'd before acceptance)
+- Family Pixel Snapper production value: `--pixel-size 15`. This value was selected by the common-scale processing gate because it is the smallest safe family-wide value that keeps every approved E0–E5 source inside the canonical `96×122 LP` canvas without per-era rescaling. Do not change it per era.
 - Aseprite: official `aseprite/aseprite` `1.3.18.6`, indexed color, no dithering
 
 ## Style bible — verbatim
