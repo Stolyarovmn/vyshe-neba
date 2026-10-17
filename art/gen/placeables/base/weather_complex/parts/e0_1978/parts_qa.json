@@ -1,0 +1,25 @@
+{
+  "asset_id": "B01",
+  "asset": "weather_complex",
+  "era": "E0",
+  "year": 1978,
+  "source": "art/gen/placeables/base/weather_complex/e0_1978.png",
+  "source_sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c",
+  "method": "pixel-exact cutout decomposition of approved anchor art; no generated replacement",
+  "canvas": [96, 122],
+  "parts": {
+    "body": {"bbox": [18, 30, 75, 118], "pivot": null},
+    "sensor": {"bbox": [25, 17, 56, 30], "pivot": [42, 29]},
+    "vane": {"bbox": [47, 29, 79, 45], "pivot": [48, 36]},
+    "indicator": {"bbox": [56, 55, 70, 78], "pivot": [57, 63]}
+  },
+  "registration": [48, 118],
+  "reconstruction_pixel_exact": true,
+  "decision": "Approved E0 anchor already contains complete visible rigid subassemblies. Parts are cut directly from approved runtime art to preserve exact geometry, palette, lighting and projection. Hidden overlap is retained at attachment pixels; no whole-sprite motion is allowed.",
+  "motion_contract": {
+    "sensor": "rigid rotation at measured attachment pivot",
+    "vane": "wind-reactive rigid rotation/sway at measured mast attachment",
+    "indicator": "physical hardware remains rigid; state light/data is code-owned"
+  },
+  "next_gate": "commit cutout PNGs, reconstruct in code, render motion/rig QA"
+}
