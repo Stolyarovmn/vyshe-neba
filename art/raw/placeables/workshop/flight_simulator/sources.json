@@ -96,6 +96,16 @@
       "runtime_cell": "transparent"
     }
   },
+  "late_era_canopy_candidate": {
+    "status": "candidate_only_not_E0",
+    "source_gen_id": "301fb1ee-c5a3-4c53-89e1-5ee5f6750f07",
+    "source_board_sha256": "3ec01924a07096a8ea3550a4c956503be6d1152fd38165b7d445b26c3151b7fb",
+    "source_board_drive_file_id": "1NbVYINDH5XulbR1OgEBDyJhI8sTHyYSi",
+    "derived_cutout_sha256": "aceccf2d3efefb967d0284e2a332d98a389db0d346da1a0f96bbe0e2b139e622",
+    "derived_drive_file_id": "1RxFUBIDQyIUnTAONJwq9BiAftxaRYSPT",
+    "derived_drive_url": "https://drive.google.com/file/d/1RxFUBIDQyIUnTAONJwq9BiAftxaRYSPT/view?usp=drivesdk",
+    "reason": "usable canopy silhouette extracted from a rejected board, but incompatible with E0 gimbal-seat lineage; retain only as a later-era candidate"
+  },
   "rejected_sources": [
     {
       "source_gen_id": "0692a1d7-9a14-4e4a-ac42-cc1357ef801f",
@@ -106,6 +116,24 @@
       "source_gen_id": "04f209d8-8641-4d03-b69b-ec374ed023d4",
       "drive_file_id": "1P7UXREdIJ0Yt5mvrmOTV9uK0dt5Od2pT",
       "reason": "pod contaminated with ground rails/base geometry; unsafe for measured cut-out rig"
+    },
+    {
+      "source_gen_id": "1059f5b6-2948-488b-abc7-6d0a377e97f5",
+      "source_sha256": "8ed19eb920e739196e76e4621784cae33d2309199f9cca732fac1bfc674d0807",
+      "drive_file_id": "1yy7YWlrzeR-4rHD7MtvhdRUPJaRCtNS9",
+      "reason": "canopy request expanded into labeled multi-era concept board instead of one isolated asset"
+    },
+    {
+      "source_gen_id": "47726c0e-7a44-4e23-8e71-49ed1f2ee694",
+      "source_sha256": "9702d8e9ef60ba479f79414d3d2b894a57920ef8772ced03083953a9598ff8e5",
+      "drive_file_id": "1b9YNkMJ0ZjlvWQ7hGGGjFCXXseOpDvFi",
+      "reason": "second canopy request again expanded into a six-era labeled board"
+    },
+    {
+      "source_gen_id": "301fb1ee-c5a3-4c53-89e1-5ee5f6750f07",
+      "source_sha256": "3ec01924a07096a8ea3550a4c956503be6d1152fd38165b7d445b26c3151b7fb",
+      "drive_file_id": "1NbVYINDH5XulbR1OgEBDyJhI8sTHyYSi",
+      "reason": "source board rejected as runtime art; one canopy silhouette retained only as an explicitly derived later-era candidate"
     }
   ],
   "note": "Google Drive stores authoritative full-resolution source bytes. Runtime sprites remain gated on official Pixel Snapper, canonical LP registration, Aseprite indexed/no-dither export and QA. E0 canopy is intentionally absent; mechanism pivots remain pending until processed part measurement and rest-pose reconstruction."
