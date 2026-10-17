@@ -46,16 +46,18 @@ jobs:
           mkdir -p "$WORK" ~/.cache/vyshe-neba/aseprite
           curl -L --fail --retry 3 -o "$WORK/aseprite.zip" "https://github.com/aseprite/aseprite/releases/download/v${ASEPRITE_VERSION}/Aseprite-v${ASEPRITE_VERSION}-Source.zip"
           unzip -q "$WORK/aseprite.zip" -d "$WORK/src"
-          ASE_SRC=$(find "$WORK/src" -maxdepth 2 -type f -name CMakeLists.txt -printf '%h\n' | while read d; do test -f "$d/src/app/CMakeLists.txt" && echo "$d"; done | head -1)
+          ASE_SRC="$WORK/src"
+          test -f "$ASE_SRC/src/app/CMakeLists.txt"
           curl -L --fail --retry 3 -o "$WORK/skia.zip" 'https://github.com/aseprite/skia/releases/download/m124-08a5439a6b/Skia-Linux-Release-x64.zip'
           unzip -q "$WORK/skia.zip" -d "$WORK/skia"
-          SKIA_LIB=$(find "$WORK/skia" -name libskia.a | head -1)
-          SKIA_DIR=$(find "$WORK/skia" -path '*/include/core/SkCanvas.h' -printf '%h\n' | sed 's#/include/core$##' | head -1)
-          test -n "$ASE_SRC" && test -f "$SKIA_LIB" && test -d "$SKIA_DIR"
+          SKIA_LIB=$(find "$WORK/skia" -name libskia.a -print -quit)
+          SKIA_CANVAS=$(find "$WORK/skia" -path '*/include/core/SkCanvas.h' -print -quit)
+          SKIA_DIR=$(dirname "$(dirname "$(dirname "$SKIA_CANVAS")")")
+          test -f "$SKIA_LIB" && test -d "$SKIA_DIR"
           cmake -S "$ASE_SRC" -B "$WORK/build" -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_FLAGS:STRING=-stdlib=libstdc++ \
-            -DCMAKE_EXE_LINKER_FLAGS:STRING=-stdlib=libstdc++ \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
             -DLAF_BACKEND=skia \
             -DSKIA_DIR="$SKIA_DIR" \
             -DSKIA_LIBRARY_DIR="$(dirname "$SKIA_LIB")" \
