@@ -1,5 +1,6 @@
 name: Art tools bootstrap
 
+# refresh canonical tool artifact: 2026-10-17
 on:
   push:
     branches: [2d_workshop-placeables-w01]
