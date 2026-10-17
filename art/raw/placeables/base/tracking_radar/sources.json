@@ -11,7 +11,8 @@
   "source_archive": {
     "provider": "google_drive",
     "folder_id": "1CHm6Htn-ujhWBOpfKX97PubGJGYE2qFl",
-    "folder_url": "https://drive.google.com/drive/folders/1CHm6Htn-ujhWBOpfKX97PubGJGYE2qFl"
+    "folder_url": "https://drive.google.com/drive/folders/1CHm6Htn-ujhWBOpfKX97PubGJGYE2qFl",
+    "rejected_folder_id": "1GSQG-XvljjGVyryI-gO8tVhQ-MUGfxIj"
   },
   "processing_target": {
     "spritefusion_pixel_snapper": {
@@ -41,5 +42,15 @@
       "review_note": "Strong readable radar silhouette and physically plausible pedestal/azimuth/elevation/feed chain. Keep the dish/yoke ancestry through later eras; do not accumulate the E0 service-platform micro-detail in future variants."
     }
   ],
-  "status": "E0 anchor approved and archived; E0 isolated part-sheet is next before E1 generation"
+  "rejected_sources": [
+    {
+      "kind": "E0_part_sheet",
+      "source_gen_id": "e3050a10-f1d1-4b6f-8870-f3a5a54e1543",
+      "source_size": [1536, 1024],
+      "source_sha256": "2d41daa6e959ce542655f2bf0f3dbecb3a0d5350b7c6537e8c0a5df2378ee4f4",
+      "drive_file_id": "1bXjrXqSXwh8XzFffm-QOx7Lw0483zEti",
+      "reason": "Part separation is mechanically useful, but candidate failed source gate: soft environmental gradient/background and semi-transparent fringe; rendering drifted toward photoreal CGI rather than canonical HD pixel/pixel-look. No destructive cleanup permitted as a substitute for regeneration."
+    }
+  ],
+  "status": "E0 anchor approved and archived; E0 part-sheet regeneration required before E1 generation"
 }
