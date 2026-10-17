@@ -1,0 +1,16 @@
+{
+  "asset": "W04 flight_simulator",
+  "era": "E3",
+  "year": 2015,
+  "source_gen_id": "2e962835-c849-4d05-b5a9-f025910a774b",
+  "source_sha256": "ba3e89be227a7de6689c25e92793c10e2081ad41e50c54dea1d40e3368f6ae23",
+  "spritefusion_pixel_snapper_rev": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "spritefusion_pixel_snapper_package": "1.0.0",
+  "pixel_size": 8,
+  "colors": 32,
+  "aseprite": "1.3.18.6",
+  "aseprite_dithering": "none",
+  "target_canvas": [172, 160],
+  "registration_target": [86, 156],
+  "mechanism_pivots": "pending_measured_rig_pass"
+}
