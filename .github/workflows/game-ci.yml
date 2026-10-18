@@ -17,6 +17,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Static pipeline validation
+        run: |
+          python3 -m json.tool art/placeables/PIPELINE_CONFIG.json >/dev/null
+          python3 -m json.tool outputs/rocket/runtime-assets.json >/dev/null
+          python3 -m py_compile \
+            tools/art_pipeline/process_asset.py \
+            tools/art_pipeline/verify_visual_gate.py \
+            tools/art_pipeline/promote_asset.py \
+            tools/art_pipeline/rebuild_b01_part_atlases.py
+          bash -n tools/art_pipeline/setup_art_tools.sh
+          node --check outputs/rocket/build.cjs
+      - name: Verify no migrated B01 runtime mirror is committed
+        run: |
+          test ! -e outputs/rocket/dist/assets/placeables/base/weather_complex/parts
+          test -s art/gen/placeables/base/weather_complex/parts/rig.json
+          test -s art/gen/placeables/base/weather_complex/parts/body_eras.png
       - name: Install browser QA harness
         run: |
           npm install --no-save --ignore-scripts playwright@1.62.1
