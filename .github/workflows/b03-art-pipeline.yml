@@ -24,7 +24,7 @@ jobs:
       OUTDIR: art/gen/placeables/base/landing_guidance
       RUNTIME_DIR: outputs/rocket/dist/assets/placeables/base/landing_guidance
       COLORS: '32'
-      PIXEL_SIZE: '12'
+      PIXEL_SIZE: '13'
       WIDTH: '46'
       HEIGHT: '82'
       REG_X: '23'
