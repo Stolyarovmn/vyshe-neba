@@ -1,0 +1,57 @@
+name: 2D asset candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      asset:
+        description: Asset family to process
+        required: true
+        type: choice
+        options: [W04, B03]
+  workflow_call:
+    inputs:
+      asset:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    env:
+      ASEPRITE_VERSION: '1.3.18.6'
+      PIXEL_SNAPPER_REV: 'ae20461f60fb39e75d15f184bab1ebec1219511c'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install art build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            clang cmake ninja-build unzip curl python3-pil jq \
+            libpixman-1-dev libfreetype6-dev libharfbuzz-dev zlib1g-dev \
+            libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev \
+            libfontconfig1-dev libjpeg-dev libpng-dev libwebp-dev
+      - name: Restore canonical art tool cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/art-tool-cache
+          key: art-tools-${{ runner.os }}-${{ runner.arch }}-aseprite-1.3.18.6-none-snapper-ae20461f
+      - name: Set up canonical art tools
+        run: tools/art_pipeline/setup_art_tools.sh "$RUNNER_TEMP/art-tools" "$RUNNER_TEMP/art-tool-cache"
+      - name: Build deterministic candidate
+        run: |
+          python3 tools/art_pipeline/process_asset.py \
+            --repo-root . \
+            --asset '${{ inputs.asset }}' \
+            --output "$RUNNER_TEMP/candidate" \
+            --pixel-snapper "$RUNNER_TEMP/art-tools/spritefusion-pixel-snapper" \
+            --aseprite "$RUNNER_TEMP/art-tools/aseprite"
+      - name: Upload candidate + QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: asset-candidate-${{ inputs.asset }}-${{ github.sha }}
+          path: ${{ runner.temp }}/candidate/
+          retention-days: 7
+          if-no-files-found: error
