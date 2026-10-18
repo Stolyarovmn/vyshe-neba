@@ -1,0 +1,46 @@
+name: Game build and regression
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  game:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install browser QA harness
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.62.1
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROMIUM_EXECUTABLE_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          elif command -v chromium >/dev/null 2>&1; then
+            echo "CHROMIUM_EXECUTABLE_PATH=$(command -v chromium)" >> "$GITHUB_ENV"
+          else
+            echo 'No system Chrome/Chromium found.' >&2
+            exit 1
+          fi
+          echo 'CHROMIUM_ARGS=["--no-sandbox","--disable-dev-shm-usage"]' >> "$GITHUB_ENV"
+      - name: Full game regression
+        run: npm test
+      - name: Record standalone build checksum
+        run: sha256sum 'outputs/Выше неба.html' > 'outputs/Выше неба.html.sha256'
+      - name: Upload standalone game and QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vyshe-neba-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            outputs/Выше неба.html
+            outputs/Выше неба.html.sha256
+            work/**
