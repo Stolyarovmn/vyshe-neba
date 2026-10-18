@@ -9,7 +9,8 @@ on:
       - 'outputs/rocket/dist/weather-complex-window.js'
       - 'outputs/rocket/dist/index.html'
       - 'outputs/rocket/dist/infrastructure.js'
-      - 'outputs/rocket/dist/assets/placeables/base/weather_complex/parts/**'
+      - 'art/gen/placeables/base/weather_complex/parts/**'
+      - 'outputs/rocket/runtime-assets.json'
       - 'outputs/rocket/build.cjs'
       - 'outputs/rocket/qa-b01-rig.cjs'
       - 'outputs/rocket/qa-b01-runtime.cjs'
@@ -26,22 +27,16 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
       - name: Build standalone game
         run: node outputs/rocket/build.cjs
-
       - name: Infrastructure regression
         run: node outputs/rocket/qa-infrastructure.cjs
-
       - name: B01 rig regression
         run: node outputs/rocket/qa-b01-rig.cjs
-
       - name: B01 runtime integration regression
         run: node outputs/rocket/qa-b01-runtime.cjs
-
       - name: Install browser QA harness
         run: |
-          set -euxo pipefail
           npm install --no-save --ignore-scripts playwright@1.62.1
           if command -v google-chrome >/dev/null 2>&1; then
             echo "CHROMIUM_EXECUTABLE_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
@@ -52,10 +47,8 @@ jobs:
             exit 1
           fi
           echo 'CHROMIUM_ARGS=["--no-sandbox","--disable-dev-shm-usage"]' >> "$GITHUB_ENV"
-
       - name: B01 in-game browser regression
         run: node outputs/rocket/qa-b01-runtime-browser.cjs
-
       - name: Upload B01 in-game QA frames
         if: always()
         uses: actions/upload-artifact@v4

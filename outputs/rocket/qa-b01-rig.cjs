@@ -2,10 +2,10 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const dist=path.join(__dirname,'dist');
-const partRoot=path.join(dist,'assets/placeables/base/weather_complex/parts');
+const partRoot=path.resolve(__dirname,'../../art/gen/placeables/base/weather_complex/parts');
 const e0Dir=path.join(partRoot,'e0_1978');
-const e0QaPath=path.resolve(__dirname,'../../art/gen/placeables/base/weather_complex/parts/e0_1978/parts_qa.json');
-const extractionPath=path.resolve(__dirname,'../../art/gen/placeables/base/weather_complex/parts/part_extraction.json');
+const e0QaPath=path.join(e0Dir,'parts_qa.json');
+const extractionPath=path.join(partRoot,'part_extraction.json');
 const rigPath=path.join(partRoot,'rig.json');
 const jsPath=path.join(dist,'b01-rig-qa.js');
 const controllerPath=path.join(dist,'weather-complex-rig.js');
@@ -23,8 +23,8 @@ const rig=JSON.parse(fs.readFileSync(rigPath,'utf8'));
 if(JSON.stringify(rig.atlas_layout?.order)!==JSON.stringify(order))throw new Error('runtime atlas order mismatch');
 for(const stem of order){const src=extraction.eras[stem],dst=rig.eras?.[stem];if(!dst)throw new Error('runtime rig missing '+stem);for(const part of ['sensor','vane','indicator'])if(JSON.stringify(src.parts[part].pivot)!==JSON.stringify(dst[part].pivot)||src.parts[part].present!==dst[part].present)throw new Error(`${stem}/${part} runtime rig drift`);}
 const controllerJs=fs.readFileSync(controllerPath,'utf8');const sandbox={window:{},Math,console};vm.createContext(sandbox);new vm.Script(controllerJs,{filename:'weather-complex-rig.js'}).runInContext(sandbox);const Controller=sandbox.window.WeatherComplexRigController;if(typeof Controller!=='function')throw new Error('WeatherComplexRigController not exported');
-const c=new Controller(rig,'e0_1978');if(c.state!=='IDLE')throw new Error('initial state must be IDLE');if(!c.dispatch('launch_prepare')||c.state!=='NOTICE')throw new Error('launch_prepare must enter NOTICE');tick(c,.30,{wind:.5});if(c.state!=='WORK')throw new Error('NOTICE must advance to WORK');tick(c,Math.max(0,.60-c.stateTime),{wind:.5});if(Math.abs(c.sensorAngle)>.001)throw new Error('WORK midpoint must pass sensor center');if(!c.dispatch('weather_window_selected',{index:1})||c.state!=='FINISH')throw new Error('selection must enter FINISH');tick(c,.30,{wind:0});if(c.state!=='COOLDOWN')throw new Error('FINISH must advance to COOLDOWN');tick(c,.65,{wind:0});if(c.state!=='IDLE')throw new Error('COOLDOWN must return to IDLE');c.setEra('e4_2035');tick(c,.10,{wind:1});if(c.vaneAngle!==0)throw new Error('E4 has no vane and must not synthesize vane motion');c.dispatch('power_off');if(c.state!=='OFF')throw new Error('power_off must enter OFF');
+const c=new Controller(rig,'e0_1978');if(c.state!=='IDLE')throw new Error('initial state must be IDLE');if(!c.dispatch('launch_prepare')||c.state!=='NOTICE')throw new Error('launch_prepare must enter NOTICE');tick(c,.30,{wind:.5});if(c.state!=='WORK')throw new Error('NOTICE must advance to WORK');tick(c,Math.max(0,.60-c.stateTime),{wind:.5});if(Math.abs(c.sensorAngle)>.001)throw new Error('WORK midpoint must pass sensor center');if(!c.dispatch('weather_window_selected',{index:1})||c.state!=='FINISH')throw new Error('selection must enter FINISH');tick(c,.30,{wind:0});if(c.state!=='COOLDOWN')throw new Error('FINISH must advance to COOLDOWN');tick(c,.65,{wind:0});if(c.state!=='IDLE')throw new Error('COOLDOWN must return IDLE');c.setEra('e4_2035');tick(c,.10,{wind:1});if(c.vaneAngle!==0)throw new Error('E4 has no vane and must not synthesize vane motion');c.dispatch('power_off');if(c.state!=='OFF')throw new Error('power_off must enter OFF');
 const js=fs.readFileSync(jsPath,'utf8');new vm.Script(js,{filename:'b01-rig-qa.js'});
 for(const token of ["drawRigidCell('sensor'","drawRigidCell('vane'","drawCell('indicator'","fetch(ROOT+'rig.json')","controller.dispatch('launch_prepare')","controller.dispatch('weather_window_selected'"])if(!js.includes(token))throw new Error('rig harness missing '+token);
 if(js.includes('wholeSpriteAngle')||js.includes('wholeSpriteScale')||js.includes('wholeSpriteBob'))throw new Error('whole-sprite fake motion marker found');
-console.log('B01 rig QA: E0-E5 atlases valid; rest reconstructions exact; measured pivots match runtime metadata; causal OFF→IDLE→NOTICE→WORK→FINISH→COOLDOWN contract passes; E4/E5 vane intentionally absent; harness syntax OK.');
+console.log('B01 rig QA: canonical E0-E5 atlases valid; rest reconstructions exact; measured pivots match canonical rig metadata; causal OFF→IDLE→NOTICE→WORK→FINISH→COOLDOWN contract passes; E4/E5 vane intentionally absent; harness syntax OK.');

@@ -1,0 +1,62 @@
+name: Game build and regression
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  game:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Static pipeline validation
+        run: |
+          python3 -m json.tool art/placeables/PIPELINE_CONFIG.json >/dev/null
+          python3 -m json.tool outputs/rocket/runtime-assets.json >/dev/null
+          python3 -m py_compile \
+            tools/art_pipeline/process_asset.py \
+            tools/art_pipeline/verify_visual_gate.py \
+            tools/art_pipeline/promote_asset.py \
+            tools/art_pipeline/rebuild_b01_part_atlases.py
+          bash -n tools/art_pipeline/setup_art_tools.sh
+          node --check outputs/rocket/build.cjs
+      - name: Verify no migrated B01 runtime mirror is committed
+        run: |
+          test ! -e outputs/rocket/dist/assets/placeables/base/weather_complex/parts
+          test -s art/gen/placeables/base/weather_complex/parts/rig.json
+          test -s art/gen/placeables/base/weather_complex/parts/body_eras.png
+      - name: Install browser QA harness
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.62.1
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROMIUM_EXECUTABLE_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          elif command -v chromium >/dev/null 2>&1; then
+            echo "CHROMIUM_EXECUTABLE_PATH=$(command -v chromium)" >> "$GITHUB_ENV"
+          else
+            echo 'No system Chrome/Chromium found.' >&2
+            exit 1
+          fi
+          echo 'CHROMIUM_ARGS=["--no-sandbox","--disable-dev-shm-usage"]' >> "$GITHUB_ENV"
+      - name: Full game regression
+        run: npm test
+      - name: Record standalone build checksum
+        run: sha256sum 'outputs/Выше неба.html' > 'outputs/Выше неба.html.sha256'
+      - name: Upload standalone game and QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vyshe-neba-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            outputs/Выше неба.html
+            outputs/Выше неба.html.sha256
+            work/**

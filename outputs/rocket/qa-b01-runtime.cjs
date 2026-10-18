@@ -29,7 +29,8 @@ yes(windowUi.includes("one choice")||windowUi.includes('Нового переб�
 yes(windowUi.includes('patchLegacyWeatherEffect'),'legacy wind-reduction compensation missing');
 yes(windowUi.includes("def.benefit='Два прогноза следующего запуска · один выбор без reroll'"),'infrastructure benefit text not updated');
 
-const rig=JSON.parse(fs.readFileSync(path.join(dist,'assets/placeables/base/weather_complex/parts/rig.json'),'utf8'));
+const rigPath=path.resolve(here,'../../art/gen/placeables/base/weather_complex/parts/rig.json');
+const rig=JSON.parse(fs.readFileSync(rigPath,'utf8'));
 yes(JSON.stringify(rig.canvas)==='[96,122]','rig canvas changed');
 yes(JSON.stringify(rig.registration)==='[48,118]','registration changed');
 yes(Object.keys(rig.eras).length===6,'expected six eras');
@@ -39,4 +40,4 @@ const ctx={window:{}};ctx.window=ctx;vm.createContext(ctx);vm.runInContext(rigCo
 const C=ctx.WeatherComplexRigController,c=new C(rig,'e0_1978');
 yes(c.state==='IDLE','controller not idle initially');yes(c.dispatch('launch_prepare')===true,'launch_prepare rejected');for(let i=0;i<20;i++)c.update(.02,{wind:.4});yes(c.state==='WORK','NOTICE did not reach WORK');for(let i=0;i<60;i++)c.update(.02,{wind:.4});yes(c.state==='WORK','WORK must wait for explicit weather choice');yes(c.dispatch('weather_window_selected',{index:1})===true,'selection event rejected');for(let i=0;i<50;i++)c.update(.02,{wind:.4});yes(c.state==='IDLE','FINISH/COOLDOWN did not return IDLE');yes(Math.abs(c.vaneAngle)>0,'wind-reactive vane did not move');
 
-console.log('B01 runtime QA PASS: scripts ordered, two-window/no-reroll mechanic wired, legacy wind bonus neutralized, causal rig waits for explicit choice.');
+console.log('B01 runtime QA PASS: scripts ordered, canonical rig metadata wired, two-window/no-reroll mechanic wired, legacy wind bonus neutralized, causal rig waits for explicit choice.');

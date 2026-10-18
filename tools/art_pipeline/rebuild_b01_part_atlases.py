@@ -6,6 +6,10 @@ and pivots are authored metadata; visible bboxes are measured output and are
 refreshed from the approved art when stale. Every derived PNG is regenerated,
 fully decoded, and compared in RGBA space so truncated/corrupt derived files
 cannot poison the rebuild.
+
+Only canonical production files under art/gen are written. Runtime packaging is
+owned by outputs/rocket/build.cjs + outputs/rocket/runtime-assets.json; this tool
+must never recreate a committed dist/assets mirror.
 """
 from __future__ import annotations
 
@@ -21,7 +25,6 @@ PARTS = ["body", "sensor", "vane", "indicator"]
 CELL = (96, 122)
 ART_ROOT = Path("art/gen/placeables/base/weather_complex")
 PART_ROOT = ART_ROOT / "parts"
-RUNTIME_PART_ROOT = Path("outputs/rocket/dist/assets/placeables/base/weather_complex/parts")
 
 
 def sha256(path: Path) -> str:
@@ -168,7 +171,6 @@ def main():
     args = ap.parse_args()
     repo = Path(args.repo_root)
     part_root = repo / PART_ROOT
-    runtime_root = repo / RUNTIME_PART_ROOT
     extraction_path = part_root / "part_extraction.json"
     extraction = json.loads(extraction_path.read_text(encoding="utf-8"))
 
@@ -177,6 +179,7 @@ def main():
         "asset": "weather_complex",
         "method": "approved anchor -> authored semantic box -> measured bbox refresh -> exact indexed PNGs/atlases",
         "derived_input_policy": "never trust existing generated PNGs as rebuild inputs",
+        "runtime_packaging": "build-time from canonical art/gen via outputs/rocket/runtime-assets.json",
         "cell": list(CELL),
         "era_order": ORDER,
         "bbox_refreshes": [],
@@ -228,17 +231,12 @@ def main():
                     part_meta["bbox"] = got_bbox
 
             art_part = part_root / stem / f"{part}.png"
-            runtime_part = runtime_root / stem / f"{part}.png"
             palette_entries = exact_indexed_save(generated[part], art_part)
-            runtime_part.parent.mkdir(parents=True, exist_ok=True)
-            runtime_part.write_bytes(art_part.read_bytes())
-
-            for check_path in (art_part, runtime_part):
-                with Image.open(check_path) as check:
-                    check.load()
-                    decoded = check.convert("RGBA")
-                if not rgba_equal(decoded, generated[part]):
-                    raise SystemExit(f"QA_FAIL: decoded part differs: {check_path}")
+            with Image.open(art_part) as check:
+                check.load()
+                decoded = check.convert("RGBA")
+            if not rgba_equal(decoded, generated[part]):
+                raise SystemExit(f"QA_FAIL: decoded part differs: {art_part}")
 
             era_report["parts"][part] = {
                 "present": present,
@@ -247,7 +245,6 @@ def main():
                 "semantic_box": semantic_box,
                 "palette_entries_including_transparent": palette_entries,
                 "art_sha256": sha256(art_part),
-                "runtime_sha256": sha256(runtime_part),
             }
 
         rest = Image.new("RGBA", CELL, (0, 0, 0, 0))
@@ -261,8 +258,6 @@ def main():
         for part in PARTS:
             cells[part].append(generated[part])
 
-    # Persist refreshed measured bboxes because runtime metadata must describe
-    # the approved art, not an older derived file.
     extraction_path.write_text(json.dumps(extraction, indent=2) + "\n", encoding="utf-8")
 
     atlas_size = (CELL[0] * 3, CELL[1] * 2)
@@ -272,23 +267,17 @@ def main():
             atlas.alpha_composite(cell, ((i % 3) * CELL[0], (i // 3) * CELL[1]))
 
         art_path = part_root / f"{part}_eras.png"
-        runtime_path = runtime_root / f"{part}_eras.png"
         palette_entries = exact_indexed_save(atlas, art_path)
-        runtime_path.parent.mkdir(parents=True, exist_ok=True)
-        runtime_path.write_bytes(art_path.read_bytes())
-
-        for check_path in (art_path, runtime_path):
-            with Image.open(check_path) as check:
-                check.load()
-                decoded = check.convert("RGBA")
-            if not rgba_equal(decoded, atlas):
-                raise SystemExit(f"QA_FAIL: decoded atlas differs: {check_path}")
+        with Image.open(art_path) as check:
+            check.load()
+            decoded = check.convert("RGBA")
+        if not rgba_equal(decoded, atlas):
+            raise SystemExit(f"QA_FAIL: decoded atlas differs: {art_path}")
 
         report["atlases"][part] = {
             "size": list(atlas_size),
             "palette_entries_including_transparent": palette_entries,
             "art_sha256": sha256(art_path),
-            "runtime_sha256": sha256(runtime_path),
             "decoded_rgba_pixel_exact": True,
         }
 
@@ -296,7 +285,7 @@ def main():
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(
         "B01 part rebuild PASS: E0-E5 derived from approved anchors; measured bboxes refreshed; "
-        "rest reconstructions exact; every PNG round-trips; atlases exact"
+        "rest reconstructions exact; every canonical PNG round-trips; atlases exact"
     )
     if report["bbox_refreshes"]:
         print("bbox_refreshes=" + json.dumps(report["bbox_refreshes"], separators=(",", ":")))

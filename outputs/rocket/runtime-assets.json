@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "legacy_root": "outputs/rocket/dist/assets",
+  "canonical_families": [
+    {
+      "asset_id": "B01",
+      "source": "art/gen/placeables/base/weather_complex/parts",
+      "target": "placeables/base/weather_complex/parts",
+      "include": [
+        "rig.json",
+        "body_eras.png",
+        "sensor_eras.png",
+        "vane_eras.png",
+        "indicator_eras.png"
+      ]
+    }
+  ]
+}
