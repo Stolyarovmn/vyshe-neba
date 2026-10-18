@@ -77,7 +77,14 @@ def main():
                 blocked = True
             yes(blocked, "second writer must be rejected by lock")
 
-        # Checkpoint identity is part of the safety boundary.
+        # Checkpoint identity is part of the safety boundary. Simulate a
+        # checkpoint restored into the wrong asset directory.
+        wrong_dir = state / "OTHER" / "e0_1978"
+        wrong_dir.mkdir(parents=True)
+        (wrong_dir / "current.json").write_text(
+            json.dumps(persisted.state),
+            encoding="utf-8",
+        )
         identity_blocked = False
         try:
             Tracker(state, "OTHER", "e0_1978")
