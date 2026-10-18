@@ -10,7 +10,9 @@ const MOBILE_COIN_SCALE=1.32;
 const ROCKET_VISUAL_SCALE=1.10;
 
 function coarse(){try{return !!root.matchMedia?.('(pointer:coarse)').matches;}catch{return false;}}
-function mobile(){return coarse();}
+function touch(){return Number(root.navigator?.maxTouchPoints||0)>0;}
+function compact(){return Math.min(Number(root.innerWidth)||9999,Number(root.innerHeight)||9999)<=900;}
+function mobile(){return coarse()||(touch()&&compact());}
 function isGameContext(ctx){return ctx?.canvas?.id===GAME_CANVAS_ID;}
 function scaledFont(font){
  if(!mobile())return font;
