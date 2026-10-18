@@ -6,6 +6,10 @@ on:
     paths:
       - 'tools/art_pipeline/setup_art_tools.sh'
       - '.github/workflows/art-tools-bootstrap.yml'
+  pull_request:
+    paths:
+      - 'tools/art_pipeline/setup_art_tools.sh'
+      - '.github/workflows/art-tools-bootstrap.yml'
   workflow_dispatch:
 
 permissions:
@@ -33,7 +37,7 @@ jobs:
           path: ${{ runner.temp }}/art-tool-cache
           key: art-tools-${{ runner.os }}-${{ runner.arch }}-aseprite-1.3.18.6-none-snapper-ae20461f
       - name: Build canonical tool bundle
-        run: tools/art_pipeline/setup_art_tools.sh "$RUNNER_TEMP/art-tools" "$RUNNER_TEMP/art-tool-cache"
+        run: bash tools/art_pipeline/setup_art_tools.sh "$RUNNER_TEMP/art-tools" "$RUNNER_TEMP/art-tool-cache"
       - uses: actions/upload-artifact@v4
         with:
           name: canonical-art-tools-linux-x64
