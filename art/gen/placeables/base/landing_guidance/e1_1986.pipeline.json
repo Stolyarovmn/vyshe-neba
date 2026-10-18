@@ -1,0 +1,19 @@
+{
+  "asset": "B03 landing_guidance",
+  "era": "E1",
+  "year": 1986,
+  "source_gen_id": "2b9f0c48-61ff-41f7-ae32-492d5b4f77b1",
+  "source_original_sha256": "ed1c9ee0bbc01c1079be594493fdb9e9450c781f59ebe4036a3e4addac479b79",
+  "text_transport_format": "indexed-zlib-b85-v1",
+  "transport_pixel_sha256": "94440364adbe7976d45f7a1d7d600d7bf007d241029ae883c8c596080903c342",
+  "transport_canvas": [138, 246],
+  "transport_to_presnap": "nearest-neighbor x4",
+  "spritefusion_pixel_snapper_rev": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "pixel_size": 14,
+  "colors": 32,
+  "aseprite": "1.3.18.6",
+  "aseprite_dithering": "none",
+  "target_canvas": [46, 82],
+  "registration_target": [23, 78],
+  "mechanism_pivots": "pending_measured_rig_pass"
+}
