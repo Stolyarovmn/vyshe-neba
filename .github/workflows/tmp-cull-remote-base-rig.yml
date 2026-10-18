@@ -1,0 +1,23 @@
+name: Temporary remote base rig culling patcher
+on:
+  push:
+    branches:
+      - 2d_world-background-traffic-fix
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.event.head_commit.message == 'Run remote base rig culling patcher'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 2d_world-background-traffic-fix
+      - run: python3 tools/tmp_cull_remote_base_rig.py
+      - run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add outputs/rocket/dist/world-art.js
+          git diff --cached --check
+          git commit -m '2D: cull remote base rig [base-cull-generated]'
+          git push origin HEAD:2d_world-background-traffic-fix
