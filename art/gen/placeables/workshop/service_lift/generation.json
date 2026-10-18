@@ -1,0 +1,37 @@
+{
+  "asset": "w01_service_lift",
+  "source": "OpenAI built-in image generation",
+  "anchor_generation": {
+    "gen_id": "bc1bd963-9c1d-4272-9a2c-1773991ac279",
+    "source_size": [1536, 1024],
+    "layout": [3, 2],
+    "purpose": "six-era anchor art E0-E5"
+  },
+  "animation_generations": [
+    {
+      "gen_id": "bcdf68ec-0f1a-4ad4-a743-efd820613c63",
+      "purpose": "era animation/keyframe and moving-part exploration"
+    },
+    {
+      "gen_id": "6a9ab518-3fa0-46e0-8bd9-e71118883973",
+      "purpose": "E3 separated rig-part study and event poses"
+    },
+    {
+      "gen_id": "5fcd85aa-4383-4bd7-a512-47fa7afaa0ea",
+      "purpose": "cleaner E3 rig/keyframe production board plus E0-E5 moving-part lineage"
+    }
+  ],
+  "post": {
+    "anchor_alpha_zero_lte": 12,
+    "anchor_alpha_opaque_snap_gte": 248,
+    "anchor_palette": "PNG8 <=256 colors, no dithering",
+    "anchor_slice": "six fixed 512x512 cells",
+    "runtime_normalization": "190x230 LP, nearest-neighbor, shared bottom-center baseline"
+  },
+  "ref2game_contract": {
+    "art_source_of_truth": "art/gen",
+    "motion_source_of_truth": "live code plus measured metadata",
+    "rule": "AI paints physical parts and authored poses; code owns motion, timing, glow, particles, dynamic light and event causality",
+    "binary_animation_status": "E3 part/keyframe sheets generated and accepted visually; final transparent binary atlas is the next import step before runtime WORK animation is enabled"
+  }
+}

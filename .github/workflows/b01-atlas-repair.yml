@@ -1,0 +1,79 @@
+name: B01 part atlas deterministic rebuild
+
+on:
+  push:
+    branches: [2d_workshop-placeables-w01]
+    paths:
+      - 'tools/art_pipeline/rebuild_b01_part_atlases.py'
+      - '.github/workflows/b01-atlas-repair.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Pillow
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-pil
+
+      - name: Rebuild B01 E0-E5 cut-outs and atlases from approved anchors
+        run: |
+          set -euxo pipefail
+          python3 tools/art_pipeline/rebuild_b01_part_atlases.py --repo-root .
+          test -s art/gen/placeables/base/weather_complex/parts/atlas_rebuild_qa.json
+
+      - name: Verify rebuilt B01 rig and render motion sheets
+        run: |
+          set -euxo pipefail
+          node outputs/rocket/qa-b01-rig.cjs
+          python3 tools/art_pipeline/b01_motion_sheet.py \
+            --root outputs/rocket/dist/assets/placeables/base/weather_complex/parts \
+            --output-dir "$RUNNER_TEMP/b01-motion-after-rebuild"
+          test -s "$RUNNER_TEMP/b01-motion-after-rebuild/b01_motion_sheet.png"
+          test -s "$RUNNER_TEMP/b01-motion-after-rebuild/motion_qa.json"
+
+      - name: Commit rebuilt production parts and atlases
+        run: |
+          set -euxo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            art/gen/placeables/base/weather_complex/parts/part_extraction.json \
+            art/gen/placeables/base/weather_complex/parts/atlas_rebuild_qa.json \
+            art/gen/placeables/base/weather_complex/parts/e0_1978 \
+            art/gen/placeables/base/weather_complex/parts/e1_1986 \
+            art/gen/placeables/base/weather_complex/parts/e2_1998 \
+            art/gen/placeables/base/weather_complex/parts/e3_2015 \
+            art/gen/placeables/base/weather_complex/parts/e4_2035 \
+            art/gen/placeables/base/weather_complex/parts/e5_2060 \
+            art/gen/placeables/base/weather_complex/parts/*_eras.png \
+            outputs/rocket/dist/assets/placeables/base/weather_complex/parts/e0_1978 \
+            outputs/rocket/dist/assets/placeables/base/weather_complex/parts/e1_1986 \
+            outputs/rocket/dist/assets/placeables/base/weather_complex/parts/e2_1998 \
+            outputs/rocket/dist/assets/placeables/base/weather_complex/parts/e3_2015 \
+            outputs/rocket/dist/assets/placeables/base/weather_complex/parts/e4_2035 \
+            outputs/rocket/dist/assets/placeables/base/weather_complex/parts/e5_2060 \
+            outputs/rocket/dist/assets/placeables/base/weather_complex/parts/*_eras.png
+          if git diff --cached --quiet; then
+            echo 'No atlas rebuild changes required.'
+            exit 0
+          fi
+          git commit -m 'Rebuild B01 parts and atlases from approved anchors [skip b01-atlas-rebuild]'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+
+      - name: Upload B01 rebuild motion verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: b01-atlas-rebuild-verification
+          path: ${{ runner.temp }}/b01-motion-after-rebuild/
+          retention-days: 3

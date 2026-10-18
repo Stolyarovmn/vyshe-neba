@@ -1,0 +1,17 @@
+{
+  "asset": "B01 weather_complex",
+  "rule": "Never fake weather-station operation by rotating/bobbing/scaling the whole sprite. Body is static; sensor/vane use measured physical pivots after the part pass.",
+  "states": ["OFF", "IDLE", "NOTICE", "WORK", "FINISH", "COOLDOWN"],
+  "semantic_triggers": {
+    "weather_preview_requested": "sensor performs one deliberate scan/pass and indicator acknowledges forecast generation",
+    "weather_window_selected": "short physical/state confirmation only; do not run a perpetual celebration loop",
+    "era_changed": "swap era art/rig family"
+  },
+  "moving_parts": ["sensor", "vane"],
+  "environment_response": {
+    "vane": "follows shared scene wind direction",
+    "cup_anemometer": "rotation rate follows shared wind strength when the selected era physically contains cups"
+  },
+  "code_owned_fx": ["forecast_data", "screen_or_indicator_data", "dynamic_light", "glow", "rain", "wind_particles", "cast_shadow"],
+  "pivot_policy": "sensor/vane pivots remain null until approved processed parts are measured"
+}

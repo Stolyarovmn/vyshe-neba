@@ -1,0 +1,15 @@
+{
+  "asset": "W04 flight_simulator",
+  "rule": "Never fake simulator motion by rotating/scaling/bobbing the whole sprite; animate the measured pod/actuator/canopy rig.",
+  "states": ["OFF", "IDLE", "NOTICE", "ENTER", "ACTIVE", "FINISH", "COOLDOWN"],
+  "events": {
+    "workshop_enter": "prepare simulator",
+    "simulator_start": "open/enter/close canopy and engage actuators",
+    "simulator_motion": "drive pod from simulated pitch/roll/acceleration cues",
+    "simulator_stop": "return to neutral and open canopy",
+    "era_changed": "swap era sprite/rig family"
+  },
+  "moving_parts": ["pod", "actuator_left", "actuator_right", "canopy"],
+  "code_owned_fx": ["screen_data", "dynamic_light", "glow", "vibration", "motion_blur", "hud"],
+  "pivot_policy": "all gimbal/linear/hinge coordinates stay null until isolated approved parts are measured"
+}

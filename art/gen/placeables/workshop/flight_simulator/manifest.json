@@ -1,0 +1,44 @@
+{
+  "id": "flight_simulator",
+  "asset_code": "W04",
+  "type": "workshop_placeable",
+  "runtime_footprint_lp": [172, 160],
+  "placement_anchor_lp": {"x": 86, "y": 156, "kind": "bottom-center"},
+  "placement_sockets": ["floor", "floor_front"],
+  "value": "Capability",
+  "cost_tier": "XL",
+  "era_sprites": [
+    {"era": "E0", "year": 1978, "file": "e0_1978.png", "lineage": "open gimbal chair + mechanical instruments", "visual_status": "approved"},
+    {"era": "E1", "year": 1986, "file": "e1_1986.png", "lineage": "training cockpit + twin powered supports", "visual_status": "rejected_baked_screen_data"},
+    {"era": "E2", "year": 1998, "file": "e2_1998.png", "lineage": "CRT cockpit + heavy motion platform", "visual_status": "rejected_baked_screen_data"},
+    {"era": "E3", "year": 2015, "file": "e3_2015.png", "lineage": "panoramic cockpit + electric actuators", "visual_status": "rejected_baked_screen_data"},
+    {"era": "E4", "year": 2035, "file": "e4_2035.png", "lineage": "VR robotic capsule + multi-actuator platform", "visual_status": "rejected_baked_scene_and_glow"},
+    {"era": "E5", "year": 2060, "file": "e5_2060.png", "lineage": "adaptive simulation cell + precision multi-axis support", "visual_status": "rejected_baked_scene_and_glow"}
+  ],
+  "parts": [
+    {"id": "base", "motion": "static", "pivot_status": "not required"},
+    {"id": "pod", "motion": "rigid-body", "pivot_intent": "gimbal center", "measured_pivot": null},
+    {"id": "actuator_left", "motion": "linear", "pivot_intent": "base-left to pod", "measured_pivot": null},
+    {"id": "actuator_right", "motion": "linear", "pivot_intent": "base-right to pod", "measured_pivot": null},
+    {"id": "canopy", "motion": "state", "pivot_intent": "hinge", "measured_pivot": null}
+  ],
+  "status": {
+    "automatic_pipeline": "passed",
+    "visual_gate": "rejected_e1_e5",
+    "anchor_art": "processed_but_not_family_approved",
+    "runtime_sprite": "blocked_pending_visual_repair",
+    "runtime_publication": "must_be_absent_until_hash_bound_visual_gate_passes",
+    "rig_parts": "e3_parts_extracted_pivots_pending; other eras pending",
+    "e3_isolated_parts": "ready_for_reconstruction_qa_but_anchor_visual_repair_pending"
+  },
+  "visual_review": {
+    "file": "visual_qa.json",
+    "reviewed_pipeline_run_id": 39102219817,
+    "policy": "all six eras must be approved and their recorded SHA-256 must match the current processed PNGs before runtime publication"
+  },
+  "e3_part_pack": {
+    "path": "parts/e3",
+    "parts": ["base", "actuator_left", "actuator_right", "seat", "console", "monitors", "canopy"],
+    "pivot_policy": "null until assembled reconstruction is measured"
+  }
+}

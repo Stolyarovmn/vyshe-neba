@@ -1,0 +1,21 @@
+{
+  "asset_id": "B03",
+  "asset": "landing_guidance",
+  "stage": "processing_visual_qa",
+  "result": "fail_regenerate_from_E0",
+  "reason": "Approved source lineage is too wide/squat for the canonical 46x82 LP portrait footprint. A family-wide Pixel Snapper size that fits width collapses visible height to roughly half of the target envelope; per-era or nonuniform scaling is forbidden.",
+  "target_canvas": [46, 82],
+  "registration_target": [23, 78],
+  "tested_family_pixel_size": 32,
+  "visible_bbox_by_era": {
+    "E0_1978": [34, 42],
+    "E1_1986": [41, 39],
+    "E2_1998": [42, 37],
+    "E3_2015": [40, 37],
+    "E4_2035": [35, 39],
+    "E5_2060": [28, 33]
+  },
+  "decision": "Do not publish runtime sprites from this source set. Regenerate E0 with the tightened portrait silhouette contract, then rebuild E1-E5 lineage from the newly approved E0.",
+  "source_originals": "preserved unchanged in Google Drive",
+  "runtime_published": false
+}

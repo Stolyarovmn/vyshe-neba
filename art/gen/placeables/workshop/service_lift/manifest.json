@@ -1,0 +1,62 @@
+{
+  "id": "service_lift",
+  "asset_code": "W01",
+  "type": "workshop_placeable",
+  "master_source": {
+    "size_px": [1536, 1024],
+    "layout": {"cols": 3, "rows": 2, "cell_px": [512, 512]},
+    "reading_order": ["E0", "E1", "E2", "E3", "E4", "E5"]
+  },
+  "runtime": {
+    "canvas_lp": [190, 230],
+    "fit_envelope_lp": [178, 218],
+    "placement_anchor_lp": {"x": 95, "y": 224, "kind": "bottom-center baseline"},
+    "bottom_padding_lp": 6,
+    "resample": "nearest-neighbor",
+    "format": "PNG8 indexed",
+    "colors_max": 32,
+    "dither": "none"
+  },
+  "placement_sockets": ["rocket_left", "rocket_right", "floor_back"],
+  "era_sprites": [
+    {"era":"E0","year":1978,"name":"Гаражная мечта","lineage":"chain hoist + welded frame","file":"e0_1978.png","master_cell":{"col":0,"row":0},"master_visible_bbox_px":[47,104,447,437],"runtime_visible_size_lp":[178,148],"runtime_offset_lp":[6,76]},
+    {"era":"E1","year":1986,"name":"Своя мастерская","lineage":"hydraulic lift","file":"e1_1986.png","master_cell":{"col":1,"row":0},"master_visible_bbox_px":[6,52,479,438],"runtime_visible_size_lp":[178,145],"runtime_offset_lp":[6,79]},
+    {"era":"E2","year":1998,"name":"Испытательный центр","lineage":"bridge service frame","file":"e2_1998.png","master_cell":{"col":2,"row":0},"master_visible_bbox_px":[6,33,489,447],"runtime_visible_size_lp":[178,153],"runtime_offset_lp":[6,71]},
+    {"era":"E3","year":2015,"name":"Космический порт","lineage":"modular service rig","file":"e3_2015.png","master_cell":{"col":0,"row":1},"master_visible_bbox_px":[17,25,498,445],"runtime_visible_size_lp":[178,155],"runtime_offset_lp":[6,69]},
+    {"era":"E4","year":2035,"name":"Орбитальная эра","lineage":"dual robotic arms","file":"e4_2035.png","master_cell":{"col":1,"row":1},"master_visible_bbox_px":[0,11,512,448],"runtime_visible_size_lp":[178,152],"runtime_offset_lp":[6,72]},
+    {"era":"E5","year":2060,"name":"Горизонт будущего","lineage":"ring service system","file":"e5_2060.png","master_cell":{"col":2,"row":1},"master_visible_bbox_px":[0,4,503,444],"runtime_visible_size_lp":[178,156],"runtime_offset_lp":[6,68]}
+  ],
+  "animation": {
+    "policy": "rigged_parts_only; do not animate by bobbing/rotating/scaling the whole sprite",
+    "events": ["workshop_enter", "loadout_changed", "launch_prepare"],
+    "states": ["OFF", "IDLE", "NOTICE", "WORK", "FINISH", "COOLDOWN"],
+    "part_families": [
+      {"id":"carriage","design_intent":"moves along the service rail/beam","measured_pivot":null,"status":"needs isolated part sheet"},
+      {"id":"arm_upper","design_intent":"rotates around shoulder joint where present","measured_pivot":null,"status":"needs isolated part sheet"},
+      {"id":"arm_lower","design_intent":"rotates around elbow joint where present","measured_pivot":null,"status":"needs isolated part sheet"},
+      {"id":"gripper","design_intent":"rotates at wrist and opens/closes where present","measured_pivot":null,"status":"needs isolated part sheet"},
+      {"id":"tool","design_intent":"swappable end effector / hook / service head","measured_pivot":null,"status":"needs isolated part sheet"}
+    ],
+    "era_notes": {
+      "E0": "animate trolley/chain hoist travel and hook height; chain length is code-drawn, not stretched artwork",
+      "E1": "animate hydraulic/service carriage and hanging hoist; hoses react secondarily",
+      "E2": "animate bridge trolley + service head travel",
+      "E3": "animate modular carriage + gripper/service head",
+      "E4": "requires real cut-out rig for both articulated robotic arms; no whole-sprite sway",
+      "E5": "requires articulated manipulators around the ring; ring itself stays static except code-owned indicator light states"
+    }
+  },
+  "alpha_cleanup": {"threshold_zero_lte":12,"opaque_snap_gte":248,"other_alpha_preserved_before_runtime_quantization":true},
+  "status": {
+    "master_anchor_art":"approved_and_sliced",
+    "runtime_sprite":"ready_as_static_anchor",
+    "rig_parts":"pending_separate_generation_and_measured_pivots"
+  },
+  "qa": {
+    "same_runtime_canvas_all_eras": true,
+    "same_placement_baseline_all_eras": true,
+    "aspect_ratio_preserved": true,
+    "whole_sprite_fake_animation_forbidden": true,
+    "visual_contact_sheet_self_review": "passed"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "asset_id": "W07",
+  "asset": "avionics_bench",
+  "era": "E0",
+  "year": 1978,
+  "status": "presnap_source",
+  "source_gen_id": "712018a0-7db5-4f5e-ad17-27634e8f1881",
+  "source_master": "imagegen 1536x1024; transport presnap reduced to 312x208/96 colors before deterministic grid snap",
+  "target_canvas": [156, 118],
+  "anchor": [78, 114],
+  "pixel_snapper": {"pixel_size": 2, "colors": 32, "grid_mode": "uniform", "cell_method": "center_weighted"},
+  "required_pipeline": ["SpriteFusion Pixel Snapper", "Aseprite"],
+  "note": "Do not treat presnap PNG as runtime art. Only art/gen output passing QA is approved."
+}

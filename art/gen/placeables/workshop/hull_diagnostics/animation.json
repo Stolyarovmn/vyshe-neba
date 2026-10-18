@@ -1,0 +1,10 @@
+{
+  "asset": "W06 hull_diagnostics",
+  "states": ["OFF", "IDLE", "NOTICE", "SCAN_DOWN", "PAUSE_ON_DAMAGE", "SCAN_UP", "FINISH", "COOLDOWN"],
+  "trigger": "diagnose",
+  "moving_parts": ["scan_carriage", "scanner_head"],
+  "static_parts": ["frame", "pad_unit"],
+  "code_owned_fx": ["scan_beam", "screen_data", "damage_marker", "indicator_light"],
+  "whole_sprite_motion": false,
+  "motion_rule": "carriage translates only on the per-era measured rail; scanner head rotates around the measured per-era pivot"
+}

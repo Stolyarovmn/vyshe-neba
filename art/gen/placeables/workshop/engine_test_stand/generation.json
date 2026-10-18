@@ -1,0 +1,17 @@
+{
+  "asset": "w02_engine_test_stand",
+  "source": "OpenAI built-in image generation",
+  "gen_id": "63d8c379-48d3-4db3-8f01-af4a8aca1eac",
+  "source_size": [1536, 1024],
+  "source_layout": {"cols":3,"rows":2,"cell_px":[512,512],"order":["E0","E1","E2","E3","E4","E5"]},
+  "post": {
+    "alpha_zero_lte": 240,
+    "alpha_opaque_snap_gte": 248,
+    "common_scale": 0.23935091277890466,
+    "runtime_canvas_px": [190,126],
+    "placement_anchor_px": [95,122],
+    "palette": "PNG8 <=32 colors, no dithering",
+    "resample": "nearest-neighbor"
+  },
+  "note": "This approved source was generated in the first workshop placeables batch. Later imagegen attempts that accidentally repeated W01 were rejected and are not repository sources."
+}

@@ -1,0 +1,34 @@
+{
+  "id": "weather_complex",
+  "asset_code": "B01",
+  "type": "base_placeable",
+  "runtime_footprint_lp": [96, 122],
+  "placement_anchor_lp": {"x":48,"y":118,"kind":"bottom-center-design-target"},
+  "placement_sockets": ["roof", "yard"],
+  "value": "Information",
+  "cost_tier": "M",
+  "mechanic": "show two pre-generated weather windows for the next launch; player may launch now or switch once to the second window; no infinite reroll",
+  "parts": [
+    {"id":"body","motion":"static","pivot_status":"not required"},
+    {"id":"sensor","motion":"rotary","pivot_intent":"sensor-head center","measured_pivot":null},
+    {"id":"vane","motion":"wind-reactive","pivot_intent":"mast attachment / vane axis","measured_pivot":null},
+    {"id":"indicator","motion":"state","pivot_status":"not required"}
+  ],
+  "era_sources": [
+    {"era":"E0","year":1978,"source_gen_id":"943ecfd0-1d0b-4fd2-9ff4-1ac5882c134a","lineage":"pipe mast + cup anemometer + vane + analog indicator"},
+    {"era":"E1","year":1986,"source_gen_id":"d50705ca-6c92-477d-8878-b7d3b224c811","lineage":"industrial mast + mechanical weather radar"},
+    {"era":"E2","year":1998,"source_gen_id":"74bf5561-1fcf-42bb-a81f-fd983844738c","lineage":"motorized radar head + CRT electronics"},
+    {"era":"E3","year":2015,"source_gen_id":"a7f81016-ac11-4032-99fe-3e8189209d88","lineage":"modular digital station"},
+    {"era":"E4","year":2035,"source_gen_id":"9dd95019-558c-4049-9e8b-4fd79be7bddc","lineage":"lidar/optical head"},
+    {"era":"E5","year":2060,"source_gen_id":"2aee0086-136d-4f0f-829d-aa9c1c0914f7","lineage":"integrated multispectral atmospheric node"}
+  ],
+  "status": {
+    "high_quality_originals":"approved_and_archived_on_google_drive",
+    "lineage_qa":"passed",
+    "pixel_snapper":"pending",
+    "aseprite":"pending",
+    "runtime_sprites":"pending",
+    "rig_parts":"pending_after_anchor_processing",
+    "mechanism_pivots":"pending_measured_parts"
+  }
+}

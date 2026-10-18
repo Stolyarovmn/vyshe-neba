@@ -1,0 +1,19 @@
+ASSET: W01 Service Lift (`service_lift`) for the workshop.
+
+Create one coherent engineering lineage across six eras of the same buyable/placeable service machine.
+Compose as a 3-column × 2-row transparent era atlas with no labels.
+Reading order:
+E0 1978 | E1 1986 | E2 1998
+E3 2015 | E4 2035 | E5 2060
+
+Lineage:
+- E0 / 1978: chain hoist with rugged jack/small welded gantry; open mechanics, hooks, simple service tools.
+- E1 / 1986: hydraulic lift; painted industrial panels, hoses and sturdier mechanisms.
+- E2 / 1998: bridge service frame; instrumentation, servo components and cable routing.
+- E3 / 2015: modular service rig; cleaner engineering, compact actuators, composite covers and flat control screen.
+- E4 / 2035: robotic service cell with multiple articulated arms and more enclosed mechanisms.
+- E5 / 2060: ring-like autonomous service system with several physically understandable jointed manipulators.
+
+Each cell: one complete isolated object, fully visible, bottom-centered, consistent scale progression, generous transparent padding, no environment.
+Preserve strong family resemblance. No text, letters, logos or pseudo-writing.
+Dynamic lights, glow, motion, cables reacting to movement and all animation are code-owned.

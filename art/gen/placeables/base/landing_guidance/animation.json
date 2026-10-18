@@ -1,0 +1,15 @@
+{
+  "asset":"B03 landing_guidance",
+  "rule":"Never rotate/bob the whole beacon to fake tracking. Base stays planted; head aims around measured pan/tilt pivots; lamp is state-only.",
+  "states":["OFF","IDLE","NOTICE","WORK","FINISH","COOLDOWN"],
+  "semantic_triggers":{
+    "approach_started":"head acquires rocket and begins measured tracking",
+    "approach_state_changed":"lamp pattern/state changes safe/unsafe without baked beam",
+    "touchdown":"short physical/state confirmation then return toward neutral",
+    "era_changed":"swap era art/rig family"
+  },
+  "moving_parts":["head"],
+  "state_parts":["lamp"],
+  "code_owned_fx":["predicted_touchdown_marker","safe_corridor","laser_or_optical_beam","lamp_glow","dynamic_light","hud","cast_shadow"],
+  "pivot_policy":"pan/tilt coordinates remain null until processed isolated head/base art is measured"
+}

@@ -1,0 +1,23 @@
+{
+  "size": [
+    46,
+    82
+  ],
+  "opaque_colors": 30,
+  "binary_alpha": true,
+  "opaque_pixel_count": 612,
+  "coverage": 0.162248,
+  "visible_bbox": [
+    4,
+    40,
+    43,
+    78
+  ],
+  "visible_bbox_size": [
+    39,
+    38
+  ],
+  "min_coverage": 0.04,
+  "min_bbox_fraction": 0.35,
+  "sha256": "8e85b477a95b4d5cefc77c34f9ee91a97f220dda008ffac151ff3baf4fef67a7"
+}

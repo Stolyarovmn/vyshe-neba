@@ -1,0 +1,8 @@
+{
+  "asset":"W05 manufacturing_cell",
+  "source":"OpenAI built-in image generation in project conversation",
+  "source_file_id":"file_00000000dc8881f4b1d896fe5e03fe8c",
+  "source_local_basename":"img4.png","source_size":[1536,1024],"layout":[3,2],"generation_id":null,
+  "note":"Generation id was not available in the retained conversation file metadata; do not invent it.",
+  "post":{"resample":"nearest-neighbor","palette":"PNG8 indexed <=32 colors","dither":"none","alpha_zero_lte":12}
+}

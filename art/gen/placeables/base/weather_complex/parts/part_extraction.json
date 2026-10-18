@@ -1,0 +1,453 @@
+{
+  "asset_id": "B01",
+  "asset": "weather_complex",
+  "canvas": [
+    96,
+    122
+  ],
+  "registration": [
+    48,
+    118
+  ],
+  "layout": "E0 E1 E2 / E3 E4 E5",
+  "method": "pixel-exact semantic cutout decomposition of approved anchor art; no replacement art generated",
+  "atlases": {
+    "body": "body_eras.png",
+    "sensor": "sensor_eras.png",
+    "vane": "vane_eras.png",
+    "indicator": "indicator_eras.png"
+  },
+  "eras": {
+    "e0_1978": {
+      "era": "E0",
+      "year": 1978,
+      "parts": {
+        "sensor": {
+          "present": true,
+          "box": [
+            24,
+            14,
+            57,
+            30
+          ],
+          "pivot": [
+            42,
+            29
+          ],
+          "bbox": [
+            25,
+            17,
+            56,
+            30
+          ]
+        },
+        "vane": {
+          "present": true,
+          "box": [
+            47,
+            28,
+            82,
+            45
+          ],
+          "pivot": [
+            48,
+            36
+          ],
+          "bbox": [
+            47,
+            29,
+            79,
+            45
+          ]
+        },
+        "indicator": {
+          "present": true,
+          "box": [
+            56,
+            53,
+            73,
+            78
+          ],
+          "pivot": [
+            57,
+            63
+          ],
+          "bbox": [
+            56,
+            55,
+            70,
+            78
+          ]
+        },
+        "body": {
+          "present": true,
+          "pivot": null,
+          "bbox": [
+            18,
+            30,
+            75,
+            118
+          ]
+        }
+      },
+      "reconstruction_pixel_exact": true
+    },
+    "e1_1986": {
+      "era": "E1",
+      "year": 1986,
+      "parts": {
+        "sensor": {
+          "present": true,
+          "box": [
+            30,
+            19,
+            50,
+            40
+          ],
+          "pivot": [
+            43,
+            39
+          ],
+          "bbox": [
+            36,
+            23,
+            50,
+            37
+          ]
+        },
+        "vane": {
+          "present": true,
+          "box": [
+            19,
+            37,
+            82,
+            53
+          ],
+          "pivot": [
+            43,
+            48
+          ],
+          "bbox": [
+            19,
+            37,
+            81,
+            53
+          ]
+        },
+        "indicator": {
+          "present": true,
+          "box": [
+            29,
+            62,
+            43,
+            82
+          ],
+          "pivot": [
+            41,
+            72
+          ],
+          "bbox": [
+            30,
+            62,
+            43,
+            82
+          ]
+        },
+        "body": {
+          "present": true,
+          "pivot": null,
+          "bbox": [
+            16,
+            23,
+            79,
+            118
+          ]
+        }
+      },
+      "reconstruction_pixel_exact": true
+    },
+    "e2_1998": {
+      "era": "E2",
+      "year": 1998,
+      "parts": {
+        "sensor": {
+          "present": true,
+          "box": [
+            35,
+            36,
+            63,
+            70
+          ],
+          "pivot": [
+            48,
+            58
+          ],
+          "bbox": [
+            44,
+            39,
+            63,
+            70
+          ]
+        },
+        "vane": {
+          "present": true,
+          "box": [
+            22,
+            41,
+            44,
+            72
+          ],
+          "pivot": [
+            43,
+            52
+          ],
+          "bbox": [
+            22,
+            43,
+            44,
+            72
+          ]
+        },
+        "indicator": {
+          "present": true,
+          "box": [
+            47,
+            73,
+            71,
+            95
+          ],
+          "pivot": [
+            49,
+            84
+          ],
+          "bbox": [
+            47,
+            73,
+            71,
+            95
+          ]
+        },
+        "body": {
+          "present": true,
+          "pivot": null,
+          "bbox": [
+            5,
+            44,
+            91,
+            118
+          ]
+        }
+      },
+      "reconstruction_pixel_exact": true
+    },
+    "e3_2015": {
+      "era": "E3",
+      "year": 2015,
+      "parts": {
+        "sensor": {
+          "present": true,
+          "box": [
+            44,
+            37,
+            66,
+            53
+          ],
+          "pivot": [
+            55,
+            52
+          ],
+          "bbox": [
+            44,
+            37,
+            66,
+            53
+          ]
+        },
+        "vane": {
+          "present": true,
+          "box": [
+            16,
+            17,
+            71,
+            36
+          ],
+          "pivot": [
+            42,
+            31
+          ],
+          "bbox": [
+            17,
+            18,
+            62,
+            36
+          ]
+        },
+        "indicator": {
+          "present": true,
+          "box": [
+            47,
+            59,
+            66,
+            81
+          ],
+          "pivot": [
+            49,
+            68
+          ],
+          "bbox": [
+            47,
+            59,
+            58,
+            81
+          ]
+        },
+        "body": {
+          "present": true,
+          "pivot": null,
+          "bbox": [
+            18,
+            36,
+            79,
+            118
+          ]
+        }
+      },
+      "reconstruction_pixel_exact": true
+    },
+    "e4_2035": {
+      "era": "E4",
+      "year": 2035,
+      "parts": {
+        "sensor": {
+          "present": true,
+          "box": [
+            29,
+            38,
+            57,
+            61
+          ],
+          "pivot": [
+            44,
+            58
+          ],
+          "bbox": [
+            35,
+            42,
+            57,
+            61
+          ]
+        },
+        "vane": {
+          "present": false,
+          "pivot": null,
+          "bbox": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "indicator": {
+          "present": true,
+          "box": [
+            47,
+            63,
+            69,
+            83
+          ],
+          "pivot": [
+            49,
+            74
+          ],
+          "bbox": [
+            47,
+            63,
+            69,
+            83
+          ]
+        },
+        "body": {
+          "present": true,
+          "pivot": null,
+          "bbox": [
+            16,
+            41,
+            79,
+            118
+          ]
+        }
+      },
+      "reconstruction_pixel_exact": true
+    },
+    "e5_2060": {
+      "era": "E5",
+      "year": 2060,
+      "parts": {
+        "sensor": {
+          "present": true,
+          "box": [
+            18,
+            24,
+            59,
+            52
+          ],
+          "pivot": [
+            43,
+            49
+          ],
+          "bbox": [
+            18,
+            24,
+            59,
+            52
+          ]
+        },
+        "vane": {
+          "present": false,
+          "pivot": null,
+          "bbox": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "indicator": {
+          "present": true,
+          "box": [
+            48,
+            62,
+            69,
+            84
+          ],
+          "pivot": [
+            50,
+            73
+          ],
+          "bbox": [
+            48,
+            62,
+            69,
+            84
+          ]
+        },
+        "body": {
+          "present": true,
+          "pivot": null,
+          "bbox": [
+            6,
+            30,
+            89,
+            118
+          ]
+        }
+      },
+      "reconstruction_pixel_exact": true
+    }
+  },
+  "notes": [
+    "E4 and E5 intentionally have no separate physical vane: sensing is integrated into lidar/multispectral heads, so vane atlas cells are transparent by design.",
+    "All six approved anchors reconstruct pixel-exactly from body + sensor + vane + indicator layers at rest pose.",
+    "Pivots are measured on approved 96x122 LP art and are never guessed by runtime code."
+  ]
+}

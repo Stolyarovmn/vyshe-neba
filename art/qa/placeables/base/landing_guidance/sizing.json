@@ -1,0 +1,40 @@
+{
+  "asset_id": "B03",
+  "asset": "landing_guidance",
+  "canvas_lp": [46, 82],
+  "registration": [23, 78],
+  "pixel_snapper": {
+    "repository": "Hugo-Dz/spritefusion-pixel-snapper",
+    "revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+    "binary_sha256": "cfa317e2ff737cbf2c0e9ffa062310241d539131023da401b3420c4c00ec9018",
+    "colors": 32,
+    "accepted_pixel_size": 33
+  },
+  "attempts": [
+    {
+      "pixel_size": 12,
+      "result": "rejected",
+      "reason": "family exceeds canonical 42x74 LP envelope before normalization"
+    },
+    {
+      "pixel_size": 15,
+      "result": "diagnostic_only_rejected",
+      "reason": "test was performed against a temporary oversized canvas and therefore is non-canonical; never published"
+    },
+    {
+      "pixel_size": 16,
+      "result": "diagnostic_only_rejected",
+      "reason": "test was performed against a temporary oversized canvas and therefore is non-canonical; never published"
+    },
+    {
+      "pixel_size": 33,
+      "result": "accepted_for_aseprite",
+      "visible_bounds_lp": {
+        "E0": [34,42], "E1": [41,38], "E2": [39,36],
+        "E3": [37,35], "E4": [34,38], "E5": [28,32]
+      }
+    }
+  ],
+  "visual_self_review": "pass: one-beacon silhouette and tripod/pan-tilt ancestry remain readable at canonical runtime scale; E5 is intentionally lower/denser",
+  "next_gate": "Aseprite 1.3.18.6 indexed/no-dither, then canonical qa_sprite.py"
+}

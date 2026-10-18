@@ -1,0 +1,6 @@
+{
+  "asset":"W05 manufacturing_cell",
+  "states":["OFF","IDLE","NOTICE","WORK","FINISH","COOLDOWN"],
+  "rule":"AI paints physical parts; code owns event timing, screen data, dynamic light and FX. Never fake work by bobbing/rotating/scaling the whole sprite.",
+  "contract":{"summary":"progress: короткая производственная сессия после завершённого полёта; finish: готовая деталь переходит в выходной лоток. Для WORK обязательны реальные moving parts, а не движение всего PNG.","events":{"flight_return":"advance manufacturing progress and optionally run a short work session","item_fabricated":"finish cycle and move payload to output tray"},"code_owned":["sparks","small_chips","indicator_states","work_light"],"physical_parts_pending":["workhead","spindle","door","payload_part"]}
+}
