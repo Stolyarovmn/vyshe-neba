@@ -139,11 +139,27 @@ jobs:
             IFS=: read -r stem era year <<< "$entry"
             raw="$RAW_DIR/${stem}_presnap.png"
             meta="$RAW_DIR/${stem}_presnap.json"
+            expanded="$WORK/${stem}_expanded.png"
             snapped="$WORK/${stem}_snapped.png"
             normalized="$WORK/${stem}_normalized.png"
             final="$OUTDIR/${stem}.png"
 
-            "$SNAP" "$raw" "$snapped" "$COLORS" --pixel-size "$PIXEL_SIZE"
+            # The migration transport can already be a logical 172x160 anchor.
+            # Expand it to the exact 8x grid before Pixel Snapper so --pixel-size 8
+            # preserves the approved logical geometry instead of collapsing it.
+            python3 - "$raw" "$expanded" "$WIDTH" "$HEIGHT" "$PIXEL_SIZE" <<'PY'
+          import sys
+          from PIL import Image
+          src, dst, w, h, px = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5])
+          im = Image.open(src).convert('RGBA')
+          target = (w * px, h * px)
+          if im.size != target:
+              im = im.resize(target, Image.Resampling.NEAREST)
+          im.save(dst)
+          print({'source_size': Image.open(src).size, 'expanded_size': target})
+          PY
+
+            "$SNAP" "$expanded" "$snapped" "$COLORS" --pixel-size "$PIXEL_SIZE"
 
             python3 tools/art_pipeline/normalize_sprite.py \
               --input "$snapped" --output "$normalized" \
@@ -156,12 +172,16 @@ jobs:
 
             python3 tools/art_pipeline/qa_sprite.py \
               --input "$final" --width "$WIDTH" --height "$HEIGHT" \
-              --max-colors "$COLORS" --report "$OUTDIR/${stem}.qa.json"
+              --max-colors "$COLORS" --min-coverage 0.01 --min-bbox-fraction 0.25 \
+              --report "$OUTDIR/${stem}.qa.json"
 
             cp "$final" "$RUNTIME_DIR/${stem}.png"
 
             source_gen_id=$(jq -r '.source_gen_id' "$meta")
-            source_sha256=$(sha256sum "$raw" | awk '{print $1}')
+            source_sha256=$(jq -r '.source_sha256' "$meta")
+            transport_sha256=$(sha256sum "$raw" | awk '{print $1}')
+            drive_file_id=$(jq -r '.source_storage.drive_file_id // empty' "$meta")
+            drive_url=$(jq -r '.source_storage.drive_url // empty' "$meta")
             cat > "$OUTDIR/${stem}.pipeline.json" <<JSON
           {
             "asset": "W04 flight_simulator",
@@ -169,6 +189,13 @@ jobs:
             "year": $year,
             "source_gen_id": "$source_gen_id",
             "source_sha256": "$source_sha256",
+            "transport_sha256": "$transport_sha256",
+            "source_storage": {
+              "provider": "google_drive",
+              "drive_file_id": "$drive_file_id",
+              "drive_url": "$drive_url"
+            },
+            "transport_policy": "nearest-expand-to-8x-grid-before-snapper",
             "spritefusion_pixel_snapper_rev": "$PIXEL_SNAPPER_REV",
             "spritefusion_pixel_snapper_package": "1.0.0",
             "pixel_size": $PIXEL_SIZE,
@@ -181,6 +208,23 @@ jobs:
           }
           JSON
           done
+
+      - name: Upload W04 QA images
+        if: steps.inputs.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: w04-qa-images
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            art/gen/placeables/workshop/flight_simulator/e0_1978.png
+            art/gen/placeables/workshop/flight_simulator/e1_1986.png
+            art/gen/placeables/workshop/flight_simulator/e2_1998.png
+            art/gen/placeables/workshop/flight_simulator/e3_2015.png
+            art/gen/placeables/workshop/flight_simulator/e4_2035.png
+            art/gen/placeables/workshop/flight_simulator/e5_2060.png
+            art/gen/placeables/workshop/flight_simulator/e*.qa.json
+            art/gen/placeables/workshop/flight_simulator/e*.pipeline.json
 
       - name: Commit verified W04 outputs
         if: steps.inputs.outputs.ready == 'true'
