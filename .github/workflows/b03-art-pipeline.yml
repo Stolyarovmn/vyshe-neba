@@ -2,7 +2,7 @@ name: B03 landing guidance art production
 
 on:
   push:
-    branches: [2d_workshop-placeables-w01]
+    branches: [main]
     paths:
       - 'art/source_transport/b03_landing_guidance/**'
       - 'tools/art_pipeline/decode_indexed_transport.py'

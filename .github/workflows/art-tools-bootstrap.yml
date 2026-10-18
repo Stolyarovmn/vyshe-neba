@@ -5,7 +5,7 @@ name: Art tools bootstrap
 # our pipeline only needs batch/indexed/no-dither export, not the GUI/Skia backend.
 on:
   push:
-    branches: [2d_workshop-placeables-w01]
+    branches: [main]
     paths:
       - '.github/workflows/art-tools-bootstrap.yml'
   workflow_dispatch:

@@ -2,7 +2,7 @@ name: B01 part atlas deterministic rebuild
 
 on:
   push:
-    branches: [2d_workshop-placeables-w01]
+    branches: [main]
     paths:
       - 'tools/art_pipeline/rebuild_b01_part_atlases.py'
       - '.github/workflows/b01-atlas-repair.yml'

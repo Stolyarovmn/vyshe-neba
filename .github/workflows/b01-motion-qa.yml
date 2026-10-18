@@ -2,7 +2,7 @@ name: B01 motion sheet QA
 
 on:
   push:
-    branches: [2d_workshop-placeables-w01]
+    branches: [main]
     paths:
       - 'outputs/rocket/dist/weather-complex-rig.js'
       - 'outputs/rocket/dist/assets/placeables/base/weather_complex/**'

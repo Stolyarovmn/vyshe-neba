@@ -2,7 +2,7 @@ name: Pixel art production
 
 on:
   push:
-    branches: [2d_workshop-placeables-w01]
+    branches: [main]
     paths:
       - 'art/raw/placeables/workshop/flight_simulator/**'
       - 'tools/art_pipeline/**'

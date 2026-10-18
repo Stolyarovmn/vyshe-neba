@@ -2,7 +2,7 @@ name: Pixel Snapper bootstrap
 
 on:
   push:
-    branches: [2d_workshop-placeables-w01]
+    branches: [main]
     paths:
       - '.github/workflows/pixel-snapper-bootstrap.yml'
   workflow_dispatch:
