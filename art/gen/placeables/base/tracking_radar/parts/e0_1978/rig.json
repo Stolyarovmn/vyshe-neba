@@ -1,0 +1,35 @@
+{
+  "asset_id": "B02",
+  "asset": "tracking_radar",
+  "era": "E0",
+  "year": 1978,
+  "canvas": [134, 118],
+  "registration": [67, 114],
+  "layer_order": ["pedestal", "azimuth", "dish", "feed"],
+  "pivots": {
+    "azimuth": [54, 96],
+    "dish": [50, 59],
+    "feed": [50, 59]
+  },
+  "motion_limits_rad": {
+    "azimuth": [-0.035, 0.035],
+    "dish": [-0.10, 0.10]
+  },
+  "rest_reconstruction_pixel_exact": true,
+  "hidden_completion": {
+    "azimuth_hinge": "small mechanical bearing backfill painted only beneath dish pixels; invisible in rest pose",
+    "pedestal_bearing": "small bearing backfill painted only beneath azimuth pixels; invisible in rest pose"
+  },
+  "motion_contract": {
+    "pedestal": "static grounded structure",
+    "azimuth": "rigid upper drive stage rotates around measured base bearing",
+    "dish": "rigid elevation assembly rotates around measured hinge",
+    "feed": "physical feed hardware inherits dish elevation and azimuth transforms"
+  },
+  "qa": {
+    "rest_reconstruction": "pixel_exact",
+    "motion_frames": ["REST", "SEARCH-L", "SEARCH-C", "SEARCH-R", "TRACK-LOW", "TRACK-HIGH", "RETURN"],
+    "canvas_clipping": false,
+    "visual_review": "pass"
+  }
+}
