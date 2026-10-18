@@ -59,10 +59,12 @@ jobs:
             outputs/rocket/dist/assets/placeables/base/weather_complex/parts
           git commit -m 'B01: rebuild canonical parts and remove runtime mirror'
           git push origin "$branch"
-          gh pr create \
+          if ! gh pr create \
             --base main --head "$branch" \
             --title '2D: rebuild B01 canonical part atlases' \
-            --body 'Deterministic B01 rebuild from approved anchors. Rig and motion QA passed. Runtime consumes canonical art/gen through runtime-assets.json; the old committed runtime mirror is removed.'
+            --body 'Deterministic B01 rebuild from approved anchors. Rig and motion QA passed. Runtime consumes canonical art/gen through runtime-assets.json; the old committed runtime mirror is removed.'; then
+            echo "::warning::Rebuild branch $branch was pushed, but GitHub Actions is not allowed to create pull requests. Open it manually; main was not modified."
+          fi
       - name: Upload B01 rebuild verification
         uses: actions/upload-artifact@v4
         with:
