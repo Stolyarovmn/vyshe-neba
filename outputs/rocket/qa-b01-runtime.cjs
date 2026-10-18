@@ -18,7 +18,7 @@ yes(runtime.includes("'launch_prepare'"),'launch_prepare event missing');
 yes(runtime.includes("'weather_window_selected'"),'weather_window_selected event missing');
 yes(runtime.includes("'weather_preview_cancel'"),'cancel event missing');
 yes(runtime.includes("'era_changed'"),'era change integration missing');
-yes(runtime.includes("body_eras.png")&&runtime.includes("sensor_eras.png")&&runtime.includes("vane_eras.png")&&runtime.includes("indicator_eras.png"),'part atlases not referenced');
+yes(runtime.includes("const PARTS=['body','sensor','vane','indicator']")&&runtime.includes("part+'_eras.png'"),'part atlas wiring not referenced');
 yes(runtime.includes("infrastructure/weather/")&&runtime.includes('TRANSPARENT'),'legacy weather sprite/procedural layer is not suppressed');
 yes(runtime.includes('ctx.rotate(angle||0)'),'rigged part rotation missing');
 yes(runtime.includes('ctx.setTransform(2,0,0,2,0,0)'),'logical-canvas transform missing');
