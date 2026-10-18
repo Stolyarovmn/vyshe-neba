@@ -28,12 +28,14 @@ jobs:
           python3 -m json.tool outputs/rocket/runtime-assets.json >/dev/null
           python3 -m py_compile \
             tools/art_pipeline/task_tracker.py \
+            tools/art_pipeline/qa_task_tracker.py \
             tools/art_pipeline/restore_asset_checkpoint.py \
             tools/art_pipeline/sync_asset_tracker_issue.py \
             tools/art_pipeline/process_asset.py \
             tools/art_pipeline/verify_visual_gate.py \
             tools/art_pipeline/promote_asset.py \
             tools/art_pipeline/rebuild_b01_part_atlases.py
+          python3 tools/art_pipeline/qa_task_tracker.py
           bash -n tools/art_pipeline/setup_art_tools.sh
           node --check outputs/rocket/build.cjs
 
