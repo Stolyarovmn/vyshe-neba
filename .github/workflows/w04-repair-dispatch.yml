@@ -1,0 +1,22 @@
+name: W04 repair dispatcher
+
+on:
+  push:
+    branches: [2d_w04-source-repair-v3]
+    paths:
+      - 'art/raw/placeables/workshop/flight_simulator/**'
+      - '.github/workflows/w04-repair-dispatch.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch-canonical-pipeline:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch canonical W04 art pipeline on this ref
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run art-pipeline.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
