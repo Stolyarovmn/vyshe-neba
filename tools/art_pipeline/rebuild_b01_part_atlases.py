@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Deterministically rebuild B01 cut-out parts/era atlases from approved anchors.
+"""Deterministically rebuild B01 cut-out parts and era atlases from approved anchors.
 
 Source of truth is the approved E0-E5 anchor art plus measured extraction
-metadata. E0 already has a valid hand-checked part sheet and calibrates the
-semantic mask priority. E1-E5 parts are exact pixel cut-outs: no resampling,
-painting, quantization, or color changes.
+metadata. Every output is regenerated from those sources, round-tripped through
+Pillow, and compared in RGBA space. No previously generated part PNG is trusted
+as an input, so a truncated/corrupt derived PNG cannot poison the rebuild.
 """
 from __future__ import annotations
 
@@ -28,7 +28,10 @@ def sha256(path: Path) -> str:
 
 
 def rgba_equal(a: Image.Image, b: Image.Image) -> bool:
-    return a.size == b.size and ImageChops.difference(a.convert("RGBA"), b.convert("RGBA")).getbbox() is None
+    return (
+        a.size == b.size
+        and ImageChops.difference(a.convert("RGBA"), b.convert("RGBA")).getbbox() is None
+    )
 
 
 def mask_for_bbox(size, bbox):
@@ -73,7 +76,7 @@ def extract_parts(anchor: Image.Image, meta: dict):
     vane_rect = mask_for_bbox(CELL, vane_meta["bbox"] if vane_meta["present"] else None)
     sensor_rect = mask_for_bbox(CELL, sensor_meta["bbox"] if sensor_meta["present"] else None)
 
-    # Same priority as the approved E0 cut-out: indicator > vane > sensor.
+    # Measured semantic priority: indicator > vane > sensor > body.
     ind = alpha_intersection(alpha, ind_rect)
     vane = mask_subtract(alpha_intersection(alpha, vane_rect), ind)
     sensor = mask_subtract(alpha_intersection(alpha, sensor_rect), mask_union(ind, vane))
@@ -89,7 +92,7 @@ def extract_parts(anchor: Image.Image, meta: dict):
 
 
 def exact_indexed_save(rgba: Image.Image, path: Path):
-    """Pack exact RGBA pixels into an indexed PNG without color reduction."""
+    """Pack exact RGBA pixels into a valid indexed PNG without color reduction."""
     rgba = rgba.convert("RGBA")
     palette = [(0, 0, 0)]  # index 0 = transparent
     lookup = {}
@@ -119,6 +122,7 @@ def exact_indexed_save(rgba: Image.Image, path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
     out.save(path, transparency=0, optimize=False)
 
+    # This is also the corruption gate: the just-written PNG must fully decode.
     with Image.open(path) as check:
         check.load()
         decoded = check.convert("RGBA")
@@ -139,13 +143,13 @@ def main():
     repo = Path(args.repo_root)
     part_root = repo / PART_ROOT
     runtime_root = repo / RUNTIME_PART_ROOT
-    meta_path = part_root / "part_extraction.json"
-    extraction = json.loads(meta_path.read_text(encoding="utf-8"))
+    extraction = json.loads((part_root / "part_extraction.json").read_text(encoding="utf-8"))
 
     report = {
         "asset_id": "B01",
         "asset": "weather_complex",
-        "method": "approved anchor -> measured semantic bbox cut-out -> exact indexed atlas pack",
+        "method": "approved anchor -> measured semantic bbox cut-out -> exact indexed PNGs/atlases",
+        "derived_input_policy": "never trust existing generated PNGs as rebuild inputs",
         "cell": list(CELL),
         "era_order": ORDER,
         "eras": {},
@@ -167,30 +171,8 @@ def main():
             raise SystemExit(f"QA_FAIL: {stem} anchor alpha is not binary")
 
         generated = extract_parts(anchor, meta)
-
-        if stem == "e0_1978":
-            # E0 is the calibration/reference part sheet. Sensor/vane/indicator
-            # must match the semantic cut-out algorithm exactly. Body keeps its
-            # already approved hidden mast completion.
-            for part in ("sensor", "vane", "indicator"):
-                existing_path = part_root / stem / f"{part}.png"
-                with Image.open(existing_path) as e:
-                    e.load(); existing = e.convert("RGBA")
-                if not rgba_equal(generated[part], existing):
-                    raise SystemExit(f"QA_FAIL: E0 calibration drift for {part}")
-                generated[part] = existing
-            body_path = part_root / stem / "body.png"
-            with Image.open(body_path) as e:
-                e.load(); generated["body"] = e.convert("RGBA")
-        else:
-            # Persist reproducible per-era cut-outs for review and future rig work.
-            era_dir = part_root / stem
-            era_dir.mkdir(parents=True, exist_ok=True)
-            for part in PARTS:
-                generated[part].save(era_dir / f"{part}.png", compress_level=9)
-
-        # Metadata bbox is a measured contract. Generated alpha bounds must match.
         era_report = {"year": meta["year"], "parts": {}}
+
         for part in PARTS:
             got_bbox = bbox_list(generated[part])
             expected_bbox = meta["parts"][part].get("bbox")
@@ -198,19 +180,33 @@ def main():
             if not present:
                 if got_bbox is not None:
                     raise SystemExit(f"QA_FAIL: {stem}/{part} should be absent, got bbox {got_bbox}")
-            elif part != "body" and got_bbox != expected_bbox:
+            elif got_bbox != expected_bbox:
                 raise SystemExit(f"QA_FAIL: {stem}/{part} bbox {got_bbox} != measured {expected_bbox}")
-            # E0 body contains approved hidden mast pixels but keeps the same bbox;
-            # all other body cut-outs should match their measured bbox exactly.
-            if part == "body" and got_bbox != expected_bbox:
-                raise SystemExit(f"QA_FAIL: {stem}/body bbox {got_bbox} != measured {expected_bbox}")
+
+            art_part = part_root / stem / f"{part}.png"
+            runtime_part = runtime_root / stem / f"{part}.png"
+            palette_entries = exact_indexed_save(generated[part], art_part)
+            runtime_part.parent.mkdir(parents=True, exist_ok=True)
+            runtime_part.write_bytes(art_part.read_bytes())
+
+            # Decode both copies so transport corruption cannot pass silently.
+            for check_path in (art_part, runtime_part):
+                with Image.open(check_path) as check:
+                    check.load()
+                    decoded = check.convert("RGBA")
+                if not rgba_equal(decoded, generated[part]):
+                    raise SystemExit(f"QA_FAIL: decoded part differs: {check_path}")
+
             era_report["parts"][part] = {
                 "present": present,
                 "bbox": got_bbox,
                 "pivot": meta["parts"][part].get("pivot"),
+                "palette_entries_including_transparent": palette_entries,
+                "art_sha256": sha256(art_part),
+                "runtime_sha256": sha256(runtime_part),
             }
 
-        # Rest pose must reconstruct the approved anchor exactly.
+        # The four rest layers must reproduce the approved anchor exactly.
         rest = Image.new("RGBA", CELL, (0, 0, 0, 0))
         for part in PARTS:
             rest.alpha_composite(generated[part])
@@ -233,8 +229,14 @@ def main():
         palette_entries = exact_indexed_save(atlas, art_path)
         runtime_path.parent.mkdir(parents=True, exist_ok=True)
         runtime_path.write_bytes(art_path.read_bytes())
-        if art_path.read_bytes() != runtime_path.read_bytes():
-            raise SystemExit(f"QA_FAIL: {part} art/runtime atlas copies differ")
+
+        for check_path in (art_path, runtime_path):
+            with Image.open(check_path) as check:
+                check.load()
+                decoded = check.convert("RGBA")
+            if not rgba_equal(decoded, atlas):
+                raise SystemExit(f"QA_FAIL: decoded atlas differs: {check_path}")
+
         report["atlases"][part] = {
             "size": list(atlas_size),
             "palette_entries_including_transparent": palette_entries,
@@ -245,7 +247,10 @@ def main():
 
     report_path = part_root / "atlas_rebuild_qa.json"
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    print("B01 part atlas rebuild PASS: E0 calibration exact; E0-E5 rest reconstructions exact; indexed atlases decode")
+    print(
+        "B01 part rebuild PASS: all E0-E5 parts regenerated from approved anchors; "
+        "rest reconstructions exact; every PNG round-trips; atlases exact"
+    )
     print(report_path)
 
 
