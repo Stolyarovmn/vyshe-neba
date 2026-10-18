@@ -9,14 +9,13 @@ const TRAFFIC_KEY='aircraft/traffic.json';
 const EFFECTS_KEY='aircraft/effects.json';
 const OLD_PLANE_CROP=[83,148,1613,588];
 const DISPLAY_WIDTH={low_primary:98,low_multiwing:98,medium_passenger:118,medium_cargo:120,high_fighter:105,high_experimental:110};
-const DEFAULT_TRAFFIC={previousEraMix:.18,experimentalCeilingByEraWorldY:[2200,2500,3500,5000,7000,9500],layers:[
+const DEFAULT_TRAFFIC={previousEraMix:.18,experimentalCeilingByEraWorldY:[2000,2100,2200,2300,2400,2400],layers:[
  {id:'safe',min:0,max:30,weights:{}},
  {id:'low',min:30,max:300,weights:{low_primary:.70,low_multiwing:.30}},
  {id:'mixed',min:300,max:600,weights:{medium_cargo:.50,medium_passenger:.35,low_primary:.10,low_multiwing:.05}},
  {id:'cruise',min:600,max:1200,weights:{medium_passenger:.60,medium_cargo:.35,high_fighter:.05}},
- {id:'high',min:1200,max:2000,weights:{high_fighter:.70,high_experimental:.30}},
- {id:'experimental',min:2000,max:8500,weights:{high_experimental:1}},
- {id:'edge',min:8500,max:10000,weights:{high_experimental:1},eraMin:5,relativeSpawnChance:.05}
+ {id:'high',min:1200,max:1800,weights:{high_fighter:.70,high_experimental:.30}},
+ {id:'experimental',min:1800,max:2400,weights:{high_experimental:1}}
 ]};
 let traffic=DEFAULT_TRAFFIC,effects=null;
 const sprites=new Map(),projection=new Map();
@@ -61,16 +60,19 @@ Promise.all([jsonAsset(TRAFFIC_KEY,'assets/aircraft/traffic.json'),jsonAsset(EFF
 loadZip();
 
 const objectKind0=J.objectKind.bind(J);
-J.objectKind=function(y,mode,era,variant){
+const planeSlot=(y,era,variant,ix=0,iy=0,j=0)=>variant===0&&((Math.floor(y/225)+era)&1)===0&&Math.abs(ix*17+iy*31+j*7)%4===0;
+J.objectKind=function(y,mode,era,variant,ix=0,iy=0,j=0){
  if(mode===2||mode===4)return objectKind0(y,mode,era,variant);
  era=Math.max(0,Math.min(5,Number(era)||0));
  if(y<30)return objectKind0(y,mode,era,variant);
- if(y<300)return variant%3===2?'balloon':'plane';
- if(y<2000)return 'plane';
- const ceiling=(traffic.experimentalCeilingByEraWorldY||DEFAULT_TRAFFIC.experimentalCeilingByEraWorldY)[era]||2200;
- if(y<Math.min(8500,ceiling))return variant%3===2?'plane':'rock';
- if(era===5&&y>=8500&&y<ceiling&&((Math.floor(y*10)+variant*997)%20===0))return 'plane';
- return objectKind0(y,mode,era,variant);
+ if(y<300)return planeSlot(y,era,variant,ix,iy,j)?'plane':'balloon';
+ if(y<1200)return planeSlot(y,era,variant,ix,iy,j)?'plane':'balloon';
+ if(y<1800)return planeSlot(y,era,variant,ix,iy,j)?'plane':'balloon';
+ const ceiling=(traffic.experimentalCeilingByEraWorldY||DEFAULT_TRAFFIC.experimentalCeilingByEraWorldY)[era]||2000;
+ if(y<ceiling)return planeSlot(y,era,variant,ix,iy,j)?'plane':'rock';
+ if(y<3500)return 'balloon';
+ if(y<8500)return 'rock';
+ return variant%2?'satellite':'rock';
 };
 
 function profileFor(id){if(!effects)return null;const name=effects.sprites?.[id];return name?effects.profiles?.[name]||null:null;}
