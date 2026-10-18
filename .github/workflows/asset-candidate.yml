@@ -4,10 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       asset:
-        description: Asset family to process
+        description: Asset ID from art/placeables/PIPELINE_CONFIG.json
         required: true
-        type: choice
-        options: [W04, B03]
+        type: string
   workflow_call:
     inputs:
       asset:
