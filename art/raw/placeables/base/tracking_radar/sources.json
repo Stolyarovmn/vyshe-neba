@@ -28,21 +28,33 @@
       "color_mode": "indexed"
     }
   },
-  "eras": [
+  "eras": [],
+  "rejected_sources": [
     {
-      "era": "E0",
-      "year": 1978,
+      "kind": "E0_anchor",
       "source_gen_id": "b3c1b6ac-e612-4308-ae9f-0d3cbd830096",
       "source_size": [1396, 1127],
       "source_sha256": "c923200745544f7af6b7fd1572feee1d287a2eec3dff779b813a61f55cba9036",
       "drive_file_id": "15myLTFVhAt6djvC2lFwDAQfLiIPcBI86",
       "drive_url": "https://drive.google.com/file/d/15myLTFVhAt6djvC2lFwDAQfLiIPcBI86/view?usp=drivesdk",
-      "lineage": "heavy welded tracking pedestal + real azimuth axis + early parabolic directional dish + physical elevation yoke/feed",
-      "review": "accepted_as_E0_anchor",
-      "review_note": "Strong readable radar silhouette and physically plausible pedestal/azimuth/elevation/feed chain. Keep the dish/yoke ancestry through later eras; do not accumulate the E0 service-platform micro-detail in future variants."
-    }
-  ],
-  "rejected_sources": [
+      "reason": "Rejected during lineage self-review: this is already a large sophisticated parabolic radar closer to E1/E2. Manifest E0 requires a coarse directional antenna on a rugged mechanical pedestal, and the silhouette is too massive for the intended 134x118 LP E0 role. File moved to Drive _rejected; do not use as lineage root."
+    },
+    {
+      "kind": "E0_anchor_attempt",
+      "source_gen_id": "51d4bb55-daa4-475b-a12d-6e15a2967f8c",
+      "source_size": [1536, 1024],
+      "source_sha256": "7736e421d49e4cff37b39b086783493234d6dd9718a80b12d6696202a5fe4b3c",
+      "drive_file_id": "1D7AQrc0WsCeByv-3ZFU7je27PRuJvdUO",
+      "reason": "Wrong-subject generation: returned a labeled six-era aircraft board instead of one isolated B02 E0 tracking antenna."
+    },
+    {
+      "kind": "E0_anchor_attempt",
+      "source_gen_id": "feb82dc0-d279-4bca-a61a-b6ee3f42e515",
+      "source_size": [1536, 1024],
+      "source_sha256": "f49db599b6bf39c2f455991a5795ed457aa61ff9924645e5c5b071309df4382f",
+      "drive_file_id": "1Vpt0OTZWL-xRC5ZjDuLPiLlo4lxODzYz",
+      "reason": "Wrong-subject generation: imagegen remained bound to W04/aircraft-board context and ignored the B02 single-object gate."
+    },
     {
       "kind": "E0_part_sheet",
       "source_gen_id": "e3050a10-f1d1-4b6f-8870-f3a5a54e1543",
@@ -76,5 +88,5 @@
       "reason": "Wrong-subject generation: produced a reduced infrastructure catalog rather than B02 E0 parts."
     }
   ],
-  "status": "E0 anchor approved and archived; E0 part-sheet regeneration blocked by current imagegen context binding; do not advance B02 to E1 until a valid isolated part sheet exists"
+  "status": "No approved E0 anchor. Invalid parabolic candidate was removed from approved lineage and moved to Drive _rejected. Current imagegen context is repeatedly returning W04/aircraft boards for B02; do not advance B02 to E1 until a valid isolated coarse-directional E0 anchor is generated and archived."
 }
