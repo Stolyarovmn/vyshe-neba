@@ -47,6 +47,7 @@ const jsSources={
   'content.js':path.join(dist,'content.js'),
   'audio.js':path.join(dist,'audio.js'),
   'vehicle-art.js':path.join(dist,'vehicle-art.js'),
+  '../../../live/mobile-ux.js':path.join(repo,'live','mobile-ux.js'),
   'game.js':path.join(dist,'game.js'),
   'weather-complex-rig.js':path.join(dist,'weather-complex-rig.js'),
   'weather-complex-runtime.js':path.join(dist,'weather-complex-runtime.js'),
