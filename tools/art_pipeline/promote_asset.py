@@ -13,11 +13,26 @@ def mark(cfg,state_dir,asset,step,status,fp,reason,outputs=()):
         elif status=='blocked': t.block(step,reason)
         elif status=='failed': t.fail(step,reason)
 
+def assert_pre_promotion_gates(cfg,state_dir,asset):
+    required=['generate','edit','archive_original','source_prepare','pixel_snap','normalize','aseprite_index','qa_auto','candidate_manifest']
+    failures=[]
+    for era in cfg['eras']:
+        t=Tracker(state_dir,asset,era['stem'])
+        for step in required:
+            status=t.state['steps'][step]['status']
+            allowed=('success','skipped') if step!='archive_original' else ('success',)
+            if status not in allowed: failures.append(f"{era['stem']}/{step}={status}")
+    if failures:
+        reason='pre-promotion tracker gates not complete: '+', '.join(failures)
+        mark(cfg,state_dir,asset,'promote','blocked',fingerprint({'blocked':failures}),reason)
+        raise SystemExit(reason)
+
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--repo-root',default='.'); p.add_argument('--config',default='art/placeables/PIPELINE_CONFIG.json'); p.add_argument('--asset',required=True); p.add_argument('--candidate',required=True); p.add_argument('--state-dir'); p.add_argument('--runtime-manifest',default='outputs/rocket/runtime-assets.json'); a=p.parse_args()
     repo=Path(a.repo_root).resolve(); root=json.loads((repo/a.config).read_text(encoding='utf-8')); cfg=root['assets'][a.asset]; candidate=Path(a.candidate).resolve(); state_dir=Path(a.state_dir).resolve() if a.state_dir else candidate/'.tracker'; review=repo/cfg['visual_review']; manifest_path=candidate/'candidate-manifest.json'
     if not manifest_path.is_file(): raise SystemExit('candidate-manifest.json missing')
     manifest=json.loads(manifest_path.read_text(encoding='utf-8')); hashes=[(x['stem'],x['sha256']) for x in manifest['files']]
+    assert_pre_promotion_gates(cfg,state_dir,a.asset)
     review_fp=fingerprint({'step':'visual_review','candidate':hashes,'review_sha256':sha(review) if review.is_file() else None})
     if not review.is_file(): mark(cfg,state_dir,a.asset,'visual_review','blocked',review_fp,'visual review file is missing'); raise SystemExit('visual review missing: '+str(review))
     verify=subprocess.run([sys.executable,repo/'tools/art_pipeline/verify_visual_gate.py','--candidate',candidate,'--review',review],capture_output=True,text=True)
