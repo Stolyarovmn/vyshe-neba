@@ -70,8 +70,10 @@ jobs:
           git add -A art/gen outputs/rocket/runtime-assets.json outputs/rocket/dist/assets
           git commit -m "Promote ${asset} approved art [skip asset-candidate]"
           git push origin "$branch"
-          gh pr create \
+          if ! gh pr create \
             --base main \
             --head "$branch" \
             --title "2D: promote ${asset} approved asset" \
-            --body "Deterministic promotion from canonical sources. Automatic QA passed and visual approval was verified against exact PNG SHA-256 values. Runtime now reads this family from art/gen; the legacy committed runtime mirror is removed."
+            --body "Deterministic promotion from canonical sources. Automatic QA passed and visual approval was verified against exact PNG SHA-256 values. Runtime now reads this family from art/gen; the legacy committed runtime mirror is removed."; then
+            echo "::warning::Promotion branch $branch was pushed, but GitHub Actions is not allowed to create pull requests in this repository. Open a PR from that branch manually; main was not modified."
+          fi
