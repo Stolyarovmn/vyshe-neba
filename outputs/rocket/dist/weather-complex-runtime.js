@@ -49,12 +49,9 @@ function sync(dt){
   if(controller.state==='NOTICE'||controller.state==='WORK')controller.dispatch('weather_preview_cancel');
   lastFlightKey=null;
  }
- const frozen=g.screen==='pause'||g.screen==='help';
+ const weatherChoiceOpen=!!window.B01WeatherWindow?.open;
+ const frozen=(g.screen==='pause'||g.screen==='help')&&!weatherChoiceOpen;
  pose=controller.update(frozen?0:dt,{wind:normalizedWind()});
- if(!frozen&&controller.state==='WORK'&&controller.stateTime>=1.2&&controller.selectedWindow==null){
-  controller.dispatch('weather_window_selected',{index:0});
-  pose=controller.update(0,{wind:normalizedWind()});
- }
  return pose;
 }
 
@@ -89,10 +86,11 @@ function drawRig(x,y,scale=1){
 
 function placement(){
  const g=window.Game,infra=window.BaseInfrastructure;if(!g||!infra||!infra.owned?.('weather')||g.profile?.location!=='earth')return null;
- if(!['home','flight','crash','result'].includes(g.screen))return null;
+ const weatherPause=g.screen==='pause'&&!!window.B01WeatherWindow?.open;
+ if(!['home','flight','crash','result'].includes(g.screen)&&!weatherPause)return null;
  const st=infra.state?.(),sid=st?.layout?.weather,slot=infra.slots?.find?.(s=>s.id===sid);if(!slot)return null;
  let x=slot.x,y=slot.y,scale=slot.zone==='remote'?.78:slot.zone==='perimeter'?.86:slot.zone==='apron'?.94:1;
- if(g.screen==='flight'||g.screen==='crash'||g.screen==='result'){
+ if(g.screen==='flight'||g.screen==='crash'||g.screen==='result'||weatherPause){
   const r=g.rocket;if(!r||r.body!=='earth'||r.y>900)return null;
   const wx=(slot.x-480)*1.2,pos=g.project(wx,0);x=pos.x;y=pos.y-4;scale*=g.camera?.zoom||1;
  }
