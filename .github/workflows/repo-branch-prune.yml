@@ -12,17 +12,37 @@ permissions:
 jobs:
   prune:
     runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Delete every remote branch except main
+      - name: Delete every branch except main through GitHub API
         shell: bash
         run: |
           set -euo pipefail
-          mapfile -t branches < <(git ls-remote --heads origin | awk '{sub("refs/heads/", "", $2); print $2}')
-          for branch in "${branches[@]}"; do
-            if [[ "$branch" != "main" ]]; then
-              git push origin --delete "$branch"
-            fi
+
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          auth=(-H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          # Repeat a few times so a branch that moves while pruning cannot win an
+          # optimistic git-push race. DELETE /git/refs deletes the current ref.
+          for pass in 1 2 3 4; do
+            mapfile -t branches < <(curl -fsSL "${auth[@]}" "${api}/branches?per_page=100" | jq -r '.[].name')
+            for branch in "${branches[@]}"; do
+              [[ "$branch" == "main" ]] && continue
+              encoded=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$branch")
+              code=$(curl -sS -o /tmp/delete-ref.json -w '%{http_code}' -X DELETE "${auth[@]}" "${api}/git/refs/heads/${encoded}")
+              if [[ "$code" != "204" && "$code" != "404" ]]; then
+                echo "delete ${branch}: HTTP ${code}"
+                cat /tmp/delete-ref.json || true
+              else
+                echo "deleted ${branch} (HTTP ${code})"
+              fi
+            done
+            sleep 1
           done
+
+          mapfile -t remaining < <(curl -fsSL "${auth[@]}" "${api}/branches?per_page=100" | jq -r '.[].name | select(. != "main")')
+          if (( ${#remaining[@]} )); then
+            printf 'Branches still present after prune: %s\n' "${remaining[*]}" >&2
+            exit 1
+          fi
