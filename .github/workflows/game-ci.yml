@@ -8,31 +8,41 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  issues: write
 
 jobs:
   game:
     runs-on: ubuntu-24.04
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+
       - name: Static pipeline validation
         run: |
           python3 -m json.tool art/placeables/PIPELINE_CONFIG.json >/dev/null
           python3 -m json.tool outputs/rocket/runtime-assets.json >/dev/null
           python3 -m py_compile \
+            tools/art_pipeline/task_tracker.py \
+            tools/art_pipeline/restore_asset_checkpoint.py \
+            tools/art_pipeline/sync_asset_tracker_issue.py \
             tools/art_pipeline/process_asset.py \
             tools/art_pipeline/verify_visual_gate.py \
             tools/art_pipeline/promote_asset.py \
             tools/art_pipeline/rebuild_b01_part_atlases.py
           bash -n tools/art_pipeline/setup_art_tools.sh
           node --check outputs/rocket/build.cjs
+
       - name: Verify no migrated B01 runtime mirror is committed
         run: |
           test ! -e outputs/rocket/dist/assets/placeables/base/weather_complex/parts
           test -s art/gen/placeables/base/weather_complex/parts/rig.json
           test -s art/gen/placeables/base/weather_complex/parts/body_eras.png
+
       - name: Install browser QA harness
         run: |
           npm install --no-save --ignore-scripts playwright@1.62.1
@@ -45,10 +55,91 @@ jobs:
             exit 1
           fi
           echo 'CHROMIUM_ARGS=["--no-sandbox","--disable-dev-shm-usage"]' >> "$GITHUB_ENV"
+
       - name: Full game regression
+        id: regression
         run: npm test
+
+      - name: Update promoted asset task tracker
+        if: >-
+          always() &&
+          github.event_name == 'pull_request' &&
+          startsWith(github.head_ref, '2d_promote-') &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
+        run: |
+          set -euo pipefail
+          asset="$(python3 - <<'PY'
+          import json, os
+          cfg=json.load(open('art/placeables/PIPELINE_CONFIG.json', encoding='utf-8'))
+          branch=os.environ['HEAD_REF']
+          for key in cfg['assets']:
+              if branch.startswith(f'2d_promote-{key.lower()}-'):
+                  print(key)
+                  break
+          PY
+          )"
+          if [ -z "$asset" ]; then
+            echo "::warning::Could not map promotion branch $HEAD_REF to an asset id"
+            exit 0
+          fi
+
+          python3 tools/art_pipeline/restore_asset_checkpoint.py \
+            --asset "$asset" \
+            --dest "$RUNNER_TEMP/candidate"
+          if [ ! -d "$RUNNER_TEMP/candidate/.tracker/$asset" ]; then
+            echo "::warning::No checkpoint tracker restored for $asset"
+            exit 0
+          fi
+
+          if [ "$REGRESSION_OUTCOME" = 'success' ]; then
+            status=success
+            reason="game-ci full regression passed for promotion PR $HEAD_REF"
+          else
+            status=failed
+            reason="game-ci regression outcome=$REGRESSION_OUTCOME for promotion PR $HEAD_REF"
+          fi
+          fp="${GITHUB_SHA}:${REGRESSION_OUTCOME}"
+          while IFS= read -r era; do
+            python3 tools/art_pipeline/task_tracker.py \
+              --state-dir "$RUNNER_TEMP/candidate/.tracker" \
+              --asset "$asset" --era "$era" \
+              mark --step game_tests --status "$status" \
+              --fingerprint "$fp" --reason "$reason"
+          done < <(python3 - "$asset" <<'PY'
+          import json, sys
+          cfg=json.load(open('art/placeables/PIPELINE_CONFIG.json', encoding='utf-8'))
+          for era in cfg['assets'][sys.argv[1]]['eras']:
+              print(era['stem'])
+          PY
+          )
+
+          checkpoint="asset-checkpoint-${asset}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          python3 tools/art_pipeline/sync_asset_tracker_issue.py \
+            --repo-root . --asset "$asset" \
+            --state-dir "$RUNNER_TEMP/candidate/.tracker" \
+            --artifact-name "$checkpoint" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "TRACKED_ASSET=$asset" >> "$GITHUB_ENV"
+          echo "TRACKER_READY=1" >> "$GITHUB_ENV"
+
+      - name: Upload game-test checkpoint
+        if: always() && env.TRACKER_READY == '1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: asset-checkpoint-${{ env.TRACKED_ASSET }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/candidate/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: warn
+
       - name: Record standalone build checksum
+        if: steps.regression.outcome == 'success'
         run: sha256sum 'outputs/Выше неба.html' > 'outputs/Выше неба.html.sha256'
+
       - name: Upload standalone game and QA evidence
         if: always()
         uses: actions/upload-artifact@v4
