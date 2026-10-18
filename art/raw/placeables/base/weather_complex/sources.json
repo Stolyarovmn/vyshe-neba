@@ -59,7 +59,7 @@
       "source_sha256": "403e787f19ea90fba5a57dc619ba4fb6f10e2c7490b0bc65ad18a839a3b82cb3",
       "drive_file_id": "1AxEZY4B-NB4WNzfkznQk9w3Pivx8wE5y",
       "drive_url": "https://drive.google.com/file/d/1AxEZY4B-NB4WNzfkznQk9w3Pivx8wE5y/view?usp=drivesdk",
-      "lineage": "motorized radar dish + CRT-era electronics + retained weather sensors"
+      "lineage": "motorized radar dish + CRT-era electronics + retained physical weather sensors"
     },
     {
       "era": "E3", "year": 2015,
@@ -115,5 +115,16 @@
       "reason": "valid E4 concept but overbuilt and visually noisier than selected lidar-head candidate"
     }
   ],
-  "status": "anchor_art_processing_and_runtime_QA_complete; part sheets + measured pivots + rig + motion QA pending"
+  "final_production_qa": {
+    "atlas_rebuild_run_id": 39100143288,
+    "runtime_qa_run_id": 39101045187,
+    "rig_qa": "pass",
+    "motion_qa": "pass",
+    "in_game_browser_qa": "pass",
+    "visual_review": "pass",
+    "mechanic": "two deterministic weather windows for the next launch; one explicit player choice; no reroll",
+    "legacy_wind_reduction": "neutralized",
+    "runtime_scripts": ["weather-complex-rig.js", "weather-complex-runtime.js", "weather-complex-window.js"]
+  },
+  "status": "ready"
 }
