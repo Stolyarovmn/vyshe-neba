@@ -1,0 +1,23 @@
+name: Temporary journey speed QA isolation patcher
+on:
+  push:
+    branches:
+      - 2d_world-background-traffic-fix
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.event.head_commit.message == 'Run journey speed QA isolation patcher'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 2d_world-background-traffic-fix
+      - run: python3 tools/tmp_isolate_journey_speed_qa.py
+      - run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add outputs/rocket/qa-journey.cjs
+          git diff --cached --check
+          git commit -m 'QA: isolate journey speed contract [journey-speed-generated]'
+          git push origin HEAD:2d_world-background-traffic-fix
