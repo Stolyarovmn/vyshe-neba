@@ -6,6 +6,10 @@ on:
     paths:
       - 'tools/art_pipeline/setup_art_tools.sh'
       - '.github/workflows/art-tools-bootstrap.yml'
+  pull_request:
+    paths:
+      - 'tools/art_pipeline/setup_art_tools.sh'
+      - '.github/workflows/art-tools-bootstrap.yml'
   workflow_dispatch:
 
 permissions:
