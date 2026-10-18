@@ -37,16 +37,23 @@ ref2game
 → SpriteFusion Pixel Snapper
 → normalize to canonical LP canvas
 → Aseprite indexed/no-dither export
-→ automatic + visual QA
+→ automatic QA
+→ candidate artifact
+→ visual QA bound to exact candidate SHA-256
+→ promotion PR
+→ canonical approved files in art/gen
 → measure real pivots on approved parts
 → pack era atlases from approved files
 → rig in code
 → motion sheet
 → event/state integration
-→ final QA
+→ game build from canonical runtime manifest
+→ final game QA
 ```
 
 Финальный era-atlas **собирается нами** из утверждённых E0–E5. Image generator не должен рисовать production atlas целиком.
+
+Candidate и production — разные состояния. Успешная техническая обработка не означает публикацию: до hash-bound visual approval candidate не может попасть в runtime.
 
 ## 3. Generation / prompt contract
 
@@ -139,21 +146,24 @@ W03 и W05 high-quality originals уже архивированы. Для W04 у
 
 ## 6. GitHub: что хранится в репозитории
 
-GitHub является источником production-инструкций, reproducibility metadata, QA и runtime output.
+GitHub является источником production-инструкций, reproducibility metadata, QA и **канонического approved art**. Derived runtime mirror для мигрированных asset families в репозиторий не коммитится: игра получает те же logical runtime paths при build-time packaging из `art/gen`.
 
 ```text
 art/docs/ASSET_PRODUCTION_PIPELINE.md
 art/style_bible.txt
 art/placeables/PRODUCTION_MANIFEST.md
-art/prompts/<asset>_eN.txt
+art/placeables/PIPELINE_CONFIG.json
+art/prompts/<asset>_eN.*
 art/raw/placeables/<zone>/<asset>/eN_YEAR_presnap.json
 art/gen/placeables/<zone>/<asset>/eN_YEAR.png
 art/gen/placeables/<zone>/<asset>/eN_YEAR.qa.json
 art/gen/placeables/<zone>/<asset>/eN_YEAR.pipeline.json
-outputs/.../assets/placeables/.../eN_YEAR.png
+outputs/rocket/runtime-assets.json
 ```
 
 High-quality raw PNG может дополнительно храниться в `art/raw/`, если размер позволяет, но это optional. Канонический source binary находится в Google Drive.
+
+`outputs/rocket/runtime-assets.json` задаёт только mapping `canonical source → logical runtime target`. `outputs/rocket/build.cjs` собирает runtime package в памяти/standalone build. Для migrated family запрещено одновременно держать вторую committed PNG-копию в `outputs/rocket/dist/assets/...`.
 
 Минимальный provenance JSON:
 
@@ -172,10 +182,19 @@ High-quality raw PNG может дополнительно храниться в
     "drive_url": "...",
     "original_filename": "W04_E0_1978_<source_gen_id>.png"
   },
-  "prompt_file": "art/prompts/w04_flight_simulator_e0.txt",
+  "prompt_file": "art/prompts/w04_flight_simulator.md",
   "target_canvas": [172, 160],
   "registration_target": [86, 156],
-  "required_pipeline": ["SpriteFusion Pixel Snapper", "Aseprite"]
+  "required_pipeline": ["SpriteFusion Pixel Snapper", "Aseprite"],
+  "output_sha256": "...",
+  "reproducibility": {
+    "style_bible_sha256": "...",
+    "production_manifest_sha256": "...",
+    "prompt_sha256": "...",
+    "pipeline_config_sha256": "...",
+    "processor_sha256": "...",
+    "git_commit": "..."
+  }
 }
 ```
 
@@ -243,6 +262,8 @@ registration target: (86,156) bottom-center
 ## 9. Aseprite
 
 Используется официальный `aseprite/aseprite`, собранный из официальных исходников. Бинарник в репозиторий не коммитится.
+
+Canonical CI configuration: официальный batch CLI с `LAF_BACKEND=none`. Все asset workflows используют один `tools/art_pipeline/setup_art_tools.sh`; отдельные workflow не имеют права незаметно собирать другой backend/tool revision.
 
 Production-задачи:
 
@@ -331,6 +352,8 @@ OFF → IDLE → NOTICE → WORK → FINISH → COOLDOWN → IDLE
 - нет бессмысленного micro-detail;
 - materials/light/projection соответствуют style bible.
 
+Visual verdict обязан быть **hash-bound**: `visual_qa.json` должен содержать approval exact SHA-256 каждого production candidate. Изменение PNG после review автоматически инвалидирует approval.
+
 ### Rig
 
 - rest reconstruction совпадает с anchor-art;
@@ -341,25 +364,61 @@ OFF → IDLE → NOTICE → WORK → FINISH → COOLDOWN → IDLE
 
 ## 12. GitHub CI
 
-Canonical automation:
+Canonical automation разделена на три ответственности:
 
 ```text
-.github/workflows/art-pipeline.yml
-tools/art_pipeline/normalize_sprite.py
-tools/art_pipeline/qa_sprite.py
+Candidate (read-only)
+.github/workflows/asset-candidate.yml
+art/placeables/PIPELINE_CONFIG.json
+tools/art_pipeline/process_asset.py
+
+Promotion (write only through branch/PR)
+.github/workflows/asset-promote.yml
+tools/art_pipeline/verify_visual_gate.py
+tools/art_pipeline/promote_asset.py
+
+Game gate
+.github/workflows/game-ci.yml
+outputs/rocket/runtime-assets.json
+outputs/rocket/build.cjs
+outputs/rocket/verify.cjs
 ```
 
-CI должен использовать pinned tool revisions и создавать:
+`art-pipeline.yml` и `b03-art-pipeline.yml` — тонкие asset-specific trigger wrappers, а не отдельные реализации processing logic.
+
+Candidate workflow:
+
+- использует pinned canonical toolchain;
+- создаёт PNG + `*.qa.json` + `*.pipeline.json` + `candidate-manifest.json`;
+- имеет `contents: read`;
+- не пишет `art/gen`, runtime и `main`;
+- публикует только Actions artifact для QA/review.
+
+Promotion workflow:
+
+- rebuild exact candidate из canonical sources;
+- требует `overall_status=approved`;
+- требует `status=approved` для каждой era;
+- требует exact SHA-256 match review ↔ candidate PNG;
+- только после этого переносит файлы в canonical `art/gen`;
+- обновляет `runtime-assets.json`;
+- создаёт `2d_*` branch/PR;
+- **никогда не push'ит production output прямо в `main`**.
+
+`pipeline.json` фиксирует source gen id/SHA, Drive source reference, Pixel Snapper revision, Aseprite version, pixel size, palette limit, canvas, registration target, output SHA и reproducibility hashes.
+
+Failed candidate никогда не становится runtime asset только потому, что pipeline технически смог его обработать. B03 с `fail_regenerate` и W04 с rejected visual review остаются blocked до нового exact approval.
+
+После merge production PR общий `game-ci.yml` обязан пройти:
 
 ```text
-eN_YEAR.png
-eN_YEAR.qa.json
-eN_YEAR.pipeline.json
+static pipeline validation
+→ verify no migrated runtime mirrors
+→ standalone build
+→ full npm test / verify.cjs
+→ standalone HTML SHA-256
+→ QA/build artifact upload
 ```
-
-`pipeline.json` фиксирует source gen id/SHA, Drive source reference, Pixel Snapper revision, Aseprite version, pixel size, palette limit, canvas и registration target.
-
-Workflow может публиковать runtime output только после QA. Failed candidate никогда не становится runtime asset только потому, что pipeline технически смог его обработать.
 
 ## 13. W04 / flight_simulator reference lineage
 
@@ -392,8 +451,12 @@ prompt saved
 + normalized to canonical LP canvas
 + Aseprite indexed/no-dither export completed
 + automatic QA passed
-+ visual QA passed
-+ runtime PNG committed
++ candidate artifact produced
++ visual QA passed for exact candidate SHA-256
++ promotion PR merged
++ canonical approved PNG lives in art/gen
++ runtime-assets mapping registered when the family is migrated
++ full game-ci passes
 ```
 
 Rigged object дополнительно требует:
@@ -409,7 +472,7 @@ part sheet approved
 
 ## 15. Обязательное правило для всех следующих ассетов
 
-Любой новый workshop/base asset начинается с `ref2game`, `art/style_bible.txt` и `art/placeables/PRODUCTION_MANIFEST.md`, генерируется по одной эпохе/одному asset за call, **сразу сохраняет нетронутый high-quality original в Google Drive**, затем проходит SpriteFusion Pixel Snapper → normalize → Aseprite → QA → measured rig.
+Любой новый workshop/base asset начинается с `ref2game`, `art/style_bible.txt` и `art/placeables/PRODUCTION_MANIFEST.md`, генерируется по одной эпохе/одному asset за call, **сразу сохраняет нетронутый high-quality original в Google Drive**, затем проходит SpriteFusion Pixel Snapper → normalize → Aseprite → automatic QA → candidate → hash-bound visual QA → promotion PR → measured rig → game QA.
 
 Нельзя:
 
@@ -418,4 +481,7 @@ part sheet approved
 - заменять original обработанной копией;
 - угадывать pivots;
 - симулировать сложную механику движением целого PNG;
-- генерировать production E0–E5 atlas одним AI board.
+- генерировать production E0–E5 atlas одним AI board;
+- публиковать candidate в runtime до hash-bound visual approval;
+- push'ить generated production output из CI прямо в `main`;
+- держать committed runtime mirror для asset family, уже переведённой на canonical `art/gen` + `runtime-assets.json`.
