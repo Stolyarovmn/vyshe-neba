@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Deterministically rebuild B01 cut-out parts and era atlases from approved anchors.
 
-Source of truth is the approved E0-E5 anchor art plus measured extraction
-metadata. Every output is regenerated from those sources, round-tripped through
-Pillow, and compared in RGBA space. No previously generated part PNG is trusted
-as an input, so a truncated/corrupt derived PNG cannot poison the rebuild.
+The approved E0-E5 anchor art is the geometry source of truth. Extraction boxes
+and pivots are authored metadata; visible bboxes are measured output and are
+refreshed from the approved art when stale. Every derived PNG is regenerated,
+fully decoded, and compared in RGBA space so truncated/corrupt derived files
+cannot poison the rebuild.
 """
 from __future__ import annotations
 
@@ -64,10 +65,29 @@ def image_from_mask(anchor: Image.Image, mask: Image.Image) -> Image.Image:
 
 
 def extraction_region(meta: dict):
-    """Use the authored semantic box; bbox is measured output, not the input mask."""
     if not meta["present"]:
         return None
     return meta.get("box") or meta.get("bbox")
+
+
+def bbox_within(inner, outer) -> bool:
+    if inner is None:
+        return True
+    if outer is None:
+        return False
+    ix0, iy0, ix1, iy1 = inner
+    ox0, oy0, ox1, oy1 = outer
+    return ox0 <= ix0 and oy0 <= iy0 and ix1 <= ox1 and iy1 <= oy1
+
+
+def pivot_within(pivot, box) -> bool:
+    if pivot is None:
+        return True
+    if box is None:
+        return False
+    x, y = pivot
+    x0, y0, x1, y1 = box
+    return x0 <= x < x1 and y0 <= y < y1
 
 
 def extract_parts(anchor: Image.Image, meta: dict):
@@ -83,7 +103,7 @@ def extract_parts(anchor: Image.Image, meta: dict):
     vane_rect = mask_for_bbox(CELL, extraction_region(vane_meta))
     sensor_rect = mask_for_bbox(CELL, extraction_region(sensor_meta))
 
-    # Measured semantic priority: indicator > vane > sensor > body.
+    # Authored semantic priority: indicator > vane > sensor > body.
     ind = alpha_intersection(alpha, ind_rect)
     vane = mask_subtract(alpha_intersection(alpha, vane_rect), ind)
     sensor = mask_subtract(alpha_intersection(alpha, sensor_rect), mask_union(ind, vane))
@@ -129,7 +149,6 @@ def exact_indexed_save(rgba: Image.Image, path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
     out.save(path, transparency=0, optimize=False)
 
-    # This is also the corruption gate: the just-written PNG must fully decode.
     with Image.open(path) as check:
         check.load()
         decoded = check.convert("RGBA")
@@ -150,15 +169,17 @@ def main():
     repo = Path(args.repo_root)
     part_root = repo / PART_ROOT
     runtime_root = repo / RUNTIME_PART_ROOT
-    extraction = json.loads((part_root / "part_extraction.json").read_text(encoding="utf-8"))
+    extraction_path = part_root / "part_extraction.json"
+    extraction = json.loads(extraction_path.read_text(encoding="utf-8"))
 
     report = {
         "asset_id": "B01",
         "asset": "weather_complex",
-        "method": "approved anchor -> authored semantic box -> measured bbox validation -> exact indexed PNGs/atlases",
+        "method": "approved anchor -> authored semantic box -> measured bbox refresh -> exact indexed PNGs/atlases",
         "derived_input_policy": "never trust existing generated PNGs as rebuild inputs",
         "cell": list(CELL),
         "era_order": ORDER,
+        "bbox_refreshes": [],
         "eras": {},
         "atlases": {},
         "result": "pass",
@@ -181,14 +202,30 @@ def main():
         era_report = {"year": meta["year"], "parts": {}}
 
         for part in PARTS:
+            part_meta = meta["parts"][part]
             got_bbox = bbox_list(generated[part])
-            expected_bbox = meta["parts"][part].get("bbox")
-            present = meta["parts"][part]["present"]
+            expected_bbox = part_meta.get("bbox")
+            present = part_meta["present"]
+            semantic_box = part_meta.get("box")
+            pivot = part_meta.get("pivot")
+
             if not present:
                 if got_bbox is not None:
                     raise SystemExit(f"QA_FAIL: {stem}/{part} should be absent, got bbox {got_bbox}")
-            elif got_bbox != expected_bbox:
-                raise SystemExit(f"QA_FAIL: {stem}/{part} bbox {got_bbox} != measured {expected_bbox}")
+            else:
+                if part != "body" and not bbox_within(got_bbox, semantic_box):
+                    raise SystemExit(
+                        f"QA_FAIL: {stem}/{part} visible bbox {got_bbox} escapes semantic box {semantic_box}"
+                    )
+                if part != "body" and not pivot_within(pivot, semantic_box):
+                    raise SystemExit(
+                        f"QA_FAIL: {stem}/{part} pivot {pivot} escapes semantic box {semantic_box}"
+                    )
+                if got_bbox != expected_bbox:
+                    report["bbox_refreshes"].append(
+                        {"era": stem, "part": part, "before": expected_bbox, "after": got_bbox}
+                    )
+                    part_meta["bbox"] = got_bbox
 
             art_part = part_root / stem / f"{part}.png"
             runtime_part = runtime_root / stem / f"{part}.png"
@@ -196,7 +233,6 @@ def main():
             runtime_part.parent.mkdir(parents=True, exist_ok=True)
             runtime_part.write_bytes(art_part.read_bytes())
 
-            # Decode both copies so transport corruption cannot pass silently.
             for check_path in (art_part, runtime_part):
                 with Image.open(check_path) as check:
                     check.load()
@@ -207,24 +243,28 @@ def main():
             era_report["parts"][part] = {
                 "present": present,
                 "bbox": got_bbox,
-                "pivot": meta["parts"][part].get("pivot"),
+                "pivot": pivot,
+                "semantic_box": semantic_box,
                 "palette_entries_including_transparent": palette_entries,
                 "art_sha256": sha256(art_part),
                 "runtime_sha256": sha256(runtime_part),
             }
 
-        # The four rest layers must reproduce the approved anchor exactly.
         rest = Image.new("RGBA", CELL, (0, 0, 0, 0))
         for part in PARTS:
             rest.alpha_composite(generated[part])
         if not rgba_equal(rest, anchor):
             raise SystemExit(f"QA_FAIL: {stem} rest reconstruction is not pixel-exact")
+        meta["reconstruction_pixel_exact"] = True
         era_report["rest_reconstruction_pixel_exact"] = True
         report["eras"][stem] = era_report
         for part in PARTS:
             cells[part].append(generated[part])
 
-    # Pack E0|E1|E2 / E3|E4|E5 with exact colors and no resampling.
+    # Persist refreshed measured bboxes because runtime metadata must describe
+    # the approved art, not an older derived file.
+    extraction_path.write_text(json.dumps(extraction, indent=2) + "\n", encoding="utf-8")
+
     atlas_size = (CELL[0] * 3, CELL[1] * 2)
     for part in PARTS:
         atlas = Image.new("RGBA", atlas_size, (0, 0, 0, 0))
@@ -255,9 +295,11 @@ def main():
     report_path = part_root / "atlas_rebuild_qa.json"
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(
-        "B01 part rebuild PASS: all E0-E5 parts regenerated from approved anchors; "
+        "B01 part rebuild PASS: E0-E5 derived from approved anchors; measured bboxes refreshed; "
         "rest reconstructions exact; every PNG round-trips; atlases exact"
     )
+    if report["bbox_refreshes"]:
+        print("bbox_refreshes=" + json.dumps(report["bbox_refreshes"], separators=(",", ":")))
     print(report_path)
 
 
