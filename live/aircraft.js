@@ -64,9 +64,9 @@ J.objectKind=function(y,mode,era,variant){
  if(mode===2||mode===4)return objectKind0(y,mode,era,variant);
  era=Math.max(0,Math.min(5,Number(era)||0));
  if(y<30)return objectKind0(y,mode,era,variant);
- if(y<300)return variant%3===2?'balloon':'plane';
- if(y<1200)return variant%4===3?'balloon':'plane';
- if(y<1800)return variant%4===3?'balloon':'plane';
+ if(y<300)return variant===0?'plane':'balloon';
+ if(y<1200)return variant===0?'plane':'balloon';
+ if(y<1800)return variant===0?'plane':'balloon';
  const ceiling=(traffic.experimentalCeilingByEraWorldY||DEFAULT_TRAFFIC.experimentalCeilingByEraWorldY)[era]||2000;
  if(y<ceiling)return variant%3===0?'plane':'rock';
  if(y<3500)return 'balloon';
