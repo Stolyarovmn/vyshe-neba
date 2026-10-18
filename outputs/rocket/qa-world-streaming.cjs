@@ -15,8 +15,8 @@ const OUT=path.resolve(__dirname,'../../work/world-streaming');fs.mkdirSync(OUT,
   direct/=n;mirror/=n;
   const altitude=[];for(let era=0;era<6;era++)for(const y of [2400,2600,3000,5000,8400,9000])for(let v=0;v<6;v++)if(Journey.objectKind(y,0,era,v)==='plane')altitude.push({era,y,v});
   Game.profile.base=5;Game.start();Game.rocket.x=0;Game.rocket.y=300;Game.rocket.vx=0;Game.rocket.vy=0;Game.camera.x=0;Game.camera.y=300;Game.camera.zoom=.7;
-  let previousVisible=false,entries=[],maxVisibleJump=0,previousX=null;
-  for(let i=0;i<=1400;i++){const t=i*.1;Game.camera.x=0;Game.camera.y=300;Game.camera.zoom=.7;Game.rocket.x=0;Game.rocket.y=300;Game.renderAt(t);Game.step(0);const p=Game.objects.find(o=>o.type==='hazard'&&o.kind==='plane'&&o.originX===280&&o.originY===300);let visible=false,x=null;if(p){x=Game.project(p.x,p.y).x;visible=x>=0&&x<=960;}if(visible&&!previousVisible)entries.push(x);if(visible&&previousVisible&&previousX!=null)maxVisibleJump=Math.max(maxVisibleJump,Math.abs(x-previousX));previousVisible=visible;previousX=visible?x:null;}
+  let previousVisible=false,entries=[],maxVisibleJump=0,previousX=null,seenSample=false;
+  for(let i=0;i<=1400;i++){const t=i*.1;Game.camera.x=0;Game.camera.y=300;Game.camera.zoom=.7;Game.rocket.x=0;Game.rocket.y=300;Game.renderAt(t);Game.step(0);const p=Game.objects.find(o=>o.type==='hazard'&&o.kind==='plane'&&o.originX===280&&o.originY===300);let visible=false,x=null;if(p){x=Game.project(p.x,p.y).x;visible=x>=0&&x<=960;}if(seenSample&&visible&&!previousVisible)entries.push(x);if(visible&&previousVisible&&previousX!=null)maxVisibleJump=Math.max(maxVisibleJump,Math.abs(x-previousX));previousVisible=visible;previousX=visible?x:null;seenSample=true;}
   Game.camera.x=0;Game.camera.y=300;Game.camera.zoom=.7;Game.rocket.x=0;Game.rocket.y=300;Game.goto('pause');Game.renderAt(8);
   return {direct,mirror,altitude,entries,maxVisibleJump,aircraft:AircraftTraffic.qa()};
  });
