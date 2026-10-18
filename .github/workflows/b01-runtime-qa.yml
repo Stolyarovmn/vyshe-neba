@@ -1,0 +1,38 @@
+name: B01 weather runtime QA
+
+on:
+  push:
+    branches: [2d_workshop-placeables-w01]
+    paths:
+      - 'outputs/rocket/dist/weather-complex-rig.js'
+      - 'outputs/rocket/dist/weather-complex-runtime.js'
+      - 'outputs/rocket/dist/index.html'
+      - 'outputs/rocket/dist/infrastructure.js'
+      - 'outputs/rocket/dist/assets/placeables/base/weather_complex/parts/**'
+      - 'outputs/rocket/build.cjs'
+      - 'outputs/rocket/qa-b01-rig.cjs'
+      - 'outputs/rocket/qa-b01-runtime.cjs'
+      - 'outputs/rocket/verify.cjs'
+      - '.github/workflows/b01-runtime-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-qa:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build standalone game
+        run: node outputs/rocket/build.cjs
+
+      - name: Infrastructure regression
+        run: node outputs/rocket/qa-infrastructure.cjs
+
+      - name: B01 rig regression
+        run: node outputs/rocket/qa-b01-rig.cjs
+
+      - name: B01 runtime integration regression
+        run: node outputs/rocket/qa-b01-runtime.cjs
