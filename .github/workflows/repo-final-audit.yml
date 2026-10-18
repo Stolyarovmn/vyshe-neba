@@ -17,9 +17,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Install browser QA dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --ignore-scripts playwright@1.62.1
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROMIUM_EXECUTABLE_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          elif command -v chromium >/dev/null 2>&1; then
+            echo "CHROMIUM_EXECUTABLE_PATH=$(command -v chromium)" >> "$GITHUB_ENV"
+          else
+            echo 'No system Chrome/Chromium found.' >&2
+            exit 1
+          fi
+          echo 'CHROMIUM_ARGS=["--no-sandbox","--disable-dev-shm-usage"]' >> "$GITHUB_ENV"
       - name: Run repository regression suite
         run: npm test
       - name: Audit exact PNG duplicates in production sprite roots
+        if: always()
         shell: bash
         run: |
           python3 - <<'PY'
