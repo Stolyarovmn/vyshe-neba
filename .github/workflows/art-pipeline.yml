@@ -124,7 +124,7 @@ jobs:
           SNAP="$RUNNER_TEMP/pixel-snapper/bin/spritefusion-pixel-snapper"
           ASE=~/.cache/vyshe-neba/aseprite/aseprite
           WORK="$RUNNER_TEMP/w04"
-          mkdir -p "$WORK" "$OUTDIR" "$RUNTIME_DIR"
+          mkdir -p "$WORK" "$OUTDIR"
 
           entries=(
             'e0_1978:E0:1978'
@@ -175,8 +175,6 @@ jobs:
               --max-colors "$COLORS" --min-coverage 0.01 --min-bbox-fraction 0.25 \
               --report "$OUTDIR/${stem}.qa.json"
 
-            cp "$final" "$RUNTIME_DIR/${stem}.png"
-
             source_gen_id=$(jq -r '.source_gen_id' "$meta")
             source_sha256=$(jq -r '.source_sha256' "$meta")
             transport_sha256=$(sha256sum "$raw" | awk '{print $1}')
@@ -209,6 +207,69 @@ jobs:
           JSON
           done
 
+      - name: Apply hash-bound W04 visual gate
+        id: visual
+        if: steps.inputs.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          review="$OUTDIR/visual_qa.json"
+          approved=true
+          family_gate=blocked
+          stems=(e0_1978 e1_1986 e2_1998 e3_2015 e4_2035 e5_2060)
+
+          if [[ ! -f "$review" ]]; then
+            echo 'visual gate: missing visual_qa.json'
+            approved=false
+          elif [[ "$(jq -r '.overall_status // "missing"' "$review")" != 'approved' ]]; then
+            echo "visual gate: overall status is $(jq -r '.overall_status // "missing"' "$review")"
+            approved=false
+          fi
+
+          if [[ -f "$review" ]]; then
+            for stem in "${stems[@]}"; do
+              final="$OUTDIR/${stem}.png"
+              actual=$(sha256sum "$final" | awk '{print $1}')
+              era_status=$(jq -r --arg stem "$stem" '.eras[$stem].status // "missing"' "$review")
+              expected=$(jq -r --arg stem "$stem" '.eras[$stem].sha256 // "missing"' "$review")
+              echo "$stem visual_status=$era_status expected_sha=$expected actual_sha=$actual"
+              if [[ "$era_status" != 'approved' || "$expected" != "$actual" ]]; then
+                approved=false
+              fi
+            done
+          fi
+
+          if [[ "$approved" == 'true' ]]; then
+            family_gate=approved
+            mkdir -p "$RUNTIME_DIR"
+            for stem in "${stems[@]}"; do
+              cp "$OUTDIR/${stem}.png" "$RUNTIME_DIR/${stem}.png"
+            done
+            echo 'W04 visual gate approved: runtime publication enabled.'
+          else
+            mkdir -p "$RUNTIME_DIR"
+            for stem in "${stems[@]}"; do
+              rm -f "$RUNTIME_DIR/${stem}.png"
+            done
+            echo 'W04 visual gate blocked: runtime PNGs removed/not published.'
+          fi
+
+          for stem in "${stems[@]}"; do
+            pipeline="$OUTDIR/${stem}.pipeline.json"
+            era_status=missing
+            if [[ -f "$review" ]]; then
+              era_status=$(jq -r --arg stem "$stem" '.eras[$stem].status // "missing"' "$review")
+            fi
+            tmp="${pipeline}.tmp"
+            jq --arg family "$family_gate" --arg era "$era_status" \
+              '. + {visual_gate: {family: $family, era: $era, review_file: "visual_qa.json", hash_bound: true}}' \
+              "$pipeline" > "$tmp"
+            mv "$tmp" "$pipeline"
+          done
+
+          echo "approved=$approved" >> "$GITHUB_OUTPUT"
+          echo "family_gate=$family_gate" >> "$GITHUB_OUTPUT"
+
       - name: Upload W04 QA images
         if: steps.inputs.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
@@ -225,18 +286,20 @@ jobs:
             art/gen/placeables/workshop/flight_simulator/e5_2060.png
             art/gen/placeables/workshop/flight_simulator/e*.qa.json
             art/gen/placeables/workshop/flight_simulator/e*.pipeline.json
+            art/gen/placeables/workshop/flight_simulator/visual_qa.json
+            art/gen/placeables/workshop/flight_simulator/manifest.json
 
-      - name: Commit verified W04 outputs
+      - name: Commit processed W04 outputs and visual-gate state
         if: steps.inputs.outputs.ready == 'true'
         run: |
           set -euxo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$OUTDIR" "$RUNTIME_DIR"
+          git add -A "$OUTDIR" "$RUNTIME_DIR"
           if git diff --cached --quiet; then
-            echo 'No generated changes.'
+            echo 'No generated or gate-state changes.'
             exit 0
           fi
-          git commit -m 'Process W04 with official Pixel Snapper and Aseprite [skip art-pipeline]'
+          git commit -m 'Process W04 and apply hash-bound visual gate [skip art-pipeline]'
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin HEAD:"$GITHUB_REF_NAME"
