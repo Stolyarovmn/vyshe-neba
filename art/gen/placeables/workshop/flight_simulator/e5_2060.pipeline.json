@@ -3,7 +3,14 @@
   "era": "E5",
   "year": 2060,
   "source_gen_id": "45c1101a-c5b7-48d7-abb0-8ce385227130",
-  "source_sha256": "5b525b98e32cb2944af667a9d50510ae7c500156aacd2594fb5d14ec66d88182",
+  "source_sha256": "39791fbfe36dc116f5c1d859b30acb04ef31aaa340d97c1706574b6b84fe74c9",
+  "transport_sha256": "5b525b98e32cb2944af667a9d50510ae7c500156aacd2594fb5d14ec66d88182",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "14pOeaaKu4N6OY9wQaVdNrMQQiFdLc6-J",
+    "drive_url": "https://drive.google.com/file/d/14pOeaaKu4N6OY9wQaVdNrMQQiFdLc6-J/view?usp=drivesdk"
+  },
+  "transport_policy": "nearest-expand-to-8x-grid-before-snapper",
   "spritefusion_pixel_snapper_rev": "ae20461f60fb39e75d15f184bab1ebec1219511c",
   "spritefusion_pixel_snapper_package": "1.0.0",
   "pixel_size": 8,

@@ -3,7 +3,14 @@
   "era": "E2",
   "year": 1998,
   "source_gen_id": "a12d3343-355a-473b-a0e8-afbb371019b0",
-  "source_sha256": "d5a4dd9a848495df6fe3de3858d339fe69a509b1355eee2a95d4f061dbc8077f",
+  "source_sha256": "451a86d998229110e4cb75b4b4c83a87d6fa28220eaba8ab1dd638ef420a4369",
+  "transport_sha256": "d5a4dd9a848495df6fe3de3858d339fe69a509b1355eee2a95d4f061dbc8077f",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1FpNCtswDxpPmV61vuOBSkBAAGL7A4F-K",
+    "drive_url": "https://drive.google.com/file/d/1FpNCtswDxpPmV61vuOBSkBAAGL7A4F-K/view?usp=drivesdk"
+  },
+  "transport_policy": "nearest-expand-to-8x-grid-before-snapper",
   "spritefusion_pixel_snapper_rev": "ae20461f60fb39e75d15f184bab1ebec1219511c",
   "spritefusion_pixel_snapper_package": "1.0.0",
   "pixel_size": 8,

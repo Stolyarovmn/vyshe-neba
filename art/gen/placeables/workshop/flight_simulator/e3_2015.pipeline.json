@@ -3,7 +3,14 @@
   "era": "E3",
   "year": 2015,
   "source_gen_id": "2e962835-c849-4d05-b5a9-f025910a774b",
-  "source_sha256": "ba3e89be227a7de6689c25e92793c10e2081ad41e50c54dea1d40e3368f6ae23",
+  "source_sha256": "be5d5f6e21e6993bb7030b866faf131dd6c059328d517d9020c11ef0186f06ca",
+  "transport_sha256": "ba3e89be227a7de6689c25e92793c10e2081ad41e50c54dea1d40e3368f6ae23",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1ztr70UqXZUuPhm78gGNr6rXluZ02TIgb",
+    "drive_url": "https://drive.google.com/file/d/1ztr70UqXZUuPhm78gGNr6rXluZ02TIgb/view?usp=drivesdk"
+  },
+  "transport_policy": "nearest-expand-to-8x-grid-before-snapper",
   "spritefusion_pixel_snapper_rev": "ae20461f60fb39e75d15f184bab1ebec1219511c",
   "spritefusion_pixel_snapper_package": "1.0.0",
   "pixel_size": 8,
