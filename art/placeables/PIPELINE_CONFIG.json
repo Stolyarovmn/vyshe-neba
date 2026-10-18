@@ -35,6 +35,7 @@
       "source_dir": "art/source_transport/b03_landing_guidance",
       "production_dir": "art/gen/placeables/base/landing_guidance",
       "runtime_target": "placeables/base/landing_guidance",
+      "prompt_file": "art/prompts/b03_landing_guidance.md",
       "colors": 32,
       "pixel_size": 12,
       "transport_scale": 4,
