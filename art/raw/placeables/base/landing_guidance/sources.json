@@ -31,6 +31,12 @@
       "version": "1.3.18.6",
       "dithering": "none",
       "color_mode": "indexed"
+    },
+    "visible_bbox_target": {
+      "min_width": 38,
+      "max_width": 42,
+      "min_height": 70,
+      "max_height": 76
     }
   },
   "eras": [
@@ -80,8 +86,18 @@
   "lineage_qa": {
     "drive_file_id":"1RRNDGztAxPrDk3s_CZZK2rKUGnB9H-tA",
     "drive_url":"https://drive.google.com/file/d/1RRNDGztAxPrDk3s_CZZK2rKUGnB9H-tA/view?usp=drivesdk",
-    "result":"accepted_for_processing",
-    "note":"one-beacon silhouette remains readable; E5 becomes lower/denser while preserving physical pan/tilt ancestry"
+    "result":"rejected_after_gameplay_size_qa",
+    "note":"High-resolution lineage was coherent, but production normalization exposed a geometry failure: the beacon reads too squat/wide in the canonical 46x82 LP footprint. The current E0 output measured only 36x42 visible pixels, versus the required 38-42x70-76 portrait silhouette. Do not promote this lineage to ready. Regenerate E0 with a taller mast/yoke and narrower stance, then evolve E1-E5 from the approved replacement."
   },
-  "status":"high_quality_originals_and_lineage_QA_complete; Pixel Snapper + common-scale normalization + Aseprite + runtime QA pending"
+  "gameplay_size_qa": {
+    "result": "fail",
+    "e0_visible_bbox_size": [36, 42],
+    "required_visible_bbox_size": {
+      "width": [38, 42],
+      "height": [70, 76]
+    },
+    "failure_class": "source_geometry_not_processing",
+    "action": "regenerate E0; old E1-E5 lineage remains archived provenance only until a replacement lineage passes the same gate"
+  },
+  "status":"blocked_visual_gate; current E0-E5 originals are archived but not production-approved; replacement E0 required before rebuilding lineage"
 }

@@ -24,11 +24,15 @@ jobs:
       OUTDIR: art/gen/placeables/base/landing_guidance
       RUNTIME_DIR: outputs/rocket/dist/assets/placeables/base/landing_guidance
       COLORS: '32'
-      PIXEL_SIZE: '14'
+      PIXEL_SIZE: '12'
       WIDTH: '46'
       HEIGHT: '82'
       REG_X: '23'
       REG_Y: '78'
+      MIN_VISIBLE_W: '38'
+      MAX_VISIBLE_W: '42'
+      MIN_VISIBLE_H: '70'
+      MAX_VISIBLE_H: '76'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -149,6 +153,8 @@ jobs:
             python3 tools/art_pipeline/qa_sprite.py \
               --input "$final" --width "$WIDTH" --height "$HEIGHT" \
               --max-colors "$COLORS" --min-coverage 0.04 --min-bbox-fraction 0.35 \
+              --min-visible-width "$MIN_VISIBLE_W" --max-visible-width "$MAX_VISIBLE_W" \
+              --min-visible-height "$MIN_VISIBLE_H" --max-visible-height "$MAX_VISIBLE_H" \
               --report "$OUTDIR/${stem}.qa.json"
 
             cp "$final" "$RUNTIME_DIR/${stem}.png"
@@ -174,6 +180,7 @@ jobs:
             "aseprite_dithering": "none",
             "target_canvas": [$WIDTH, $HEIGHT],
             "registration_target": [$REG_X, $REG_Y],
+            "visible_bbox_target": [$MIN_VISIBLE_W, $MAX_VISIBLE_W, $MIN_VISIBLE_H, $MAX_VISIBLE_H],
             "mechanism_pivots": "pending_measured_rig_pass"
           }
           JSON
@@ -182,7 +189,7 @@ jobs:
       - name: Build B03 QA contact sheet
         run: |
           python3 - <<'PY'
-          from PIL import Image, ImageDraw
+          from PIL import Image
           from pathlib import Path
           stems = ['e0_1978','e1_1986','e2_1998','e3_2015','e4_2035','e5_2060']
           cell_w, cell_h, scale = 46, 82, 6
@@ -213,6 +220,6 @@ jobs:
             echo 'No generated changes.'
             exit 0
           fi
-          git commit -m 'Process B03 with text transport, Pixel Snapper and Aseprite [skip b03-art-pipeline]'
+          git commit -m 'Process B03 with strict silhouette gate [skip b03-art-pipeline]'
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin HEAD:"$GITHUB_REF_NAME"
