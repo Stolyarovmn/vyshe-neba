@@ -6,6 +6,7 @@ on:
     paths:
       - 'outputs/rocket/dist/weather-complex-rig.js'
       - 'outputs/rocket/dist/weather-complex-runtime.js'
+      - 'outputs/rocket/dist/weather-complex-window.js'
       - 'outputs/rocket/dist/index.html'
       - 'outputs/rocket/dist/infrastructure.js'
       - 'outputs/rocket/dist/assets/placeables/base/weather_complex/parts/**'
