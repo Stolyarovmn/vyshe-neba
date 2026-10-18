@@ -5,10 +5,7 @@ on:
     branches: [main]
     paths:
       - 'art/raw/placeables/workshop/flight_simulator/**'
-      - 'art/placeables/PIPELINE_CONFIG.json'
-      - 'tools/art_pipeline/**'
       - '.github/workflows/art-pipeline.yml'
-      - '.github/workflows/asset-candidate.yml'
   workflow_dispatch:
 
 permissions:
