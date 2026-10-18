@@ -1,46 +1,28 @@
 # B03 — Система посадочного наведения (`landing_guidance`)
 
-High-quality E0–E5 originals for **one** beacon are generated under `ref2game`, archived on Google Drive and lineage-reviewed. Gameplay purchases place a symmetric pair; symmetry is code/layout, not baked into the source sprite.
+B03 производится по `ref2game` и `art/docs/ASSET_PRODUCTION_PIPELINE.md`. Покупка ставит симметричную пару, но production-арт всегда описывает **один** маяк.
 
-Runtime art is not marked ready until official SpriteFusion Pixel Snapper, common-scale normalization to `46×82 LP`, Aseprite indexed/no-dither export and QA are complete.
+## Текущий статус
 
-## Lineage
+Автоматический production pass для E0–E5 завершился технически успешно: Pixel Snapper, common-scale normalization, Aseprite indexed/no-dither и per-file QA проходят. Однако обязательный gameplay-size visual gate **не пройден**.
 
-| era | year | stage |
-|---|---:|---|
-| E0 | 1978 | tripod + optical sight + physical lamp |
-| E1 | 1986 | sectional radio beacon |
-| E2 | 1998 | motorized optical/radio tracker |
-| E3 | 2015 | laser-optical multi-sensor tracker |
-| E4 | 2035 | autonomous compact tracker |
-| E5 | 2060 | integrated directional multispectral beacon |
+Текущая lineage слишком широкая и низкая для authored footprint `46×82 LP`: при почти заполненной допустимой ширине (`31–41 LP`) видимая высота составляет только `35–42 LP`, тогда как production prompt требует примерно `70–76 LP`. Это невозможно исправить простым масштабированием без выхода по ширине — нужна новая исходная геометрия.
 
-## Runtime target
+Поэтому:
 
-- one-beacon footprint: `46×82 LP`
-- registration target: `(23,78)` bottom-center
-- sockets: `pad_left | pad_right`
-- parts: `base` static; `head` aiming; `lamp` state
-- mechanic: touchdown prediction / safe corridor / approach state only; never steers the rocket
+- processed E0–E5 остаются в `art/gen/` только как QA/rejection evidence;
+- runtime-копии удалены и не считаются опубликованными;
+- part extraction / pivots / rig для этой lineage не выполняются;
+- следующий шаг — **перегенерация E0** как высокого узкого посадочного маяка по текущему `art/prompts/b03_landing_guidance.md`, затем E1→E5 последовательно от утверждённого predecessor.
 
-The head must track around measured physical pivots. Predicted touchdown marker, corridor, optical/laser beam, lamp glow and HUD are code-owned.
+Подробная причина и измерения: `visual_qa.json`.
 
-## Source archive
+## Runtime contract после новой lineage
 
-Canonical full-resolution originals and the lineage QA contact sheet live under:
-
-`vyshe-neba/art-originals/base/B03_landing_guidance/`
-
-Exact generation IDs, SHA-256 values and Drive IDs/URLs are in:
-
-`art/raw/placeables/base/landing_guidance/sources.json`
-
-## Next production pass
-
-1. Pixel Snapper candidate at baseline `pixel-size 12`, <=32 colors.
-2. Normalize all eras at one common world scale to `46×82` with registration `(23,78)`.
-3. Aseprite indexed/no-dither export.
-4. Gameplay-size lineage QA.
-5. Isolate `head` and lamp/base geometry from approved processed anchors.
-6. Measure actual yoke/azimuth pivots; reconstruct rest pose.
-7. Wire tracking and state response in code; render motion sheet and QA it frame by frame.
+- canvas: `46×82 LP`;
+- registration: `(23,78)` bottom-center;
+- visible target: примерно `38–42 LP` wide × `70–76 LP` high;
+- parts: `base` static, `head` pan/tilt, `lamp` state;
+- код владеет corridor / touchdown marker / beam / glow / HUD / dynamic light;
+- whole-sprite fake motion запрещён;
+- pivots измеряются только по утверждённому processed art.
