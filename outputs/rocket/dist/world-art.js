@@ -49,7 +49,7 @@ function draw(ctx,cam,r,p,art){
   let floor=project(0,BOTTOM+2).y;if(floor<600){rect(0,floor,960,600-floor,'#28332d');for(let row=Math.floor((BOTTOM-bottom)/18);row>=0;row--)for(let col=Math.floor(left/24);col<=Math.ceil(right/24);col++){let q=project(col*24,BOTTOM-row*18);rect(q.x,q.y,12*z,3*z,hash(col,row)>.5?'#41473b':'#1d2927');}}
   // Stars follow the opaque atmosphere layer, but precede physical celestial bodies.
   const baseRig=root.WorldSprites?.manifest.base;
-  if(baseRig&&top>-132&&bottom<600){
+  if(baseRig&&top>-132&&bottom<600&&right>LEFT&&left<LEFT+WIDTH){
    const rig=baseRig.eras[p.base||0],cw=baseRig.size[0]/3,ch=baseRig.size[1]/2,t=r.time||0;
    const point=(u,v)=>{const ax=BASE_LEFT+(u-2)*1280/(cw-4),wy=600-(v-2)*800/(ch-4);return project(LEFT+ax,wy);};
    for(const [kind,list]of [['lamp',rig.lamps],['beacon',rig.beacons]])for(const [i,a]of list.entries()){
