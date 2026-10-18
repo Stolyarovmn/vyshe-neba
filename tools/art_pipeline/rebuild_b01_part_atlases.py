@@ -63,6 +63,13 @@ def image_from_mask(anchor: Image.Image, mask: Image.Image) -> Image.Image:
     return out
 
 
+def extraction_region(meta: dict):
+    """Use the authored semantic box; bbox is measured output, not the input mask."""
+    if not meta["present"]:
+        return None
+    return meta.get("box") or meta.get("bbox")
+
+
 def extract_parts(anchor: Image.Image, meta: dict):
     if anchor.size != CELL:
         raise ValueError(f"anchor {anchor.size} != {CELL}")
@@ -72,9 +79,9 @@ def extract_parts(anchor: Image.Image, meta: dict):
     vane_meta = meta["parts"]["vane"]
     sensor_meta = meta["parts"]["sensor"]
 
-    ind_rect = mask_for_bbox(CELL, ind_meta["bbox"] if ind_meta["present"] else None)
-    vane_rect = mask_for_bbox(CELL, vane_meta["bbox"] if vane_meta["present"] else None)
-    sensor_rect = mask_for_bbox(CELL, sensor_meta["bbox"] if sensor_meta["present"] else None)
+    ind_rect = mask_for_bbox(CELL, extraction_region(ind_meta))
+    vane_rect = mask_for_bbox(CELL, extraction_region(vane_meta))
+    sensor_rect = mask_for_bbox(CELL, extraction_region(sensor_meta))
 
     # Measured semantic priority: indicator > vane > sensor > body.
     ind = alpha_intersection(alpha, ind_rect)
@@ -148,7 +155,7 @@ def main():
     report = {
         "asset_id": "B01",
         "asset": "weather_complex",
-        "method": "approved anchor -> measured semantic bbox cut-out -> exact indexed PNGs/atlases",
+        "method": "approved anchor -> authored semantic box -> measured bbox validation -> exact indexed PNGs/atlases",
         "derived_input_policy": "never trust existing generated PNGs as rebuild inputs",
         "cell": list(CELL),
         "era_order": ORDER,
