@@ -15,11 +15,19 @@
   },
   "registration": [48, 118],
   "reconstruction_pixel_exact": true,
-  "decision": "Approved E0 anchor already contains complete visible rigid subassemblies. Parts are cut directly from approved runtime art to preserve exact geometry, palette, lighting and projection. Hidden overlap is retained at attachment pixels; no whole-sprite motion is allowed.",
+  "decision": "Approved E0 anchor is decomposed deterministically into rigid physical subassemblies. The rebuilt PNGs round-trip through indexed PNG decoding, reconstruct the approved anchor pixel-exactly, and pass motion plus in-game browser QA without whole-sprite fake motion.",
   "motion_contract": {
     "sensor": "rigid rotation at measured attachment pivot",
     "vane": "wind-reactive rigid rotation/sway at measured mast attachment",
     "indicator": "physical hardware remains rigid; state light/data is code-owned"
   },
-  "next_gate": "commit cutout PNGs, reconstruct in code, render motion/rig QA"
+  "final_qa": {
+    "atlas_rebuild_run_id": 39100143288,
+    "runtime_qa_run_id": 39101045187,
+    "runtime_qa_result": "pass",
+    "visual_review": "pass",
+    "weather_window_mechanic": "two deterministic windows, exactly one choice, no reroll",
+    "status": "ready"
+  },
+  "next_gate": null
 }
