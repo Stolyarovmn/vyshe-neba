@@ -15,17 +15,18 @@ const OUT=path.resolve(__dirname,'../../work/world-streaming');fs.mkdirSync(OUT,
   direct/=n;mirror/=n;
   const altitude=[];for(let era=0;era<6;era++)for(const y of [2400,2600,3000,5000,8400,9000])for(let v=0;v<6;v++)if(Journey.objectKind(y,0,era,v)==='plane')altitude.push({era,y,v});
   Game.profile.base=5;Game.start();Game.rocket.x=0;Game.rocket.y=300;Game.rocket.vx=0;Game.rocket.vy=0;Game.camera.x=0;Game.camera.y=300;Game.camera.zoom=.7;
-  let previousVisible=false,entries=[],maxVisibleJump=0,previousX=null,seenSample=false;
-  for(let i=0;i<=1400;i++){const t=i*.1;Game.camera.x=0;Game.camera.y=300;Game.camera.zoom=.7;Game.rocket.x=0;Game.rocket.y=300;Game.renderAt(t);Game.step(0);const p=Game.objects.find(o=>o.type==='hazard'&&o.kind==='plane'&&o.originX===280&&o.originY===300);let visible=false,x=null;if(p){x=Game.project(p.x,p.y).x;visible=x>=0&&x<=960;}if(seenSample&&visible&&!previousVisible)entries.push(x);if(visible&&previousVisible&&previousX!=null)maxVisibleJump=Math.max(maxVisibleJump,Math.abs(x-previousX));previousVisible=visible;previousX=visible?x:null;seenSample=true;}
+  let previousVisible=false,entries=[],maxVisibleJump=0,previousX=null,seenSample=false,visiblePlanePeak=0;
+  for(let i=0;i<=1400;i++){const t=i*.1;Game.camera.x=0;Game.camera.y=300;Game.camera.zoom=.7;Game.rocket.x=0;Game.rocket.y=300;Game.renderAt(t);Game.step(0);let visiblePlanes=0;for(const o of Game.objects)if(o.type==='hazard'&&o.kind==='plane'){const q=Game.project(o.x,o.y);if(q.x>=0&&q.x<=960&&q.y>=0&&q.y<=600)visiblePlanes++;}visiblePlanePeak=Math.max(visiblePlanePeak,visiblePlanes);const p=Game.objects.find(o=>o.type==='hazard'&&o.kind==='plane'&&o.originX===280&&o.originY===300);let visible=false,x=null;if(p){x=Game.project(p.x,p.y).x;visible=x>=0&&x<=960;}if(seenSample&&visible&&!previousVisible)entries.push(x);if(visible&&previousVisible&&previousX!=null)maxVisibleJump=Math.max(maxVisibleJump,Math.abs(x-previousX));previousVisible=visible;previousX=visible?x:null;seenSample=true;}
   Game.camera.x=0;Game.camera.y=300;Game.camera.zoom=.7;Game.rocket.x=0;Game.rocket.y=300;Game.goto('pause');Game.renderAt(8);
-  return {direct,mirror,altitude,entries,maxVisibleJump,aircraft:AircraftTraffic.qa()};
+  return {direct,mirror,altitude,entries,maxVisibleJump,visiblePlanePeak,aircraft:AircraftTraffic.qa()};
  });
  await page.screenshot({path:path.join(OUT,'ground-flight.png')});
  assert(result.direct>4&&result.mirror>4,`Base/background still repeats across world bands: direct=${result.direct.toFixed(2)} mirror=${result.mirror.toFixed(2)}`);
  assert.deepEqual(result.altitude,[],`Aircraft found above 24 km: ${JSON.stringify(result.altitude.slice(0,8))}`);
+ assert(result.visiblePlanePeak<=5,`Aircraft density too high at 3 km: peak ${result.visiblePlanePeak}`);
  assert(result.entries.length>=2,`Expected repeated aircraft edge entries, got ${JSON.stringify(result.entries)}`);
  assert(result.entries.every(x=>x<120||x>840),`Aircraft popped into visible middle: ${JSON.stringify(result.entries)}`);
  assert(result.maxVisibleJump<30,`Aircraft jumped while visible: ${result.maxVisibleJump}`);
  assert.deepEqual(errors,[]);
- console.log('World streaming QA PASS',JSON.stringify({bandDiff:[result.direct,result.mirror],entries:result.entries,maxVisibleJump:result.maxVisibleJump}));
+ console.log('World streaming QA PASS',JSON.stringify({bandDiff:[result.direct,result.mirror],visiblePlanePeak:result.visiblePlanePeak,entries:result.entries,maxVisibleJump:result.maxVisibleJump}));
 }finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
