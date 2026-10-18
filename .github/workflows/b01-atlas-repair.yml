@@ -47,6 +47,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add \
+            art/gen/placeables/base/weather_complex/parts/part_extraction.json \
             art/gen/placeables/base/weather_complex/parts/atlas_rebuild_qa.json \
             art/gen/placeables/base/weather_complex/parts/e0_1978 \
             art/gen/placeables/base/weather_complex/parts/e1_1986 \
