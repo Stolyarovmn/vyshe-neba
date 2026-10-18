@@ -1,0 +1,603 @@
+{
+  "asset_id": "B01",
+  "asset": "weather_complex",
+  "method": "approved anchor -> authored semantic box -> measured bbox refresh -> exact indexed PNGs/atlases",
+  "derived_input_policy": "never trust existing generated PNGs as rebuild inputs",
+  "cell": [
+    96,
+    122
+  ],
+  "era_order": [
+    "e0_1978",
+    "e1_1986",
+    "e2_1998",
+    "e3_2015",
+    "e4_2035",
+    "e5_2060"
+  ],
+  "bbox_refreshes": [
+    {
+      "era": "e1_1986",
+      "part": "sensor",
+      "before": [
+        36,
+        23,
+        50,
+        40
+      ],
+      "after": [
+        36,
+        23,
+        50,
+        37
+      ]
+    },
+    {
+      "era": "e2_1998",
+      "part": "sensor",
+      "before": [
+        35,
+        39,
+        63,
+        70
+      ],
+      "after": [
+        44,
+        39,
+        63,
+        70
+      ]
+    },
+    {
+      "era": "e2_1998",
+      "part": "vane",
+      "before": [
+        22,
+        43,
+        37,
+        72
+      ],
+      "after": [
+        22,
+        43,
+        44,
+        72
+      ]
+    }
+  ],
+  "eras": {
+    "e0_1978": {
+      "year": 1978,
+      "parts": {
+        "body": {
+          "present": true,
+          "bbox": [
+            18,
+            30,
+            75,
+            118
+          ],
+          "pivot": null,
+          "semantic_box": null,
+          "palette_entries_including_transparent": 33,
+          "art_sha256": "30dc2f0eb5a27857f04507342a05f82006f6839b113cb57ef22203cc95ae08a8",
+          "runtime_sha256": "30dc2f0eb5a27857f04507342a05f82006f6839b113cb57ef22203cc95ae08a8"
+        },
+        "sensor": {
+          "present": true,
+          "bbox": [
+            25,
+            17,
+            56,
+            30
+          ],
+          "pivot": [
+            42,
+            29
+          ],
+          "semantic_box": [
+            24,
+            14,
+            57,
+            30
+          ],
+          "palette_entries_including_transparent": 24,
+          "art_sha256": "5ce7c3d7670e8d964407d1c6423056a4a47a0cdd5e25650f55244b5fca3b54b7",
+          "runtime_sha256": "5ce7c3d7670e8d964407d1c6423056a4a47a0cdd5e25650f55244b5fca3b54b7"
+        },
+        "vane": {
+          "present": true,
+          "bbox": [
+            47,
+            29,
+            79,
+            45
+          ],
+          "pivot": [
+            48,
+            36
+          ],
+          "semantic_box": [
+            47,
+            28,
+            82,
+            45
+          ],
+          "palette_entries_including_transparent": 27,
+          "art_sha256": "294288a5af3c840514d06e6b74b8960f257a40e150a8ff32758384957cd19c91",
+          "runtime_sha256": "294288a5af3c840514d06e6b74b8960f257a40e150a8ff32758384957cd19c91"
+        },
+        "indicator": {
+          "present": true,
+          "bbox": [
+            56,
+            55,
+            70,
+            78
+          ],
+          "pivot": [
+            57,
+            63
+          ],
+          "semantic_box": [
+            56,
+            53,
+            73,
+            78
+          ],
+          "palette_entries_including_transparent": 25,
+          "art_sha256": "3619383c95970d462dd2887b94fd92fb456a6f7d7b90affc72e94e705c3cab01",
+          "runtime_sha256": "3619383c95970d462dd2887b94fd92fb456a6f7d7b90affc72e94e705c3cab01"
+        }
+      },
+      "rest_reconstruction_pixel_exact": true
+    },
+    "e1_1986": {
+      "year": 1986,
+      "parts": {
+        "body": {
+          "present": true,
+          "bbox": [
+            16,
+            23,
+            79,
+            118
+          ],
+          "pivot": null,
+          "semantic_box": null,
+          "palette_entries_including_transparent": 31,
+          "art_sha256": "ed00b026096d0f098adcf5f5cb9645863908b55e7c62515bd7f41785a0a068ec",
+          "runtime_sha256": "ed00b026096d0f098adcf5f5cb9645863908b55e7c62515bd7f41785a0a068ec"
+        },
+        "sensor": {
+          "present": true,
+          "bbox": [
+            36,
+            23,
+            50,
+            37
+          ],
+          "pivot": [
+            43,
+            39
+          ],
+          "semantic_box": [
+            30,
+            19,
+            50,
+            40
+          ],
+          "palette_entries_including_transparent": 18,
+          "art_sha256": "f69b69eea5b580d961c434692feb43252e4a12120584aa57373b86b467957fdb",
+          "runtime_sha256": "f69b69eea5b580d961c434692feb43252e4a12120584aa57373b86b467957fdb"
+        },
+        "vane": {
+          "present": true,
+          "bbox": [
+            19,
+            37,
+            81,
+            53
+          ],
+          "pivot": [
+            43,
+            48
+          ],
+          "semantic_box": [
+            19,
+            37,
+            82,
+            53
+          ],
+          "palette_entries_including_transparent": 31,
+          "art_sha256": "3ab9612d8c3a18aa4e8ae73121760d72ba07093472e56b51054622f8ded76189",
+          "runtime_sha256": "3ab9612d8c3a18aa4e8ae73121760d72ba07093472e56b51054622f8ded76189"
+        },
+        "indicator": {
+          "present": true,
+          "bbox": [
+            30,
+            62,
+            43,
+            82
+          ],
+          "pivot": [
+            41,
+            72
+          ],
+          "semantic_box": [
+            29,
+            62,
+            43,
+            82
+          ],
+          "palette_entries_including_transparent": 26,
+          "art_sha256": "1ef23276cc917e011de72d239e0cf0ddff183b9e69a79156c055de39eae7a266",
+          "runtime_sha256": "1ef23276cc917e011de72d239e0cf0ddff183b9e69a79156c055de39eae7a266"
+        }
+      },
+      "rest_reconstruction_pixel_exact": true
+    },
+    "e2_1998": {
+      "year": 1998,
+      "parts": {
+        "body": {
+          "present": true,
+          "bbox": [
+            5,
+            44,
+            91,
+            118
+          ],
+          "pivot": null,
+          "semantic_box": null,
+          "palette_entries_including_transparent": 30,
+          "art_sha256": "e007744ba357a4793e0e7e4e1814893fb67463c2fe8e352ae3508e7486a536dd",
+          "runtime_sha256": "e007744ba357a4793e0e7e4e1814893fb67463c2fe8e352ae3508e7486a536dd"
+        },
+        "sensor": {
+          "present": true,
+          "bbox": [
+            44,
+            39,
+            63,
+            70
+          ],
+          "pivot": [
+            48,
+            58
+          ],
+          "semantic_box": [
+            35,
+            36,
+            63,
+            70
+          ],
+          "palette_entries_including_transparent": 25,
+          "art_sha256": "7edc48f0b8a784bb5f115d6ef7a29502e91402c27bf3c1ee94507b9995082c49",
+          "runtime_sha256": "7edc48f0b8a784bb5f115d6ef7a29502e91402c27bf3c1ee94507b9995082c49"
+        },
+        "vane": {
+          "present": true,
+          "bbox": [
+            22,
+            43,
+            44,
+            72
+          ],
+          "pivot": [
+            43,
+            52
+          ],
+          "semantic_box": [
+            22,
+            41,
+            44,
+            72
+          ],
+          "palette_entries_including_transparent": 26,
+          "art_sha256": "4dfe4662a3efc3ea7bc9542bc0acb9b09e78794a1143a9b47340d1f224ba0499",
+          "runtime_sha256": "4dfe4662a3efc3ea7bc9542bc0acb9b09e78794a1143a9b47340d1f224ba0499"
+        },
+        "indicator": {
+          "present": true,
+          "bbox": [
+            47,
+            73,
+            71,
+            95
+          ],
+          "pivot": [
+            49,
+            84
+          ],
+          "semantic_box": [
+            47,
+            73,
+            71,
+            95
+          ],
+          "palette_entries_including_transparent": 27,
+          "art_sha256": "4835b04fe7fd38cafe3fd88195c94a5577aff7f6973281fa566fcb794cb81ce9",
+          "runtime_sha256": "4835b04fe7fd38cafe3fd88195c94a5577aff7f6973281fa566fcb794cb81ce9"
+        }
+      },
+      "rest_reconstruction_pixel_exact": true
+    },
+    "e3_2015": {
+      "year": 2015,
+      "parts": {
+        "body": {
+          "present": true,
+          "bbox": [
+            18,
+            36,
+            79,
+            118
+          ],
+          "pivot": null,
+          "semantic_box": null,
+          "palette_entries_including_transparent": 30,
+          "art_sha256": "fcb7dbc56a35ea57737d290b7a40acc8c2e15c3da9ed6fba8d7829a1730e00ea",
+          "runtime_sha256": "fcb7dbc56a35ea57737d290b7a40acc8c2e15c3da9ed6fba8d7829a1730e00ea"
+        },
+        "sensor": {
+          "present": true,
+          "bbox": [
+            44,
+            37,
+            66,
+            53
+          ],
+          "pivot": [
+            55,
+            52
+          ],
+          "semantic_box": [
+            44,
+            37,
+            66,
+            53
+          ],
+          "palette_entries_including_transparent": 20,
+          "art_sha256": "94236fabf7a83ba3eb9de765a79ca3283c273f722ec4dd30a73e3d78fe5059cd",
+          "runtime_sha256": "94236fabf7a83ba3eb9de765a79ca3283c273f722ec4dd30a73e3d78fe5059cd"
+        },
+        "vane": {
+          "present": true,
+          "bbox": [
+            17,
+            18,
+            62,
+            36
+          ],
+          "pivot": [
+            42,
+            31
+          ],
+          "semantic_box": [
+            16,
+            17,
+            71,
+            36
+          ],
+          "palette_entries_including_transparent": 23,
+          "art_sha256": "634254f892857a2927313d372b5285c02033fc09a0ed16d237cabce8578c78b4",
+          "runtime_sha256": "634254f892857a2927313d372b5285c02033fc09a0ed16d237cabce8578c78b4"
+        },
+        "indicator": {
+          "present": true,
+          "bbox": [
+            47,
+            59,
+            58,
+            81
+          ],
+          "pivot": [
+            49,
+            68
+          ],
+          "semantic_box": [
+            47,
+            59,
+            66,
+            81
+          ],
+          "palette_entries_including_transparent": 20,
+          "art_sha256": "15abaa9874e9ee655f381e2c8904a394d980b32ac3692d09779b8b9a399a86ec",
+          "runtime_sha256": "15abaa9874e9ee655f381e2c8904a394d980b32ac3692d09779b8b9a399a86ec"
+        }
+      },
+      "rest_reconstruction_pixel_exact": true
+    },
+    "e4_2035": {
+      "year": 2035,
+      "parts": {
+        "body": {
+          "present": true,
+          "bbox": [
+            16,
+            41,
+            79,
+            118
+          ],
+          "pivot": null,
+          "semantic_box": null,
+          "palette_entries_including_transparent": 32,
+          "art_sha256": "a4ab70a7a40b54368f37fed581eb24bd6a711d5b77ad1edb2cadce4f02630c28",
+          "runtime_sha256": "a4ab70a7a40b54368f37fed581eb24bd6a711d5b77ad1edb2cadce4f02630c28"
+        },
+        "sensor": {
+          "present": true,
+          "bbox": [
+            35,
+            42,
+            57,
+            61
+          ],
+          "pivot": [
+            44,
+            58
+          ],
+          "semantic_box": [
+            29,
+            38,
+            57,
+            61
+          ],
+          "palette_entries_including_transparent": 29,
+          "art_sha256": "7442087bf62433b8ed8d416e049f25ab1b6d44737bad1684de33ce6b3c8b3bba",
+          "runtime_sha256": "7442087bf62433b8ed8d416e049f25ab1b6d44737bad1684de33ce6b3c8b3bba"
+        },
+        "vane": {
+          "present": false,
+          "bbox": null,
+          "pivot": null,
+          "semantic_box": null,
+          "palette_entries_including_transparent": 1,
+          "art_sha256": "215f8b05a4f9301c3232285a08abbf7389f11324a991c822105f6bbd98333035",
+          "runtime_sha256": "215f8b05a4f9301c3232285a08abbf7389f11324a991c822105f6bbd98333035"
+        },
+        "indicator": {
+          "present": true,
+          "bbox": [
+            47,
+            63,
+            69,
+            83
+          ],
+          "pivot": [
+            49,
+            74
+          ],
+          "semantic_box": [
+            47,
+            63,
+            69,
+            83
+          ],
+          "palette_entries_including_transparent": 23,
+          "art_sha256": "9cb7210cf57da1710f9356e60e34a5e14b59ec594094aa42e7540c3b0b279aea",
+          "runtime_sha256": "9cb7210cf57da1710f9356e60e34a5e14b59ec594094aa42e7540c3b0b279aea"
+        }
+      },
+      "rest_reconstruction_pixel_exact": true
+    },
+    "e5_2060": {
+      "year": 2060,
+      "parts": {
+        "body": {
+          "present": true,
+          "bbox": [
+            6,
+            30,
+            89,
+            118
+          ],
+          "pivot": null,
+          "semantic_box": null,
+          "palette_entries_including_transparent": 29,
+          "art_sha256": "7c10900e9ff9c2b9b43e0d5f04ac6013d498042eb71244e329860c226d8faf5a",
+          "runtime_sha256": "7c10900e9ff9c2b9b43e0d5f04ac6013d498042eb71244e329860c226d8faf5a"
+        },
+        "sensor": {
+          "present": true,
+          "bbox": [
+            18,
+            24,
+            59,
+            52
+          ],
+          "pivot": [
+            43,
+            49
+          ],
+          "semantic_box": [
+            18,
+            24,
+            59,
+            52
+          ],
+          "palette_entries_including_transparent": 30,
+          "art_sha256": "8dfe2fb1b5542dfc8eef4ed0d56cb14af4db23f80a33111938f8af647fe33fad",
+          "runtime_sha256": "8dfe2fb1b5542dfc8eef4ed0d56cb14af4db23f80a33111938f8af647fe33fad"
+        },
+        "vane": {
+          "present": false,
+          "bbox": null,
+          "pivot": null,
+          "semantic_box": null,
+          "palette_entries_including_transparent": 1,
+          "art_sha256": "215f8b05a4f9301c3232285a08abbf7389f11324a991c822105f6bbd98333035",
+          "runtime_sha256": "215f8b05a4f9301c3232285a08abbf7389f11324a991c822105f6bbd98333035"
+        },
+        "indicator": {
+          "present": true,
+          "bbox": [
+            48,
+            62,
+            69,
+            84
+          ],
+          "pivot": [
+            50,
+            73
+          ],
+          "semantic_box": [
+            48,
+            62,
+            69,
+            84
+          ],
+          "palette_entries_including_transparent": 27,
+          "art_sha256": "434833f5481169273a98a7cdc71398bb90626726a3f49f204df1ea1f5e697884",
+          "runtime_sha256": "434833f5481169273a98a7cdc71398bb90626726a3f49f204df1ea1f5e697884"
+        }
+      },
+      "rest_reconstruction_pixel_exact": true
+    }
+  },
+  "atlases": {
+    "body": {
+      "size": [
+        288,
+        244
+      ],
+      "palette_entries_including_transparent": 178,
+      "art_sha256": "0af476b24892ea26eccfa29f7209d4ee382c2d93ee3ad0fa7dfe8ee1a93d752a",
+      "runtime_sha256": "0af476b24892ea26eccfa29f7209d4ee382c2d93ee3ad0fa7dfe8ee1a93d752a",
+      "decoded_rgba_pixel_exact": true
+    },
+    "sensor": {
+      "size": [
+        288,
+        244
+      ],
+      "palette_entries_including_transparent": 139,
+      "art_sha256": "4cb52f7e545446bfc73700bb2c857247f0d69e2864f55e76fe0e31ca3cd7f713",
+      "runtime_sha256": "4cb52f7e545446bfc73700bb2c857247f0d69e2864f55e76fe0e31ca3cd7f713",
+      "decoded_rgba_pixel_exact": true
+    },
+    "vane": {
+      "size": [
+        288,
+        244
+      ],
+      "palette_entries_including_transparent": 103,
+      "art_sha256": "7c609e6bb336de0bb379101cdc843b93032f1c00abc9474ac925aee04d5694c4",
+      "runtime_sha256": "7c609e6bb336de0bb379101cdc843b93032f1c00abc9474ac925aee04d5694c4",
+      "decoded_rgba_pixel_exact": true
+    },
+    "indicator": {
+      "size": [
+        288,
+        244
+      ],
+      "palette_entries_including_transparent": 141,
+      "art_sha256": "6ba51db9f01092385246515fe51507d18c09960e71c1c21003e2167449dcfd59",
+      "runtime_sha256": "6ba51db9f01092385246515fe51507d18c09960e71c1c21003e2167449dcfd59",
+      "decoded_rgba_pixel_exact": true
+    }
+  },
+  "result": "pass"
+}
