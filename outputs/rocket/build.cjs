@@ -9,7 +9,7 @@ let html=fs.readFileSync(path.join(dist,'index.html'),'utf8');
 html=html.replace('<link rel="stylesheet" href="style.css">',()=>'<style>'+fs.readFileSync(path.join(dist,'style.css'),'utf8')+'</style>');
 
 const assets={};
-const mime={'.png':'image/png','.json':'application/json','.zip':'application/zip'};
+const mime={'.png':'image/png','.webp':'image/webp','.json':'application/json','.zip':'application/zip'};
 function embedFile(abs,logical){
   const ext=path.extname(abs).toLowerCase();
   if(!mime[ext])throw new Error(`Unsupported runtime asset extension: ${abs}`);
@@ -44,14 +44,18 @@ const jsSources={
   'aircraft-runtime.js':path.join(repo,'live','aircraft.js'),
   'world-sprites.js':path.join(repo,'live','world-sprites.js'),
   'world-art.js':path.join(dist,'world-art.js'),
+  'island-world.js':path.join(dist,'island-world.js'),
   'content.js':path.join(dist,'content.js'),
   'audio.js':path.join(dist,'audio.js'),
   'vehicle-art.js':path.join(dist,'vehicle-art.js'),
+  'portrait-pre.js':path.join(dist,'portrait-pre.js'),
   '../../../live/mobile-ux.js':path.join(repo,'live','mobile-ux.js'),
   'game.js':path.join(dist,'game.js'),
   'weather-complex-rig.js':path.join(dist,'weather-complex-rig.js'),
   'weather-complex-runtime.js':path.join(dist,'weather-complex-runtime.js'),
   'infrastructure.js':path.join(dist,'infrastructure.js'),
+  'island-layout.js':path.join(dist,'island-layout.js'),
+  'portrait-mode.js':path.join(dist,'portrait-mode.js'),
   'weather-complex-window.js':path.join(dist,'weather-complex-window.js')
 };
 for(const [logical,source] of Object.entries(jsSources)){
