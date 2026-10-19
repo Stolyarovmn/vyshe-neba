@@ -8,6 +8,7 @@ const ISLAND={left:-448,top:335,width:1440,height:602,padX:0,padY:0,right:992,bo
 const WATER={top:130,bottom:-360};
 const image=new Image();
 image.src=(root.__GAME_ASSETS__?.['environment/start_island/start-island.webp'])||'assets/environment/start_island/start-island.webp';
+const stats={draws:0,culls:0};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const mix=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t));
 const rgb=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
@@ -22,7 +23,6 @@ function drawOcean(ctx,cam,r){
  const z=cam.zoom||1,qTop=project(0,WATER.top,cam),qBottom=project(0,WATER.bottom,cam),y0=Math.max(0,Math.min(H,qTop.y)),y1=Math.max(0,Math.min(H,qBottom.y));
  if(y1<=y0)return;
  const p=waterPalette(r.weather||root.Game?.weather);
- // Rasterize colour from world-Y, not a screen-space CanvasGradient. A camera shift then samples the exact same world pixels.
  const start=Math.floor(y0/3)*3;for(let sy=start;sy<y1;sy+=3){let wy=cam.y+(468-sy)/z,u=clamp((WATER.top-wy)/(WATER.top-WATER.bottom),0,1);ctx.fillStyle=rgb(mix(p.top,p.deep,u));ctx.fillRect(0,sy,W,3);}
  const t=Number(r.time||0),wind=Number((r.weather||root.Game?.weather)?.wind||0);ctx.save();ctx.globalAlpha=.14+.18*p.rough;ctx.lineWidth=1;
  for(let row=0;row<18;row++){
@@ -33,10 +33,10 @@ function drawOcean(ctx,cam,r){
  ctx.restore();
 }
 function drawIsland(ctx,cam){
- if(!image.complete||!image.naturalWidth)return;
+ if(!image.complete||!image.naturalWidth)return false;
  const z=cam.zoom||1,left=cam.x-528/z,right=cam.x+432/z,bottom=cam.y-132/z,top=cam.y+468/z;
- if(right<ISLAND.left||left>ISLAND.right||top<ISLAND.bottom||bottom>ISLAND.top)return;
- const q=project(ISLAND.left,ISLAND.top,cam);ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(image,q.x,q.y,ISLAND.width*z,ISLAND.height*z);ctx.restore();
+ if(right<ISLAND.left||left>ISLAND.right||top<ISLAND.bottom||bottom>ISLAND.top){stats.culls++;return false;}
+ const q=project(ISLAND.left,ISLAND.top,cam);ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(image,q.x,q.y,ISLAND.width*z,ISLAND.height*z);ctx.restore();stats.draws++;return true;
 }
 function withoutBakedBase(ctx,cam,r,p,art){
  const ws=root.WorldSprites,oldSprite=ws?.sprite;
@@ -49,5 +49,5 @@ root.WorldArt.draw=function(ctx,cam,r,p,art){
  drawOcean(ctx,cam,r);
  drawIsland(ctx,cam);
 };
-root.WorldIsland={installed:true,bounds:{...ISLAND},water:{...WATER},image,waterPalette};
+root.WorldIsland={installed:true,bounds:{...ISLAND},water:{...WATER},image,waterPalette,stats,resetStats(){stats.draws=0;stats.culls=0;}};
 })(window);
