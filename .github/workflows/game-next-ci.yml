@@ -1,0 +1,63 @@
+name: Next game build and tests
+
+on:
+  pull_request:
+    paths:
+      - 'game/**'
+      - 'art/placeables/BASE_ISLAND_LAYOUT.json'
+      - 'live/world-assets.js'
+      - '.github/workflows/game-next-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'game/**'
+      - '.github/workflows/game-next-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  next-game:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install build and browser QA tools
+        run: |
+          npm install --no-save --ignore-scripts esbuild@0.25.10 playwright@1.62.1
+          node node_modules/esbuild/install.js
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROMIUM_EXECUTABLE_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          elif command -v chromium >/dev/null 2>&1; then
+            echo "CHROMIUM_EXECUTABLE_PATH=$(command -v chromium)" >> "$GITHUB_ENV"
+          else
+            echo 'No system Chrome/Chromium found.' >&2
+            exit 1
+          fi
+          echo 'CHROMIUM_ARGS=["--no-sandbox","--disable-dev-shm-usage"]' >> "$GITHUB_ENV"
+
+      - name: Unit tests (simulation, data, rules, economy, UI logic)
+        run: node --test "game/test/**/*.test.mjs"
+
+      - name: Build standalone game
+        run: npm run game:build
+
+      - name: Browser tests (portrait and landscape)
+        run: node game/test/browser.cjs
+
+      - name: Upload build and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-game-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            game/dist/vyshe-neba.html
+            game/dist/vyshe-neba.html.sha256
+            work/**
