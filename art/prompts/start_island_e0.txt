@@ -1,0 +1,18 @@
+START_ISLAND_E0 / environment
+Create ONE large finite starter-island environment asset, and nothing else.
+Low side / slight 3/4 side gameplay camera matching the rocket flight scene, not top-down and not map/isometric.
+The island must be broad enough for all future base placeables B01-B07, with several naturally connected flat buildable terraces and access paths.
+Only the starter launch table / launch pad is allowed as built infrastructure. No rocket. No hangars, tanks, radar, antennas, warehouses, cranes, docks, vehicles, people, text, UI, diagrams or multiple views.
+The physical island contains rocky shoreline, cliffs, sand coves, sparse conifers/low vegetation, dirt/service paths and intentionally empty construction clearings.
+No ocean background, no sky, no distant mountains, no clouds. Transparent background outside the physical island silhouette.
+Complete uncropped silhouette with padding. One island only.
+One consistent key light comes from the upper-left, with warm light on upper-left planes and cool blue-gray shadow on lower-right planes; use no baked cast shadow.
+
+VYSHE NEBA — CANONICAL STYLE BIBLE
+Style family: cohesive HD pixel-art / pixel-look game art with deliberate pixel clusters, clear silhouettes, restrained detail and a finished indie-game presentation. It must look designed, not like a filtered 3D render or generic AI illustration.
+Shape language: large readable masses first, functional construction second, sparse small accents last. Silhouettes must remain legible at actual gameplay size and when reduced by the camera.
+Shading: stepped pixel shading is the default. Use a small, intentional tonal ramp per material. No pillow shading and no soft airbrushed volume on solid small sprites.
+Palette temperature: shadows are cool dark blue-gray; lit neutrals are warm off-white/metal; saturated reds, golds and cyans are accents.
+Line: prefer dark chromatic selective outlines instead of pure black.
+Texture: intentional pixel clusters, stepped diagonals and broad quiet regions. Avoid random single-pixel noise.
+Detail hierarchy: keep most of the surface calm. Concentrate detail around functional mechanisms, focal points, material changes and attachment areas.
