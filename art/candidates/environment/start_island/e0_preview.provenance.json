@@ -1,0 +1,23 @@
+{
+  "asset_id": "ENV_START_ISLAND",
+  "asset": "start_island",
+  "era": "E0",
+  "source_gen_id": "ce5cf549-d912-4c31-9b50-3b70c2111b95",
+  "source_size": [1916, 821],
+  "source_sha256": "0fc1d53e1cca7fe190c0268e7622f15deb4a3a4dd2361209555ac705479259c6",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "109IFUuj4paHf6Chdbj-5ABRoyLmDj8mw",
+    "drive_url": "https://drive.google.com/file/d/109IFUuj4paHf6Chdbj-5ABRoyLmDj8mw/view?usp=drivesdk",
+    "original_filename": "start_island_E0_ce5cf549-d912-4c31-9b50-3b70c2111b95.png"
+  },
+  "prompt_file": "art/prompts/start_island_e0.txt",
+  "candidate": {
+    "path": "art/candidates/environment/start_island/e0_preview.png",
+    "size": [480, 206],
+    "sha256": "bd2074e0df9ef3dbe5b0395517cd72f99f09a733f32fa677249afe4445d38e2f",
+    "processing": "nearest-neighbor preview resize + 32-color no-dither quantization",
+    "status": "preview_only",
+    "note": "Not promoted to art/gen. Must pass canonical processing and hash-bound visual review before production promotion."
+  }
+}
