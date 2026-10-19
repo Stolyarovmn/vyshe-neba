@@ -22,7 +22,7 @@ if(nativeMatchMedia){
 }
 const style=document.createElement('style');
 style.textContent=`
-#portraitHud,#portraitFlightPad{display:none}
+#portraitHud,#portraitFlightPad,#portraitPause{display:none}
 @media (orientation:portrait) and (pointer:coarse){
  #game.portrait-flight{
   width:100vw!important;height:100dvh!important;max-width:none!important;aspect-ratio:auto!important;
@@ -34,7 +34,12 @@ style.textContent=`
   object-fit:cover!important;object-position:50% 50%!important;pointer-events:none!important;
  }
  #game.portrait-flight #fullscreenToggle{left:auto!important;right:12px!important;top:12px!important;z-index:30!important}
- #game.portrait-flight #touch{display:flex!important;right:12px!important;bottom:18px!important;z-index:30!important}
+ #game.portrait-flight #touch{display:flex!important;left:12px!important;right:auto!important;bottom:18px!important;z-index:30!important}
+ #game.portrait-flight #portraitPause{
+  display:grid!important;place-items:center;position:absolute;z-index:40;right:12px;bottom:12px;
+  width:46px;height:46px;border:1px solid #8fb3bd55;border-radius:11px;background:#102735e8;color:#efc263;
+  font:700 23px/1 "Segoe UI",Arial,sans-serif;pointer-events:auto;touch-action:manipulation;
+ }
  #game.portrait-flight #portraitHud{
   display:grid!important;position:absolute;z-index:30;left:12px;right:64px;top:12px;
   grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;pointer-events:none;
@@ -59,7 +64,10 @@ const hud=document.createElement('div');hud.id='portraitHud';
 hud.innerHTML='<div class="pstat">Высота<b data-p="alt">0 м</b></div><div class="pstat">Скорость<b data-p="speed">0 м/с</b></div><div class="pstat">Топливо<b data-p="fuel">100%</b></div><div class="pstat">Монеты<b data-p="coins">0</b></div>';
 game.appendChild(hud);
 const pad=document.createElement('div');pad.id='portraitFlightPad';pad.setAttribute('aria-label','Тяга и наклон ракеты');game.appendChild(pad);
+const pause=document.createElement('button');pause.id='portraitPause';pause.type='button';pause.setAttribute('aria-label','Пауза');pause.textContent='Ⅱ';game.appendChild(pause);
 const fire=(type,code)=>root.dispatchEvent(new KeyboardEvent(type,{code,bubbles:true}));
+pause.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();});
+pause.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fire('keydown','KeyP');fire('keyup','KeyP');});
 let activePointer=null,startX=0,left=false,right=false,thrust=false;
 function key(code,on){
  if(code==='ArrowLeft'){if(left===on)return;left=on;}
