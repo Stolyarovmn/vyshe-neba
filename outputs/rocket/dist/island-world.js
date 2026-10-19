@@ -21,13 +21,15 @@ function waterPalette(weather){
 function drawOcean(ctx,cam,r){
  const z=cam.zoom||1,qTop=project(0,WATER.top,cam),qBottom=project(0,WATER.bottom,cam),y0=Math.max(0,Math.min(H,qTop.y)),y1=Math.max(0,Math.min(H,qBottom.y));
  if(y1<=y0)return;
- const p=waterPalette(r.weather||root.Game?.weather),g=ctx.createLinearGradient(0,y0,0,y1);g.addColorStop(0,rgb(p.top));g.addColorStop(1,rgb(p.deep));ctx.fillStyle=g;ctx.fillRect(0,y0,W,y1-y0);
+ const p=waterPalette(r.weather||root.Game?.weather);
+ // Rasterize colour from world-Y, not a screen-space CanvasGradient. A camera shift then samples the exact same world pixels.
+ const start=Math.floor(y0/3)*3;for(let sy=start;sy<y1;sy+=3){let wy=cam.y+(468-sy)/z,u=clamp((WATER.top-wy)/(WATER.top-WATER.bottom),0,1);ctx.fillStyle=rgb(mix(p.top,p.deep,u));ctx.fillRect(0,sy,W,3);}
  const t=Number(r.time||0),wind=Number((r.weather||root.Game?.weather)?.wind||0);ctx.save();ctx.globalAlpha=.14+.18*p.rough;ctx.lineWidth=1;
  for(let row=0;row<18;row++){
   const wy=WATER.top-row*28,sy=project(0,wy,cam).y;if(sy<y0||sy>y1)continue;const spacing=70-row*1.5,shift=(t*(9+row*.7)+wind*3+row*31)%spacing;ctx.strokeStyle=row<5?'#b9e4e7':'#83c5d5';
   for(let x=-80+shift;x<W+80;x+=spacing){const len=16+((row*13)%22)*p.rough;ctx.beginPath();ctx.moveTo(x,sy);ctx.lineTo(x+len,sy+Math.sin(t*1.2+row)*1.2);ctx.stroke();}
  }
- if(p.shine>.05){ctx.globalAlpha=p.shine*.22;ctx.fillStyle='#f4cf8d';for(let i=0;i<8;i++){let yy=y0+28+i*17,ww=70-i*5;ctx.fillRect(480-ww/2+Math.sin(t+i)*8,yy,ww,1);}}
+ if(p.shine>.05){ctx.globalAlpha=p.shine*.22;ctx.fillStyle='#f4cf8d';for(let i=0;i<8;i++){let wy=WATER.top-28-i*17,yy=project(0,wy,cam).y,ww=70-i*5;ctx.fillRect(480-ww/2+Math.sin(t+i)*8,yy,ww,1);}}
  ctx.restore();
 }
 function drawIsland(ctx,cam){
