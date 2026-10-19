@@ -1,39 +1,57 @@
-/* Единая длинная карта: меняется окно камеры, а не прозрачность сцен. */
+/* Единая длинная карта: sky/landscape/base — независимые слои в мировых координатах. */
 (function(root){
 'use strict';
-const TOP=6400,BOTTOM=-132,WIDTH=1600,LEFT=-800,BASE_FLOOR=600,BASE_LEFT=150,BASE_FADE=260;
+const TOP=6400,BOTTOM=-132,WIDTH=1600,LEFT=-800,BASE_FLOOR=600,BASE_WORLD_LEFT=-640,BASE_WIDTH=1280,BASE_EDGE=150;
 const hash=(x,y)=>{let n=Math.imul(x^73471,y^19283);n=Math.imul(n^(n>>>16),2246822519);return ((n^(n>>>13))>>>0)/4294967296;};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const baseFadeAt=(x)=>clamp(Math.min((x-LEFT)/BASE_FADE,(LEFT+WIDTH-x)/BASE_FADE),0,1);
+const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
+const baseVisibilityAt=(x)=>smooth(BASE_WORLD_LEFT,BASE_WORLD_LEFT+BASE_EDGE,x)*smooth(BASE_WORLD_LEFT+BASE_WIDTH,BASE_WORLD_LEFT+BASE_WIDTH-BASE_EDGE,x);
 let atlas=null,baseLayer=null,baseLayerEra=-1;
 function earthAtlas(art){
  if(!art.routeSky?.naturalWidth)return null;
  if(atlas)return atlas;
  atlas=document.createElement('canvas');atlas.width=WIDTH;atlas.height=TOP-BOTTOM;
- let c=atlas.getContext('2d');c.imageSmoothingEnabled=false;
+ const c=atlas.getContext('2d');c.imageSmoothingEnabled=false;
  c.drawImage(art.routeSky,0,0,WIDTH,TOP+100);
- let cap=c.createLinearGradient(0,0,0,180);cap.addColorStop(0,'#030818');cap.addColorStop(1,'#03081800');c.fillStyle=cap;c.fillRect(0,0,WIDTH,180);
+ const cap=c.createLinearGradient(0,0,0,180);cap.addColorStop(0,'#030818');cap.addColorStop(1,'#03081800');c.fillStyle=cap;c.fillRect(0,0,WIDTH,180);
  return atlas;
+}
+function isolateBaseScenery(tile){
+ const c=tile.getContext('2d'),w=tile.width,h=tile.height,img=c.getImageData(0,0,w,h),d=img.data,scanH=Math.min(460,h-4),win=31;
+ const texture=new Float32Array(w*scanH),raw=new Float32Array(w),tmp=new Float32Array(w),skyline=new Float32Array(w);
+ const px=(x,y)=>((y*w+x)<<2);
+ for(let y=4;y<scanH-4;y++)for(let x=0;x<w;x++){
+  const xr=Math.min(w-1,x+3),i=px(x,y),ix=px(xr,y),iy=px(x,y+3);
+  let dx=0,dy=0;for(let k=0;k<3;k++){dx+=Math.abs(d[i+k]-d[ix+k]);dy+=Math.abs(d[i+k]-d[iy+k]);}
+  texture[y*w+x]=(dx+dy)/6;
+ }
+ for(let x=0;x<w;x++){
+  let sum=0;for(let y=40;y<40+win;y++)sum+=texture[y*w+x];
+  let boundary=320;
+  for(let y=40;y<Math.min(430,scanH-win);y++){
+   if(sum/win>10){boundary=y;break;}
+   sum+=texture[(y+win)*w+x]-texture[y*w+x];
+  }
+  raw[x]=boundary;
+ }
+ // Two broad horizontal passes suppress single-column spikes while keeping towers/mountain peaks.
+ for(let x=0;x<w;x++){let s=0,n=0;for(let k=-10;k<=10;k++){const q=x+k;if(q>=0&&q<w){s+=raw[q];n++;}}tmp[x]=s/n;}
+ for(let x=0;x<w;x++){let s=0,n=0;for(let k=-8;k<=8;k++){const q=x+k;if(q>=0&&q<w){s+=tmp[q];n++;}}skyline[x]=s/n;}
+ for(let x=0;x<w;x++){
+  const edge=smooth(0,BASE_EDGE,x)*smooth(w,w-BASE_EDGE,x),b=skyline[x],y0=b-18,y1=b+18;
+  for(let y=0;y<h;y++){
+   const a=edge*smooth(y0,y1,y),i=px(x,y);d[i+3]=Math.round(d[i+3]*a);
+  }
+ }
+ c.clearRect(0,0,w,h);c.putImageData(img,0,0);return tile;
 }
 function earthBase(art,era){
  if(!art.base?.naturalWidth)return null;
  if(baseLayer&&baseLayerEra===era)return baseLayer;
- baseLayer=document.createElement('canvas');baseLayer.width=WIDTH;baseLayer.height=800;
- let c=baseLayer.getContext('2d');c.imageSmoothingEnabled=false;
- let tile=document.createElement('canvas');tile.width=1280;tile.height=800;
- let b=tile.getContext('2d'),cw=art.base.naturalWidth/3,ch=art.base.naturalHeight/2;
- b.imageSmoothingEnabled=false;b.drawImage(art.base,era%3*cw+2,Math.floor(era/3)*ch+2,cw-4,ch-4,0,0,1280,800);
- b.globalCompositeOperation='destination-in';let g=b.createLinearGradient(0,0,0,145);g.addColorStop(0,'transparent');g.addColorStop(1,'#fff');b.fillStyle=g;b.fillRect(0,0,1280,800);
- c.drawImage(tile,BASE_LEFT,0);
- c.save();c.translate(BASE_LEFT,0);c.scale(-1,1);c.drawImage(tile,0,0,BASE_LEFT,800,0,0,BASE_LEFT,800);c.restore();
- let right=WIDTH-BASE_LEFT-1280;c.save();c.translate(WIDTH,0);c.scale(-1,1);c.drawImage(tile,1280-right,0,right,800,0,0,right,800);c.restore();
- // The base is a unique world location. Fade its scenery to the route sky over a
- // broad horizontal margin instead of exposing a hard rectangular texture edge or
- // stretching a few source columns into visible smears during horizontal travel.
- c.globalCompositeOperation='destination-in';
- const edgeFade=c.createLinearGradient(0,0,WIDTH,0),f=BASE_FADE/WIDTH;
- edgeFade.addColorStop(0,'rgba(255,255,255,0)');edgeFade.addColorStop(f,'rgba(255,255,255,1)');edgeFade.addColorStop(1-f,'rgba(255,255,255,1)');edgeFade.addColorStop(1,'rgba(255,255,255,0)');
- c.fillStyle=edgeFade;c.fillRect(0,0,WIDTH,800);c.globalCompositeOperation='source-over';
+ baseLayer=document.createElement('canvas');baseLayer.width=BASE_WIDTH;baseLayer.height=800;
+ const c=baseLayer.getContext('2d'),cw=art.base.naturalWidth/3,ch=art.base.naturalHeight/2;c.imageSmoothingEnabled=false;
+ c.drawImage(art.base,era%3*cw+2,Math.floor(era/3)*ch+2,cw-4,ch-4,0,0,BASE_WIDTH,800);
+ isolateBaseScenery(baseLayer);
  baseLayerEra=era;return baseLayer;
 }
 function color(y){let stops=[[0,[44,171,222]],[2000,[16,79,162]],[4500,[5,22,73]],[6400,[3,8,24]],[18000,[3,8,24]]],i=0;while(i<stops.length-2&&y>stops[i+1][0])i++;let a=stops[i],b=stops[i+1],t=clamp((y-a[0])/(b[0]-a[0]),0,1);return a[1].map((v,j)=>Math.round(v+(b[1][j]-v)*t));}
@@ -53,13 +71,18 @@ function draw(ctx,cam,r,p,art){
     ctx.drawImage(map,0,0,map.width,map.height,0,0,WIDTH*z,map.height*z);ctx.restore();
    }
   }
-  let base=earthBase(art,p.base||0);if(base){let q=project(LEFT,BASE_FLOOR);ctx.drawImage(base,q.x,q.y,WIDTH*z,base.height*z);}
+  // Warm local horizon light is code-owned atmosphere, not a finite sky rectangle.
+  if(right>BASE_WORLD_LEFT-500&&left<BASE_WORLD_LEFT+BASE_WIDTH+500){
+   const q=project(BASE_WORLD_LEFT+BASE_WIDTH*.5,360),rr=760*z;ctx.save();ctx.translate(q.x,q.y);ctx.scale(1,.42);
+   const haze=ctx.createRadialGradient(0,0,0,0,0,rr);haze.addColorStop(0,'rgba(255,137,96,.18)');haze.addColorStop(.45,'rgba(238,102,105,.09)');haze.addColorStop(1,'rgba(238,102,105,0)');ctx.fillStyle=haze;ctx.fillRect(-rr,-rr,rr*2,rr*2);ctx.restore();
+  }
+  let base=earthBase(art,p.base||0);if(base&&right>BASE_WORLD_LEFT&&left<BASE_WORLD_LEFT+BASE_WIDTH){let q=project(BASE_WORLD_LEFT,BASE_FLOOR);ctx.drawImage(base,q.x,q.y,BASE_WIDTH*z,base.height*z);}
   let floor=project(0,BOTTOM+2).y;if(floor<600){rect(0,floor,960,600-floor,'#28332d');for(let row=Math.floor((BOTTOM-bottom)/18);row>=0;row--)for(let col=Math.floor(left/24);col<=Math.ceil(right/24);col++){let q=project(col*24,BOTTOM-row*18);rect(q.x,q.y,12*z,3*z,hash(col,row)>.5?'#41473b':'#1d2927');}}
-  // Stars follow the opaque atmosphere layer, but precede physical celestial bodies.
+  // Base emitters share the exact finite world footprint of the isolated base layer.
   const baseRig=root.WorldSprites?.manifest.base;
-  if(baseRig&&top>-132&&bottom<600&&right>LEFT&&left<LEFT+WIDTH){
+  if(baseRig&&top>-132&&bottom<600&&right>BASE_WORLD_LEFT&&left<BASE_WORLD_LEFT+BASE_WIDTH){
    const rig=baseRig.eras[p.base||0],cw=baseRig.size[0]/3,ch=baseRig.size[1]/2,t=r.time||0;
-   const point=(u,v)=>{const ax=BASE_LEFT+(u-2)*1280/(cw-4),wx=LEFT+ax,wy=600-(v-2)*800/(ch-4);return {...project(wx,wy),fade:baseFadeAt(wx)};};
+   const point=(u,v)=>{const wx=BASE_WORLD_LEFT+(u-2)*BASE_WIDTH/(cw-4),wy=600-(v-2)*800/(ch-4);return {...project(wx,wy),fade:baseVisibilityAt(wx)};};
    for(const [kind,list]of [['lamp',rig.lamps],['beacon',rig.beacons]])for(const [i,a]of list.entries()){
     const q=point(a.x,a.y),on=(kind==='lamp'?.85+.15*Math.sin(t*1.3+i):((t+i*.19)%1.32<.18?1:0))*q.fade;
     if(!on)continue;ctx.save();ctx.globalAlpha=on;const radius=(kind==='lamp'?12:5)*z,g=ctx.createRadialGradient(q.x,q.y,0,q.x,q.y,radius);
