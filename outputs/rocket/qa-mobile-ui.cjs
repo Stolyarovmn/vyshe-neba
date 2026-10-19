@@ -1,61 +1,10 @@
 const fs=require('node:fs'),path=require('node:path');
 const {pathToFileURL}=require('node:url');
 const {chromium}=require('playwright');
-
-const root=path.resolve(__dirname,'../..');
-const gameFile=process.env.GAME_FILE||path.resolve(__dirname,'../Выше неба.html');
-const out=path.join(root,'work','mobile-ui');
-fs.mkdirSync(out,{recursive:true});
-const assert=(condition,message)=>{if(!condition)throw new Error(message);};
-
-(async()=>{
-  const executablePath=process.env.CHROMIUM_EXECUTABLE_PATH||undefined;
-  const args=process.env.CHROMIUM_ARGS?JSON.parse(process.env.CHROMIUM_ARGS):[];
-  const browser=await chromium.launch({headless:true,executablePath,args});
-  try{
-    const mobile=await browser.newContext({
-      viewport:{width:844,height:390},
-      screen:{width:844,height:390},
-      hasTouch:true,
-      isMobile:true,
-      deviceScaleFactor:2
-    });
-    const page=await mobile.newPage();
-    await page.goto(pathToFileURL(gameFile).href);
-    await page.waitForFunction(()=>window.MobileUX?.installed===true);
-
-    const mobileResult=await page.evaluate(()=>{
-      const metrics=window.MobileUX.metrics();
-      const gameCtx=document.getElementById('canvas').getContext('2d');
-      gameCtx.save();
-      gameCtx.font='600 14px Arial';
-      const gameWidth=gameCtx.measureText('МОБИЛЬНЫЙ ТЕКСТ').width;
-      gameCtx.restore();
-      const probe=document.createElement('canvas').getContext('2d');
-      probe.font='600 14px Arial';
-      const baseWidth=probe.measureText('МОБИЛЬНЫЙ ТЕКСТ').width;
-      return {metrics,textRatio:gameWidth/baseWidth,maxTouchPoints:navigator.maxTouchPoints};
-    });
-    assert(mobileResult.metrics.mobile===true,`phone viewport was not classified as mobile: ${JSON.stringify(mobileResult)}`);
-    assert(mobileResult.metrics.fontScale>=1.20,`mobile font scale too small: ${mobileResult.metrics.fontScale}`);
-    assert(mobileResult.textRatio>=1.18,`game-canvas text was not enlarged enough: ${mobileResult.textRatio}`);
-    assert(mobileResult.metrics.coinScale>=1.30,`mobile coin scale too small: ${mobileResult.metrics.coinScale}`);
-    assert(mobileResult.metrics.rocketScale>=1.08,`rocket visual scale too small: ${mobileResult.metrics.rocketScale}`);
-    await page.screenshot({path:path.join(out,'mobile-home.png'),fullPage:true});
-    await mobile.close();
-
-    const desktop=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:1});
-    const desktopPage=await desktop.newPage();
-    await desktopPage.goto(pathToFileURL(gameFile).href);
-    await desktopPage.waitForFunction(()=>window.MobileUX?.installed===true);
-    const desktopResult=await desktopPage.evaluate(()=>window.MobileUX.metrics());
-    assert(desktopResult.mobile===false,`desktop viewport was incorrectly classified as mobile: ${JSON.stringify(desktopResult)}`);
-    assert(desktopResult.fontScale===1,`desktop font must retain original scale: ${desktopResult.fontScale}`);
-    assert(desktopResult.rocketScale>=1.08,`desktop rocket visual boost missing: ${desktopResult.rocketScale}`);
-    await desktop.close();
-
-    console.log('mobile UI QA PASS',JSON.stringify({mobile:mobileResult,desktop:desktopResult}));
-  }finally{
-    await browser.close();
-  }
-})().catch(error=>{console.error(error);process.exit(1);});
+const root=path.resolve(__dirname,'../..'),gameFile=process.env.GAME_FILE||path.resolve(__dirname,'../Выше неба.html'),out=path.join(root,'work','mobile-ui');fs.mkdirSync(out,{recursive:true});
+const assert=(c,m)=>{if(!c)throw new Error(m);};
+(async()=>{const executablePath=process.env.CHROMIUM_EXECUTABLE_PATH||undefined,args=process.env.CHROMIUM_ARGS?JSON.parse(process.env.CHROMIUM_ARGS):[],browser=await chromium.launch({headless:true,executablePath,args});try{
+ const landscape=await browser.newContext({viewport:{width:844,height:390},screen:{width:844,height:390},hasTouch:true,isMobile:true,deviceScaleFactor:2});const lp=await landscape.newPage();await lp.goto(pathToFileURL(gameFile).href);await lp.waitForFunction(()=>window.MobileUX?.installed===true);const lr=await lp.evaluate(()=>{const metrics=MobileUX.metrics(),c=document.getElementById('canvas').getContext('2d');c.save();c.font='600 14px Arial';const w=c.measureText('МОБИЛЬНЫЙ ТЕКСТ').width;c.restore();const p=document.createElement('canvas').getContext('2d');p.font='600 14px Arial';return{metrics,textRatio:w/p.measureText('МОБИЛЬНЫЙ ТЕКСТ').width};});assert(lr.metrics.mobile,'landscape phone not mobile');assert(lr.metrics.portrait===false,'landscape phone misclassified as portrait');assert(lr.metrics.fontScale>=1.20&&lr.textRatio>=1.18,'mobile text not enlarged');assert(lr.metrics.coinScale>=1.30&&lr.metrics.rocketScale>=1.08,'mobile sprite scale regression');await landscape.close();
+ const portrait=await browser.newContext({viewport:{width:390,height:844},screen:{width:390,height:844},hasTouch:true,isMobile:true,deviceScaleFactor:2});const pp=await portrait.newPage();await pp.goto(pathToFileURL(gameFile).href);await pp.waitForFunction(()=>window.MobileUX?.metrics().portraitCanvas?.[0]===600);await pp.waitForTimeout(120);let pr=await pp.evaluate(()=>({metrics:MobileUX.metrics(),classes:[...document.body.classList],gameTransform:getComputedStyle(document.getElementById('game')).transform,portraitDisplay:getComputedStyle(document.getElementById('portraitCanvas')).display,canvasOpacity:getComputedStyle(document.getElementById('canvas')).opacity}));assert(pr.metrics.portrait===true,`portrait phone not classified: ${JSON.stringify(pr)}`);assert(JSON.stringify(pr.metrics.portraitCanvas)==='[600,960]','portrait canvas dimensions wrong');assert(pr.classes.includes('portrait-game'),'portrait body class missing');assert(pr.portraitDisplay!=='none','portrait canvas hidden');assert(pr.canvasOpacity==='0','landscape source canvas must be hidden in portrait');assert(!String(pr.gameTransform).includes('matrix(0, 1')&&!String(pr.gameTransform).includes('matrix(0,1'),'portrait must not rotate landscape game by 90deg');await pp.screenshot({path:path.join(out,'portrait-home.png'),fullPage:true});
+ await pp.evaluate(()=>Game.start());await pp.waitForFunction(()=>document.body.classList.contains('portrait-flight'));await pp.waitForTimeout(180);pr=await pp.evaluate(()=>{const pc=document.getElementById('portraitCanvas'),b=pc.getBoundingClientRect(),touch=[...document.querySelectorAll('#touch button')].map(x=>{let r=x.getBoundingClientRect();return[r.width,r.height]});return{screen:Game.screen,metrics:MobileUX.metrics(),rect:[b.width,b.height],touch,classes:[...document.body.classList]};});assert(pr.screen==='flight'&&pr.classes.includes('portrait-flight'),'flight portrait mode not active');assert(pr.rect[1]>pr.rect[0]*1.45,`visible portrait surface not vertical: ${pr.rect}`);assert(pr.touch.every(([w,h])=>w>=56&&h>=56),`portrait touch targets too small: ${JSON.stringify(pr.touch)}`);await pp.screenshot({path:path.join(out,'portrait-flight.png'),fullPage:true});await portrait.close();
+ const desktop=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:1});const dp=await desktop.newPage();await dp.goto(pathToFileURL(gameFile).href);await dp.waitForFunction(()=>window.MobileUX?.installed===true);const dr=await dp.evaluate(()=>MobileUX.metrics());assert(dr.mobile===false&&dr.portrait===false,'desktop classified as mobile/portrait');assert(dr.fontScale===1,'desktop font scale changed');await desktop.close();console.log('mobile UI QA PASS',JSON.stringify({landscape:lr,portrait:pr,desktop:dr}));}finally{await browser.close();}})().catch(e=>{console.error(e);process.exit(1);});
