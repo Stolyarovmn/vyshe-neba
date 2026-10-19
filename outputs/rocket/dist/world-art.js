@@ -44,7 +44,7 @@ function waterPalette(weather){
 function drawOcean(ctx,cam,r,project,z){
  const q=project(0,OCEAN_SURFACE_Y),y0=clamp(q.y,0,600);
  if(y0>=600)return;
- const pal=waterPalette(r.weather),t=r.time||0,g=ctx.createLinearGradient(0,y0,0,600);
+ const pal=waterPalette(r.weather||root.Game?.weather),t=r.time||0,g=ctx.createLinearGradient(0,y0,0,600);
  g.addColorStop(0,`rgb(${pal.horizon})`);g.addColorStop(1,`rgb(${pal.deep})`);ctx.fillStyle=g;ctx.fillRect(0,y0,960,600-y0);
  ctx.save();ctx.globalAlpha=.34+.12*Math.min(1,pal.rough/3);ctx.lineWidth=1;
  for(let row=0;row<18;row++){
@@ -78,7 +78,7 @@ function draw(ctx,cam,r,p,art){
    }
   }
   drawOcean(ctx,cam,r,project,z);
-  const island=islandAsset(),islandHeight=ISLAND_WORLD_WIDTH*(island.naturalHeight||138)/(island.naturalWidth||320);
+  const island=islandAsset(),islandHeight=ISLAND_WORLD_WIDTH*(island.naturalHeight||166)/(island.naturalWidth||384);
   if(island.complete&&island.naturalWidth&&right>ISLAND_WORLD_LEFT&&left<ISLAND_WORLD_LEFT+ISLAND_WORLD_WIDTH){
    const q=project(ISLAND_WORLD_LEFT,ISLAND_WORLD_TOP);
    ctx.drawImage(island,q.x,q.y,ISLAND_WORLD_WIDTH*z,islandHeight*z);
