@@ -1,0 +1,1 @@
+Runtime island binary is stored at art/gen/environment/start_island_e0.png and generated from source gen f65729dd-9a79-40fb-94e3-a093bbef7221. This note exists only to make the lineage visible in text review.
