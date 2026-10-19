@@ -1,0 +1,37 @@
+{
+  "asset_id": "ENV_START_ISLAND",
+  "asset": "start_island",
+  "source_gen_id": "1e06a7f3-5f75-4827-a90a-edd37645b45b",
+  "source_size": [1942, 809],
+  "source_sha256": "a3e456340b3dcb6735f66e4f0eca3a633e07e32d699d6bd3c73511c3f06fc6e3",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1eRoehvSj6GfIZLUPmXvK2vQPZWsX1CTW",
+    "drive_url": "https://drive.google.com/file/d/1eRoehvSj6GfIZLUPmXvK2vQPZWsX1CTW/view",
+    "original_filename": "start_island_source_1e06a7f3-5f75-4827-a90a-edd37645b45b.png"
+  },
+  "prompt_file": "art/prompts/start_island.txt",
+  "processing": {
+    "artifact_cleanup": "remove isolated high-saturation generation artifacts",
+    "logical_source_size": [486, 203],
+    "palette_limit": 64,
+    "dithering": "none",
+    "runtime_format": "webp",
+    "runtime_quality": 82,
+    "runtime_world_size": [1440, 602],
+    "launch_registration_world": [0, 0]
+  },
+  "output_sha256": "3d558f086a74677e2a9a9d80c963b6a5b67109fff49ae72a6e17b3e623cbc532",
+  "world_bounds": {
+    "left": -448,
+    "right": 992,
+    "top": 335,
+    "bottom": -267
+  },
+  "system_separation": {
+    "baked_water": false,
+    "baked_weather": false,
+    "baked_purchased_buildings": false,
+    "code_owned": ["ocean", "weather", "waves", "reflections", "rain", "storm-lighting"]
+  }
+}
