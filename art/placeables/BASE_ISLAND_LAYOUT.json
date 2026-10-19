@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "world": {
+    "island_asset": "art/gen/environment/start_island_e0.png",
+    "island_world_left": -330,
+    "island_world_top": 420,
+    "island_world_width": 1650,
+    "water_surface_y": 150,
+    "launch_origin": [0, 0]
+  },
+  "rules": {
+    "starter_scene": "Only the launch table/pad is present. All B01-B07 purchases are absent until bought.",
+    "placement": "Purchased base placeables use fixed reserved sockets so the fully developed base remains readable and collision-free.",
+    "water": "Water is a continuous runtime layer and changes palette/wave response with weather; it is not baked into the island asset."
+  },
+  "placeables": {
+    "B01_weather_complex": {"zone":"command_north","anchor":[760,82],"reserved_footprint":[118,144]},
+    "B02_tracking_radar": {"zone":"command_north","anchor":[930,92],"reserved_footprint":[150,136]},
+    "B03_landing_guidance": {"zone":"launch_core","anchors":[[-92,4],[92,4]],"reserved_footprint_each":[58,92]},
+    "B04_recovery_complex": {"zone":"service_central","anchor":[470,8],"reserved_footprint":[188,112]},
+    "B05_fuel_depot": {"zone":"fuel_east","anchor":[650,10],"reserved_footprint":[176,150]},
+    "B06_deep_comms": {"zone":"command_north","anchor":[1090,76],"reserved_footprint":[144,164]},
+    "B07_cargo_terminal": {"zone":"logistics_east","anchor":[1240,2],"reserved_footprint":[208,148]}
+  }
+}
