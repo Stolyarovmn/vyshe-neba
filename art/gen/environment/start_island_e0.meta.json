@@ -1,0 +1,11 @@
+{
+  "asset_id": "ENV_START_ISLAND",
+  "asset": "start_island_e0",
+  "source_gen_id": "f65729dd-9a79-40fb-94e3-a093bbef7221",
+  "source_role": "low-angle island source",
+  "processing": "technical alpha isolation from generated source; art preserved, sky/water removed",
+  "output_sha256": "3ce24253a98724917d0710829220b373e38521c107728266617f522379ff721c",
+  "runtime_world": {"left": -330, "top": 420, "width": 1650},
+  "contains_rocket": false,
+  "contains_only_starter_infrastructure": true
+}
