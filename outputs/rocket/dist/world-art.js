@@ -1,9 +1,10 @@
 /* Единая длинная карта: меняется окно камеры, а не прозрачность сцен. */
 (function(root){
 'use strict';
-const TOP=6400,BOTTOM=-132,WIDTH=1600,LEFT=-800,BASE_FLOOR=600,BASE_LEFT=150,BASE_TAIL=1200,BASE_EDGE_STRIP=96;
+const TOP=6400,BOTTOM=-132,WIDTH=1600,LEFT=-800,BASE_FLOOR=600,BASE_LEFT=150,BASE_FADE=260;
 const hash=(x,y)=>{let n=Math.imul(x^73471,y^19283);n=Math.imul(n^(n>>>16),2246822519);return ((n^(n>>>13))>>>0)/4294967296;};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const baseFadeAt=(x)=>clamp(Math.min((x-LEFT)/BASE_FADE,(LEFT+WIDTH-x)/BASE_FADE),0,1);
 let atlas=null,baseLayer=null,baseLayerEra=-1;
 function earthAtlas(art){
  if(!art.routeSky?.naturalWidth)return null;
@@ -17,8 +18,8 @@ function earthAtlas(art){
 function earthBase(art,era){
  if(!art.base?.naturalWidth)return null;
  if(baseLayer&&baseLayerEra===era)return baseLayer;
- const core=document.createElement('canvas');core.width=WIDTH;core.height=800;
- let c=core.getContext('2d');c.imageSmoothingEnabled=false;
+ baseLayer=document.createElement('canvas');baseLayer.width=WIDTH;baseLayer.height=800;
+ let c=baseLayer.getContext('2d');c.imageSmoothingEnabled=false;
  let tile=document.createElement('canvas');tile.width=1280;tile.height=800;
  let b=tile.getContext('2d'),cw=art.base.naturalWidth/3,ch=art.base.naturalHeight/2;
  b.imageSmoothingEnabled=false;b.drawImage(art.base,era%3*cw+2,Math.floor(era/3)*ch+2,cw-4,ch-4,0,0,1280,800);
@@ -26,18 +27,13 @@ function earthBase(art,era){
  c.drawImage(tile,BASE_LEFT,0);
  c.save();c.translate(BASE_LEFT,0);c.scale(-1,1);c.drawImage(tile,0,0,BASE_LEFT,800,0,0,BASE_LEFT,800);c.restore();
  let right=WIDTH-BASE_LEFT-1280;c.save();c.translate(WIDTH,0);c.scale(-1,1);c.drawImage(tile,1280-right,0,right,800,0,0,right,800);c.restore();
- // The recognizable base remains unique. Outside its 1600u core we only stretch a
- // narrow scenery edge and fade it out gradually, so horizontal camera travel never
- // reveals a rectangular cut from the sunset/mountains straight into the route sky.
- baseLayer=document.createElement('canvas');baseLayer.width=WIDTH+BASE_TAIL*2;baseLayer.height=800;
- const out=baseLayer.getContext('2d');out.imageSmoothingEnabled=false;
- out.drawImage(core,BASE_TAIL,0);
- out.drawImage(core,0,0,BASE_EDGE_STRIP,800,0,0,BASE_TAIL,800);
- out.drawImage(core,WIDTH-BASE_EDGE_STRIP,0,BASE_EDGE_STRIP,800,BASE_TAIL+WIDTH,0,BASE_TAIL,800);
- out.globalCompositeOperation='destination-in';
- const edgeFade=out.createLinearGradient(0,0,baseLayer.width,0),a=BASE_TAIL/baseLayer.width,bx=(BASE_TAIL+WIDTH)/baseLayer.width;
- edgeFade.addColorStop(0,'rgba(255,255,255,0)');edgeFade.addColorStop(a,'rgba(255,255,255,1)');edgeFade.addColorStop(bx,'rgba(255,255,255,1)');edgeFade.addColorStop(1,'rgba(255,255,255,0)');
- out.fillStyle=edgeFade;out.fillRect(0,0,baseLayer.width,baseLayer.height);out.globalCompositeOperation='source-over';
+ // The base is a unique world location. Fade its scenery to the route sky over a
+ // broad horizontal margin instead of exposing a hard rectangular texture edge or
+ // stretching a few source columns into visible smears during horizontal travel.
+ c.globalCompositeOperation='destination-in';
+ const edgeFade=c.createLinearGradient(0,0,WIDTH,0),f=BASE_FADE/WIDTH;
+ edgeFade.addColorStop(0,'rgba(255,255,255,0)');edgeFade.addColorStop(f,'rgba(255,255,255,1)');edgeFade.addColorStop(1-f,'rgba(255,255,255,1)');edgeFade.addColorStop(1,'rgba(255,255,255,0)');
+ c.fillStyle=edgeFade;c.fillRect(0,0,WIDTH,800);c.globalCompositeOperation='source-over';
  baseLayerEra=era;return baseLayer;
 }
 function color(y){let stops=[[0,[44,171,222]],[2000,[16,79,162]],[4500,[5,22,73]],[6400,[3,8,24]],[18000,[3,8,24]]],i=0;while(i<stops.length-2&&y>stops[i+1][0])i++;let a=stops[i],b=stops[i+1],t=clamp((y-a[0])/(b[0]-a[0]),0,1);return a[1].map((v,j)=>Math.round(v+(b[1][j]-v)*t));}
@@ -57,20 +53,20 @@ function draw(ctx,cam,r,p,art){
     ctx.drawImage(map,0,0,map.width,map.height,0,0,WIDTH*z,map.height*z);ctx.restore();
    }
   }
-  let base=earthBase(art,p.base||0);if(base){let q=project(LEFT-BASE_TAIL,BASE_FLOOR);ctx.drawImage(base,q.x,q.y,base.width*z,base.height*z);}
+  let base=earthBase(art,p.base||0);if(base){let q=project(LEFT,BASE_FLOOR);ctx.drawImage(base,q.x,q.y,WIDTH*z,base.height*z);}
   let floor=project(0,BOTTOM+2).y;if(floor<600){rect(0,floor,960,600-floor,'#28332d');for(let row=Math.floor((BOTTOM-bottom)/18);row>=0;row--)for(let col=Math.floor(left/24);col<=Math.ceil(right/24);col++){let q=project(col*24,BOTTOM-row*18);rect(q.x,q.y,12*z,3*z,hash(col,row)>.5?'#41473b':'#1d2927');}}
   // Stars follow the opaque atmosphere layer, but precede physical celestial bodies.
   const baseRig=root.WorldSprites?.manifest.base;
   if(baseRig&&top>-132&&bottom<600&&right>LEFT&&left<LEFT+WIDTH){
    const rig=baseRig.eras[p.base||0],cw=baseRig.size[0]/3,ch=baseRig.size[1]/2,t=r.time||0;
-   const point=(u,v)=>{const ax=BASE_LEFT+(u-2)*1280/(cw-4),wy=600-(v-2)*800/(ch-4);return project(LEFT+ax,wy);};
+   const point=(u,v)=>{const ax=BASE_LEFT+(u-2)*1280/(cw-4),wx=LEFT+ax,wy=600-(v-2)*800/(ch-4);return {...project(wx,wy),fade:baseFadeAt(wx)};};
    for(const [kind,list]of [['lamp',rig.lamps],['beacon',rig.beacons]])for(const [i,a]of list.entries()){
-    const q=point(a.x,a.y),on=kind==='lamp'?.85+.15*Math.sin(t*1.3+i):((t+i*.19)%1.32<.18?1:0);
+    const q=point(a.x,a.y),on=(kind==='lamp'?.85+.15*Math.sin(t*1.3+i):((t+i*.19)%1.32<.18?1:0))*q.fade;
     if(!on)continue;ctx.save();ctx.globalAlpha=on;const radius=(kind==='lamp'?12:5)*z,g=ctx.createRadialGradient(q.x,q.y,0,q.x,q.y,radius);
     g.addColorStop(0,a.suggestedColor+'70');g.addColorStop(1,a.suggestedColor+'00');ctx.fillStyle=g;ctx.fillRect(q.x-radius,q.y-radius,radius*2,radius*2);rect(q.x-z,q.y-z,2*z,z,a.suggestedColor);ctx.restore();
    }
    if((p.base||0)===5)for(const [i,[u,v,w,part]]of root.WorldSprites.manifest.baseDrones.placements.entries()){
-    const q=point(u+Math.sin(t*.6+i)*1.5,v+Math.sin(t*1.2+i)*1.2);ctx.save();ctx.translate(q.x,q.y);root.WorldSprites.baseDrone(ctx,part,0,0,w*z,t+i);ctx.restore();
+    const q=point(u+Math.sin(t*.6+i)*1.5,v+Math.sin(t*1.2+i)*1.2);if(q.fade<=0)continue;ctx.save();ctx.globalAlpha=q.fade;ctx.translate(q.x,q.y);root.WorldSprites.baseDrone(ctx,part,0,0,w*z,t+i);ctx.restore();
    }
   }
   stars();
