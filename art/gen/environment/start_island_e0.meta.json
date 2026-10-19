@@ -3,9 +3,10 @@
   "asset": "start_island_e0",
   "source_gen_id": "f65729dd-9a79-40fb-94e3-a093bbef7221",
   "source_role": "low-angle island source",
-  "processing": "technical alpha isolation from generated source; art preserved, sky/water removed; 384px runtime quantization",
-  "output_sha256": "e4784ccedc90421fccb0cc10eeb1fd0912d93a683418544d0475077527118a8f",
+  "processing": "technical alpha isolation from generated source; art preserved, sky/water removed; 192px preview runtime quantization",
+  "output_sha256": "e87bf8ca72ac3934de84890aadcd953d4bfb54d38711ce0ac065abb14aa0347f",
   "runtime_world": {"left": -330, "top": 420, "width": 1650},
   "contains_rocket": false,
-  "contains_only_starter_infrastructure": true
+  "contains_only_starter_infrastructure": true,
+  "status": "preview_candidate_not_production_approved"
 }
