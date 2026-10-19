@@ -9,5 +9,6 @@
   "contains_rocket": false,
   "contains_starter_tower": false,
   "contains_only_starter_infrastructure": false,
-  "status": "preview_candidate_not_production_approved"
+  "status": "approved_by_user",
+  "approved_by_user_on": "2026-10-19"
 }

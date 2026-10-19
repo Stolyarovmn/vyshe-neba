@@ -163,7 +163,7 @@ outputs/rocket/runtime-assets.json
 
 High-quality raw PNG может дополнительно храниться в `art/raw/`, если размер позволяет, но это optional. Канонический source binary находится в Google Drive.
 
-`outputs/rocket/runtime-assets.json` задаёт только mapping `canonical source → logical runtime target`. `outputs/rocket/build.cjs` собирает runtime package в памяти/standalone build. Для migrated family запрещено одновременно держать вторую committed PNG-копию в `outputs/rocket/dist/assets/...`. Запрет относится к PNG-зеркалам ассетов; автономный `outputs/Выше неба.html` — отдельный generated-артефакт (см. `art/PROGRESS.md`).
+`outputs/rocket/runtime-assets.json` задаёт только mapping `canonical source → logical runtime target`. `outputs/rocket/build.cjs` собирает runtime package в памяти/standalone build. Для migrated family запрещено одновременно держать вторую committed PNG-копию в `outputs/rocket/dist/assets/...`. Запрет относится к PNG-зеркалам ассетов; автономный `outputs/Выше неба.html` — generated-артефакт, он не коммитится (`.gitignore`) и публикуется только артефактом CI.
 
 Минимальный provenance JSON:
 
