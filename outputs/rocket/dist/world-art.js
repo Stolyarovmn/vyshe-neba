@@ -2,10 +2,10 @@
 (function(root){
 'use strict';
 const TOP=6400,BOTTOM=-132,WIDTH=1600,LEFT=-800;
-const ISLAND_WORLD_LEFT=-330,ISLAND_WORLD_TOP=420,ISLAND_WORLD_WIDTH=1650,OCEAN_SURFACE_Y=150;
+const ISLAND_WORLD_LEFT=-330,ISLAND_WORLD_TOP=510,ISLAND_WORLD_WIDTH=1650,OCEAN_SURFACE_Y=150;
 const hash=(x,y)=>{let n=Math.imul(x^73471,y^19283);n=Math.imul(n^(n>>>16),2246822519);return ((n^(n>>>13))>>>0)/4294967296;};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-let atlas=null,islandImage=null;
+let atlas=null,islandImage=null,islandReady=null;
 function earthAtlas(art){
  if(!art.routeSky?.naturalWidth)return null;
  if(atlas)return atlas;
@@ -19,8 +19,10 @@ function islandAsset(){
  if(islandImage)return islandImage;
  islandImage=new Image();
  islandImage.src=root.__GAME_ASSETS__?.['environment/start_island_e0.png']||'assets/environment/start_island_e0.png';
+ islandReady=islandImage.decode().catch(()=>{});
  return islandImage;
 }
+async function preload(){const im=islandAsset();if(im.complete&&im.naturalWidth)return im;await islandReady;return im;}
 function color(y){
  let stops=[[0,[44,171,222]],[2000,[16,79,162]],[4500,[5,22,73]],[6400,[3,8,24]],[18000,[3,8,24]]],i=0;
  while(i<stops.length-2&&y>stops[i+1][0])i++;
@@ -100,5 +102,5 @@ function draw(ctx,cam,r,p,art){
  }
  ctx.restore();
 }
-root.WorldArt={draw,color,qa(){return{island:{left:ISLAND_WORLD_LEFT,top:ISLAND_WORLD_TOP,width:ISLAND_WORLD_WIDTH},oceanSurfaceY:OCEAN_SURFACE_Y,clearWater:waterPalette({}),stormWater:waterPalette({effectiveCloud:1,effectiveRain:1,effectiveStorm:1})};}};
+root.WorldArt={draw,color,preload,qa(){return{island:{left:ISLAND_WORLD_LEFT,top:ISLAND_WORLD_TOP,width:ISLAND_WORLD_WIDTH},oceanSurfaceY:OCEAN_SURFACE_Y,clearWater:waterPalette({}),stormWater:waterPalette({effectiveCloud:1,effectiveRain:1,effectiveStorm:1})};}};
 })(typeof window!=='undefined'?window:globalThis);
