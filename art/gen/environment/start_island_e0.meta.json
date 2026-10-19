@@ -3,10 +3,11 @@
   "asset": "start_island_e0",
   "source_gen_id": "f65729dd-9a79-40fb-94e3-a093bbef7221",
   "source_role": "low-angle island source",
-  "processing": "technical alpha isolation from generated source; art preserved, sky/water removed; 384px runtime, 64-color no-dither preview quantization",
-  "output_sha256": "9ef57fa906b82da7ebd8fa2d1b17346ce8cd938132e869ce099bbec7e8369145",
+  "processing": "technical alpha isolation from generated source; sky/water removed; starter tower removed by local source patch; 384px runtime, 64-color no-dither preview quantization",
+  "output_sha256": "686762324a0b9244317fa0ff0327135f9039ad61c19c7510a88fdd18983e1ab3",
   "runtime_world": {"left": -330, "top": 510, "width": 1650},
   "contains_rocket": false,
-  "contains_only_starter_infrastructure": true,
+  "contains_starter_tower": false,
+  "contains_only_starter_infrastructure": false,
   "status": "preview_candidate_not_production_approved"
 }
