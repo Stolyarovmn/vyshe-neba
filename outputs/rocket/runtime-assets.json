@@ -13,6 +13,12 @@
         "vane_eras.png",
         "indicator_eras.png"
       ]
+    },
+    {
+      "asset_id": "ENV_START_ISLAND_PREVIEW",
+      "source": "art/candidates/environment/start_island",
+      "target": "environment/start_island",
+      "include": ["e0_preview.png"]
     }
   ]
 }
