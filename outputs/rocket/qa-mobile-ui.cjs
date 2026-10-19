@@ -44,6 +44,45 @@ const assert=(condition,message)=>{if(!condition)throw new Error(message);};
     await page.screenshot({path:path.join(out,'mobile-home.png'),fullPage:true});
     await mobile.close();
 
+    const portrait=await browser.newContext({
+      viewport:{width:390,height:844},
+      screen:{width:390,height:844},
+      hasTouch:true,
+      isMobile:true,
+      deviceScaleFactor:2
+    });
+    const portraitPage=await portrait.newPage();
+    await portraitPage.goto(pathToFileURL(gameFile).href);
+    await portraitPage.waitForFunction(()=>window.PortraitUX?.installed===true&&window.Game);
+    const homePortrait=await portraitPage.evaluate(()=>{
+      const game=document.getElementById('game');
+      return {transform:game.style.transform,portrait:PortraitUX.isPortrait(),flight:PortraitUX.isFlightPortrait()};
+    });
+    assert(homePortrait.portrait===true,`portrait phone not detected: ${JSON.stringify(homePortrait)}`);
+    assert(!homePortrait.transform.includes('rotate('),`portrait menu was still rotated sideways: ${homePortrait.transform}`);
+    await portraitPage.evaluate(()=>Game.start());
+    await portraitPage.waitForFunction(()=>PortraitUX.isFlightPortrait()===true);
+    await portraitPage.waitForTimeout(150);
+    const flightPortrait=await portraitPage.evaluate(()=>{
+      const game=document.getElementById('game'),canvas=document.getElementById('canvas'),hud=document.getElementById('portraitHud'),pad=document.getElementById('portraitFlightPad');
+      const gs=getComputedStyle(game),cs=getComputedStyle(canvas),hs=getComputedStyle(hud),ps=getComputedStyle(pad);
+      return {
+        game:[parseFloat(gs.width),parseFloat(gs.height)],
+        transform:game.style.transform,
+        objectFit:cs.objectFit,
+        hudDisplay:hs.display,
+        padDisplay:ps.display,
+        screen:Game.screen
+      };
+    });
+    assert(flightPortrait.screen==='flight',`portrait QA did not enter flight: ${JSON.stringify(flightPortrait)}`);
+    assert(flightPortrait.game[1]>flightPortrait.game[0]*1.7,`portrait flight did not fill a vertical stage: ${JSON.stringify(flightPortrait)}`);
+    assert(flightPortrait.objectFit==='cover',`portrait flight world must preserve aspect ratio and crop, not stretch: ${JSON.stringify(flightPortrait)}`);
+    assert(flightPortrait.hudDisplay!=='none'&&flightPortrait.padDisplay!=='none',`portrait HUD/touch pad missing: ${JSON.stringify(flightPortrait)}`);
+    assert(!flightPortrait.transform.includes('rotate('),`portrait flight still rotated sideways: ${flightPortrait.transform}`);
+    await portraitPage.screenshot({path:path.join(out,'portrait-flight.png'),fullPage:true});
+    await portrait.close();
+
     const desktop=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:1});
     const desktopPage=await desktop.newPage();
     await desktopPage.goto(pathToFileURL(gameFile).href);
@@ -54,7 +93,7 @@ const assert=(condition,message)=>{if(!condition)throw new Error(message);};
     assert(desktopResult.rocketScale>=1.08,`desktop rocket visual boost missing: ${desktopResult.rocketScale}`);
     await desktop.close();
 
-    console.log('mobile UI QA PASS',JSON.stringify({mobile:mobileResult,desktop:desktopResult}));
+    console.log('mobile UI QA PASS',JSON.stringify({mobile:mobileResult,portrait:{home:homePortrait,flight:flightPortrait},desktop:desktopResult}));
   }finally{
     await browser.close();
   }

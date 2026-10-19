@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "world": {
+    "island_asset": "art/gen/environment/start_island_e0.png",
+    "island_world_left": -330,
+    "island_world_top": 510,
+    "island_world_width": 1650,
+    "water_surface_y": 150,
+    "launch_origin": [0, 0]
+  },
+  "rules": {
+    "starter_scene": "Only the starter launch table/pad is present. Every purchasable base expansion is absent until bought.",
+    "placement": "Every purchase has a deterministic reserved world anchor on the island. The fully developed base must fit without overlapping the launch core or leaving the island.",
+    "water": "Water is a continuous runtime layer and changes palette/wave response with weather; it is not baked into the island asset."
+  },
+  "purchases": {
+    "beacons": {"name":"Стартовые маяки","zone":"launch_core","anchors":[[-92,4],[92,4]],"reason":"По обе стороны стартового стола."},
+    "gantry": {"name":"Башня обслуживания","zone":"launch_core","anchor":[150,12],"reason":"Рядом со стартовым столом, но вне траектории ракеты."},
+    "deluge": {"name":"Охлаждение площадки","zone":"launch_core","anchor":[235,8],"reason":"У кромки стартовой площадки, короткие магистрали воды."},
+    "service": {"name":"Сервисная команда","zone":"service_central","anchor":[335,12],"reason":"Первый технический двор после стартовой площадки."},
+    "rescue": {"name":"Спасательная станция","zone":"service_central","anchor":[445,14],"reason":"Быстрый выезд к старту и береговой дороге."},
+    "fuel": {"name":"Топливный комплекс","zone":"fuel_east","anchor":[560,16],"reason":"Отделён от стартовой зоны сервисным сектором."},
+    "logistics": {"name":"Логистический терминал","zone":"logistics_east","anchor":[685,12],"reason":"На широкой восточной террасе с доступом к берегу."},
+    "factory": {"name":"Производственный цех","zone":"industrial_east","anchor":[815,16],"reason":"Рядом с логистикой, дальше от стартового стола."},
+    "weather": {"name":"Метеостанция","zone":"command_north","anchor":[760,92],"reason":"На возвышенности без экранирования."},
+    "control": {"name":"Центр управления","zone":"command_north","anchor":[905,78],"reason":"За промышленной зоной с прямой видимостью старта."},
+    "radar": {"name":"Радар слежения","zone":"command_north","anchor":[1035,96],"reason":"На отдельной восточной высоте с открытым горизонтом."},
+    "energy": {"name":"Энергетический узел","zone":"utility_east","anchor":[1085,30],"reason":"Между потребителями, но вне стартовой зоны."},
+    "observation": {"name":"Наблюдательный комплекс","zone":"perimeter_east","anchor":[1180,102],"reason":"На дальней возвышенности с обзором стартовой площадки."},
+    "recovery": {"name":"Система возврата","zone":"recovery_east","anchor":[1210,14],"reason":"У дальнего восточного края и береговой логистики."}
+  },
+  "asset_families": {
+    "B01_weather_complex": {"purchase":"weather","zone":"command_north"},
+    "B02_tracking_radar": {"purchase":"radar","zone":"command_north"},
+    "B03_landing_guidance": {"purchase":"beacons","zone":"launch_core"},
+    "B04_recovery_complex": {"purchase":"recovery","zone":"recovery_east"},
+    "B05_fuel_depot": {"purchase":"fuel","zone":"fuel_east"},
+    "B06_deep_comms": {"purchase":"control","zone":"command_north"},
+    "B07_cargo_terminal": {"purchase":"logistics","zone":"logistics_east"}
+  }
+}
