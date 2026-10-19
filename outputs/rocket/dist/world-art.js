@@ -71,11 +71,6 @@ function draw(ctx,cam,r,p,art){
     ctx.drawImage(map,0,0,map.width,map.height,0,0,WIDTH*z,map.height*z);ctx.restore();
    }
   }
-  // Warm local horizon light is code-owned atmosphere, not a finite sky rectangle.
-  if(right>BASE_WORLD_LEFT-500&&left<BASE_WORLD_LEFT+BASE_WIDTH+500){
-   const q=project(BASE_WORLD_LEFT+BASE_WIDTH*.5,360),rr=760*z;ctx.save();ctx.translate(q.x,q.y);ctx.scale(1,.42);
-   const haze=ctx.createRadialGradient(0,0,0,0,0,rr);haze.addColorStop(0,'rgba(255,137,96,.18)');haze.addColorStop(.45,'rgba(238,102,105,.09)');haze.addColorStop(1,'rgba(238,102,105,0)');ctx.fillStyle=haze;ctx.fillRect(-rr,-rr,rr*2,rr*2);ctx.restore();
-  }
   let base=earthBase(art,p.base||0);if(base&&right>BASE_WORLD_LEFT&&left<BASE_WORLD_LEFT+BASE_WIDTH){let q=project(BASE_WORLD_LEFT,BASE_FLOOR);ctx.drawImage(base,q.x,q.y,BASE_WIDTH*z,base.height*z);}
   let floor=project(0,BOTTOM+2).y;if(floor<600){rect(0,floor,960,600-floor,'#28332d');for(let row=Math.floor((BOTTOM-bottom)/18);row>=0;row--)for(let col=Math.floor(left/24);col<=Math.ceil(right/24);col++){let q=project(col*24,BOTTOM-row*18);rect(q.x,q.y,12*z,3*z,hash(col,row)>.5?'#41473b':'#1d2927');}}
   // Base emitters share the exact finite world footprint of the isolated base layer.
