@@ -21,6 +21,7 @@ permissions:
 jobs:
   candidate:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     concurrency:
       group: asset-pipeline-${{ inputs.asset }}
       cancel-in-progress: false

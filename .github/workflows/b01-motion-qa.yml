@@ -17,6 +17,7 @@ permissions:
 jobs:
   motion-sheet:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Diagnose canonical B01 atlas PNG structure

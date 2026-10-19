@@ -1,5 +1,16 @@
 # ref2game art source
 
+В репозитории два связанных производственных потока. Выбор зависит от типа ассета:
+
+| Поток | Для чего | Где описан | Инструменты |
+| --- | --- | --- | --- |
+| **ref2game: world sprites** | самолёты, дроны, природа, небо, фон, посадочные площадки, монеты | этот файл и `art/PROGRESS.md` | `tools/ref2game/{gen,slice,prep}.py`, `ref2game.json` |
+| **Placeables pipeline** | покупаемые и размещаемые объекты базы и мастерской W/B (эпохи E0–E5) | `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `art/docs/ASSET_TASK_TRACKER.md`, `art/placeables/PRODUCTION_MANIFEST.md` | `tools/art_pipeline/*`, workflows `asset-candidate` / `asset-promote` |
+
+Общее для обоих потоков: `art/style_bible.txt` вставляется дословно в каждый запрос на генерацию; интерактивные ходы подчиняются `art/docs/EXECUTION_TIMEOUT_POLICY.md`.
+
+Хранение оригиналов: для placeables канонический архив нетронутых генераций находится на Google Drive (`vyshe-neba/art-originals/`), а `art/raw/` необязателен. Для world sprites оригиналы листов дополнительно лежат в `art/raw` и `art/gen`.
+
 `art/style_bible.txt` is the canonical style block and must be prepended verbatim to every future image-generation request.
 
 For the current aircraft pass, the previously generated/sliced pack is being normalized into the ref2game layout. Future regeneration must follow `gen.py prepare -> image generation -> gen.py import -> slice.py -> prep.py` rather than bypassing those stages.

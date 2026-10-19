@@ -47,4 +47,17 @@ npm test
 
 Тесты используют Playwright и установленный Chrome (канал chrome). Промежуточные снимки сохраняются в work и не попадают в Git.
 
+## Документация
+
+| Тема | Файл |
+| --- | --- |
+| Подробная инструкция игрока и устройство сборки | [outputs/rocket/Прочти меня.md](outputs/rocket/Прочти%20меня.md) |
+| Проверки по замечаниям, регрессии | outputs/rocket/study/PITFALLS.md |
+| Разбор механик Into Space | outputs/rocket/study/into-space-review.md, outputs/rocket/study/Разбор Into Space.md |
+| Воздушный трафик по эпохам и высотам | outputs/rocket/docs/AEROSTAT_TRAFFIC.md |
+| Производство арта (два потока) | art/README.md, art/PROGRESS.md |
+| Pipeline ассетов, трекер, таймауты | art/docs/ |
+| Контракт покупаемых объектов базы | art/placeables/PRODUCTION_MANIFEST.md |
+| Критика и ревью (история) | study/critique/, outputs/rocket/study/critique/ |
+
 Механики полёта исследованы по серии Into Space; в проекте используется собственная реализация и собственное визуальное оформление. Оригинальные SWF, декомпилированный код и графика этих игр в репозиторий не включены.

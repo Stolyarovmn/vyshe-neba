@@ -163,7 +163,7 @@ outputs/rocket/runtime-assets.json
 
 High-quality raw PNG может дополнительно храниться в `art/raw/`, если размер позволяет, но это optional. Канонический source binary находится в Google Drive.
 
-`outputs/rocket/runtime-assets.json` задаёт только mapping `canonical source → logical runtime target`. `outputs/rocket/build.cjs` собирает runtime package в памяти/standalone build. Для migrated family запрещено одновременно держать вторую committed PNG-копию в `outputs/rocket/dist/assets/...`.
+`outputs/rocket/runtime-assets.json` задаёт только mapping `canonical source → logical runtime target`. `outputs/rocket/build.cjs` собирает runtime package в памяти/standalone build. Для migrated family запрещено одновременно держать вторую committed PNG-копию в `outputs/rocket/dist/assets/...`. Запрет относится к PNG-зеркалам ассетов; автономный `outputs/Выше неба.html` — отдельный generated-артефакт (см. `art/PROGRESS.md`).
 
 Минимальный provenance JSON:
 
@@ -384,7 +384,19 @@ outputs/rocket/build.cjs
 outputs/rocket/verify.cjs
 ```
 
-`art-pipeline.yml` и `b03-art-pipeline.yml` — тонкие asset-specific trigger wrappers, а не отдельные реализации processing logic.
+`art-pipeline.yml` (W04) и `b03-art-pipeline.yml` (B03) — тонкие asset-specific trigger wrappers, а не отдельные реализации processing logic.
+
+Остальные workflow:
+
+| Workflow | Назначение | Запуск |
+| --- | --- | --- |
+| `art-tools-bootstrap.yml` | сборка и проверка канонического toolchain (`setup_art_tools.sh`) | push/PR по путям скрипта, вручную |
+| `b01-atlas-repair.yml` | детерминированная пересборка part-атласов B01 | push в `main` по путям, вручную |
+| `b01-motion-qa.yml` | проверка motion sheet B01 | push в `main` по путям, вручную |
+| `b01-rig-qa.yml` | проверка рига B01 | push в `main` по путям, вручную |
+| `b01-runtime-qa.yml` | проверка погодного runtime B01 | push в `main` по путям, вручную |
+
+Все jobs имеют `timeout-minutes: 30` (раздел 16). B01 QA workflows запускаются только после push в `main`; на pull request обязательный gate — `game-ci.yml`.
 
 Candidate workflow:
 

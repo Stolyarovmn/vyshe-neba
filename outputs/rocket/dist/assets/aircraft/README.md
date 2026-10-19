@@ -11,4 +11,4 @@ Canonical ordering:
 - columns: `1978`, `1986`, `1998`, `2015`, `2035`, `2060`
 - rows: `low_primary`, `low_multiwing`, `medium_passenger`, `medium_cargo`, `high_fighter`, `high_experimental`
 
-The era years are gameplay technology tiers, not claims of strict historical accuracy. Sprite selection rules are documented in `study/aircraft-traffic-by-altitude-and-era.md`.
+The era years are gameplay technology tiers, not claims of strict historical accuracy. Sprite selection rules are documented in `outputs/rocket/study/aircraft-traffic-by-altitude-and-era.md`.
