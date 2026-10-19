@@ -2,22 +2,28 @@
   "asset_id": "ENV_START_ISLAND",
   "asset": "start_island",
   "era": "E0",
-  "source_gen_id": "ce5cf549-d912-4c31-9b50-3b70c2111b95",
-  "source_size": [1916, 821],
-  "source_sha256": "0fc1d53e1cca7fe190c0268e7622f15deb4a3a4dd2361209555ac705479259c6",
+  "source_gen_id": "1e06a7f3-5f75-4827-a90a-edd37645b45b",
+  "source_size": [1942, 809],
+  "source_sha256": "a3e456340b3dcb6735f66e4f0eca3a633e07e32d699d6bd3c73511c3f06fc6e3",
   "source_storage": {
     "provider": "google_drive",
-    "drive_file_id": "109IFUuj4paHf6Chdbj-5ABRoyLmDj8mw",
-    "drive_url": "https://drive.google.com/file/d/109IFUuj4paHf6Chdbj-5ABRoyLmDj8mw/view?usp=drivesdk",
-    "original_filename": "start_island_E0_ce5cf549-d912-4c31-9b50-3b70c2111b95.png"
+    "drive_file_id": "1eRoehvSj6GfIZLUPmXvK2vQPZWsX1CTW",
+    "drive_url": "https://drive.google.com/file/d/1eRoehvSj6GfIZLUPmXvK2vQPZWsX1CTW/view?usp=drivesdk",
+    "original_filename": "start_island_source_1e06a7f3-5f75-4827-a90a-edd37645b45b.png"
   },
   "prompt_file": "art/prompts/start_island_e0.txt",
   "candidate": {
     "path": "art/candidates/environment/start_island/e0_preview.png",
-    "size": [480, 206],
-    "sha256": "bd2074e0df9ef3dbe5b0395517cd72f99f09a733f32fa677249afe4445d38e2f",
-    "processing": "nearest-neighbor preview resize + 32-color no-dither quantization",
+    "size": [486, 203],
+    "sha256": "fac37e3c6f7fd86bd06ef4a1baf3d5a9f52d6db63d0b265f6b885ddb0ac7c885",
+    "processing": "source alpha-edge cleanup + nearest-neighbor 1/4 preview resize; no creative repaint",
     "status": "preview_only",
-    "note": "Not promoted to art/gen. Must pass canonical processing and hash-bound visual review before production promotion."
-  }
+    "note": "Candidate only. It is intentionally not in art/gen until automatic QA plus hash-bound visual review pass."
+  },
+  "rejected_generations": [
+    {"source_gen_id": "ce5cf549-d912-4c31-9b50-3b70c2111b95", "reason": "projection too top-down for current flight scene"},
+    {"source_gen_id": "be74d15d-fd48-4d50-968a-6069cd9ce731", "reason": "generator inferred isometric top-down instead of requested side/slight-3/4"},
+    {"source_gen_id": "a125a558-814f-410c-8408-865b4d07e0ca", "reason": "same projection failure"},
+    {"source_gen_id": "a1c97856-98f0-4f23-9450-d4df1e3a46b5", "reason": "same projection failure"}
+  ]
 }
