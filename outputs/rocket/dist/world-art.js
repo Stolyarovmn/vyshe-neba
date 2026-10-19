@@ -1,7 +1,7 @@
 /* Единая длинная карта: sky/landscape/base — независимые слои в мировых координатах. */
 (function(root){
 'use strict';
-const TOP=6400,BOTTOM=-132,WIDTH=1600,LEFT=-800,BASE_FLOOR=600,BASE_WORLD_LEFT=-640,BASE_WIDTH=1280,BASE_EDGE=150;
+const TOP=6400,BOTTOM=-132,WIDTH=1600,LEFT=-800,BASE_FLOOR=600,BASE_WORLD_LEFT=-650,BASE_WIDTH=1280,BASE_EDGE=150;
 const hash=(x,y)=>{let n=Math.imul(x^73471,y^19283);n=Math.imul(n^(n>>>16),2246822519);return ((n^(n>>>13))>>>0)/4294967296;};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
