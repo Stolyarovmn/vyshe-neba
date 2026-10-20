@@ -178,3 +178,19 @@ renderer.layout(w, h, dpr, safeInsets)           // -> Layout
 ## 12. Ассеты в dev и в сборке
 
 `src/render/manifest.js` экспортирует `ASSET_FILES = { logicalName: 'путь/от/корня/репозитория.png', ... }` плюс данные обрезки и масштаба из `live/world-assets.js`. Загрузчик берёт адрес как `globalThis.__GAME_ASSETS__?.[path] ?? '/' + path`: в dev файлы раздаёт статический сервер из корня репозитория (`/game/index.html`), при сборке `tools/build.mjs` подставляет `data:`-адреса в `__GAME_ASSETS__`. Каждый логический ассет перечислен в манифесте ровно один раз; неиспользуемые файлы в сборку не попадают.
+
+## 13. Фактические API и отличия от контракта (после реализации)
+
+Источник правды — код; здесь собраны отличия, которые нужно знать при доработке.
+
+**Sim** (`game/src/sim`): `createFlight`, `step`, `summarize`, `createAutopilot({skill, mission:'hop'|'space'|'land', targetAlt, seed}).next(state, dt)`, `runFlight`, `advance`. В `FlightConfig` добавлены `start` ({body, alt, x, vx, vy, angle, stageIndex, fuel01}), `limits` ({speed, fall}) и фиксированная `weather`. В `FlightState` добавлены `climb`, `fuelTotal`, `fuel01`, `weightless`, `transferCostFuel`, `approach`, `chute`, `boost`, `maxAccel`, `turnRate`. `reason` — код (`landing-speed`, `landing-drift`, `landing-tilt`, `hull-destroyed`, `lost-in-space`, `lost-contact`), виновник в `killer`. `FlightResult.landing` содержит фактические допуски (`vTol`, `hTol`, `angTol`, `onPad`). Событие `storm` имеет `phase`, событие `warn` — `kind`. Опасности и предметы: `objects[].kind` (`coin|fuel|ring|repair|plane|balloon|asteroid|debris`).
+
+**Rules/Data/State**: `cap.building = id + 1`; `milestones.maxAlt` и `stats.distance` хранятся в метрах, а `FlightResult.maxAlt`/`distance` — в единицах игры (×10). `settleFlight(profile, result, config?)` принимает конфиг для списания расходников. Покупки возвращают `awarded`. Дополнительно: `refillContracts`, `buyConsumable`, `buySkin`, `selectSkin`, `checkAchievements`. Веха E0 → E1: одна мягкая посадка и высота 3 км. Парашют: скорость снижения `12 − 0.4·уровень` (минимум 3,5), поэтому все 18 уровней значимы.
+
+**Render**: `renderer.flight.start(flight, config)`, `renderer.events(list, flight?)`, `renderer.flight.timeScale` (замедление после касания/аварии), `hub.hitTest(x, y)` (ключ постройки, `'rocket'` или `null`), `hub.screenPos`, `hub.pan`, `hub.focus`, `hub.setSelected`. Все `draw` рисуют в пикселях устройства (`canvas.width = w·dpr`). Спрайты построек radar/recovery/logistics/energy/observation пока программные; спрайт `bld_<ключ>_<год>` в `ASSET_FILES` подхватывается автоматически (см. `art/docs/MISSING_ASSETS_PROMPTS.md`).
+
+**Audio**: `createAudio()` по §7, плюс `event(ev)`, `events(list)`, `getVolumes`, `isMuted`, `dispose`, `renderOffline`. В кадре допустимы `phase:'hub'` и `storm`; `music.set` принимает `mood:'win'|'fail'`; `alt01 = высота / 100 км`.
+
+**UI/Input**: id кнопок для тестов — `dock-*`, `launch-start`, `launch-dest-<id>`, `part-<id>`, `results-*`, `flight-*`, `back`. Хук `globalThis.__VN_TEST__` и `__VN_APP__`. Настройки касаний хранятся в `localStorage` под ключом `vyshe-neba:ui` вне Profile.
+
+**Инструменты**: `game/tools/economy-bot.mjs` (проверка баланса, `--real` — через sim и автопилот), `game/tools/probe-landing.mjs` (успешность посадок на Луну/Марс). Юнит-тесты запускаются шаблоном `node --test "game/test/**/*.test.mjs"` (форма `node --test game/test/` в Node 24 не работает).

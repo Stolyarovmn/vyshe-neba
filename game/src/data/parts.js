@@ -161,7 +161,7 @@ export const PARTS = {
     need: 'Нужен парашют',
     cost: { base: 45, growth: 1.28 },
     dataWeight: 0.5,
-    stats: (level) => ({ level, descent: Math.max(3.5, round(12 - 0.65 * level, 2)) }),
+    stats: (level) => ({ level, descent: Math.max(3.5, round(12 - 0.4 * level, 2)) }),
     statInfo: [stat('level', 'Купол', 'ур.', 1, 0), stat('descent', 'Скорость снижения', 'ед./с', -1, 1)],
     requires: (level) => [{ building: 'rescue', level: ceilDiv(level, 4) }],
   }),

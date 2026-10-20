@@ -47,8 +47,15 @@ jobs:
       - name: Build standalone game
         run: npm run game:build
 
-      - name: Browser tests (portrait and landscape)
-        run: node game/test/browser.cjs
+      - name: Browser tests (portrait and landscape, UI, render, audio)
+        run: |
+          node game/test/browser.cjs
+          node game/test/ui.browser.cjs
+          node game/test/render.browser.cjs
+          node game/test/audio.browser.cjs
+
+      - name: Economy balance check
+        run: node game/tools/economy-bot.mjs
 
       - name: Upload build and screenshots
         if: always()

@@ -3,7 +3,7 @@
 import { BODIES, densityAt, gravityAt } from './bodies.js';
 import { clamp, wrapAngle } from './math.js';
 
-export const CHUTE = { minDensity: 0.35, terminalBase: 12, terminalPerLevel: 0.65, terminalMin: 3.5, decel: 110 };
+export const CHUTE = { minDensity: 0.35, terminalBase: 12, terminalPerLevel: 0.4, terminalMin: 3.5, decel: 110 };
 const OFF_PAD_FACTOR = 0.7; // rough ground: every tolerance shrinks
 const BEACON_TOLERANCE_GAIN = 0.25; // full beacon coverage widens tolerances by this much on the pad
 const PERFECT = { v: 0.46, h: 0.34, ang: 0.44 }; // share of the tolerance a perfect landing must stay under

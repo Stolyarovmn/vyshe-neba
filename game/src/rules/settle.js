@@ -50,9 +50,9 @@ function explainCrash(profile, result, config) {
     return { code: result.reason ?? 'crash', part: 'hull', text: 'Ракета разбита. Прочная обшивка и ремонт сохраняют корпус.' };
   }
   const deg = (rad) => Math.round((rad * 180) / Math.PI);
-  if (result.reason === 'landing-speed') return { code: result.reason, part: hint.part, building: 'beacons', text: hint.text(Math.round(num(landing.v)), Math.round(legs.vTol)) };
-  if (result.reason === 'landing-drift') return { code: result.reason, part: hint.part, building: 'beacons', text: hint.text(Math.round(num(landing.h)), Math.round(legs.hTol)) };
-  return { code: result.reason, part: hint.part, building: 'control', text: hint.text(deg(num(landing.ang)), deg(legs.angTol)) };
+  if (result.reason === 'landing-speed') return { code: result.reason, part: hint.part, building: 'beacons', text: hint.text(Math.round(num(landing.v)), Math.round(landing.vTol ?? legs.vTol)) };
+  if (result.reason === 'landing-drift') return { code: result.reason, part: hint.part, building: 'beacons', text: hint.text(Math.round(num(landing.h)), Math.round(landing.hTol ?? legs.hTol)) };
+  return { code: result.reason, part: hint.part, building: 'control', text: hint.text(deg(num(landing.ang)), deg(landing.angTol ?? legs.angTol)) };
 }
 
 export function settleFlight(profile, result, config = null) {

@@ -121,7 +121,7 @@ test('the parachute slows the fall to a survivable speed and counts as used', ()
   assert.ok(events.some((e) => e.type === 'parachute'));
   advance(state, { throttle: 1 }, 2);
   assert.equal(state.throttle, 0, 'the engine is off under the canopy');
-  assert.ok(Math.abs(state.vy - (12 - 0.65 * 4)) < 1e-9, 'terminal speed of a level 4 canopy');
+  assert.ok(Math.abs(state.vy - (12 - 0.4 * 4)) < 1e-9, 'terminal speed of a level 4 canopy');
   advance(state, { parachute: true }, 60);
   assert.equal(state.phase, 'landed');
   const result = summarize(state);
