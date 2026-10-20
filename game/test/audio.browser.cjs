@@ -72,7 +72,7 @@ async function main() {
     assert.equal(flight.invalid, 0, 'no NaN or Infinity samples');
     assert.ok(flight.peakDb <= PEAK_LIMIT_DB, `peak ${flight.peakDb} dBFS above ${PEAK_LIMIT_DB}`);
     assert.ok(flight.longestSilence <= SILENCE_LIMIT_SECONDS, `silence of ${flight.longestSilence} s inside the scenario`);
-    assert.ok(flight.rmsDb > -30 && flight.rmsDb < -12, `rms ${flight.rmsDb} dBFS outside -30..-12`);
+    assert.ok(flight.rmsDb > -26 && flight.rmsDb < -15, `rms ${flight.rmsDb} dBFS outside -26..-15`);
     assert.ok(Math.abs(flight.dcOffset) < 0.01, `dc offset ${flight.dcOffset}`);
     assert.ok(flight.repeatDifference < 1e-3, `two renders of the same seed differ by ${flight.repeatDifference}`);
     assert.ok(flight.otherSeedDifference > 1e-4, 'another seed sounds different');
@@ -83,7 +83,7 @@ async function main() {
     console.log(`hub     peak ${fixed(hub.peakDb)} dBFS  rms ${fixed(hub.rmsDb)} dBFS  longest silence ${fixed(hub.longestSilence, 1)} s`);
     assert.equal(hub.invalid, 0);
     assert.ok(hub.peakDb <= PEAK_LIMIT_DB, `hub peak ${hub.peakDb}`);
-    assert.ok(hub.rmsDb > -42 && hub.rmsDb < -16, `hub rms ${hub.rmsDb}`);
+    assert.ok(hub.rmsDb > -30 && hub.rmsDb < -19, `hub rms ${hub.rmsDb}`);
     assert.ok(hub.longestSilence <= SILENCE_LIMIT_SECONDS, `hub silence ${hub.longestSilence} s`);
 
     const pause = await page.evaluate(() => globalThis.audioTest.pause());

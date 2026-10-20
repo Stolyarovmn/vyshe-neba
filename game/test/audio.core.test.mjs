@@ -275,6 +275,28 @@ test('offline mode never touches the graph while it renders', () => {
   assert.ok(ctx.stats.released > 50, 'dispose releases the graph');
 });
 
+test('the engine graph is parked while the game is quiet and wakes on demand', () => {
+  const { ctx, core, advance } = rig();
+  core.music.setMuted(true);
+  advance(2, { phase: 'hub' });
+  assert.equal(core.stats().engineAwake, true, 'not parked straight away');
+  advance(9, { phase: 'hub' });
+  assert.equal(core.stats().engineAwake, false, 'parked after a few quiet seconds');
+  const wake = (frame) => {
+    advance(ctx.currentTime + 0.1, frame);
+    return core.stats().engineAwake;
+  };
+  assert.equal(wake({ phase: 'ascent', throttle: 0.5, atmo: 1 }), true, 'throttle wakes it');
+  advance(30, { phase: 'hub' });
+  assert.equal(core.stats().engineAwake, false);
+  assert.equal(wake({ phase: 'ascent', throttle: 0, atmo: 1, speed01: 0.6 }), true, 'wind wakes it');
+  advance(60, { phase: 'ascent', throttle: 0, atmo: 0, speed01: 0 });
+  assert.equal(core.stats().engineAwake, false, 'vacuum without thrust is silent too');
+  assert.equal(wake({ phase: 'space', throttle: 0, atmo: 0, rcs: { left: 1, right: 0 } }), true, 'RCS wakes it');
+  advance(80, { phase: 'ascent', throttle: 1, paused: true });
+  assert.equal(core.stats().engineAwake, false, 'pause parks it');
+});
+
 test('createAudio without Web Audio is a harmless no-op', async () => {
   const audio = createAudio({ autoUnlock: false });
   assert.equal(audio.state, 'none');

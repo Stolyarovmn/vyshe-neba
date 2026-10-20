@@ -91,7 +91,12 @@ class MockNode {
     return target;
   }
 
-  disconnect() {
+  disconnect(target) {
+    if (target !== undefined) {
+      // Selective disconnect: the node stays alive, like in the real API.
+      if (!this.outputs.delete(target)) throw new Error(`${this.kind}.disconnect: not connected to that target`);
+      return;
+    }
     this.outputs.clear();
     if (!this.disconnected) {
       this.disconnected = true;

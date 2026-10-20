@@ -388,7 +388,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
   function handleFlightEvents(s, events) {
     if (!events.length) return;
     try {
-      renderer.events?.(events);
+      renderer.events?.(events, s.flight);
     } catch (err) {
       console.warn('[app] renderer.events:', err);
     }
@@ -443,13 +443,15 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       audioFrame(s, dt);
       return;
     }
+    // замедление в момент касания и аварии отдаёт рендер (fx.slowmo)
+    const scale = renderer.flight?.timeScale ?? 1;
     if (s.phase === 'flying') {
-      s.acc += Math.min(dt, MAX_FRAME);
+      s.acc += Math.min(dt, MAX_FRAME) * scale;
       const n = Math.min(MAX_STEPS, Math.floor(s.acc / DT));
       s.acc -= n * DT;
       if (n > 0) handleFlightEvents(s, simulate(s, n, inp));
     } else if (s.phase === 'ending') {
-      s.acc += Math.min(dt, MAX_FRAME);
+      s.acc += Math.min(dt, MAX_FRAME) * scale;
       const n = Math.min(MAX_STEPS, Math.floor(s.acc / DT));
       s.acc -= n * DT;
       if (n > 0) handleFlightEvents(s, simulate(s, n, stripPulses(inp)));

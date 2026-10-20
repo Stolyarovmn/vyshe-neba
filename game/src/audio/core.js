@@ -96,6 +96,7 @@ export function createCore({ ctx, seed = 1, now = () => ctx.currentTime, volumes
       stolen: toolkit.stats.stolen,
       music: music.info(),
       sfx: { ...sfx.stats },
+      engineAwake: engine.isAwake(),
     }),
   };
 }
