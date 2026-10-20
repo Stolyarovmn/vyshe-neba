@@ -144,3 +144,15 @@ test('отсутствующие ассеты не ломают полёт: за
     renderer.draw(ctx, { flight: state.flight, config: state.config, time: 1, layout, settings: {} });
   }
 });
+
+test('маркер посадочной зоны и линия прогноза не показываются на старте и пока ракета стоит', async () => {
+  const { landingZoneAlpha } = await import('../src/render/overlays.js');
+  const base = { liftedOff: true, phase: 'descent', alt: 400 };
+  assert.equal(landingZoneAlpha({ ...base, liftedOff: false, phase: 'pad', alt: 0 }), 0);
+  assert.equal(landingZoneAlpha({ ...base, phase: 'pad', alt: 3 }), 0);
+  assert.equal(landingZoneAlpha({ ...base, phase: 'ascent', alt: 4 }), 0);
+  assert.equal(landingZoneAlpha({ ...base, phase: 'landed', alt: 0 }), 0);
+  assert.equal(landingZoneAlpha({ ...base, phase: 'crashed', alt: 0 }), 0);
+  assert.equal(landingZoneAlpha({ ...base, alt: 200 }), 1);
+  assert.ok(landingZoneAlpha({ ...base, alt: 40 }) > 0 && landingZoneAlpha({ ...base, alt: 40 }) < 1);
+});

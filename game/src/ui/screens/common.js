@@ -12,7 +12,8 @@ export const BUILDING_ICON = {
   factory: 'gear', weather: 'wind', control: 'avionics', radar: 'radar', energy: 'bolt', observation: 'eye', recovery: 'chute',
 };
 
-export const buildingIcon = (key) => BUILDING_ICON[key] || 'building';
+/** Имя иконки постройки: спрайт здания по эпохе/уровню (см. ui/icons.js), векторный запасной вариант — из BUILDING_ICON. */
+export const buildingIcon = (key, level = 0) => `bld:${key}:${level}`;
 export const partIcon = (id) => id;
 
 export const STAT_BETTER_DOWN = new Set(['burnRate', 'consumption', 'drag', 'mass', 'cost', 'fuelBurn']);
@@ -229,10 +230,12 @@ export function drawBuildingCard(app, kit, r, key, o = {}) {
 
   kit.scrollArea(`card-scroll-${key}`, bodyRect, undefined, (top) => {
     let y = top;
-    kit.drawText(t('card.level', { n: st.level, max: st.max }), bodyRect.x, y + size * 0.7, { size: kit.fs(14), color: c.amber });
-    y += size * 1.6;
-    levelPips(kit, { x: bodyRect.x, y, w: bodyRect.w - L.px * 3, h: Math.round(L.ui * 8) }, st.level, st.max, st.cap);
-    y += Math.round(L.ui * 8) + L.gap;
+    const sprite = Math.round(Math.min(72 * L.ui, bodyRect.w * 0.3));
+    kit.icon(buildingIcon(key, st.level || 1), bodyRect.x + sprite / 2, y + sprite / 2, sprite, c.text, st.level ? 1 : 0.55);
+    const hx = bodyRect.x + sprite + L.gap;
+    kit.drawText(t('card.level', { n: st.level, max: st.max }), hx, y + sprite * 0.3, { size: kit.fs(14), color: c.amber });
+    levelPips(kit, { x: hx, y: y + sprite * 0.55, w: bodyRect.w - L.px * 3 - sprite - L.gap, h: Math.round(L.ui * 8) }, st.level, st.max, st.cap);
+    y += sprite + L.gap;
     y += kit.paragraph(buildingDesc(app, key), bodyRect.x, y, bodyRect.w - L.px * 3, { size, color: c.textDim, lineHeight: 1.25 }) + L.gap;
     const infos = app.data.BUILDINGS?.[key]?.effectInfo || [];
     const effRows = st.next ? deltaRows(infos, st.effects, st.next.effects) : [];
@@ -258,6 +261,11 @@ export function drawBuildingCard(app, kit, r, key, o = {}) {
     } else {
       kit.drawText(t('card.maxed'), bodyRect.x, y + size * 0.7, { size: kit.fs(14), color: c.green });
       y += size * 1.8;
+    }
+    if (o.onShow && st.level > 0) {
+      y += L.gap * 0.5;
+      if (kit.button(`show-${key}`, { x: bodyRect.x, y, w: bodyRect.w - L.px * 3, h: L.touch(48) }, { label: t('card.show'), icon: 'target', variant: 'btn', size: kit.fs(14) })) o.onShow(key);
+      y += L.touch(48) + L.gap;
     }
     return y - top + L.gap;
   });

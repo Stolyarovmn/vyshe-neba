@@ -96,6 +96,7 @@ export function normalizeConfig(input = {}) {
       fall: input.limits?.fall == null ? null : num(input.limits.fall, null),
     },
     weather: forcedWeather,
+    quietSky: Boolean(input.quietSky),
     start: normalizeStart(input.start),
   };
 }

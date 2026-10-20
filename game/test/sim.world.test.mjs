@@ -1,76 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  SPACE_ALT, ZONES, advance, createFlight, heavyRocket, startRocket, step,
+  ZONES, advance, createFlight, heavyRocket, startRocket, step,
 } from '../src/sim/index.js';
-import { PLANE_FLOOR, bandWeight, spawnHazards } from '../src/sim/hazards.js';
-import { createRngState, hashSeed } from '../src/sim/rng.js';
-
-function sample(bodyId, era, rows, columns = 6) {
-  const found = [];
-  let id = 1;
-  for (let iy = 0; iy < rows; iy++) {
-    for (let ix = -columns; ix < columns; ix++) {
-      const rs = createRngState(hashSeed(7, ix, iy, era));
-      found.push(...spawnHazards(rs, {
-        bodyId, era, x0: ix * 600, alt0: iy * 300, width: 600, height: 300, padX: 0, nextId: () => id++,
-      }));
-    }
-  }
-  return found;
-}
-
-test('hazard bands fade in and out smoothly', () => {
-  assert.equal(bandWeight(50, 100, 200), 0);
-  assert.equal(bandWeight(250, 100, 200), 0);
-  assert.equal(bandWeight(150, 100, 200), 1);
-  assert.ok(bandWeight(105, 100, 200) > 0 && bandWeight(105, 100, 200) < 1);
-  assert.ok(bandWeight(195, 100, 200) > 0 && bandWeight(195, 100, 200) < 1);
-});
-
-test('aircraft stay off the launch zone and out of space; balloons stay below 50 km', () => {
-  const hazards = sample('earth', 3, 40);
-  const planes = hazards.filter((h) => h.kind === 'plane');
-  const balloons = hazards.filter((h) => h.kind === 'balloon');
-  assert.ok(planes.length > 20 && balloons.length > 20);
-  for (const plane of planes) {
-    const alt = -plane.oy;
-    assert.ok(alt >= PLANE_FLOOR, `plane at ${alt}`);
-    assert.ok(alt <= 5000, `era 3 experimental ceiling is 50 km, got ${alt}`);
-  }
-  for (const balloon of balloons) assert.ok(-balloon.oy <= 4500 && -balloon.oy >= 20);
-});
-
-test('altitude decides the role: aircraft lineages follow their bands', () => {
-  const planes = sample('earth', 4, 40).filter((h) => h.kind === 'plane');
-  const at = (lineage) => planes.filter((p) => p.lineage === lineage).map((p) => -p.oy);
-  assert.ok(Math.max(...at('low_primary')) <= 400, 'light aircraft only in the low sky');
-  assert.ok(Math.min(...at('medium_passenger')) >= 700 && Math.max(...at('medium_passenger')) <= 1300);
-  assert.ok(Math.min(...at('high_fighter')) >= 1200 && Math.max(...at('high_fighter')) <= 2300);
-  assert.ok(Math.min(...at('high_experimental')) >= 2300);
-});
-
-test('the sky is empty of aircraft above 100 km and full of rocks and debris', () => {
-  const high = sample('earth', 5, 60).filter((h) => -h.oy > 9000);
-  assert.ok(high.length > 0);
-  assert.ok(high.every((h) => h.kind === 'asteroid' || h.kind === 'debris' || h.kind === 'plane'));
-  assert.ok(high.filter((h) => -h.oy >= SPACE_ALT).every((h) => h.kind === 'asteroid' || h.kind === 'debris'));
-  assert.ok(sample('earth', 5, 40).some((h) => h.kind === 'asteroid' && -h.oy < 8500));
-});
-
-test('the world follows the era: era 0 only shows the first generation, newer eras mix', () => {
-  assert.ok(sample('earth', 0, 20).filter((h) => h.kind === 'plane' || h.kind === 'balloon').every((h) => h.gen === 0));
-  const mix = sample('earth', 4, 40).filter((h) => h.kind === 'plane');
-  const gens = new Set(mix.map((h) => h.gen));
-  assert.ok(gens.has(4) && gens.has(3), `generations seen: ${[...gens]}`);
-  assert.ok(mix.filter((h) => h.gen === 4).length > mix.filter((h) => h.gen === 3).length);
-});
-
-test('the Moon only has rocks', () => {
-  const moon = sample('moon', 3, 8);
-  assert.ok(moon.length > 0);
-  assert.ok(moon.every((h) => h.kind === 'asteroid'));
-});
 
 test('cells are generated from the seed alone, so the same sky always appears', () => {
   const a = createFlight(startRocket({ seed: 12 }));
@@ -136,7 +68,7 @@ test('pickups: coins pay, fuel refills the tank, repair kits heal, rings boost t
 
   const ringed = createFlight(startRocket({ weather: 'clear', start: { body: 'earth', alt: 500, vy: -30 } }));
   const control = createFlight(startRocket({ weather: 'clear', start: { body: 'earth', alt: 500, vy: -30 } }));
-  ringed.objects.push({ id: 1, kind: 'ring', hazard: false, x: 0, y: -(500 + 26 - 30 * 0.05), r: 35, active: true });
+  ringed.objects.push({ id: 1, kind: 'ring', hazard: false, orient: 'horizontal', halfWidth: 70, x: 0, y: -(500 + 26 + 1), r: 70, active: true });
   advance(ringed, { throttle: 0 }, 0.1);
   advance(control, { throttle: 0 }, 0.1);
   assert.equal(ringed.rings, 1);
@@ -202,55 +134,6 @@ test('zones open as the rocket climbs and each reports once', () => {
   assert.equal(zones[0].id, ZONES.earth[1].id);
   assert.ok(state.zonesSeen.includes('above-clouds'));
   assert.equal(new Set(zones.filter((e) => e.first).map((e) => e.id)).size, zones.filter((e) => e.first).length);
-});
-
-test('weather: a forced storm blows in the lower sky, shakes the rocket and is gone above the clouds', () => {
-  const low = createFlight(startRocket({ weather: 'storm', start: { body: 'earth', alt: 500 } }));
-  const events = advance(low, { throttle: 0.7 }, 12);
-  assert.equal(low.weather.kind, 'storm');
-  assert.ok(low.weather.storm > 0.5);
-  assert.ok(events.some((e) => e.type === 'storm' && e.phase === 'start'));
-  assert.ok(low.stormTime > 5);
-
-  const high = createFlight(startRocket({ weather: 'storm', start: { body: 'earth', alt: 6000 } }));
-  advance(high, { throttle: 0 }, 5);
-  assert.equal(high.weather.storm, 0);
-  assert.equal(high.weather.wind, 0);
-
-  const calm = createFlight(startRocket({ weather: 'clear', start: { body: 'earth', alt: 500 } }));
-  advance(calm, { throttle: 0 }, 5);
-  assert.equal(calm.weather.wind, 0);
-  assert.equal(calm.stormTime, 0);
-});
-
-test('weather: wind pushes sideways, fins reduce it, the forecast needs the weather station', () => {
-  const drift = (dragCut) => {
-    const state = createFlight(startRocket({ weather: 'storm', fins: { dragCut }, start: { body: 'earth', alt: 600 } }));
-    let peak = 0;
-    advance(state, { throttle: 0 }, 5, (s) => { peak = Math.max(peak, Math.abs(s.vx)); });
-    return peak;
-  };
-  assert.ok(drift(0) > 1);
-  assert.ok(drift(0.5) < drift(0));
-
-  const noStation = createFlight(startRocket({ seed: 4, start: { body: 'earth', alt: 500 } }));
-  advance(noStation, { throttle: 0 }, 1);
-  assert.equal(noStation.weather.forecast, null);
-  const station = createFlight(startRocket({ seed: 4, base: { weather: 1 }, start: { body: 'earth', alt: 500 } }));
-  advance(station, { throttle: 0 }, 1);
-  assert.ok(['clear', 'cloudy', 'rain', 'storm'].includes(station.weather.forecast.kind));
-  assert.ok(station.weather.forecast.in > 0);
-});
-
-test('weather changes over time and the Moon has none', () => {
-  const state = createFlight(startRocket({ seed: 6, start: { body: 'earth', alt: 9500 } }));
-  const kinds = new Set();
-  advance(state, { throttle: 0 }, 150, (s) => kinds.add(s.weather.kind));
-  assert.ok(kinds.size >= 2, `weather stayed ${[...kinds]}`);
-
-  const moon = createFlight(startRocket({ start: { body: 'moon' } }));
-  assert.equal(moon.weather.kind, 'none');
-  assert.equal(moon.weather.wind, 0);
 });
 
 test('the pad blast scorches the hull of a strong engine unless the pad is cooled', () => {

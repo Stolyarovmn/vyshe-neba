@@ -81,11 +81,6 @@ export function wrapAngle(a) {
   return v;
 }
 
-/** Кадрированное значение 0..n-1 по времени: frame(t, 8 fps, 4 кадра). */
-export function frameIndex(t, fps, count) {
-  return Math.floor(t * fps) % count;
-}
-
 /** Генератор mulberry32 для визуальных эффектов: rng() -> [0, 1). Не связан с симуляцией. */
 export function createRng(seed = 1) {
   let a = seed >>> 0;

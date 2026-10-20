@@ -112,3 +112,13 @@ test('выбор постройки: рамка подсветки рисует�
   hub.setSelected(null);
   assert.equal(hub.selected, null);
 });
+
+test('парные маяки: у каждого своя цель, ракета между ними по-прежнему «rocket»', () => {
+  const { hub, layout, ctx } = setup();
+  hub.draw(ctx, { profile: profile({ beacons: 1 }), time: 1, layout });
+  const rects = hub.screenRects('beacons');
+  assert.equal(rects.length, 2);
+  const rocket = hub.screenPos('rocket');
+  assert.equal(hub.hitTest(rocket.x, rocket.y), 'rocket');
+  for (const rect of rects) assert.equal(hub.hitTest((rect.x0 + rect.x1) / 2, (rect.y0 + rect.y1) / 2), 'beacons');
+});

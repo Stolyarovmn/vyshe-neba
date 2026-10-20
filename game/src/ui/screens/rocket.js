@@ -68,13 +68,87 @@ export default {
 
 // ---------- схема ----------
 
+let stationLayer = null;
+
+/** Занятые подписями, кнопками и ракетой области схемы: станции мастерской под ними не рисуются. */
+function occupiedBoxes(app, kit, L, G) {
+  const pad = Math.round(6 * L.ui);
+  const grow = (b) => ({ x: b.x - pad, y: b.y - pad, w: b.w + pad * 2, h: b.h + pad * 2 });
+  const boxes = [grow(G.rocket), grow(G.stand)];
+  for (const id of PART_KEYS) {
+    const r = G.spots[id];
+    if (!r) continue;
+    boxes.push(grow(r));
+    if (G.compact) continue;
+    const lb = labelLayout(app, kit, L, G, id);
+    boxes.push(grow(lb.box));
+  }
+  return boxes;
+}
+
+/** Фоновые станции эпохи: рисуются в слой, вырезаются под занятые области, приглушаются и кладутся с прозрачностью ≈ 0,55. */
+function drawStations(app, kit, L, G) {
+  const dpr = L.dpr;
+  const sc = G.schematic;
+  const w = Math.ceil(sc.w * dpr);
+  const h = Math.ceil(sc.h * dpr);
+  if (!stationLayer || stationLayer.width !== w || stationLayer.height !== h) {
+    stationLayer = document.createElement('canvas');
+    stationLayer.width = w;
+    stationLayer.height = h;
+  }
+  const og = stationLayer.getContext('2d');
+  og.setTransform(1, 0, 0, 1, 0, 0);
+  og.globalCompositeOperation = 'source-over';
+  og.clearRect(0, 0, w, h);
+  og.setTransform(dpr, 0, 0, dpr, -sc.x * dpr, -sc.y * dpr);
+  try {
+    app.renderer.workshop.drawStations(og, { era: app.profile.era, rect: sc, time: app.time });
+  } catch (err) {
+    console.warn('[rocket] drawStations:', err);
+    return;
+  }
+  og.setTransform(1, 0, 0, 1, 0, 0);
+  og.globalCompositeOperation = 'source-atop';
+  og.fillStyle = 'rgba(8,14,28,0.32)';
+  og.fillRect(0, 0, w, h);
+  og.globalCompositeOperation = 'destination-out';
+  og.fillStyle = '#000';
+  for (const b of occupiedBoxes(app, kit, L, G)) og.fillRect(Math.round((b.x - sc.x) * dpr), Math.round((b.y - sc.y) * dpr), Math.round(b.w * dpr), Math.round(b.h * dpr));
+  og.globalCompositeOperation = 'source-over';
+  const ctx = kit.S.ctx;
+  ctx.save();
+  ctx.globalAlpha = 0.55;
+  ctx.drawImage(stationLayer, sc.x, sc.y, sc.w, sc.h);
+  ctx.restore();
+}
+
+/** Раскладка подписи модуля у горячей точки: строки, размер шрифта, привязка и охватывающая рамка. */
+function labelLayout(app, kit, L, G, id) {
+  const r = G.spots[id];
+  const ps = app.rules.getPartState(app.profile, id);
+  const lx = r.side < 0 ? r.x - L.gap : r.x + r.w + L.gap;
+  const align = r.side < 0 ? 'right' : 'left';
+  const maxW = r.side < 0 ? lx - G.schematic.x - L.gap * 0.5 : G.schematic.x + G.schematic.w - lx - L.gap * 0.5;
+  const shortName = partShort(app, id);
+  const nsize = kit.text.fitWords(shortName, maxW, kit.fs(12));
+  const lines = kit.text.wrap(shortName, maxW, nsize).slice(0, 2);
+  const lh = nsize * 1.15;
+  const levelText = ps.level ? t('rocket.lvl', { n: ps.level }) : t('rocket.none');
+  const blockH = lines.length * lh + kit.fs(11) * 1.2;
+  const w = Math.min(maxW, Math.max(...lines.map((ln) => kit.text.measure(ln, nsize)), kit.text.measure(levelText, kit.fs(11))));
+  return { lx, align, maxW, nsize, lines, lh, levelText, blockH, ps, box: { x: r.side < 0 ? lx - w : lx, y: r.y + (r.h - blockH) / 2, w, h: blockH } };
+}
+
 /** Сборка настоящими спрайтами эпохи (render/rocket-view.js), подсветка выбранного модуля, вспышка при улучшении. */
 function drawSchematic(app, kit, L, G, st, thr) {
   const ctx = kit.S.ctx;
   const c = kit.c;
   const p = app.profile;
   const r = G.rocket;
-  kit.nine('inset', G.schematic.x, G.schematic.y, G.schematic.w, G.schematic.h);
+  // с фоном мастерской рамка стеклянная; станции — приглушённый фон, вырезанный под подписи и кнопки
+  kit.nine(app.backdropOn ? 'glass' : 'inset', G.schematic.x, G.schematic.y, G.schematic.w, G.schematic.h);
+  if (app.backdropOn && !L.portrait && G.schematic.w > 480 * L.ui && app.renderer.workshop?.drawStations) drawStations(app, kit, L, G);
   const shake = thr > 0 && !app.settings.reduceMotion ? Math.sin(app.time * 90) * thr * 1.2 : 0;
   const cx = r.x + r.w / 2 + shake;
   drawAssembly(ctx, app.renderer.painter, {
@@ -148,27 +222,20 @@ function drawSpots(app, kit, L, G, st) {
     const m = Math.max(3, L.px + 1);
     ctx.fillRect(Math.round(mark.x - m), Math.round(mark.y - m), m * 2, m * 2);
 
-    const clicked = kit.button(`part-${id}`, r, { icon: partIcon(id), variant: on ? 'cardOn' : 'card', iconSize: Math.round(r.w * 0.52), tip: partName(app, id), badge: upgradable ? '!' : undefined, iconColor: ps.level ? c.text : c.textMute });
+    const clicked = kit.button(`part-${id}`, r, { icon: partIcon(id), variant: on ? 'cardOn' : 'card', iconSize: Math.round(r.w * 0.66), tip: partName(app, id), badge: upgradable ? '!' : undefined, iconColor: ps.level ? c.text : c.textMute });
     if (clicked) st.selected = id;
     if (G.compact) {
       // тесная раскладка: без подписей, уровень цифрой в углу
       if (ps.level) kit.drawText(String(ps.level), r.x + L.px * 3, r.y + r.h - Math.round(8 * L.ui), { size: kit.fs(12), color: c.amber, weight: 900, shadow: 'rgba(0,0,0,0.9)' });
     } else {
       // подпись снаружи: название в одну-две строки и уровень
-      const lx = r.side < 0 ? r.x - L.gap : r.x + r.w + L.gap;
-      const align = r.side < 0 ? 'right' : 'left';
-      const maxW = r.side < 0 ? lx - G.schematic.x - L.gap * 0.5 : G.schematic.x + G.schematic.w - lx - L.gap * 0.5;
-      const shortName = partShort(app, id);
-    const nsize = kit.text.fitWords(shortName, maxW, kit.fs(12));
-    const lines = kit.text.wrap(shortName, maxW, nsize).slice(0, 2);
-    const lh = nsize * 1.15;
-      const blockH = lines.length * lh + kit.fs(11) * 1.2;
-      let ty = r.y + (r.h - blockH) / 2 + lh / 2;
-      for (const ln of lines) {
-        kit.drawText(ln, lx, ty, { size: nsize, color: on ? c.amber : c.text, align, maxWidth: maxW });
-        ty += lh;
+      const lb = labelLayout(app, kit, L, G, id);
+      let ty = lb.box.y + lb.lh / 2;
+      for (const ln of lb.lines) {
+        kit.drawText(ln, lb.lx, ty, { size: lb.nsize, color: on ? c.amber : c.text, align: lb.align, maxWidth: lb.maxW, shadow: 'rgba(0,0,0,0.85)' });
+        ty += lb.lh;
       }
-      kit.drawText(ps.level ? t('rocket.lvl', { n: ps.level }) : t('rocket.none'), lx, ty + kit.fs(2), { size: kit.fs(11), color: ps.level ? c.amber : c.textMute, align, maxWidth: maxW });
+      kit.drawText(lb.levelText, lb.lx, ty + kit.fs(2), { size: kit.fs(11), color: ps.level ? c.amber : c.textMute, align: lb.align, maxWidth: lb.maxW, shadow: 'rgba(0,0,0,0.85)' });
     }
     if (lockedReq) kit.icon('lock', r.side < 0 ? r.x + 8 * L.ui : r.x + r.w - 8 * L.ui, r.y + r.h - 8 * L.ui, Math.round(12 * L.ui), c.amber);
   }
@@ -181,7 +248,7 @@ function drawPanel(app, kit, L, G, st) {
   const p = app.profile;
   const id = st.selected;
   const ps = app.rules.getPartState(p, id);
-  const inner = kit.panel(G.panel, { title: partName(app, id), titleIcon: partIcon(id), variant: 'panel' });
+  const inner = kit.panel(G.panel, { title: partName(app, id), titleIcon: partIcon(id), variant: app.backdropOn ? 'panelGlass' : 'panel' });
   const footerH = L.touch(56) + L.gap;
   const body = { x: inner.x, y: inner.y, w: inner.w, h: inner.h - footerH };
   const rows = statRows(app, id);

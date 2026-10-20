@@ -6,34 +6,46 @@ import { fillWorldRect } from './painter.js';
 import { clamp, hash2, smoothstep, TAU } from './util.js';
 
 /**
+ * Видимость маркера посадочной зоны (0..1): нет на старте и пока ракета стоит (площадка, посадка, авария),
+ * после отрыва плавно растёт с высотой.
+ */
+export function landingZoneAlpha(flight) {
+  if (!flight.liftedOff || flight.phase === 'landed' || flight.phase === 'crashed' || flight.phase === 'pad') return 0;
+  return smoothstep(12, 70, flight.alt ?? 0);
+}
+
+/**
  * Зона посадки: огни по краям площадки, полоса на грунте и тонкий световой луч сверху.
  * pad = { x, half, lit }; ok — текущее состояние допустимо для посадки и ракета над площадкой.
  */
-export function drawLandingZone(ctx, view, pad, lit, ok, time, alt, descending) {
-  if (!pad || pad.visible === false) return;
+export function drawLandingZone(ctx, view, pad, lit, ok, time, alt, alpha) {
+  if (!pad || pad.visible === false || alpha <= 0.01) return;
   const half = pad.half;
   const left = pad.x - half;
   const right = pad.x + half;
   if (right < view.left - 30 || left > view.right + 30) return;
   const color = ok ? 'rgba(150,240,170,0.9)' : 'rgba(255,214,120,0.85)';
+  const previous = ctx.globalAlpha;
+  ctx.globalAlpha = previous * alpha;
   fillWorldRect(ctx, view, left, -2, half * 2, 2, color);
   drawPadLights(ctx, view, pad.x, half, lit, time, ok);
-  if (descending && alt > 30 && alt < 2400) {
+  if (alt > 30 && alt < 2400) {
     // Луч над площадкой: помогает найти её при подлёте. Три слоя разной ширины дают мягкие края.
     const sy1 = view.sy(0);
     const sy0 = Math.max(0, view.sy(-700));
     const pulse = 0.5 + 0.5 * Math.sin(time * 2.4);
     const layers = [[0.5, 0.045], [0.32, 0.055], [0.16, 0.07]];
-    for (const [width, alpha] of layers) {
+    for (const [width, strength] of layers) {
       const sx0 = view.sx(pad.x - half * width);
       const sx1 = view.sx(pad.x + half * width);
       const beam = ctx.createLinearGradient(0, sy1, 0, sy0);
-      beam.addColorStop(0, `rgba(160,245,180,${(alpha * (1.4 + pulse * 0.6)).toFixed(3)})`);
+      beam.addColorStop(0, `rgba(160,245,180,${(strength * (1.4 + pulse * 0.6)).toFixed(3)})`);
       beam.addColorStop(1, 'rgba(160,245,180,0)');
       ctx.fillStyle = beam;
       ctx.fillRect(sx0, sy0, sx1 - sx0, sy1 - sy0);
     }
   }
+  ctx.globalAlpha = previous;
 }
 
 /** Стрелка на краю кадра в сторону площадки, когда она вне экрана по горизонтали. */
@@ -62,11 +74,12 @@ export function drawPadPointer(ctx, view, pad, anchorY, time) {
  * Линия прогноза: пунктир по опорным точкам sim.predict.points ([x, y] в мире) и, на втором
  * уровне авионики, отметка точки падения (зелёная на площадке, жёлтая рядом).
  */
-export function drawPredict(ctx, view, predict, time) {
-  if (!predict || !predict.points || predict.points.length < 2) return;
+export function drawPredict(ctx, view, predict, time, alpha = 1, groundView = view) {
+  if (!predict || !predict.points || predict.points.length < 2 || alpha <= 0.01) return;
   const px = view.px;
   const points = predict.points;
   ctx.save();
+  ctx.globalAlpha *= alpha;
   ctx.lineWidth = Math.max(1, Math.round(px * 1.2));
   ctx.setLineDash([4 * px, 4 * px]);
   ctx.lineDashOffset = -time * 20 * px;
@@ -78,13 +91,13 @@ export function drawPredict(ctx, view, predict, time) {
   ctx.setLineDash([]);
   const impact = predict.impact;
   if (impact) {
-    const x = view.sx(impact.x);
-    const y = view.sy(0);
+    const x = groundView.sx(impact.x);
+    const y = groundView.sy(0);
     const color = impact.onPad ? 'rgba(150,240,170,0.95)' : 'rgba(255,200,110,0.95)';
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
     ctx.lineWidth = Math.max(1, Math.round(px * 1.5));
-    const r = 9 * px;
+    const r = 9 * px * (groundView.S / view.S);
     ctx.beginPath();
     ctx.ellipse(x, y, r * 1.6, r * 0.5, 0, 0, TAU);
     ctx.stroke();

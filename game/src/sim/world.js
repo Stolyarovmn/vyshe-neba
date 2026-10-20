@@ -3,21 +3,21 @@
 
 import { BODIES, zoneAt } from './bodies.js';
 import { chance, createRngState, hashSeed, range } from './rng.js';
-import { createWeather } from './weather.js';
+import { createWeather, updateWeather } from './weather.js';
+import { resetClouds, updateClouds } from './clouds.js';
 import { collisionDamage, positionHazard, spawnHazards } from './hazards.js';
 import {
   COIN_VALUE, FUEL_PICKUP_SHARE, MAGNET_BONUS, PICKUP_RADIUS, REPAIR_AMOUNT, RING_BOOST_TIME,
   RING_IMPULSE, spawnPickups,
 } from './pickups.js';
-import { activeStage, addFuel, warn } from './rocket.js';
+import { ROCKET_AXIS_OFFSET, ROCKET_RADIUS, activeStage, addFuel, warn } from './rocket.js';
 
 export const CELL_W = 600;
 export const CELL_H = 300;
-export const ROCKET_AXIS_OFFSET = 26; // collision centre sits this far above the feet
-export const ROCKET_RADIUS = 12;
 const NEAR_MISS_INNER = 15;
 const NEAR_MISS_OUTER = 42;
 const HIT_COOLDOWN = 0.8;
+const RING_CENTER_OFFSET = 0.35; // passing this close to the middle counts as a centred pass
 const BODY_INDEX = { earth: 0, moon: 1, mars: 2 };
 const KEEP_X = 3500;
 const KEEP_ALT = 2600;
@@ -50,6 +50,8 @@ export function enterBody(s, bodyId, opts = {}) {
   s.pad = makePad(s, bodyId, padX);
   s.weather = createWeather(hashSeed(s.cfg.seed, 11, BODY_INDEX[bodyId]), bodyId, s.cfg.weather);
   resetWorld(s);
+  s.lastCx = null;
+  s.lastCy = null;
   s.entryTime = s.time;
   s.x = opts.x ?? 0;
   s.y = -(opts.alt ?? 0);
@@ -58,6 +60,9 @@ export function enterBody(s, bodyId, opts = {}) {
   s.angle = opts.angle ?? 0;
   s.av = 0;
   s.zone = zoneAt(bodyId, opts.alt ?? 0);
+  updateWeather(s.weather, bodyId, opts.alt ?? 0, 0, s.cfg.base.weather > 0 || s.cfg.avionics.predict > 0);
+  resetClouds(s);
+  updateClouds(s, 0);
 }
 
 function generateCell(s, ix, iy) {
@@ -72,6 +77,7 @@ function generateCell(s, ix, iy) {
     width: CELL_W,
     height: CELL_H,
     padX: s.pad.x,
+    quiet: s.cfg.quietSky,
     fuelDropRate: s.cfg.base.fuelDropRate,
     nextId: () => s.world.nextId++,
   };
@@ -119,7 +125,7 @@ function hitHazard(s, o, events) {
   }
 
   if (s.hp <= 0) s.killer = o.kind;
-  events.push({ type: 'hit', kind: o.kind, lineage: o.lineage, damage, hp: s.hp, x: o.x, y: o.y });
+  events.push({ type: 'hit', kind: o.kind, lineage: o.lineage, size: o.size, damage, hp: s.hp, x: o.x, y: o.y });
   events.push({ type: 'thrust-cut', reason: 'hit' });
 }
 
@@ -139,18 +145,26 @@ function collect(s, o, events) {
     s.hp += restored;
     s.items.repair += 1;
     events.push({ type: 'pickup', kind: 'repair', value: restored, x: o.x, y: o.y });
-  } else if (o.kind === 'ring') {
-    s.rings += 1;
-    const speed = Math.hypot(s.vx, s.vy);
-    const dirX = speed > 0.5 ? s.vx / speed : Math.sin(s.angle);
-    const dirY = speed > 0.5 ? s.vy / speed : -Math.cos(s.angle);
-    s.vx += dirX * RING_IMPULSE;
-    s.vy += dirY * RING_IMPULSE;
-    s.ringBoost = RING_BOOST_TIME;
-    events.push({ type: 'ring', x: o.x, y: o.y });
-    return;
   }
   s.pickups += 1;
+}
+
+// Flying through a horizontal ring: the rocket crosses the ring's level inside its width, in either direction.
+// The speed boost follows the direction of travel and is better the closer to the middle the rocket passes.
+function passRing(s, o, offset, crossingDir, events) {
+  o.active = false;
+  s.rings += 1;
+  if (offset <= RING_CENTER_OFFSET) s.ringsCentered += 1;
+  const speed = Math.hypot(s.vx, s.vy);
+  const dirX = speed > 0.5 ? s.vx / speed : Math.sin(s.angle);
+  const dirY = speed > 0.5 ? s.vy / speed : -Math.cos(s.angle);
+  const impulse = RING_IMPULSE * (1.15 - 0.5 * offset);
+  s.vx += dirX * impulse;
+  s.vy += dirY * impulse;
+  s.ringBoost = RING_BOOST_TIME;
+  events.push({
+    type: 'ring', x: o.x, y: o.y, halfWidth: o.halfWidth, offset, dir: crossingDir, quality: offset <= RING_CENTER_OFFSET ? 'center' : 'edge',
+  });
 }
 
 export function updateObjects(s, events) {
@@ -194,10 +208,20 @@ export function updateObjects(s, events) {
     } else if ((o.kind === 'fuel' || o.kind === 'repair') && d < PICKUP_RADIUS[o.kind]) {
       collect(s, o, events);
       removed = true;
-    } else if (o.kind === 'ring' && d < o.r - 5) {
-      collect(s, o, events);
-      removed = true;
+    } else if (o.kind === 'ring' && s.lastCy !== null) {
+      const before = s.lastCy - o.y;
+      const after = cy - o.y;
+      if (before * after <= 0 && before !== after) {
+        const t = before / (before - after);
+        const offset = Math.abs(s.lastCx + (cx - s.lastCx) * t - o.x) / o.halfWidth;
+        if (offset <= 1) {
+          passRing(s, o, offset, cy < s.lastCy ? 'up' : 'down', events);
+          removed = true;
+        }
+      }
     }
   }
+  s.lastCx = cx;
+  s.lastCy = cy;
   if (removed) s.objects = s.objects.filter((o) => o.active);
 }

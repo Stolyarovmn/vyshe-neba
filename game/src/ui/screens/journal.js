@@ -31,7 +31,7 @@ export default {
       { id: 'skins', label: t('journal.tab.skins'), icon: 'brush' },
     ];
     st.tab = kit.tabs('journal-tabs', G.tabs, tabs, st.tab, { size: kit.fs(L.portrait ? 11 : 13) });
-    kit.nine('panel', G.list.x, G.list.y, G.list.w, G.list.h);
+    kit.nine(app.backdropOn ? 'panelGlass' : 'panel', G.list.x, G.list.y, G.list.w, G.list.h);
     kit.hit('journal-bg', G.list, {});
     const inner = { x: G.list.x + L.px * 2, y: G.list.y + L.px * 2, w: G.list.w - L.px * 4, h: G.list.h - L.px * 4 };
     if (st.tab === 'contracts') drawContracts(app, kit, L, inner);
@@ -125,34 +125,40 @@ function drawAchievements(app, kit, L, r) {
 
 // ---------- лавка ----------
 
+/** Витрина 2×2: крупные карточки расходников (спрайт эпохи, описание, запас, кнопка покупки) заполняют всю область. */
 function drawShop(app, kit, L, r) {
   const c = kit.c;
   const items = shopItems(app.mods);
   const p = app.profile;
-  const rowH = Math.round(84 * L.ui);
-  kit.scrollList('journal-shop', r, {
-    count: items.length,
-    itemH: rowH,
-    gap: L.gap,
-    draw: (i, ir) => {
-      const it = items[i];
+  const cols = 2;
+  const gap = L.gap;
+  const rows = Math.ceil(items.length / cols);
+  const cardW = Math.floor((r.w - gap * (cols - 1) - L.px * 3) / cols);
+  const minH = Math.round(236 * L.ui);
+  const cardH = Math.max(minH, Math.min(Math.round(320 * L.ui), Math.floor((r.h - gap * (rows - 1)) / rows)));
+  kit.scrollArea('journal-shop', r, rows * (cardH + gap) - gap, (top) => {
+    items.forEach((it, i) => {
+      const x = r.x + (i % cols) * (cardW + gap);
+      const y = top + Math.floor(i / cols) * (cardH + gap);
       const have = p.inventory[it.id] || 0;
-      kit.nine('card', ir.x, ir.y, ir.w, ir.h);
-      kit.icon(CONSUMABLE_ICON[it.id] || 'info', ir.x + L.pad + 16 * L.ui, ir.y + ir.h / 2, Math.round(32 * L.ui), c.amber);
-      const tx = ir.x + L.pad + 44 * L.ui;
-      const btnW = Math.round(112 * L.ui);
-      const maxW = ir.w - (tx - ir.x) - btnW - L.pad * 2;
-      kit.drawText(it.name, tx, ir.y + ir.h * 0.24, { size: kit.fs(14), color: c.text, maxWidth: maxW });
-      kit.paragraph(it.desc, tx, ir.y + ir.h * 0.38, maxW, { size: kit.fs(11), color: c.textDim, maxLines: 2, lineHeight: 1.15 });
-      kit.drawText(t('shop.have', { n: have }), tx, ir.y + ir.h * 0.86, { size: kit.fs(11), color: have ? c.green : c.textMute });
+      kit.nine('card', x, y, cardW, cardH);
+      const icon = Math.round(Math.min(cardW * 0.46, cardH * 0.3));
+      kit.icon(CONSUMABLE_ICON[it.id] || 'info', x + cardW / 2, y + L.pad + icon / 2, icon, c.amber);
+      kit.drawText(it.name, x + cardW / 2, y + L.pad * 1.4 + icon + kit.fs(8), { size: kit.fs(14), color: c.text, align: 'center', maxWidth: cardW - L.pad });
+      const descY = y + L.pad * 1.4 + icon + kit.fs(22);
+      kit.paragraph(it.desc, x + L.pad * 0.8, descY, cardW - L.pad * 1.6, { size: kit.fs(11), color: c.textDim, maxLines: 3, lineHeight: 1.18, align: 'center' });
+      const btnH = L.touch(52);
+      const stockY = y + cardH - btnH - L.gap * 1.6 - L.pad * 0.5;
+      kit.drawText(t('shop.have', { n: have }), x + cardW / 2, stockY, { size: kit.fs(12), color: have ? c.green : c.textMute, align: 'center' });
       const full = have >= STOCK_MAX;
       const afford = p.coins >= it.price;
-      const b = { x: ir.x + ir.w - btnW - L.pad, y: ir.y + (ir.h - L.touch(52)) / 2, w: btnW, h: L.touch(52) };
-      if (kit.button(`shop-buy-${it.id}`, b, { label: full ? t('shop.full') : fmtInt(it.price), icon: full ? undefined : 'coin', variant: 'primary', disabled: full || !afford, size: kit.fs(14), sub: !full && !afford ? t('card.needFunds') : undefined })) {
+      const b = { x: x + L.gap, y: y + cardH - btnH - L.gap, w: cardW - L.gap * 2, h: btnH };
+      if (kit.button(`shop-buy-${it.id}`, b, { label: full ? t('shop.full') : fmtInt(it.price), icon: full ? undefined : 'coin', variant: 'primary', disabled: full || !afford, size: kit.fs(15), sub: !full && !afford ? t('card.needFunds') : undefined })) {
         const res = app.buyConsumable(it.id);
         if (res.ok) kit.toast(t('shop.bought', { name: it.name }), { kind: 'good', icon: CONSUMABLE_ICON[it.id] });
       }
-    },
+    });
+    return rows * (cardH + gap) - gap;
   });
 }
 

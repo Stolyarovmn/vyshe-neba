@@ -39,13 +39,13 @@ function makeObjects(body, era) {
       } else if (roll < 0.58 && alt < 4000) {
         add({ kind: 'balloon', hazard: true, lineage: alt < 300 ? 'low' : alt < 1200 ? 'mid' : 'high', gen: era, r: 28, dir: 1, phase: rng(), ox: x, oy: -alt, x, y: -alt, motion: 'sway' });
       } else if (roll < 0.66 && alt > 4800) {
-        add({ kind: 'asteroid', hazard: true, lineage: 'rock', gen: 0, r: 28, dir: 1, phase: rng(), ox: x, oy: -alt, x, y: -alt, motion: 'drift' });
+        addRock(add, rng, x, alt);
       } else if (roll < 0.72 && alt > 7000) {
         add({ kind: 'debris', hazard: true, lineage: 'satellite', gen: era, r: 32, dir: 1, phase: rng(), ox: x, oy: -alt, x, y: -alt, motion: 'drift' });
       } else if (roll < 0.84) {
         for (let i = 0; i < 5; i++) add({ kind: 'coin', hazard: false, r: 9, x: x + i * 30, y: -alt - i * 8 });
       } else if (roll < 0.9) {
-        add({ kind: 'ring', hazard: false, r: 35, x, y: -alt });
+        add({ kind: 'ring', hazard: false, r: 35, orient: 'horizontal', halfWidth: 38, x, y: -alt });
       } else if (roll < 0.95) {
         add({ kind: 'fuel', hazard: false, r: 15, x, y: -alt });
       } else {
@@ -56,13 +56,45 @@ function makeObjects(body, era) {
     for (let alt = 160; alt < 1500; alt += 90) {
       const x = x0 + rng() * 2800;
       const roll = rng();
-      if (roll < 0.3) add({ kind: 'asteroid', hazard: true, lineage: 'rock', gen: 0, r: 28, dir: 1, phase: rng(), ox: x, oy: -alt, x, y: -alt, motion: 'drift', dx: 4, dy: 2 });
+      if (roll < 0.3) addRock(add, rng, x, alt, { dx: 4, dy: 2 });
       else if (roll < 0.6) for (let i = 0; i < 5; i++) add({ kind: 'coin', hazard: false, r: 9, x: x + i * 30, y: -alt });
-      else if (roll < 0.75) add({ kind: 'ring', hazard: false, r: 35, x, y: -alt });
+      else if (roll < 0.75) add({ kind: 'ring', hazard: false, r: 35, orient: 'horizontal', halfWidth: 38, x, y: -alt });
       else if (roll < 0.85) add({ kind: 'fuel', hazard: false, r: 15, x, y: -alt });
     }
   }
   return objects;
+}
+
+const ROCK_CLASSES = [['medium', 28], ['large', 46], ['huge', 70]];
+
+function addRock(add, rng, x, alt, extra = {}) {
+  const [size, radius] = ROCK_CLASSES[Math.floor(rng() * 3)];
+  add({ kind: 'asteroid', hazard: true, lineage: 'rock', gen: 0, size, r: radius, radius, dir: 1, phase: rng(), ox: x, oy: -alt, x, y: -alt, motion: 'drift', ...extra });
+}
+
+/** Облака в формате sim: положение уже включает снос; скорость постоянная, без качаний. */
+function makeClouds(body, cloudiness) {
+  if (body !== 'earth') return [];
+  const rng = createRng(31);
+  const list = [];
+  let id = 1;
+  for (let alt = 120; alt < 5200; alt += 150) {
+    const count = 1 + (rng() < 0.5 ? 1 : 0);
+    for (let i = 0; i < count; i++) {
+      if (rng() > 0.25 + 0.7 * cloudiness) continue;
+      const kind = alt > 3400 ? 'cirrus' : alt > 2200 ? (rng() < 0.5 ? 'stratus' : 'cirrus') : rng() < 0.22 ? 'stratus' : rng() < 0.2 * cloudiness ? 'storm' : 'cumulus';
+      list.push({
+        id: id++, kind, ox: -1200 + rng() * 2400, alt: alt + rng() * 100,
+        w: kind === 'stratus' ? 480 + rng() * 360 : kind === 'cirrus' ? 360 + rng() * 300 : 170 + rng() * 170,
+        h: 0, density: 0.25 + rng() * 0.7, storm: kind === 'storm', vx: 3 + rng() * 3, x: 0,
+      });
+    }
+  }
+  return list;
+}
+
+function moveClouds(clouds, t) {
+  for (const cloud of clouds) cloud.x = cloud.ox + cloud.vx * t;
 }
 
 function moveObjects(objects, t) {
@@ -96,6 +128,8 @@ export function createStubFlight() {
   let flight = null;
   let objects = [];
   let objectsKey = '';
+  let cloudsKey = '';
+  let clouds = [];
   let loop = null;
 
   function ensure(opts) {
@@ -106,7 +140,7 @@ export function createStubFlight() {
         key,
         version: 1,
         cfg: { era: opts.era, skin: 'classic', destination: opts.body === 'earth' ? 'earth' : opts.body, stages: [] },
-        phase: 'pad', ended: false, time: 0, body: opts.body,
+        phase: 'pad', ended: false, liftedOff: false, time: 0, body: opts.body,
         x: 0, y: 0, vx: 0, vy: 0, angle: 0, av: 0, throttle: 0, alt: 0, speed: 0, climb: 0,
         stageIndex: 0, stages: makeStages(stageKind), fuel: 100, maxFuel: 100, fuel01: 1,
         hp: 100, maxHp: 100, coins: 0, rcs: { left: 0, right: 0 }, boost: { heat: 0, locked: false, active: false },
@@ -118,12 +152,19 @@ export function createStubFlight() {
       };
       objects = [];
       objectsKey = '';
+      cloudsKey = '';
       loop = null;
     }
     if (objectsKey !== `${opts.body}|${opts.era}|${opts.objects}`) {
       objectsKey = `${opts.body}|${opts.era}|${opts.objects}`;
       objects = opts.objects ? makeObjects(opts.body, opts.era) : [];
       flight.objects = objects;
+    }
+    const weatherKind = opts.weather ? opts.weather.kind : 'clear';
+    if (cloudsKey !== `${opts.body}|${weatherKind}`) {
+      cloudsKey = `${opts.body}|${weatherKind}`;
+      clouds = makeClouds(opts.body, weatherKind === 'clear' ? 0.15 : weatherKind === 'cloudy' ? 0.6 : 0.9);
+      flight.clouds = clouds;
     }
     flight.cfg.era = opts.era;
     return flight;
@@ -163,6 +204,7 @@ export function createStubFlight() {
   function stepLoop(f, dt, opts) {
     if (!loop) {
       loop = { t: 0, sep: false, chute: false, ended: 0, lifted: false };
+      f.liftedOff = false;
       f.stageIndex = 0;
       f.phase = 'pad';
       f.x = 0; f.y = 0; f.vx = 0; f.vy = 0; f.angle = 0; f.throttle = 0; f.hp = 100;
@@ -183,6 +225,7 @@ export function createStubFlight() {
     f.throttle = t < 1 ? 0 : t < 1.5 ? (t - 1) * 2 : f.alt < (body === 'earth' ? 1100 : 500) && f.vy < 20 && !f.chute.deployed && f.phase !== 'descent' ? 1 : 0;
     if (t >= 1.5 && !loop.lifted) {
       loop.lifted = true;
+      f.liftedOff = true;
       f.phase = 'ascent';
       events.push({ type: 'liftoff', x: 0, y: 0 });
     }
@@ -237,6 +280,7 @@ export function createStubFlight() {
       const t = opts.time || 0;
       f.weather = weatherFor(opts.weather ? opts.weather.kind : 'clear', t);
       moveObjects(f.objects, t);
+      moveClouds(clouds, t);
       const scenario = opts.scenario;
       f.boost.active = false;
       if (scenario === 'loop') {
@@ -255,6 +299,7 @@ export function createStubFlight() {
       f.vx = scenario === 'ascent' ? 8 * Math.sin(t * 0.3) : 0;
       f.vy = speedBy[scenario] ?? 0;
       f.angle = scenario === 'free' || scenario === 'landing' ? opts.angle : scenario === 'ascent' ? 0.12 * Math.sin(t * 0.7) : scenario === 'descent' ? 0.04 : 0;
+      f.liftedOff = scenario !== 'pad' && scenario !== 'launch';
       f.phase = scenario === 'pad' ? 'pad' : alt > 10000 && f.body === 'earth' ? 'space' : scenario === 'ascent' || scenario === 'launch' ? 'ascent' : scenario === 'landing' && alt < 2 ? 'landed' : 'descent';
       f.throttle = scenario === 'pad' ? 0 : scenario === 'launch' ? Math.max(0.6, opts.throttle) : scenario === 'chute' || scenario === 'landing' && alt < 2 ? 0 : opts.throttle;
       f.rcs.left = scenario === 'ascent' && Math.sin(t * 2) > 0.7 ? 0.8 : 0;

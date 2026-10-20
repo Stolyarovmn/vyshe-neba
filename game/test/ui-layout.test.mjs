@@ -132,7 +132,9 @@ test('экран ракеты: девять горячих точек ≥ 48 px,
 test('остальные экраны: области внутри безопасной зоны, вкладки ≥ 48 px', () => {
   for (const { w, h, L } of layouts()) {
     const base = baseLayout(L);
-    assert.ok(base.tabs.h >= MIN_TOUCH && inside(base.map, L.area) && inside(base.list, L.area), `${w}x${h}: база`);
+    assert.ok(base.tabs.h >= MIN_TOUCH && inside(base.energy, L.area) && inside(base.list, L.area) && inside(base.detail, L.area), `${w}x${h}: база`);
+    assert.ok(!overlaps(base.energy, base.list) && !overlaps(base.energy, base.tabs), `${w}x${h}: энергия перекрывает список`);
+    if (base.wide) assert.ok(!overlaps(base.list, base.detail) && !overlaps(base.tabs, base.detail), `${w}x${h}: список и карточка пересекаются`);
     const l = launchLayout(L);
     assert.ok(l.start.h >= MIN_TOUCH && inside(l.start, L.area) && inside(l.cons, L.area), `${w}x${h}: запуск`);
     for (const c of l.destCards) assert.ok(inside(c, L.area) && c.h >= MIN_TOUCH, `${w}x${h}: карточка цели`);

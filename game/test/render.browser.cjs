@@ -89,8 +89,45 @@ async function checkHub(browser, base, vp) {
     if (hit[key] !== 'не нарисована') assert(hit[key] === key, `${vp.name}: тап по ${key} → ${hit[key]}`);
   }
   await page.screenshot({ path: path.join(outDir, `render-hub-${vp.name}.png`) });
+
+  // зум и панорама: точка под пальцами остаётся на месте, рамки построек пересчитываются
+  const gesture = await page.evaluate(() => {
+    const hub = window.__preview.renderer.hub;
+    const before = hub.view;
+    const rocketBefore = hub.screenPos('rocket');
+    hub.zoomBy(1.7, rocketBefore.x, rocketBefore.y);
+    window.__preview.advance(2);
+    const rocketAfter = hub.screenPos('rocket');
+    const zoomed = hub.view;
+    hub.pan(-80, -40);
+    window.__preview.advance(2);
+    const panned = hub.screenPos('rocket');
+    hub.focus('control', true);
+    window.__preview.advance(2);
+    const control = hub.screenPos('control');
+    return { before, zoomed, rocketBefore, rocketAfter, panned, control, w: innerWidth, h: innerHeight };
+  });
+  assert(gesture.zoomed.zoom > gesture.before.zoom, `${vp.name}: зум не сработал`);
+  assert(Math.hypot(gesture.rocketAfter.x - gesture.rocketBefore.x, gesture.rocketAfter.y - gesture.rocketBefore.y) < 40, `${vp.name}: точка под пальцами уехала`);
+  assert(gesture.panned.x < gesture.rocketAfter.x - 20, `${vp.name}: панорама не сдвинула мир`);
+  assert(gesture.control && gesture.control.x > 0 && gesture.control.x < gesture.w && gesture.control.y > 0 && gesture.control.y < gesture.h, `${vp.name}: focus('control') не вывел постройку в кадр`);
+  await page.screenshot({ path: path.join(outDir, `render-hub-focus-${vp.name}.png`) });
   assert(errors.length === 0, `${vp.name}/хаб: ошибки страницы:\n${errors.join('\n')}`);
   await context.close();
+}
+
+async function checkBackdrops(browser, base) {
+  for (const vp of [VIEWPORTS[0], VIEWPORTS[1]]) {
+    for (const kind of ['workshop', 'shop', 'launch-earth', 'launch-moon']) {
+      const { page, context, errors } = await openPreview(browser, base, vp, `mode=backdrop&bkind=${kind}&era=3&bdim=0.15`);
+      await page.evaluate(() => window.__preview.advance(20));
+      const colors = await distinctColors(page);
+      assert(colors > 20, `фон ${kind} (${vp.name}) выглядит пустым (${colors} цветов)`);
+      await page.screenshot({ path: path.join(outDir, `render-backdrop-${kind}-${vp.name}.png`) });
+      assert(errors.length === 0, `фон ${kind}: ошибки страницы:\n${errors.join('\n')}`);
+      await context.close();
+    }
+  }
 }
 
 async function checkFlight(browser, base, vp) {
@@ -173,6 +210,8 @@ async function frameBudget(browser, base) {
     }
     await checkBodies(browser, url);
     console.log('ok: Луна и Марс');
+    await checkBackdrops(browser, url);
+    console.log('ok: фоны мастерской, лавки и запусков');
     await frameBudget(browser, url);
     console.log('render.browser: всё прошло');
   } catch (error) {

@@ -149,12 +149,19 @@ function applyEvent(e, env) {
     }
     case 'ring': {
       const [x, y] = rocketPoint(env, e);
-      particles.emit(PARTICLE.FLASH, x, y, 0, 0, 0.45, 10, 54, 0, 0, PALETTE_VARIANT.CYAN);
-      emitBurst(particles, rng, {
-        kind: PARTICLE.GLINT, x, y, count: scaled(14, env.reduceMotion), speed: [30, 90], ttl: [0.4, 0.8], size: [1.5, 3],
-        gravity: 0, drag: 1.4, variant: PALETTE_VARIANT.CYAN, angle: 0, spread: Math.PI, shrink: 0.3,
-      });
-      camera.addTrauma(0.12);
+      const half = e.halfWidth || 40;
+      const variant = e.quality === 'center' ? PALETTE_VARIANT.GOLD : PALETTE_VARIANT.CYAN;
+      // Горизонтальное кольцо: вспышка бежит по его кромке наружу (эллипс, а не круг).
+      const count = scaled(26, env.reduceMotion);
+      for (let i = 0; i < count; i++) {
+        const a = (i / count) * Math.PI * 2;
+        particles.emit(
+          PARTICLE.GLINT, x + Math.cos(a) * half * 0.9, y + Math.sin(a) * half * 0.27,
+          Math.cos(a) * 46, Math.sin(a) * 14 - 6, 0.45 + (i % 3) * 0.08, 2.4, 0.6, 0, 1.2, variant,
+        );
+      }
+      particles.emit(PARTICLE.FLASH, x, y, 0, 0, 0.35, 8, 40, 0, 0, variant);
+      camera.addTrauma(e.quality === 'center' ? 0.18 : 0.1);
       break;
     }
     case 'near-miss':

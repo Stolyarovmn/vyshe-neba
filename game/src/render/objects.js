@@ -25,10 +25,22 @@ function drawBalloon(ctx, painter, view, o, era, time) {
   painter.sprite(ctx, view, name, o.x, o.y - h * 0.3, { h, ay: 0.2, angle: sway });
 }
 
+/** Множитель диаметра камня к радиусу по классу размера sim. */
+const ROCK_SCALE = { medium: 2.5, large: 2.7, huge: 2.9 };
+/** Минимальный видимый диаметр астероида (ед. мира = игровые пиксели на базовом зуме). */
+export const ROCK_MIN_DIAMETER = 60;
+
+/** Диаметр прорисовки камня (ед. мира) по классу размера и радиусу sim; не меньше ROCK_MIN_DIAMETER. */
+export function rockDiameter(o) {
+  const radius = o.radius ?? o.r ?? 28;
+  const scale = ROCK_SCALE[o.size] || ROCK_SCALE.medium;
+  return Math.max(ROCK_MIN_DIAMETER, radius * scale);
+}
+
 function drawAsteroid(ctx, painter, view, o, time) {
   const variant = Math.floor(hash2(o.id | 0, 5) * 4);
-  const spin = (variant % 2 ? 1 : -1) * time * 0.22 + o.phase * TAU;
-  painter.sprite(ctx, view, `rock_${variant}`, o.x, o.y, { w: o.r * 2.6, angle: spin });
+  const spin = (variant % 2 ? 1 : -1) * time * 0.22 + (o.phase || 0) * TAU;
+  painter.sprite(ctx, view, `rock_${variant}`, o.x, o.y, { w: rockDiameter(o), angle: spin });
 }
 
 function drawSatellite(ctx, painter, view, o, era, time) {
@@ -80,25 +92,77 @@ function drawItem(ctx, painter, view, o, era, time) {
   }
 }
 
-function drawRing(ctx, painter, view, o, era, time) {
+const RING_FLAT = 0.3; // высота горизонтального кольца к его ширине (вид сверху-3/4)
+
+function isHorizontalRing(o) {
+  return o.orient === 'horizontal' || o.halfWidth > 0;
+}
+
+/** Мягкое свечение вокруг кольца: ворота, которые хочется пролететь. */
+function ringGlow(ctx, view, o, time, flat) {
+  const pulse = 0.5 + 0.5 * Math.sin(time * 3.2 + (o.id | 0));
+  const sx = view.sx(o.x);
+  const sy = view.sy(o.y);
+  const rx = (flat ? (o.halfWidth || 40) * 1.25 : 40) * view.S;
+  const ry = flat ? rx * RING_FLAT * 1.4 : rx;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.translate(sx, sy);
+  ctx.scale(1, ry / rx);
+  const glow = ctx.createRadialGradient(0, 0, rx * 0.35, 0, 0, rx);
+  glow.addColorStop(0, `rgba(120,220,255,${0.05 + 0.08 * pulse})`);
+  glow.addColorStop(1, 'rgba(120,220,255,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(-rx, -rx, rx * 2, rx * 2);
+  ctx.restore();
+}
+
+/**
+ * Половина горизонтального кольца: half = 'back' (дальняя, верхняя на экране — под ракетой) или
+ * 'front' (ближняя, нижняя — поверх ракеты). Спрайт повёрнут на 90° и сплющен в плоский эллипс.
+ */
+function drawRingHalf(ctx, painter, view, o, era, half) {
+  const name = spriteName('ring', era);
+  if (!painter.has(name)) return;
+  const width = 2 * (o.halfWidth || 38);
+  const height = width * RING_FLAT;
+  const sx = view.sx(o.x);
+  const sy = view.sy(o.y);
+  const pad = 4 * view.S;
+  ctx.save();
+  ctx.beginPath();
+  if (half === 'back') ctx.rect(sx - width * view.S, sy - height * view.S - pad, width * view.S * 2, height * view.S + pad);
+  else ctx.rect(sx - width * view.S, sy, width * view.S * 2, height * view.S + pad);
+  ctx.clip();
+  painter.sprite(ctx, view, name, o.x, o.y, { w: height, h: width, angle: Math.PI / 2 });
+  ctx.restore();
+}
+
+function drawVerticalRing(ctx, painter, view, o, era, time) {
   const name = spriteName('ring', era);
   const asset = painter.assets.get(name);
   const bound = 76;
   const k = asset ? bound / Math.max(asset.w, asset.h) : 1;
-  const pulse = 0.5 + 0.5 * Math.sin(time * 3.2 + (o.id | 0));
-  // Мягкое свечение: кольцо — ворота, которые хочется пролететь.
-  ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
-  const sx = view.sx(o.x);
-  const sy = view.sy(o.y);
-  const radius = 40 * view.S;
-  const glow = ctx.createRadialGradient(sx, sy, radius * 0.4, sx, sy, radius);
-  glow.addColorStop(0, `rgba(120,220,255,${0.05 + 0.08 * pulse})`);
-  glow.addColorStop(1, 'rgba(120,220,255,0)');
-  ctx.fillStyle = glow;
-  ctx.fillRect(sx - radius, sy - radius, radius * 2, radius * 2);
-  ctx.restore();
+  ringGlow(ctx, view, o, time, false);
   if (asset) painter.sprite(ctx, view, name, o.x, o.y, { w: asset.w * k, h: asset.h * k });
+}
+
+function drawRing(ctx, painter, view, o, era, time) {
+  if (isHorizontalRing(o)) {
+    ringGlow(ctx, view, o, time, true);
+    drawRingHalf(ctx, painter, view, o, era, 'back');
+  } else {
+    drawVerticalRing(ctx, painter, view, o, era, time);
+  }
+}
+
+/** Передние половины горизонтальных колец: рисуются поверх ракеты, чтобы она пролетала «сквозь» кольцо. */
+export function drawObjectsFront(ctx, painter, view, objects, era) {
+  if (!objects || !objects.length) return;
+  for (const o of objects) {
+    if (!o.active || o.kind !== 'ring' || !isHorizontalRing(o) || cull(view, o.x, o.y, 140)) continue;
+    drawRingHalf(ctx, painter, view, o, era, 'front');
+  }
 }
 
 /** Рисует все видимые объекты полёта (сзади вперёд: самолёты, шары, камни, спутники, предметы, кольца). */

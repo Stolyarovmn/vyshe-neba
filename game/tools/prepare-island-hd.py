@@ -29,19 +29,21 @@ SOURCE = os.path.join(ROOT, 'work', 'island-src', 'start_island_E0_original.png'
 OUT_DIR = os.path.join(ROOT, 'art', 'gen', 'environment')
 OUT_PNG = os.path.join(OUT_DIR, 'start_island_hd.png')
 OUT_META = os.path.join(OUT_DIR, 'start_island_hd.meta.json')
+OUT_LAND = os.path.join(OUT_DIR, 'start_island_hd.land.json')
+LAND_CELL = 8  # размер ячейки маски суши в пикселях
 DRIVE_ID = '109IFUuj4paHf6Chdbj-5ABRoyLmDj8mw'
 DRIVE_PATH = 'art-originals/environment/start_island'
 
 # Координаты в пикселях оригинала (1916x821). Измерено по сетке 10 px.
 PAD_EDGE_Y = 277              # верхняя кромка бетонной площадки
-PAD_CENTER = (388, 375)       # центр пусковой пятаки (основание башни)
+PAD_CENTER = (388, 375)       # центр пусковой площадки (основание башни)
 CIRCLE_RADIUS = 83            # радиус жёлтой пунктирной окружности вокруг центра
 GRASS_MASK = [(364, 186, 414, PAD_EDGE_Y - 6)]                         # башня над площадкой (трава)
-CONCRETE_MASK = [(334, PAD_EDGE_Y + 8, 442, 403)]                      # башня и кольцо на бетоне
+CONCRETE_MASK = [(334, PAD_EDGE_Y + 8, 442, 403), (324, 392, 372, 418), (404, 395, 444, 416)]  # башня, кольцо и обломки основания на бетоне
 SHADOW_MASK = [(276, 338, 346, 400)]                                   # тень башни слева
 EDGE_BAND = (PAD_EDGE_Y - 6, PAD_EDGE_Y + 8)                           # полоса кромки между травой и бетоном
 EDGE_DONOR_X = (342, 362)                                              # чистый участок кромки для повтора
-GRASS_DONORS = [(276, 150, 362, 270), (416, 262, 440, 276)]
+GRASS_MIRROR_SOURCE = (322, 364)                                       # чистая трава слева от башни: отражается внутрь выреза
 CONCRETE_DONORS = [(284, 286, 336, 336), (440, 290, 470, 340), (410, 408, 470, 446), (290, 410, 336, 468)]
 
 
@@ -72,15 +74,15 @@ def concrete_pixels(rgb):
     """Серый бетон: низкая насыщенность, средняя яркость, без жёлтых линий и тёмных контуров."""
     val, sat = hsv_arrays(rgb)
     r, g, b = (rgb[..., i].astype(np.int32) for i in range(3))
-    yellow = (r - b) > 60
-    return (sat < 0.26) & (val > 0.5) & (val < 0.78) & ~yellow
+    yellow = ((r - b) > 62) | (g - b > 52)
+    return (sat < 0.34) & (val > 0.55) & (val < 0.8) & ~yellow
 
 
 def grass_pixels(rgb):
-    """Трава: оттенок зелёно-оливковый, средняя яркость (без деревьев и тропинок)."""
+    """Трава: оливковый оттенок, средняя яркость (без деревьев, камней и песчаной тропинки)."""
     r, g, b = (rgb[..., i].astype(np.int32) for i in range(3))
     val, _ = hsv_arrays(rgb)
-    return (g >= r - 6) & (g > b + 14) & (val > 0.32) & (val < 0.62)
+    return (g > b + 30) & (r > b + 24) & (np.abs(r - g) < 48) & (val > 0.34) & (val < 0.72)
 
 
 def donor_valid(pixel_ok, donors, block):
@@ -145,6 +147,36 @@ def feather_composite(original, filled, mask, radius=2.2):
     return np.clip(mixed, 0, 255).astype(np.uint8)
 
 
+def mirror_fill(rgb, mask, source_x):
+    """Заполняет вырез травой, зеркально повторяя примыкающую слева полосу (шов-отражение незаметен)."""
+    out = rgb.copy()
+    x_edge, x_start = source_x[1], source_x[0]
+    span = x_edge - x_start
+    ys, xs = np.nonzero(mask)
+    for y, x in zip(ys, xs):
+        d = (x - x_edge) % (2 * span)
+        offset = d if d < span else 2 * span - 1 - d
+        out[y, x] = rgb[y, x_edge - 1 - offset]
+    return out
+
+
+def match_boundary(filled, original, mask, rect, ramp_power=1.5, window=15):
+    """Подгоняет средний цвет залитой травы к цвету справа от выреза плавным градиентом по ширине."""
+    x0, y0, x1, y1 = rect
+    rows = slice(y0, y1)
+    inner = filled[rows, x1 - 8:x1 - 2].astype(np.float32).mean(axis=1)
+    outer = original[rows, x1 + 2:x1 + 8].astype(np.float32).mean(axis=1)
+    delta = outer - inner
+    kernel = np.ones(window) / window
+    delta = np.stack([np.convolve(np.pad(delta[:, c], window // 2, mode='edge'), kernel, mode='valid') for c in range(3)], axis=1)
+    ramp = (np.arange(x0, x1) - x0) / max(1, x1 - x0 - 1)
+    ramp = ramp ** ramp_power
+    patch = filled[rows, x0:x1].astype(np.float32) + delta[:, None, :] * ramp[None, :, None]
+    out = filled.copy()
+    out[rows, x0:x1] = np.clip(patch, 0, 255).astype(np.uint8)
+    return out
+
+
 def paste_edge_strip(rgb, x_range, y_range, donor_x):
     """Повторяет чистый участок кромки площадки (с зеркалированием) поперёк выреза."""
     y0, y1 = y_range
@@ -190,11 +222,11 @@ def remove_tower(image):
     grass_mask = rect_mask((h, w), GRASS_MASK)
     concrete_mask = rect_mask((h, w), CONCRETE_MASK) | rect_mask((h, w), SHADOW_MASK)
 
-    grass_ok = grass_pixels(original) & ~grass_mask & ~concrete_mask
     concrete_ok = concrete_pixels(original) & ~concrete_mask & ~grass_mask
 
-    filled_grass = quilt(original, grass_mask, GRASS_DONORS, grass_ok, block=14, overlap=4, seed=3)
+    filled_grass = mirror_fill(original, grass_mask, GRASS_MIRROR_SOURCE)
     filled = np.where(grass_mask[..., None], filled_grass, original)
+    filled = match_boundary(filled, original, grass_mask, GRASS_MASK[0])
     filled_concrete = quilt(filled, concrete_mask, CONCRETE_DONORS, concrete_ok, block=18, overlap=6, seed=5)
     filled = np.where(concrete_mask[..., None], filled_concrete, filled)
 
@@ -204,7 +236,7 @@ def remove_tower(image):
 
     full_mask = grass_mask | concrete_mask
     full_mask[EDGE_BAND[0]:EDGE_BAND[1], edge_x[0]:edge_x[1]] = True
-    result = feather_composite(original, filled, full_mask)
+    result = feather_composite(original, filled, full_mask, radius=3.0)
 
     # восстановить пунктирную окружность вокруг центра пусковой площадки там, где её закрывала башня
     dash_color = (206, 178, 70)
@@ -213,6 +245,28 @@ def remove_tower(image):
 
     out = np.dstack([result, alpha])
     return Image.fromarray(out, 'RGBA'), full_mask
+
+
+def land_mask(image, cell=LAND_CELL):
+    """Грубая маска суши (1 = суша): непрозрачно и не бирюзовая вода/кайма. Ячейка cell x cell."""
+    arr = np.asarray(image.convert('RGBA')).astype(np.int32)
+    r, g, b, a = arr[..., 0], arr[..., 1], arr[..., 2], arr[..., 3]
+    water = (b > r + 30) & (g > r + 10)
+    land = (a > 128) & ~water
+    h, w = land.shape
+    rows, cols = h // cell, w // cell
+    blocks = land[: rows * cell, : cols * cell].reshape(rows, cell, cols, cell).mean(axis=(1, 3))
+    return blocks >= 0.6
+
+
+def land_mask_rows(mask):
+    """Строки маски в hex (4 ячейки на символ, лишние биты справа нулевые)."""
+    rows = []
+    for row in mask:
+        bits = ''.join('1' if v else '0' for v in row)
+        bits += '0' * (-len(bits) % 4)
+        rows.append(''.join('%x' % int(bits[i:i + 4], 2) for i in range(0, len(bits), 4)))
+    return rows
 
 
 def quantize_rgba(image, colors=256):
@@ -250,10 +304,11 @@ def main():
         quantize_rgba(cleaned).save(OUT_PNG, optimize=True)
         encoding = 'PNG-8, палитра 255 цветов + прозрачность, без дизеринга'
     if args.preview:
-        sheet = Image.new('RGBA', (image.width, 520), (60, 60, 80, 255))
-        crop = (200, 150, 620, 520)
+        crop = (230, 160, 560, 500)
+        sheet = Image.new('RGBA', ((crop[2] - crop[0]) * 2 + 10, crop[3] - crop[1]), (60, 60, 80, 255))
         sheet.alpha_composite(image.crop(crop), (0, 0))
-        sheet.alpha_composite(Image.open(OUT_PNG).convert('RGBA').crop(crop), (430, 0))
+        sheet.alpha_composite(Image.open(OUT_PNG).convert('RGBA').crop(crop), (crop[2] - crop[0] + 10, 0))
+        sheet = sheet.resize((sheet.width * 3 // 2, sheet.height * 3 // 2), Image.NEAREST)
         sheet.convert('RGB').save(args.preview)
 
     meta = {
@@ -287,6 +342,18 @@ def main():
     }
     with open(OUT_META, 'w', encoding='utf-8') as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
+        f.write('\n')
+    mask = land_mask(cleaned)
+    with open(OUT_LAND, 'w', encoding='utf-8') as f:
+        json.dump({
+            'asset': 'start_island_hd',
+            'cell_px': LAND_CELL,
+            'size': [image.width, image.height],
+            'cols': int(mask.shape[1]),
+            'rows': int(mask.shape[0]),
+            'land_hex_rows': land_mask_rows(mask),
+            'note': '1 = суша (непрозрачно и не вода/кайма); строки в hex, 4 ячейки на символ. Нужна тестам раскладки построек.',
+        }, f, ensure_ascii=False, indent=0)
         f.write('\n')
     print(f"{os.path.relpath(OUT_PNG, ROOT)}: {meta['output_bytes'] // 1024} KB, sha256 {meta['output_sha256'][:12]}")
     return 0

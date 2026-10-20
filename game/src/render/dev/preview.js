@@ -176,14 +176,26 @@ $('sepBtn').onclick = () => pendingEvents.push(eventFor('stage-sep'));
 function attachDrag() {
   let drag = null;
   canvas.addEventListener('pointerdown', (e) => {
-    drag = { x: e.clientX, moved: 0 };
+    drag = { x: e.clientX, y: e.clientY, moved: 0 };
     canvas.setPointerCapture(e.pointerId);
   });
   canvas.addEventListener('pointermove', (e) => {
     if (!drag || ui.mode.value !== 'hub') return;
-    renderer.hub.pan(e.clientX - drag.x);
-    drag.moved += Math.abs(e.clientX - drag.x);
+    renderer.hub.pan(e.clientX - drag.x, e.clientY - drag.y);
+    drag.moved += Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y);
     drag.x = e.clientX;
+    drag.y = e.clientY;
+  });
+  canvas.addEventListener('wheel', (e) => {
+    if (ui.mode.value !== 'hub') return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    renderer.hub.zoomBy(Math.exp(-e.deltaY * 0.0015), e.clientX - rect.left, e.clientY - rect.top);
+  }, { passive: false });
+  canvas.addEventListener('dblclick', (e) => {
+    if (ui.mode.value !== 'hub') return;
+    const rect = canvas.getBoundingClientRect();
+    renderer.hub.toggleZoom(e.clientX - rect.left, e.clientY - rect.top);
   });
   canvas.addEventListener('pointerup', (e) => {
     if (drag && drag.moved < 4 && ui.mode.value === 'hub') {
@@ -232,7 +244,7 @@ async function start() {
   window.__preview = { advance(frames) { for (let i = 0; i < frames; i++) renderFrame(1 / 60); }, renderer, assets, ui, owned, stub, state: () => (ui.scenario.value === 'sim' && simRunner ? simRunner : stub).last, events: (list) => pendingEvents.push(...list), setFrozen: (t) => { frozen = t; } };
   applyFrame();
   syncPanels();
-  if (params.has('focus')) renderer.hub.focus(params.get('focus').match(/^-?\d+(\.\d+)?$/) ? Number(params.get('focus')) : params.get('focus'), true);
+  if (params.has('focus')) renderer.hub.focus(params.get('focus'), true);
   attachDrag();
   if (!manual) requestAnimationFrame(tick);
   document.title = 'Render preview ready';

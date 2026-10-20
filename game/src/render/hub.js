@@ -1,98 +1,211 @@
-// Космодром: стартовый остров на непрерывном море, постройки по якорям (только купленные),
-// ракета на столе, облака, волны, погода, самолёты и дроны; тап по постройкам и подсветка выбора.
+// Космодром: HD-карта острова (вид сверху-3/4), постройки на своих площадках (только купленные),
+// ракета на пусковом столе, облака с тенями, самолёты и дроны, погода. Панорама и зум пальцем/мышью,
+// тап по постройке, подсветка выбора.
 
-import { createView } from './camera.js';
+import { createMapView, drawIslandHd, drawSea } from './islandmap.js';
 import { ensureWorld } from './layout.js';
-import {
-  BUILDING_ANCHORS, BUILDING_KEYS, ISLAND, eraYear, spriteName,
-} from './manifest.js';
-import { CLOUD_LAYERS_HUB, drawClouds, drawRain, drawSky, drawSun } from './sky.js';
-import { drawIsland, drawOcean } from './ground.js';
-import { drawPlacedBuildings } from './buildings.js';
+import { BUILDING_ANCHORS, ISLAND, eraYear, spriteName } from './manifest.js';
+import { drawPlacedBuildings, islandToWorld } from './buildings.js';
+import { drawLaunchMount } from './launchpad.js';
 import { createRocketPose, drawRocket, stackHeight } from './rocket.js';
-import { rocketKind } from './rocket-view.js';
 import { drawAircraft, drawDrone } from './traffic.js';
-import { drawLaunchTable } from './launchpad.js';
-import { fillWorldRect } from './painter.js';
-import { clamp, damp, hash2 } from './util.js';
+import { drawRain } from './sky.js';
+import { clamp, damp, hash2, smoothstep } from './util.js';
 import { weatherMood } from './weather.js';
 
-const GROUND_FRACTION = { landscape: 0.66, portrait: 0.6 };
-const FOCUS_RATE = 5;
 const MIN_TOUCH_CSS = 48;
-const CAPSULE_DISPLAY_X = -50;
+const VIEW_RATE = 7;
+const MAX_ZOOM_WIDTH = 150; // самый крупный план: столько единиц по ширине экрана
+const DEFAULT_VIEW = {
+  portrait: { visibleWidth: 300, cx: 36, cy: -14 },
+  landscape: { visibleWidth: 760, cx: 250, cy: -14 },
+};
+const CAPSULE_CART = { x: -42, y: 34 };
+
+/** Масштаб «остров целиком» (пикселей устройства на единицу). */
+export function fitScale(devW, devH) {
+  return Math.min((devW * 0.98) / ISLAND.widthUnits, (devH * 0.88) / ISLAND.heightUnits);
+}
+
+/** Допустимый центр вида: остров всегда остаётся в кадре. */
+export function clampCenter(cx, cy, s, devW, devH) {
+  const visW = devW / s;
+  const visH = devH / s;
+  const midX = ISLAND.leftUnits + ISLAND.widthUnits / 2;
+  const midY = ISLAND.topUnits + ISLAND.heightUnits / 2;
+  const x = visW >= ISLAND.widthUnits * 0.92
+    ? midX
+    : clamp(cx, ISLAND.leftUnits + visW * 0.35, ISLAND.leftUnits + ISLAND.widthUnits - visW * 0.35);
+  const y = visH >= ISLAND.heightUnits * 0.9
+    ? midY
+    : clamp(cy, ISLAND.topUnits + visH * 0.35, ISLAND.topUnits + ISLAND.heightUnits - visH * 0.35);
+  return [x, y];
+}
 
 export function createHub(painter, shared) {
-  const view = createView();
+  const mv = createMapView();
   const pose = createRocketPose();
   const rects = new Map();
+  const mood = { cloud: 0, rain: 0, storm: 0, wind: 0, dust: 0, flash: 0 };
   const state = {
-    focusX: null,
-    targetX: null,
-    lastView: { devPerCss: 1, vw: 0, unitsPerCss: 1 },
+    cx: 0,
+    cy: 0,
+    zoom: 1,
+    tx: 0,
+    ty: 0,
+    tz: 1,
+    ready: false,
+    orientation: '',
     selected: null,
+    pending: null,
     lastTime: null,
+    devW: 1,
+    devH: 1,
+    devPerCss: 1,
+    sFit: 1,
   };
 
-  function rectFor(key) {
-    let r = rects.get(key);
+  /** Рамки хранятся по идентификатору key#n: у парных построек (маяки) их несколько, и ракета между ними остаётся доступной. */
+  function rectFor(key, index) {
+    const id = index ? `${key}#${index}` : key;
+    let r = rects.get(id);
     if (!r) {
       r = { key, x0: 0, y0: 0, x1: 0, y1: 0, cx: 0, cy: 0, active: false };
-      rects.set(key, r);
+      rects.set(id, r);
     }
     return r;
   }
 
-  /** Добавляет рамку (в пикселях устройства); повторный вызов за кадр объединяет рамки (пара маяков). */
-  function addRect(key, x0, y0, x1, y1, devPerCss) {
-    const r = rectFor(key);
-    const nx0 = x0 / devPerCss;
-    const ny0 = y0 / devPerCss;
-    const nx1 = x1 / devPerCss;
-    const ny1 = y1 / devPerCss;
-    if (r.active) {
-      r.x0 = Math.min(r.x0, nx0);
-      r.y0 = Math.min(r.y0, ny0);
-      r.x1 = Math.max(r.x1, nx1);
-      r.y1 = Math.max(r.y1, ny1);
-    } else {
-      r.x0 = nx0;
-      r.y0 = ny0;
-      r.x1 = nx1;
-      r.y1 = ny1;
-      r.active = true;
-    }
+  const frameCounts = new Map();
+
+  /** Добавляет рамку постройки (в пикселях устройства); вторая и следующие рамки того же ключа — отдельные цели. */
+  function addRect(key, x0, y0, x1, y1) {
+    const index = frameCounts.get(key) || 0;
+    frameCounts.set(key, index + 1);
+    const r = rectFor(key, index);
+    const d = state.devPerCss;
+    r.x0 = x0 / d;
+    r.y0 = y0 / d;
+    r.x1 = x1 / d;
+    r.y1 = y1 / d;
     r.cx = (r.x0 + r.x1) / 2;
     r.cy = (r.y0 + r.y1) / 2;
+    r.active = true;
     return r;
   }
 
-  function clampFocus(x, vw) {
-    const lo = ISLAND.left + vw * 0.12;
-    const hi = ISLAND.left + ISLAND.width - vw * 0.12;
-    return clamp(x, Math.min(lo, hi), Math.max(lo, hi));
+  function scaleFor(zoom) {
+    return state.sFit * zoom;
+  }
+
+  function maxZoom() {
+    return Math.max(1, state.devW / MAX_ZOOM_WIDTH / state.sFit);
+  }
+
+  function applyDefault() {
+    const spec = DEFAULT_VIEW[state.orientation] || DEFAULT_VIEW.landscape;
+    const zoom = clamp(state.devW / spec.visibleWidth / state.sFit, 1, maxZoom());
+    const [cx, cy] = clampCenter(spec.cx, spec.cy, scaleFor(zoom), state.devW, state.devH);
+    state.tz = zoom;
+    state.tx = cx;
+    state.ty = cy;
+  }
+
+  /** Центр и зум так, чтобы карта-точка (mx, my) осталась под экранной точкой (xDev, yDev). */
+  function keepPointUnder(mx, my, xDev, yDev, zoom) {
+    const s = scaleFor(zoom);
+    return clampCenter(mx - (xDev - state.devW / 2) / s, my - (yDev - state.devH / 2) / s, s, state.devW, state.devH);
   }
 
   const hub = {
-    /** Подвинуть вид на dxCss экранных пикселей (перетаскивание пальцем). Положительное — мир уезжает вправо. */
-    pan(dxCss) {
-      if (state.targetX === null) return;
-      state.targetX = clampFocus(state.targetX - dxCss * state.lastView.unitsPerCss, state.lastView.vw);
+    /** Сдвиг вида на экранные пиксели CSS (перетаскивание): мир едет за пальцем. */
+    pan(dxCss, dyCss = 0) {
+      if (!state.ready) return;
+      const k = state.devPerCss / scaleFor(state.zoom);
+      const [x, y] = clampCenter(state.cx - dxCss * k, state.cy - dyCss * k, scaleFor(state.zoom), state.devW, state.devH);
+      state.cx = state.tx = x;
+      state.cy = state.ty = y;
     },
 
-    /** Плавно навести вид на постройку (ключ) или на мировую координату x; immediate — без плавности. */
+    /** Зум щипком/колесом: factor > 1 приближает; (xCss, yCss) — точка под пальцами остаётся на месте. */
+    zoomBy(factor, xCss, yCss) {
+      if (!state.ready) return;
+      const xDev = xCss === undefined ? state.devW / 2 : xCss * state.devPerCss;
+      const yDev = yCss === undefined ? state.devH / 2 : yCss * state.devPerCss;
+      const s = scaleFor(state.zoom);
+      const mx = state.cx + (xDev - state.devW / 2) / s;
+      const my = state.cy + (yDev - state.devH / 2) / s;
+      const zoom = clamp(state.zoom * factor, 1, maxZoom());
+      const [cx, cy] = keepPointUnder(mx, my, xDev, yDev, zoom);
+      state.zoom = state.tz = zoom;
+      state.cx = state.tx = cx;
+      state.cy = state.ty = cy;
+    },
+
+    /** Двойной тап: из обзора приближает к точке, из крупного плана возвращает к стартовому виду. */
+    toggleZoom(xCss, yCss) {
+      if (!state.ready) return;
+      const spec = DEFAULT_VIEW[state.orientation] || DEFAULT_VIEW.landscape;
+      const home = clamp(state.devW / spec.visibleWidth / state.sFit, 1, maxZoom());
+      if (state.tz < home * 1.35) {
+        const zoom = clamp(Math.max(state.tz * 2.4, home * 1.8), 1, maxZoom());
+        const xDev = xCss === undefined ? state.devW / 2 : xCss * state.devPerCss;
+        const yDev = yCss === undefined ? state.devH / 2 : yCss * state.devPerCss;
+        const s = scaleFor(state.zoom);
+        const mx = state.cx + (xDev - state.devW / 2) / s;
+        const my = state.cy + (yDev - state.devH / 2) / s;
+        const [cx, cy] = keepPointUnder(mx, my, state.devW / 2, state.devH / 2, zoom);
+        state.tz = zoom;
+        state.tx = cx;
+        state.ty = cy;
+      } else {
+        applyDefault();
+      }
+    },
+
+    /** Плавно навести вид на постройку (ключ) или на точку карты {x, y} в единицах мира. */
     focus(target, immediate = false) {
-      const anchors = typeof target === 'string' && BUILDING_ANCHORS[target];
-      const x = anchors ? anchors.anchors[0][0] : Number(target);
-      if (!Number.isFinite(x)) return;
-      state.targetX = clampFocus(x, state.lastView.vw || 300);
-      if (immediate) state.focusX = state.targetX;
+      if (!state.ready) {
+        state.pending = { target, immediate };
+        return;
+      }
+      let x;
+      let y;
+      let zoom = clamp(state.devW / 380 / state.sFit, 1, maxZoom());
+      if (typeof target === 'string' && BUILDING_ANCHORS[target]) {
+        const anchor = BUILDING_ANCHORS[target].anchors[0];
+        const [wx, wy] = islandToWorld(anchor[0], anchor[1]);
+        const heightUnits = BUILDING_ANCHORS[target].size[1] * ISLAND.unitsPerPx;
+        x = wx;
+        y = wy - heightUnits * 0.4;
+      } else if (target && typeof target === 'object') {
+        x = target.x;
+        y = target.y;
+        if (target.zoom) zoom = clamp(target.zoom, 1, maxZoom());
+      } else {
+        return;
+      }
+      zoom = Math.max(zoom, Math.min(state.tz, maxZoom()));
+      const [cx, cy] = clampCenter(x, y, scaleFor(zoom), state.devW, state.devH);
+      state.tz = zoom;
+      state.tx = cx;
+      state.ty = cy;
+      if (immediate) {
+        state.zoom = zoom;
+        state.cx = cx;
+        state.cy = cy;
+      }
     },
 
-    /** Вернуть вид на стартовый стол. */
-    reset() {
-      state.targetX = null;
-      state.focusX = null;
+    /** Вернуть стартовый вид (площадка крупно в портрете, широкий кадр в ландшафте). */
+    reset(immediate = false) {
+      if (!state.ready) return;
+      applyDefault();
+      if (immediate) {
+        state.zoom = state.tz;
+        state.cx = state.tx;
+        state.cy = state.ty;
+      }
     },
 
     setSelected(key) {
@@ -101,6 +214,11 @@ export function createHub(painter, shared) {
 
     get selected() {
       return state.selected;
+    },
+
+    /** Текущий вид: { zoom, cx, cy, scale } — для тестов и отладки. */
+    get view() {
+      return { zoom: state.zoom, cx: state.cx, cy: state.cy, scale: scaleFor(state.zoom) };
     },
 
     /**
@@ -133,6 +251,13 @@ export function createHub(painter, shared) {
       return r && r.active ? { x: r.cx, y: r.cy } : null;
     },
 
+    /** Все экранные рамки постройки (CSS-пиксели): у пары маяков их две. */
+    screenRects(key) {
+      const out = [];
+      for (const r of rects.values()) if (r.active && r.key === key) out.push({ x0: r.x0, y0: r.y0, x1: r.x1, y1: r.y1 });
+      return out;
+    },
+
     /**
      * Рисует хаб. params: { profile, time, layout, weather?, selected? }.
      * Рисует в пикселях устройства (внутри сбрасывает transform и восстанавливает его).
@@ -145,151 +270,215 @@ export function createHub(painter, shared) {
       const canvas = ctx.canvas;
       const devW = canvas.width;
       const devH = canvas.height;
-      const devPerCss = devW / layout.w;
-      const px = ensureWorld(layout).hubPx;
-      const vw = devW / px;
+      ensureWorld(layout);
+      state.devW = devW;
+      state.devH = devH;
+      state.devPerCss = devW / layout.w;
+      state.sFit = fitScale(devW, devH);
+      if (!state.ready || state.orientation !== layout.orientation) {
+        state.ready = true;
+        state.orientation = layout.orientation;
+        applyDefault();
+        state.zoom = state.tz;
+        state.cx = state.tx;
+        state.cy = state.ty;
+      }
+      if (state.pending) {
+        const { target, immediate } = state.pending;
+        state.pending = null;
+        hub.focus(target, immediate);
+      }
       const dt = state.lastTime === null ? 0 : clamp(time - state.lastTime, 0, 0.1);
       state.lastTime = time;
+      if (dt > 0) {
+        state.zoom = damp(state.zoom, state.tz, VIEW_RATE, dt);
+        state.cx = damp(state.cx, state.tx, VIEW_RATE, dt);
+        state.cy = damp(state.cy, state.ty, VIEW_RATE, dt);
+      }
+      const s = scaleFor(state.zoom);
+      [state.cx, state.cy] = clampCenter(state.cx, state.cy, s, devW, devH);
 
-      const mood = weatherMood(weather);
-      const defaultFocus = vw * 0.12;
-      if (state.targetX === null) state.targetX = clampFocus(defaultFocus, vw);
-      if (state.focusX === null) state.focusX = state.targetX;
-      state.targetX = clampFocus(state.targetX, vw);
-      state.focusX = dt > 0 ? damp(state.focusX, state.targetX, FOCUS_RATE, dt) : state.focusX;
-      state.lastView.devPerCss = devPerCss;
-      state.lastView.vw = vw;
-      state.lastView.unitsPerCss = devPerCss / px;
-
-      const groundY = devH * GROUND_FRACTION[layout.orientation];
-      view.setStatic(state.focusX, 0, devW / 2, groundY, px, devW, devH);
+      weatherMood(weather, mood);
+      mv.set(devW / 2 - state.cx * s, devH / 2 - state.cy * s, s, devW, devH);
 
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.imageSmoothingEnabled = false;
+      ctx.imageSmoothingEnabled = true;
       for (const r of rects.values()) r.active = false;
+      frameCounts.clear();
 
-      drawSky(ctx, view, 'earth', mood, ISLAND.waterSurfaceY);
-      drawSun(ctx, view, 0.8, 0.1, clamp(1 - mood.cloud * 0.85, 0, 1));
-      drawClouds(ctx, painter, view, CLOUD_LAYERS_HUB, time, 0.5 + mood.cloud * 0.5, mood.wind, mood.storm, 1);
-      drawHubPlanes(ctx, painter, view, time, profile);
-      drawOcean(ctx, view, time, mood);
-      drawIsland(ctx, painter, view);
+      drawSea(ctx, mv, time, mood);
+      drawIslandHd(ctx, painter, mv);
+      drawCloudShadows(ctx, painter, mv, time, mood, state.zoom);
 
-      drawPlacedBuildings(ctx, painter, view, profile, time, (key, x0, y0, x1, y1) => addRect(key, x0, y0, x1, y1, devPerCss));
-      drawLaunchPad(ctx, painter, view, profile, pose, time, devPerCss, addRect);
-      drawHubDrones(ctx, painter, view, profile, time);
+      const era = profile ? clamp(profile.era | 0, 0, 5) : 0;
+      const parts = profile && profile.parts ? profile.parts : {};
+      const rocketItem = {
+        y: 0,
+        draw() {
+          drawLaunchMount(ctx, mv, era, time);
+          if ((parts.capsule | 0) > 0) drawCapsuleOnCart(ctx, painter, mv, era);
+          pose.x = 0;
+          pose.y = 0;
+          pose.angle = 0;
+          pose.era = era;
+          pose.kind = (parts.booster | 0) > 0 ? 'booster' : 'core';
+          pose.throttle = 0;
+          pose.atmo = 1;
+          pose.skin = (profile && profile.skin) || 'classic';
+          pose.visible = true;
+          drawRocket(ctx, painter, mv, pose, time);
+          const height = stackHeight(pose.kind);
+          addRect('rocket', mv.sx(-18), mv.sy(-height), mv.sx(18), mv.sy(4));
+        },
+      };
+      drawPlacedBuildings(ctx, painter, mv, profile, time, addRect, [rocketItem]);
+      drawHubDrones(ctx, painter, mv, profile, time);
+      drawHubPlanes(ctx, painter, mv, time, profile);
+      drawHubClouds(ctx, painter, mv, time, mood, state.zoom);
 
-      if (mood.rain > 0.05) drawRain(ctx, view, time, mood.rain, mood.wind);
+      if (mood.rain > 0.05) drawRain(ctx, mv, time, mood.rain, mood.wind);
       if (mood.storm > 0.3) {
-        ctx.fillStyle = `rgba(20,28,40,${(0.18 * mood.storm).toFixed(2)})`;
+        ctx.fillStyle = `rgba(20,28,40,${(0.2 * mood.storm).toFixed(2)})`;
         ctx.fillRect(0, 0, devW, devH);
       }
-      if (state.selected) drawSelection(ctx, view, rects.get(state.selected), devPerCss, time);
+      if (state.selected) {
+        for (const r of rects.values()) if (r.active && r.key === state.selected) drawSelection(ctx, mv, r, state.devPerCss, time);
+      }
       ctx.restore();
     },
   };
   return hub;
 }
 
-// --- стартовая площадка ------------------------------------------------------------------
-
-function drawLaunchPad(ctx, painter, view, profile, pose, time, devPerCss, addRect) {
-  const era = profile ? clamp(profile.era | 0, 0, 5) : 0;
-  drawLaunchTable(ctx, view, era);
-
-  const parts = profile && profile.parts ? profile.parts : {};
-  pose.x = 0;
-  pose.y = 0;
-  pose.angle = 0;
-  pose.era = era;
-  pose.kind = rocketKind(parts);
-  pose.throttle = 0;
-  pose.atmo = 1;
-  pose.skin = (profile && profile.skin) || 'classic';
-  pose.visible = true;
-  if ((parts.capsule | 0) > 0) drawCapsuleOnCart(ctx, painter, view, era);
-  drawRocket(ctx, painter, view, pose, time);
-
-  const height = stackHeight(pose.kind);
-  const wide = 34;
-  addRect('rocket', view.sx(-wide / 2), view.sy(-height), view.sx(wide / 2), view.sy(0), devPerCss);
+function drawCapsuleOnCart(ctx, painter, mv, era) {
+  const { x, y } = CAPSULE_CART;
+  const s = mv.S;
+  ctx.fillStyle = 'rgba(8,12,18,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(mv.sx(x), mv.sy(y), 17 * s, 5 * s, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#59606a';
+  ctx.fillRect(mv.sx(x - 16), mv.sy(y - 5), Math.round(32 * s), Math.max(2, Math.round(3 * s)));
+  ctx.fillStyle = '#2a3038';
+  for (const side of [-1, 1]) ctx.fillRect(mv.sx(x + side * 13 - 2), mv.sy(y - 3), Math.max(2, Math.round(4 * s)), Math.max(2, Math.round(3 * s)));
+  painter.sprite(ctx, mv, spriteName('capsule', era), x, y - 4, { h: 36, smooth: true });
 }
 
-function drawCapsuleOnCart(ctx, painter, view, era) {
-  const x = CAPSULE_DISPLAY_X;
-  fillWorldRect(ctx, view, x - 15, -7, 30, 3, '#59606a');
-  fillWorldRect(ctx, view, x - 17, -4, 4, 4, '#2a3038');
-  fillWorldRect(ctx, view, x + 13, -4, 4, 4, '#2a3038');
-  fillWorldRect(ctx, view, x - 12, -11, 3, 4, '#8f98a1');
-  fillWorldRect(ctx, view, x + 9, -11, 3, 4, '#8f98a1');
-  painter.sprite(ctx, view, spriteName('capsule', era), x, -10, { h: 33 });
+// --- облака ---------------------------------------------------------------------------------------
+
+const CLOUD_CELL = [420, 320];
+const CLOUD_DRIFT = 2.6; // ед./с в одну сторону: без качаний
+
+function cloudCells(mv, time, density, fn) {
+  const drift = time * CLOUD_DRIFT;
+  const x0 = Math.floor((mv.left - drift - 200) / CLOUD_CELL[0]);
+  const x1 = Math.floor((mv.right - drift + 200) / CLOUD_CELL[0]);
+  const y0 = Math.floor((mv.top - 160) / CLOUD_CELL[1]);
+  const y1 = Math.floor((mv.bottom + 160) / CLOUD_CELL[1]);
+  for (let iy = y0; iy <= y1; iy++) {
+    for (let ix = x0; ix <= x1; ix++) {
+      if (hash2(ix, iy, 61) > density) continue;
+      const x = (ix + 0.2 + 0.6 * hash2(ix, iy, 62)) * CLOUD_CELL[0] + drift;
+      const y = (iy + 0.2 + 0.6 * hash2(ix, iy, 63)) * CLOUD_CELL[1];
+      fn(x, y, Math.floor(hash2(ix, iy, 64) * 4), 190 + 120 * hash2(ix, iy, 65));
+    }
+  }
 }
 
-// --- живность ---------------------------------------------------------------------------------
+const SHADOW_TINT = { r: 0, g: 0, b: 0, a: 1 };
+
+/** При крупном плане облака растворяются: они не должны закрывать постройки, на которые навели вид. */
+function cloudZoomFade(zoom) {
+  return 1 - 0.8 * smoothstep(1.6, 3.8, zoom);
+}
+
+function drawCloudShadows(ctx, painter, mv, time, mood, zoom) {
+  const density = 0.18 + mood.cloud * 0.4;
+  const fade = cloudZoomFade(zoom);
+  if (fade <= 0.02) return;
+  cloudCells(mv, time, density, (x, y, kind, width) => {
+    painter.sprite(ctx, mv, `cloud_${kind}`, x + 36, y + 52, { w: width, tint: SHADOW_TINT, alpha: 0.16 * fade });
+  });
+}
+
+function drawHubClouds(ctx, painter, mv, time, mood, zoom) {
+  const density = 0.18 + mood.cloud * 0.4;
+  const alpha = (0.42 + mood.cloud * 0.3) * cloudZoomFade(zoom);
+  if (alpha <= 0.02) return;
+  cloudCells(mv, time, density, (x, y, kind, width) => {
+    painter.sprite(ctx, mv, `cloud_${kind}`, x, y, { w: width, alpha });
+  });
+}
+
+// --- живность ---------------------------------------------------------------------------------------
 
 const PLANE_LANES = [
-  { alt: 200, speed: 14, width: 52, dir: 1, phase: 0.1 },
-  { alt: 245, speed: 9, width: 62, dir: -1, phase: 0.55 },
-  { alt: 285, speed: 20, width: 48, dir: 1, phase: 0.8 },
+  { y: -70, speed: 16, width: 78, dir: 1, phase: 0.1 },
+  { y: 150, speed: 11, width: 92, dir: -1, phase: 0.55 },
+  { y: 30, speed: 22, width: 70, dir: 1, phase: 0.8 },
 ];
 
-function drawHubPlanes(ctx, painter, view, time, profile) {
+function drawHubPlanes(ctx, painter, mv, time, profile) {
   const era = profile ? clamp(profile.era | 0, 0, 5) : 0;
   const count = 1 + (era >= 2 ? 1 : 0) + (era >= 4 ? 1 : 0);
-  const span = 3400;
+  const span = 2600;
   for (let i = 0; i < count; i++) {
     const lane = PLANE_LANES[i];
     const t = (time * lane.speed + lane.phase * span) % span;
-    const wx = lane.dir > 0 ? -span / 2 + t : span / 2 - t;
+    const wx = (lane.dir > 0 ? -span / 2 + t : span / 2 - t) + 380;
     const lineage = i === 1 ? 'medium_passenger' : i === 2 ? 'high_fighter' : 'low_primary';
-    // Второй самолёт — техника предыдущей эпохи: небо не меняется целиком за один шаг.
     const name = `${lineage}_${eraYear(i === 1 ? era - 1 : era)}`;
-    const world = -lane.alt - Math.sin(time * 0.3 + i) * 3;
-    drawAircraft(ctx, painter, view, name, lineage, wx, world, lane.dir, time, lane.width);
+    painter.sprite(ctx, mv, name, wx + 48, lane.y + 70, {
+      w: lane.width * 0.92, flipX: lane.dir < 0, tint: SHADOW_TINT, alpha: 0.2,
+    });
+    drawAircraft(ctx, painter, mv, name, lineage, wx, lane.y, lane.dir, time, lane.width);
   }
 }
 
 const DRONE_ROUTES = [
-  { cx: 150, alt: 78, rx: 70, ry: 14, speed: 0.35, width: 34, index: 0 },
-  { cx: 560, alt: 92, rx: 110, ry: 18, speed: 0.28, width: 38, index: 1 },
+  { cx: 150, cy: -20, rx: 70, ry: 24, speed: 0.35, width: 38, index: 0 },
+  { cx: 520, cy: -10, rx: 90, ry: 30, speed: 0.28, width: 42, index: 1 },
 ];
 
-function drawHubDrones(ctx, painter, view, profile, time) {
-  const built = profile && profile.buildings ? BUILDING_KEYS.filter((key) => (profile.buildings[key] | 0) > 0).length : 0;
-  const count = Math.min(DRONE_ROUTES.length, Math.floor(built / 3) + ((profile && profile.era | 0) >= 2 ? 1 : 0));
+function drawHubDrones(ctx, painter, mv, profile, time) {
+  const owned = profile && profile.buildings ? Object.keys(profile.buildings).filter((key) => (profile.buildings[key] | 0) > 0).length : 0;
+  const count = Math.min(DRONE_ROUTES.length, Math.floor(owned / 3) + ((profile && profile.era | 0) >= 2 ? 1 : 0));
   for (let i = 0; i < count; i++) {
     const route = DRONE_ROUTES[i];
     const a = time * route.speed + hash2(i, 3) * 6;
     const wx = route.cx + Math.sin(a) * route.rx;
-    const wy = -(route.alt + Math.sin(a * 1.7 + 1) * route.ry + Math.sin(time * 2.1 + i) * 1.5);
-    drawDrone(ctx, painter, view, route.index, wx, wy, route.width, time);
+    const wy = route.cy + Math.sin(a * 1.7 + 1) * route.ry + Math.sin(time * 2.1 + i) * 1.5;
+    painter.sprite(ctx, mv, `base_drone_${route.index}`, wx + 14, wy + 30, {
+      w: route.width * 0.9, tint: SHADOW_TINT, alpha: 0.2,
+    });
+    drawDrone(ctx, painter, mv, route.index, wx, wy, route.width, time);
   }
 }
 
 // --- подсветка выбора ---------------------------------------------------------------------
 
-function drawSelection(ctx, view, rect, devPerCss, time) {
+function drawSelection(ctx, mv, rect, devPerCss, time) {
   if (!rect || !rect.active) return;
   const pulse = 0.55 + 0.45 * Math.sin(time * 4.2);
-  const pad = 4 * view.px;
+  const pad = Math.max(4, 3 * mv.s);
   const x0 = Math.round(rect.x0 * devPerCss) - pad;
   const y0 = Math.round(rect.y0 * devPerCss) - pad;
   const x1 = Math.round(rect.x1 * devPerCss) + pad;
   const y1 = Math.round(rect.y1 * devPerCss) + pad;
-  const arm = Math.max(6 * view.px, Math.min(x1 - x0, y1 - y0) * 0.22);
-  const t = Math.max(1, Math.round(view.px));
+  const arm = Math.max(10, Math.min(x1 - x0, y1 - y0) * 0.2);
+  const t = Math.max(2, Math.round(mv.s * 1.3));
   ctx.save();
-  ctx.fillStyle = `rgba(239,194,99,${(0.55 + 0.4 * pulse).toFixed(2)})`;
+  ctx.fillStyle = `rgba(239,194,99,${(0.6 + 0.4 * pulse).toFixed(2)})`;
   for (const [cx, cy, sx, sy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) {
     ctx.fillRect(sx > 0 ? cx : cx - arm, sy > 0 ? cy : cy - t, arm, t);
     ctx.fillRect(sx > 0 ? cx : cx - t, sy > 0 ? cy : cy - arm, t, arm);
   }
-  ctx.strokeStyle = `rgba(239,194,99,${(0.25 + 0.3 * pulse).toFixed(2)})`;
+  ctx.strokeStyle = `rgba(239,194,99,${(0.3 + 0.3 * pulse).toFixed(2)})`;
   ctx.lineWidth = t;
   ctx.beginPath();
-  const baseY = y1 - pad;
-  ctx.ellipse((x0 + x1) / 2, baseY, (x1 - x0) * 0.55, Math.max(3, 4 * view.px), 0, 0, Math.PI * 2);
+  ctx.ellipse((x0 + x1) / 2, y1 - pad, (x1 - x0) * 0.55, Math.max(4, 4 * mv.s), 0, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
 }
+

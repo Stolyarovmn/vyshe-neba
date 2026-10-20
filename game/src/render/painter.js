@@ -50,11 +50,24 @@ export function createPainter(assets, makeCanvas) {
       return painter.blitDev(ctx, asset, sx, sy, devW, devH, ax, ay, opts);
     },
 
+    /** Исходник для рисования спрайта размером uw x uh единиц в этом виде (с ступенчатым масштабом карты). */
+    sourceFor(view, asset, uw, uh, tint, hue) {
+      let baseW = uw * view.px;
+      let baseH = uh * view.px;
+      if (view.quantizeScale) {
+        // Масштаб карты плавно меняется (зум, высота): уменьшенные копии берём ступенями 6 %,
+        // иначе кэш пересоздавался бы каждый кадр.
+        const q = quantizeSize(baseW);
+        baseH = (baseH * q) / baseW;
+        baseW = q;
+      }
+      return painter.source(asset, baseW, baseH, tint, hue);
+    },
+
     blit(ctx, view, asset, sx, sy, uw, uh, ax, ay, opts) {
-      const baseW = uw * view.px;
-      const baseH = uh * view.px;
-      const src = painter.source(asset, baseW, baseH, opts.tint, opts.hue);
-      return painter.blitSource(ctx, src, sx, sy, uw * view.S, uh * view.S, ax, ay, opts);
+      const src = painter.sourceFor(view, asset, uw, uh, opts.tint, opts.hue);
+      const smooth = opts.smooth ?? view.smooth;
+      return painter.blitSource(ctx, src, sx, sy, uw * view.S, uh * view.S, ax, ay, opts, smooth);
     },
 
     blitDev(ctx, asset, sx, sy, devW, devH, ax, ay, opts) {
@@ -62,7 +75,7 @@ export function createPainter(assets, makeCanvas) {
       return painter.blitSource(ctx, src, sx, sy, devW, devH, ax, ay, opts);
     },
 
-    blitSource(ctx, src, sx, sy, dw, dh, ax, ay, opts) {
+    blitSource(ctx, src, sx, sy, dw, dh, ax, ay, opts, smooth) {
       const w = Math.max(1, Math.round(dw));
       const h = Math.max(1, Math.round(dh));
       const alpha = opts.alpha ?? 1;
@@ -70,6 +83,8 @@ export function createPainter(assets, makeCanvas) {
       const angle = opts.angle || 0;
       const flip = opts.flipX ? -1 : 1;
       if (alpha < 1) ctx.globalAlpha *= alpha;
+      const wasSmooth = ctx.imageSmoothingEnabled;
+      if (smooth !== undefined && smooth !== wasSmooth) ctx.imageSmoothingEnabled = !!smooth;
       if (angle || flip < 0) {
         ctx.save();
         ctx.translate(sx, sy);
@@ -80,6 +95,7 @@ export function createPainter(assets, makeCanvas) {
       } else {
         ctx.drawImage(src, sx - Math.round(ax * w), sy - Math.round(ay * h), w, h);
       }
+      if (smooth !== undefined && smooth !== wasSmooth) ctx.imageSmoothingEnabled = wasSmooth;
       if (alpha < 1) ctx.globalAlpha /= alpha;
       return true;
     },
@@ -168,6 +184,13 @@ function clampByte(v) {
   return v < 0 ? 0 : v > 255 ? 255 : v;
 }
 
+const SIZE_STEP = Math.log(1.06);
+
+/** Ширина, округлённая до ступени геометрической сетки (шаг 6 %). */
+export function quantizeSize(width) {
+  return Math.round(Math.exp(Math.round(Math.log(Math.max(1, width)) / SIZE_STEP) * SIZE_STEP));
+}
+
 /** Прямоугольник в мировых координатах, привязанный к пикселям устройства без зазоров. */
 export function fillWorldRect(ctx, view, wx, wy, ww, wh, color) {
   const x0 = view.sx(wx);
@@ -176,15 +199,4 @@ export function fillWorldRect(ctx, view, wx, wy, ww, wh, color) {
   const y1 = view.sy(wy + wh);
   ctx.fillStyle = color;
   ctx.fillRect(x0, y0, Math.max(1, x1 - x0), Math.max(1, y1 - y0));
-}
-
-/** Закрашенный круг-«пиксель»: квадрат size единиц с центром в (wx, wy). */
-export function fillWorldDot(ctx, view, wx, wy, size, color) {
-  const half = size / 2;
-  fillWorldRect(ctx, view, wx - half, wy - half, size, size, color);
-}
-
-/** Целое число пикселей устройства для толщины в единицах мира (не меньше 1). */
-export function devSize(view, units) {
-  return Math.max(1, Math.round(units * view.S));
 }

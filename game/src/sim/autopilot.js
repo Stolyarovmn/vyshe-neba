@@ -62,11 +62,34 @@ function dodgeSpeed(s) {
   return side * 45;
 }
 
+// Near the ground a dodge must stay gentle: the landing needs the rocket close to the pad and nearly still.
+function dodgeFor(s) {
+  const lowGround = s.vy > 0 ? clamp((s.alt - 60) / 80, 0, 1) : clamp((s.alt - 25) / 80, 0, 1);
+  return lowGround > 0 ? dodgeSpeed(s) * (0.4 + 0.6 * lowGround) : 0;
+}
+
+// Sideways speed that lines the rocket up with the nearest boost ring above it, or null when none is worth taking.
+// Rings are only taken when the sky is clear of threats and there is fuel to spare.
+function ringAim(s) {
+  if (s.alt < 120 || s.fuel01 < 0.3) return null;
+  const centreAlt = s.alt + Math.cos(s.angle) * 26;
+  let best = null;
+  for (const o of s.objects) {
+    if (o.kind !== 'ring' || !o.active) continue;
+    const up = -o.y - centreAlt;
+    if (up < 25 || up > 500 || Math.abs(o.x - s.x) > o.halfWidth + 200) continue;
+    if (!best || up < best.up) best = { up, dx: o.x - s.x };
+  }
+  if (!best || dodgeSpeed(s) !== 0) return null;
+  return clamp(best.dx / Math.max(0.6, best.up / Math.max(15, s.climb)), -40, 40);
+}
+
 export function createAutopilot(options = {}) {
   const skill = clamp(options.skill ?? 1, 0, 1);
   const sloppy = 1 - skill;
   const mission = options.mission ?? 'hop';
   const targetAlt = options.targetAlt ?? 90;
+  const takeRings = options.rings !== false;
   const rng = createRngState(hashSeed(options.seed ?? 1, 4242));
 
   // Per-flight personality: how optimistic the landing plan is, and how long the reaction takes.
@@ -91,11 +114,12 @@ export function createAutopilot(options = {}) {
   }
 
   // Horizontal guidance toward the pad: returns the angle to hold.
-  function steerAngle(s) {
+  function steerAngle(s, climbing = false) {
     const dx = s.x - s.pad.x;
+    const aim = climbing && takeRings ? ringAim(s) : null;
     const reach = Math.max(1.5, s.g * 0.4 * Math.tan(0.4)); // sideways acceleration the tilt can really give
     const maxSpeed = Math.min(60, 3 + 0.35 * s.alt, Math.sqrt(2 * 0.6 * reach * Math.abs(dx)));
-    const wanted = -Math.sign(dx) * maxSpeed + (s.alt > 120 ? dodgeSpeed(s) : 0);
+    const wanted = (aim ?? -Math.sign(dx) * maxSpeed) + dodgeFor(s);
     const accel = 1.5 * (wanted - s.vx);
     const limit = clamp(0.06 + s.alt * 0.01, 0.06, 0.45);
     return clamp(Math.atan2(accel, Math.max(s.g, 3)), -limit, limit);
@@ -139,7 +163,7 @@ export function createAutopilot(options = {}) {
       if (apogee >= goalAlt) mode = 'coast';
       else if (apogee < goalAlt - 15) mode = 'climb';
       out.throttle = mode === 'climb' ? 1 : 0;
-      out.tilt = tiltToward(s, steerAngle(s));
+      out.tilt = tiltToward(s, steerAngle(s, true));
       return out;
     }
 

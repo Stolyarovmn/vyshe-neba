@@ -40,8 +40,8 @@ export default {
       if (clicked) st.dest = d.id;
       else if (kit.denied === `launch-dest-${d.id}`) kit.toast(t('launch.closed'), { kind: 'bad', icon: 'lock' });
       const pad = L.pad;
-      const ic = Math.round((L.portrait ? 40 : 52) * L.ui);
-      kit.icon(DEST_ICON[d.id], r.x + pad + ic / 2, r.y + pad + ic / 2, ic, d.ok ? c.text : c.textMute, d.ok ? 1 : 0.6);
+      const ic = Math.min(Math.round((L.portrait ? 40 : 52) * L.ui), Math.round(r.w * 0.26));
+      kit.icon(DEST_ICON[d.id], r.x + pad + ic / 2, r.y + pad + ic / 2, ic, d.id === 'mars' ? '#e8845a' : c.text, d.ok ? 1 : 0.55);
       const tx = r.x + pad + ic + L.gap;
       const tw = r.w - (tx - r.x) - pad;
       kit.drawText(d.name, tx, r.y + pad + kit.fs(10), { size: kit.fs(17), color: d.ok ? (on ? c.amber : c.text) : c.textDim, maxWidth: tw });

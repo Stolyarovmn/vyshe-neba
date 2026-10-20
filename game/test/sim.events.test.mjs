@@ -77,9 +77,9 @@ test('pickups and rings are reported as events with positions', () => {
   const state = createFlight(startRocket({ weather: 'clear' }));
   state.objects.push(
     { id: 9001, kind: 'coin', hazard: false, x: 0, y: -60, r: 9, active: true },
-    { id: 9002, kind: 'ring', hazard: false, x: 0, y: -90, r: 35, active: true },
+    { id: 9002, kind: 'ring', hazard: false, orient: 'horizontal', halfWidth: 70, x: 0, y: -90, r: 70, active: true },
   );
-  const events = advance(state, { throttle: 1 }, 3);
+  const events = advance(state, { throttle: 1 }, 4);
   const coin = events.find((e) => e.type === 'pickup' && e.kind === 'coin');
   assert.ok(coin && coin.value === 4 && typeof coin.x === 'number');
   assert.ok(events.some((e) => e.type === 'ring'));

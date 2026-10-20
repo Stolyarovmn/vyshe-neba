@@ -119,9 +119,18 @@ const ICONS = {
 };
 
 // Иконка → спрайт рендера (базовое имя в manifest, по эпохе): настоящий арт вместо векторной заглушки.
+// плоские спрайты без эпохи
+const SPRITE_FLAT = { earth: 'earth', moon: 'moon' };
+
 const SPRITE_OF = {
   coin: 'coin', fuel: 'fuel', canister: 'fuel', repair: 'repair',
   chute: 'canopy', parachute: 'canopy', capsule: 'capsule', booster: 'booster',
+};
+
+// запасные векторные иконки построек, пока для них нет спрайта эпохи
+const BUILDING_FALLBACK = {
+  beacons: 'target', gantry: 'building', deluge: 'fuel', service: 'repair', rescue: 'shield', fuel: 'canister', logistics: 'cart',
+  factory: 'gear', weather: 'wind', control: 'avionics', radar: 'radar', energy: 'bolt', observation: 'eye', recovery: 'chute',
 };
 
 export const ICON_NAMES = Object.keys(ICONS);
@@ -220,7 +229,8 @@ export function createIcons() {
     if (name.startsWith('bld:')) {
       const [, key, lv] = name.split(':');
       sprite = buildingSpriteName(key, Math.max(1, Number(lv) || era + 1));
-    } else if (SPRITE_OF[name]) sprite = spriteName(SPRITE_OF[name], era);
+    } else if (SPRITE_FLAT[name]) sprite = SPRITE_FLAT[name];
+    else if (SPRITE_OF[name]) sprite = spriteName(SPRITE_OF[name], era);
     void level;
     const asset = sprite && painter.assets.get(sprite);
     return asset || null;
@@ -249,7 +259,7 @@ export function createIcons() {
       const src = painter.source(asset, wDev, hDev);
       ctx.drawImage(src, Math.round((cx - wDev / dpr / 2) * dpr) / dpr, Math.round((cy - hDev / dpr / 2) * dpr) / dpr, wDev / dpr, hDev / dpr);
     } else {
-      const vname = name.startsWith('bld:') ? 'building' : name;
+      const vname = name.startsWith('bld:') ? BUILDING_FALLBACK[name.split(':')[1]] || 'building' : name;
       const sizeDev = Math.max(8, Math.round(size * dpr));
       const bm = vector(vname in ICONS ? vname : 'info', color, sizeDev);
       actual = sizeDev / dpr;

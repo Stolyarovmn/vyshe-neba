@@ -12,7 +12,7 @@ const WORLD_DIR = 'outputs/rocket/dist/assets/world/';
 const INFRA_DIR = 'outputs/rocket/dist/assets/infrastructure/';
 const PLACEABLE_DIR = 'outputs/rocket/dist/assets/placeables/';
 
-export const ISLAND_FILE = 'art/gen/environment/start_island_e0.png';
+export const ISLAND_FILE = 'art/gen/environment/start_island_hd.png';
 // Фоны экранов: лёгкие WebP-копии утверждённого арта (game/tools/prepare-backdrops.py).
 export const BACKDROP_INTERIOR_FILE = 'art/gen/environment/backdrop_interior_eras.webp';
 export const BACKDROP_ENV_FILE = 'art/gen/environment/backdrop_environments.webp';
@@ -188,31 +188,37 @@ export const BASE_DRONES = [
   { name: 'base_drone_1', size: [738, 365], fans: [[396, 28, 46], [134, 56, 37], [656, 57, 37], [81, 130, 39], [658, 154, 39]] },
 ];
 
-// Остров и якоря построек: art/placeables/BASE_ISLAND_LAYOUT.json (version 2).
-// Ось Y здесь вверх от стартового стола (как в JSON); в мире sim ось Y вниз: worldY = -y.
+// Остров и якоря построек: art/placeables/BASE_ISLAND_LAYOUT.json (version 3, генерируется game/tools/island-layout.py).
+// Арт — HD-остров (вид сверху-3/4, 1916x821). Якоря и размеры — в пикселях острова (ось Y вниз), якорь —
+// низ спрайта по центру; мировые единицы отсчитываются от центра стартовой площадки (там стоит ракета).
 export const ISLAND = {
-  left: -330,
-  top: 510,
-  width: 1650,
-  waterSurfaceY: 150,
-  launchOrigin: [0, 0],
+  width: 1916,
+  height: 821,
+  launchOrigin: [388, 375],
+  unitsPerPx: 0.665, // октагон площадки 256 px = 170 ед. (ширина посадочной зоны sim)
+  padCore: { center: [388, 375], radius: 52, trench: [372, 403, 405, 486] },
 };
+ISLAND.widthUnits = ISLAND.width * ISLAND.unitsPerPx;
+ISLAND.heightUnits = ISLAND.height * ISLAND.unitsPerPx;
+ISLAND.leftUnits = -ISLAND.launchOrigin[0] * ISLAND.unitsPerPx;
+ISLAND.topUnits = -ISLAND.launchOrigin[1] * ISLAND.unitsPerPx;
 
+// anchors: [[x, y], ...] px острова; size: видимый спрайт [w, h] px; footprint: след на земле [w, глубина] px.
 export const BUILDING_ANCHORS = {
-  beacons: { zone: 'launch_core', anchors: [[-92, 4], [92, 4]] },
-  gantry: { zone: 'launch_core', anchors: [[150, 12]] },
-  deluge: { zone: 'launch_core', anchors: [[235, 8]] },
-  service: { zone: 'service_central', anchors: [[335, 12]] },
-  rescue: { zone: 'service_central', anchors: [[445, 14]] },
-  fuel: { zone: 'fuel_east', anchors: [[560, 16]] },
-  logistics: { zone: 'logistics_east', anchors: [[685, 12]] },
-  factory: { zone: 'industrial_east', anchors: [[815, 16]] },
-  weather: { zone: 'command_north', anchors: [[760, 92]] },
-  control: { zone: 'command_north', anchors: [[905, 78]] },
-  radar: { zone: 'command_north', anchors: [[1035, 96]] },
-  energy: { zone: 'utility_east', anchors: [[1085, 30]] },
-  observation: { zone: 'perimeter_east', anchors: [[1180, 102]] },
-  recovery: { zone: 'recovery_east', anchors: [[1210, 14]] },
+  beacons: { zone: 'launch_core', anchors: [[283, 395], [493, 395]], size: [100, 77], footprint: [90, 26] },
+  gantry: { zone: 'launch_core', anchors: [[480, 305]], size: [113, 190], footprint: [102, 34] },
+  deluge: { zone: 'launch_core', anchors: [[492, 452]], size: [130, 118], footprint: [117, 32] },
+  service: { zone: 'service_central', anchors: [[640, 395]], size: [120, 102], footprint: [108, 30] },
+  rescue: { zone: 'service_central', anchors: [[740, 340]], size: [125, 115], footprint: [112, 30] },
+  fuel: { zone: 'fuel_east', anchors: [[870, 470]], size: [170, 93], footprint: [153, 32] },
+  logistics: { zone: 'logistics_east', anchors: [[1200, 470]], size: [190, 105], footprint: [171, 34] },
+  factory: { zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34] },
+  weather: { zone: 'command_north', anchors: [[1000, 350]], size: [142, 180], footprint: [100, 28] },
+  control: { zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34] },
+  radar: { zone: 'command_north', anchors: [[860, 170]], size: [170, 190], footprint: [140, 34] },
+  energy: { zone: 'utility_east', anchors: [[1500, 380]], size: [200, 115], footprint: [180, 36] },
+  observation: { zone: 'perimeter_east', anchors: [[1380, 320]], size: [150, 175], footprint: [120, 34] },
+  recovery: { zone: 'recovery_east', anchors: [[1610, 478]], size: [200, 112], footprint: [180, 34] },
 };
 
 // Слои движения самолётов по высоте (ед. мира) — как art/aircraft/traffic.json и live/aircraft.js.

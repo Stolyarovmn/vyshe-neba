@@ -20,8 +20,9 @@ test('without thrust the rocket falls: altitude drops, speed grows, then the fal
   }
   assert.ok(speeds.at(-1) > 40);
   advance(state, { throttle: 0 }, 6);
-  assert.ok(state.speed <= state.limits.fall + 1e-9, 'never faster than the fall limit');
-  assert.ok(state.speed > state.limits.fall - 0.05, `fall speed ${state.speed} should sit at the limit ${state.limits.fall}`);
+  const airSpeed = Math.hypot(state.vx - state.weather.felt, state.vy);
+  assert.ok(airSpeed <= state.limits.fall + 1e-9, 'never faster through the air than the fall limit');
+  assert.ok(airSpeed > state.limits.fall - 0.05, `fall speed ${airSpeed} should sit at the limit ${state.limits.fall}`);
   assert.ok(state.vy > 0, 'vy > 0 means falling');
 });
 
@@ -59,6 +60,8 @@ test('weightlessness: above the boundary there is no gravity and no drag', () =>
 test('turning without thrust never changes the velocity vector', () => {
   const turning = airborne(SPACE_ALT + 500, { vx: 12, vy: -25 });
   const still = airborne(SPACE_ALT + 500, { vx: 12, vy: -25 });
+  turning.objects = []; // a turned hull has a different outline, so keep hazards out of this comparison
+  still.objects = [];
   advance(turning, { throttle: 0, tilt: 1 }, 4);
   advance(still, { throttle: 0, tilt: 0 }, 4);
   assert.ok(Math.abs(turning.angle) > 1, 'the rocket must actually have turned');
@@ -67,6 +70,8 @@ test('turning without thrust never changes the velocity vector', () => {
 
   const inAir = airborne(3000, { vx: 20, vy: 10 });
   const inAirStill = airborne(3000, { vx: 20, vy: 10 });
+  inAir.objects = []; // a turned hull has a different outline, so keep hazards out of this comparison
+  inAirStill.objects = [];
   advance(inAir, { throttle: 0, tilt: 1 }, 2);
   advance(inAirStill, { throttle: 0 }, 2);
   assert.ok(Math.abs(inAir.vx - inAirStill.vx) < 1e-12);
@@ -122,14 +127,21 @@ test('the pad holds the rocket until thrust beats gravity', () => {
 });
 
 test('speed is limited and a stronger engine allows more', () => {
-  const weak = airborne(2000, {}, { stages: [{ id: 'core', thrust: 72, fuel: 5000, burnRate: 1 }] });
-  const strong = airborne(2000, {}, { stages: [{ id: 'core', thrust: 160, fuel: 5000, burnRate: 1 }] });
-  advance(weak, { throttle: 1 }, 20);
-  advance(strong, { throttle: 1 }, 20);
-  assert.ok(weak.speed <= weak.limits.speed + 1e-9);
-  assert.ok(strong.speed <= strong.limits.speed + 1e-9);
-  assert.ok(strong.limits.speed > weak.limits.speed);
-  assert.ok(strong.speed > weak.speed);
+  const air = (s) => Math.hypot(s.vx - s.weather.felt, s.vy);
+  const climb = (thrust) => {
+    const state = airborne(2000, {}, { stages: [{ id: 'core', thrust, fuel: 5000, burnRate: 1 }] });
+    let worst = 0;
+    // A boost ring lifts the limit for a few seconds, so those moments are left out.
+    advance(state, { throttle: 1 }, 20, (s) => {
+      if (s.ringBoost === 0) worst = Math.max(worst, air(s) - s.limits.speed);
+    });
+    return { state, worst };
+  };
+  const weak = climb(72);
+  const strong = climb(160);
+  assert.ok(weak.worst <= 1e-9 && strong.worst <= 1e-9, 'never faster through the air than the limit');
+  assert.ok(strong.state.limits.speed > weak.state.limits.speed);
+  assert.ok(air(strong.state) > air(weak.state));
 });
 
 test('rotation is faster in vacuum and fins speed it up', () => {

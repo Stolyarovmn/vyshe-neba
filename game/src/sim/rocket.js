@@ -3,6 +3,8 @@
 
 import { clamp, wrapAngle } from './math.js';
 
+export const ROCKET_AXIS_OFFSET = 26; // the collision circle is centred this far above the feet
+export const ROCKET_RADIUS = 12;
 export const THROTTLE_RISE = 3; // per second: 0 -> 100% in a third of a second
 export const THROTTLE_FALL = 4;
 export const RCS_FUEL_SHARE = 0.2; // share of burnRate spent while turning at full rate

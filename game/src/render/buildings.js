@@ -4,27 +4,13 @@
 // Все функции рисуют в единицах мира через view; (wx, wy) — точка опоры (низ по центру).
 
 import {
-  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
+  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, ISLAND, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
 } from './manifest.js';
 import { clamp, hash2 } from './util.js';
 import { fillWorldRect } from './painter.js';
 
-/** Высота спрайта построек с артом (ед. мира); ширина по пропорциям PNG. */
-export const ART_HEIGHT = {
-  beacons: 38,
-  gantry: 122,
-  deluge: 74,
-  service: 60,
-  rescue: 64,
-  fuel: 58,
-  weather: 96,
-  factory: 62,
-  control: 56,
-};
-const DEFAULT_ART_HEIGHT = 64;
-
-/** Габариты программного силуэта (ед. мира) — используются для hit-test и подсветки. */
-export const PROCEDURAL_SIZE = {
+/** Размер дизайн-коробки программных силуэтов (ед. мира): силуэт масштабируется под sprite_px раскладки. */
+export const PROCEDURAL_DESIGN = {
   logistics: { w: 100, h: 56 },
   factory: { w: 112, h: 74 },
   control: { w: 88, h: 76 },
@@ -56,39 +42,40 @@ export function isProceduralBuilding(key) {
   return PROCEDURAL_BUILDINGS.includes(key);
 }
 
-/** Размер в единицах мира [ширина, высота] для постройки (для рамок и тапов). */
+/** Целевой размер спрайта постройки в единицах мира [ширина, высота] (по sprite_px раскладки острова). */
 export function buildingSize(painter, key, level) {
+  const layout = BUILDING_ANCHORS[key];
+  const [px, py] = layout ? layout.size : [100, 100];
+  const height = py * ISLAND.unitsPerPx;
   const asset = painter.assets.get(buildingSpriteName(key, level));
-  if (asset) {
-    const h = ART_HEIGHT[key] || DEFAULT_ART_HEIGHT;
-    return [h * asset.w / asset.h, h];
-  }
-  const size = PROCEDURAL_SIZE[key];
-  return size ? [size.w, size.h] : [48, 48];
+  const width = asset ? (height * asset.w) / asset.h : px * ISLAND.unitsPerPx;
+  return [width, height];
 }
 
 /**
- * Рисует постройку. opts: { mirror, phase (0..1 для анимации), selected }.
+ * Рисует постройку: (wx, wy) — низ спрайта по центру, ед. мира. opts: { mirror }.
  * Возвращает true, если использован спрайт арта, false — программный силуэт.
  */
 export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts = {}) {
   const lv = clamp(level | 0, 1, 6);
-  drawShadow(ctx, view, wx, wy, buildingSize(painter, key, lv)[0]);
+  const [width, height] = buildingSize(painter, key, lv);
+  drawShadow(ctx, view, wx, wy, BUILDING_ANCHORS[key], width);
   const name = buildingSpriteName(key, lv);
   if (painter.has(name)) {
-    return painter.sprite(ctx, view, name, wx, wy, { h: ART_HEIGHT[key] || DEFAULT_ART_HEIGHT, flipX: !!opts.mirror });
+    return painter.sprite(ctx, view, name, wx, wy, { h: height, flipX: !!opts.mirror, smooth: true });
   }
-  drawProcedural(ctx, view, key, lv, wx, wy, time);
+  drawProcedural(ctx, view, key, lv, wx, wy, time, width);
   return false;
 }
 
-function drawShadow(ctx, view, wx, wy, width) {
-  const w = width * 0.9;
+function drawShadow(ctx, view, wx, wy, layout, width) {
+  const w = width * 0.92;
+  const depth = layout ? layout.footprint[1] * ISLAND.unitsPerPx : 20;
   const x0 = view.sx(wx - w / 2);
   const x1 = view.sx(wx + w / 2);
-  const y = view.sy(wy);
-  const half = Math.max(2, Math.round(view.S * 3));
-  ctx.fillStyle = 'rgba(8,16,24,0.26)';
+  const y = view.sy(wy - depth * 0.15);
+  const half = Math.max(2, Math.round(view.S * depth * 0.5));
+  ctx.fillStyle = 'rgba(8,16,24,0.28)';
   ctx.beginPath();
   ctx.ellipse((x0 + x1) / 2, y, (x1 - x0) / 2, half, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -96,12 +83,21 @@ function drawShadow(ctx, view, wx, wy, width) {
 
 // --- программные силуэты ---------------------------------------------------------
 
-function drawProcedural(ctx, view, key, level, wx, wy, time) {
+function drawProcedural(ctx, view, key, level, wx, wy, time, widthUnits) {
+  const design = PROCEDURAL_DESIGN[key];
+  if (!design) return;
   const c = PALETTES[level - 1];
-  const R = (x, y, w, h, color) => fillWorldRect(ctx, view, wx + x, wy + y, w, h, color);
+  // Силуэт нарисован в дизайн-координатах (низ по центру в нуле) и масштабируется в k раз.
+  const k = widthUnits / design.w;
+  const dv = {
+    S: view.S * k,
+    px: view.px,
+    sx: (x) => view.sx(wx + x * k),
+    sy: (y) => view.sy(wy + y * k),
+  };
+  const R = (x, y, w, h, color) => fillWorldRect(ctx, dv, x, y, w, h, color);
   const painters = { logistics, factory, control, radar, energy, observation, recovery };
-  const draw = painters[key];
-  if (draw) draw(R, c, level, time, ctx, view, wx, wy);
+  painters[key](R, c, level, time, ctx, dv, 0, 0);
 }
 
 function windows(R, x, y, count, step, on, c) {
@@ -189,20 +185,34 @@ function radar(R, c, level, time, ctx, view, wx, wy) {
 function dish(ctx, view, wx, wy, radius, angle, light, metal, big) {
   const cx = view.sx(wx);
   const cy = view.sy(wy);
-  const rx = Math.max(1, Math.abs(Math.cos(angle)) * radius * view.S);
-  const ry = radius * view.S * 0.55;
+  const rx = Math.max(2, Math.abs(Math.cos(angle)) * radius * view.S);
+  const ry = radius * view.S * 0.62;
+  const tilt = -0.35;
+  const line = Math.max(1, Math.round(view.px * (big ? 2 : 1.5)));
   ctx.save();
-  ctx.lineWidth = Math.max(1, Math.round(view.px * (big ? 2 : 1.5)));
-  ctx.strokeStyle = light;
+  ctx.lineWidth = line;
+  // обод, вогнутая внутренность и мачта облучателя: тарелка читается как антенна, а не как диск
+  ctx.fillStyle = light;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, tilt, 0, Math.PI * 2);
+  ctx.fill();
   ctx.fillStyle = metal;
   ctx.beginPath();
-  ctx.ellipse(cx, cy, rx, ry, -0.35, 0, Math.PI * 2);
+  ctx.ellipse(cx + rx * 0.06, cy + ry * 0.08, rx * 0.82, ry * 0.8, tilt, 0, Math.PI * 2);
   ctx.fill();
+  ctx.strokeStyle = 'rgba(8,16,24,0.55)';
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, tilt, 0, Math.PI * 2);
   ctx.stroke();
+  const feedX = cx + Math.sin(angle) * radius * view.S * 0.55;
+  const feedY = cy - ry * 1.5;
+  ctx.strokeStyle = light;
   ctx.beginPath();
   ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + Math.sin(angle) * radius * view.S * 0.6, cy - ry * 1.3);
+  ctx.lineTo(feedX, feedY);
   ctx.stroke();
+  ctx.fillStyle = light;
+  ctx.fillRect(Math.round(feedX - line), Math.round(feedY - line), line * 2, line * 2);
   ctx.restore();
 }
 
@@ -379,34 +389,45 @@ export function drawBuildingBadge(ctx, view, key, wx, topY, time) {
 
 // --- расстановка по якорям ----------------------------------------------------------------
 
-/** Порядок рисования купленных построек: дальние (выше на острове) раньше. */
+/** Мировая точка (ед. мира) якоря по пикселю HD-острова. */
+export function islandToWorld(px, py) {
+  return [(px - ISLAND.launchOrigin[0]) * ISLAND.unitsPerPx, (py - ISLAND.launchOrigin[1]) * ISLAND.unitsPerPx];
+}
+
+/** Купленные постройки с мировыми координатами; порядок рисования: дальние (севернее) раньше. */
 export function buildingDrawOrder(profile) {
   const owned = [];
   for (const key of BUILDING_KEYS) {
     const level = profile && profile.buildings ? profile.buildings[key] | 0 : 0;
     if (level <= 0) continue;
     BUILDING_ANCHORS[key].anchors.forEach((anchor, index) => {
-      owned.push({ key, level, anchorX: anchor[0], anchorY: anchor[1], mirror: index > 0 });
+      const [x, y] = islandToWorld(anchor[0], anchor[1]);
+      owned.push({ key, level, x, y, mirror: index > 0 });
     });
   }
-  owned.sort((a, b) => b.anchorY - a.anchorY || a.anchorX - b.anchorX);
+  owned.sort((a, b) => a.y - b.y || a.x - b.x);
   return owned;
 }
 
 /**
- * Рисует купленные постройки по якорям острова (ось Y якоря вверх, в мир — вниз).
- * onRect(key, x0, y0, x1, y1) — рамка каждой постройки в пикселях устройства (для тапов).
+ * Рисует купленные постройки по якорям острова (мировые единицы, ось Y вниз). onRect(key, x0, y0, x1, y1) —
+ * рамка каждой постройки в пикселях устройства (для тапов). extras — [{ y, draw() }]: объекты, которые нужно
+ * вставить в нужную глубину (например, ракета на площадке).
  */
-export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect) {
-  for (const item of buildingDrawOrder(profile)) {
-    const wx = item.anchorX;
-    const wy = -item.anchorY;
-    const [w, h] = buildingSize(painter, item.key, item.level);
-    if (wx + w < view.left || wx - w > view.right) continue;
-    drawBuilding(ctx, painter, view, item.key, item.level, wx, wy, time, { mirror: item.mirror });
-    if (isProceduralBuilding(item.key) && !painter.has(buildingSpriteName(item.key, item.level))) {
-      drawBuildingBadge(ctx, view, item.key, wx, wy - h, time);
+export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, extras) {
+  const items = buildingDrawOrder(profile);
+  const queue = extras && extras.length ? [...items, ...extras].sort((a, b) => a.y - b.y) : items;
+  for (const item of queue) {
+    if (item.draw) {
+      item.draw();
+      continue;
     }
-    if (onRect) onRect(item.key, view.sx(wx - w / 2), view.sy(wy - h), view.sx(wx + w / 2), view.sy(wy));
+    const [w, h] = buildingSize(painter, item.key, item.level);
+    if (item.x + w < view.left || item.x - w > view.right || item.y - h > view.bottom || item.y < view.top) continue;
+    drawBuilding(ctx, painter, view, item.key, item.level, item.x, item.y, time, { mirror: item.mirror });
+    if (isProceduralBuilding(item.key) && !painter.has(buildingSpriteName(item.key, item.level))) {
+      drawBuildingBadge(ctx, view, item.key, item.x, item.y - h, time);
+    }
+    if (onRect) onRect(item.key, view.sx(item.x - w / 2), view.sy(item.y - h), view.sx(item.x + w / 2), view.sy(item.y));
   }
 }

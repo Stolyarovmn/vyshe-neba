@@ -56,6 +56,8 @@ const VARIANTS = {
   card: { fill: '#17213a', hi: '#33456b', lo: '#080d19' },
   cardOn: { fill: '#233256', hi: 'amber', lo: 'amberDeep' },
   warn: { fill: '#3a1a1c', hi: 'red', lo: '#1c0a0c' },
+  panelGlass: { fill: 'rgba(19,27,46,0.76)', hi: 'panelHi', lo: 'panelLo' },
+  glass: { fill: 'rgba(8,13,26,0.30)', hi: 'rgba(190,210,245,0.38)', lo: 'rgba(0,0,0,0.5)' },
   hud: { fill: 'rgba(8,13,26,0.62)', hi: 'rgba(120,150,210,0.45)', lo: 'rgba(0,0,0,0.5)' },
 };
 

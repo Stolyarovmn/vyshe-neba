@@ -14,6 +14,7 @@ import {
 } from './rocket.js';
 import { CANISTER_SHARE, CONSUMABLE_REPAIR } from './pickups.js';
 import { canTransfer, startTransfer, transferFuelCost, updateTransfer } from './transfer.js';
+import { updateClouds, updateStorm } from './clouds.js';
 import { updateWeather } from './weather.js';
 import { createWorld, enterBody, streamWorld, updateObjects } from './world.js';
 
@@ -78,6 +79,10 @@ export function createFlight(config) {
     atmo: 1,
     weightless: false,
     weather: null,
+    clouds: [],
+    cloudField: null,
+    lastCx: null,
+    lastCy: null,
     objects: [],
     world: createWorld(),
     pad: null,
@@ -104,6 +109,7 @@ export function createFlight(config) {
     maxAlt: 0,
     distance: 0,
     rings: 0,
+    ringsCentered: 0,
     pickups: 0,
     items: { coin: 0, fuel: 0, repair: 0 },
     near: 0,
@@ -211,8 +217,11 @@ function tick(s, cmd, dt, events) {
   const density = densityAt(body, alt);
   const weightless = g <= 0;
 
-  updateWeather(s.weather, s.body, alt, dt, events, s.cfg.base.weather > 0);
-  if (s.weather.storm > 0.5) s.stormTime += dt;
+  updateWeather(s.weather, s.body, alt, dt, s.cfg.base.weather > 0 || s.cfg.avionics.predict > 0);
+  updateClouds(s, dt);
+  updateStorm(s, events);
+  const storm = s.weather.storm;
+  if (storm > 0.5) s.stormTime += dt;
 
   if (cmd.parachute && !s.chute.deployed) {
     if (canParachute(s)) deployChute(s, events);
@@ -247,21 +256,25 @@ function tick(s, cmd, dt, events) {
 
   const fins = s.cfg.fins.dragCut;
   const windFactor = 1 - Math.min(0.9, 1.4 * fins);
-  const wind = (Math.sin(s.time * 0.57) * body.wind + s.weather.wind) * density * windFactor;
-  if (s.liftedOff) {
-    // Gusts also shake the nose a little in a storm.
-    s.av += s.weather.storm * 0.5 * (Math.sin(s.time * 3.1) + Math.sin(s.time * 5.3 + 1)) * windFactor * dt;
+  if (s.liftedOff && storm > 0.01) {
+    // Inside a storm cloud: the nose is shaken and the air rises and sinks in smooth gusts.
+    s.av += storm * 0.7 * (Math.sin(s.time * 2.9) + Math.sin(s.time * 5.3 + 1)) * windFactor * dt;
+    s.vy += storm * 6 * Math.sin(s.time * 1.7 + 0.4) * dt;
   }
 
-  s.vx += (Math.sin(s.angle) * thrust + wind) * dt;
+  s.vx += Math.sin(s.angle) * thrust * dt;
   s.vy += (-Math.cos(s.angle) * thrust + g) * dt;
 
-  const speed = Math.hypot(s.vx, s.vy);
-  if (density > 0 && speed > 0.001) {
-    const climbShare = 0.5 - 0.5 * (s.vy / speed);
+  // Air drag works against the velocity relative to the moving air: that is how the wind carries the rocket.
+  const windSpeed = (s.weather.wind + storm * 8 * Math.sin(s.time * 0.9)) * windFactor;
+  s.weather.push = 0;
+  if (density > 0) {
+    const speed = Math.hypot(s.vx, s.vy);
+    const climbShare = speed > 0.001 ? 0.5 - 0.5 * (s.vy / speed) : 0.5;
     const k = density * (0.065 + 0.155 * climbShare) * (1 - fins);
     const keep = Math.exp(-k * dt);
-    s.vx *= keep;
+    s.weather.push = k * (windSpeed - s.vx);
+    s.vx = windSpeed + (s.vx - windSpeed) * keep;
     s.vy *= keep;
   }
   if (s.chute.deployed) applyChute(s, dt);
@@ -270,10 +283,12 @@ function tick(s, cmd, dt, events) {
   let limit = falling ? s.limits.fall : s.limits.speed;
   limit *= 1 + 0.12 * Math.min(1, s.ringBoost);
   if (s.boost.active) limit *= BOOST.speed;
-  const capped = Math.hypot(s.vx, s.vy);
-  if (capped > limit) {
-    s.vx *= limit / capped;
-    s.vy *= limit / capped;
+  // The limit is on the speed through the air, so a wind-carried rocket is not slowed down by the cap.
+  s.weather.felt = windSpeed;
+  const airSpeed = Math.hypot(s.vx - windSpeed, s.vy);
+  if (airSpeed > limit) {
+    s.vx = windSpeed + (s.vx - windSpeed) * (limit / airSpeed);
+    s.vy *= limit / airSpeed;
   }
 
   if (!s.liftedOff && s.y >= 0 && s.vy >= 0) {
@@ -392,7 +407,7 @@ function updateWarnings(s, events) {
   }
   if (s.boost.active && s.boost.heat > 0.8) warn(s, 'overheat', events, 2);
   if (s.hp / s.maxHp < 0.25) warn(s, 'hull', events, 8);
-  if (Math.abs(s.weather.wind) * s.atmo > 3.5) warn(s, 'wind', events, 12);
+  if (Math.abs(s.weather.push) > 3.5) warn(s, 'wind', events, 12);
 
   const fraction = s.fuel01;
   if (fraction < 0.2 && s.lowFuel < 1 && s.fuelTotal > 0) {
@@ -453,6 +468,7 @@ export function summarize(s) {
     hpLeft01: s.hp / s.maxHp,
     coinsPicked: s.coins,
     rings: s.rings,
+    ringsCentered: s.ringsCentered,
     pickups: s.pickups,
     near: s.near,
     stormTime: s.stormTime,

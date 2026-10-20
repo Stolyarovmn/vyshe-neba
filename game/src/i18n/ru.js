@@ -47,6 +47,7 @@ export default {
   'card.locked': 'Сначала условия',
   'card.needFunds': 'Не хватает ресурсов',
   'card.cannot': 'Пока нельзя',
+  'card.show': 'Показать на острове',
   'card.built': '{name}: готово',
 
   // ракета
@@ -77,6 +78,7 @@ export default {
   'base.tab.era': 'Эпохи',
   'base.power': 'Мощность {use} / {supply}',
   'base.powerLow': 'Мощности не хватает: эффекты −{pct}%',
+  'base.pick': 'Выбери постройку в списке: здесь её эффект, цена и условия',
   'base.row.cost': 'Цена',
   'base.row.lvl': 'ур. {n}',
   'base.row.none': 'нет',
@@ -147,6 +149,11 @@ export default {
   'hint.transfer.touch': 'Перелёт доступен — нажми кнопку',
   'hint.wind.right': 'Ветер справа',
   'hint.wind.left': 'Ветер слева',
+  'hint.forecast.storm': 'Через {n} с гроза',
+  'hint.forecast.dust': 'Через {n} с пылевая буря',
+  'hint.forecast.rain': 'Через {n} с дождь',
+  'hint.forecast.wind.right': 'Через {n} с ветер справа',
+  'hint.forecast.wind.left': 'Через {n} с ветер слева',
   'hint.impact': 'Касание через {t} с: скорость {v} из {tol}',
   'tut.thrust.key': 'Держи W — тяга поднимет ракету',
   'tut.thrust.touch': 'Держи рычаг справа — ракета взлетит',

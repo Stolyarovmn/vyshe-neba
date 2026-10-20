@@ -209,9 +209,22 @@ export function rocketLayout(L) {
 
 export function baseLayout(L) {
   const { body } = screenFrame(L, { header: true });
-  const { a: map, b: side } = splitBody(L, body, L.portrait ? 0.46 : 0.52);
+  const energyH = L.touch(56);
+  const energy = rect(body.x, body.y, body.w, energyH);
+  const rest = rect(body.x, body.y + energyH + L.gap, body.w, Math.max(0, body.h - energyH - L.gap));
   const tabsH = L.touch(44);
-  return { map, side, tabs: rect(side.x, side.y, side.w, tabsH), list: rect(side.x, side.y + tabsH + L.gap, side.w, side.h - tabsH - L.gap) };
+  if (L.portrait) {
+    // список и карточка постройки делят одну область: выбранная карточка заменяет список
+    const tabs = rect(rest.x, rest.y, rest.w, tabsH);
+    const list = rect(rest.x, rest.y + tabsH + L.gap, rest.w, rest.h - tabsH - L.gap);
+    return { energy, tabs, list, detail: list, wide: false };
+  }
+  // ландшафт: слева вкладки и список, справа постоянная карточка выбранной постройки
+  const leftW = R((rest.w - L.gap) * 0.46);
+  const tabs = rect(rest.x, rest.y, leftW, tabsH);
+  const list = rect(rest.x, rest.y + tabsH + L.gap, leftW, rest.h - tabsH - L.gap);
+  const detail = rect(rest.x + leftW + L.gap, rest.y, rest.w - leftW - L.gap, rest.h);
+  return { energy, tabs, list, detail, wide: true, full: rect(rest.x, rest.y + tabsH + L.gap, rest.w, rest.h - tabsH - L.gap) };
 }
 
 // --- журнал / настройки ---

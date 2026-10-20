@@ -22,7 +22,7 @@ const MARS_KINDS = [
 
 const DRIVE_EASE = 25; // seconds: how slowly the prevailing wind follows a new target
 const RETARGET_EVERY = [40, 120]; // seconds between new targets
-const REVERSE_CHANCE = 0.12; // chance that a new target flips the prevailing direction
+const REVERSE_CHANCE = 0.08; // chance that a new target flips the prevailing direction
 const MIN_STRENGTH = 0.25;
 const GUST_GAP = [5, 15];
 const GUST_LENGTH = [6, 14];
@@ -77,7 +77,7 @@ export function createWeather(seed, bodyId, forcedKind = null) {
   const kinds = kindsFor(bodyId);
   const rng = createRngState(seed);
   const calm = {
-    time: 0, cloud: 0, rain: 0, stormLevel: 0, storm: 0, wind: 0, windDir: 1, gust: 0, push: 0, flash: 0, forecast: null,
+    time: 0, cloud: 0, rain: 0, stormLevel: 0, storm: 0, wind: 0, windDir: 1, gust: 0, push: 0, felt: 0, flash: 0, forecast: null,
     drive: 0, driveTarget: 0, sign: 1, windNext: 1e9, gusts: [], gustAt: 1e9, lightningAt: 1e9, stormOn: false, rng,
   };
   if (!kinds.length) return { ...calm, kind: 'none', nextKind: 'none', locked: true, next: 1e9 };

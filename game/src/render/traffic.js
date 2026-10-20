@@ -72,7 +72,7 @@ export function drawAircraft(ctx, painter, view, name, lineage, wx, wy, dir, tim
   const dx = -Math.round(dw / 2);
   const dy = -Math.round(dh / 2);
   if (profile) drawBehind(ctx, profile, dx, dy, dw, dh, view, time, wy);
-  ctx.drawImage(painter.source(asset, w * view.px, h * view.px), dx, dy, dw, dh);
+  ctx.drawImage(painter.sourceFor(view, asset, w, h), dx, dy, dw, dh);
   if (profile) drawFront(ctx, profile, dx, dy, dw, dh, view, time);
   ctx.restore();
   return true;
@@ -193,7 +193,7 @@ export function drawDrone(ctx, painter, view, index, wx, wy, widthUnits, time) {
   const dh = Math.round(h * view.S);
   const left = sx - Math.round(dw / 2);
   const top = sy - Math.round(dh / 2);
-  ctx.drawImage(painter.source(asset, widthUnits * view.px, h * view.px), left, top, dw, dh);
+  ctx.drawImage(painter.sourceFor(view, asset, widthUnits, h), left, top, dw, dh);
   const f = dw / part.size[0];
   ctx.save();
   ctx.strokeStyle = '#97aeb9';

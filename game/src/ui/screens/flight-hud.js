@@ -307,8 +307,18 @@ function pickHint(app, s, f, tut) {
   if (f.canTransfer) out.push({ pri: 2, key: 'transfer', text: app.touchUi ? t('hint.transfer.touch') : t('hint.transfer'), icon: 'transfer', kind: 'good' });
   if (f.lowFuel >= 1 && f.fuelTotal > 0) out.push({ pri: 1, key: 'lowfuel', text: t('hint.lowFuel'), icon: 'fuel', kind: 'bad' });
   if (f.liftedOff && f.vy > 20 && f.alt < 380 && f.fuelTotal <= 0.01 && !f.chute.deployed && (f.cfg.parachute.level > 0 || f.chute.consumable)) out.push({ pri: 3, key: 'chute', text: t('hint.chute'), icon: 'chute', kind: 'bad' });
-  const wind = f.weather ? f.weather.wind * f.atmo : 0;
-  if (Math.abs(wind) > 3 && f.liftedOff) out.push({ pri: 1, key: `wind${Math.sign(wind)}`, text: t(wind > 0 ? 'hint.wind.right' : 'hint.wind.left'), icon: 'wind', kind: 'tip' });
+  // ветер: боковое ускорение weather.push (знак — направление, + вправо); прогноз weather.forecast — если открыт
+  const w = f.weather;
+  const push = w ? w.push || 0 : 0;
+  if (Math.abs(push) > 3 && f.liftedOff) out.push({ pri: 1, key: `wind${Math.sign(push)}`, text: t(push > 0 ? 'hint.wind.right' : 'hint.wind.left'), icon: push > 0 ? 'arrow' : 'back', kind: 'tip' });
+  const fc = w?.forecast;
+  if (fc && f.liftedOff) {
+    const soon = Math.ceil(fc.in);
+    const front = fc.kind !== w.kind && fc.in > 0 && fc.in <= 20 && ['storm', 'dust', 'rain'].includes(fc.kind);
+    const windSoon = fc.windIn > 0 && fc.windIn <= 12 && Math.abs(fc.wind) >= 3 && Math.sign(fc.wind || fc.windDir) !== Math.sign(w.windDir || 1);
+    if (front) out.push({ pri: 0.9, key: `fc:${fc.kind}`, text: t(`hint.forecast.${fc.kind}`, { n: soon }), icon: 'wind', kind: 'tip' });
+    else if (windSoon) out.push({ pri: 0.8, key: `fcw:${fc.windDir}`, text: t(fc.windDir > 0 ? 'hint.forecast.wind.right' : 'hint.forecast.wind.left', { n: Math.ceil(fc.windIn) }), icon: fc.windDir > 0 ? 'arrow' : 'back', kind: 'tip' });
+  }
   const impact = f.predict?.impact;
   if (impact && f.vy > 5) out.push({ pri: 1, key: 'impact', text: t('hint.impact', { t: Math.max(0.1, impact.t).toFixed(1).replace('.', ','), v: fmtSpeed(impact.v), tol: fmtSpeed(f.landing?.vTol ?? 0) }), icon: impact.onPad ? 'check' : 'target', kind: impact.onPad ? 'good' : 'tip' });
   out.sort((a, b) => b.pri - a.pri);

@@ -33,19 +33,30 @@ test('размеры в манифесте совпадают с заголов�
   }
 });
 
-test('якоря построек совпадают с art/placeables/BASE_ISLAND_LAYOUT.json', () => {
+test('раскладка построек совпадает с art/placeables/BASE_ISLAND_LAYOUT.json (version 3)', () => {
   const layout = JSON.parse(fs.readFileSync(path.join(repoRoot, 'art', 'placeables', 'BASE_ISLAND_LAYOUT.json'), 'utf8'));
-  assert.equal(ISLAND.left, layout.world.island_world_left);
-  assert.equal(ISLAND.top, layout.world.island_world_top);
-  assert.equal(ISLAND.width, layout.world.island_world_width);
-  assert.equal(ISLAND.waterSurfaceY, layout.world.water_surface_y);
+  assert.equal(layout.version, 3);
+  assert.deepEqual(layout.world.island_size_px, [ISLAND.width, ISLAND.height]);
+  assert.deepEqual(layout.world.launch_origin_px, ISLAND.launchOrigin);
+  assert.equal(layout.world.units_per_px, ISLAND.unitsPerPx);
+  assert.deepEqual(layout.world.pad_core.trench_px, ISLAND.padCore.trench);
+  assert.equal(layout.world.pad_core.radius_px, ISLAND.padCore.radius);
   assert.equal(fileOf(ASSET_FILES.island_start), layout.world.island_asset);
   assert.deepEqual(Object.keys(layout.purchases).sort(), [...BUILDING_KEYS].sort());
   for (const [key, purchase] of Object.entries(layout.purchases)) {
-    const expected = purchase.anchors || [purchase.anchor];
-    assert.deepEqual(BUILDING_ANCHORS[key].anchors, expected, key);
+    assert.deepEqual(BUILDING_ANCHORS[key].anchors, purchase.anchors, key);
     assert.equal(BUILDING_ANCHORS[key].zone, purchase.zone, key);
+    assert.deepEqual(BUILDING_ANCHORS[key].size, purchase.sprite_px, key);
+    assert.deepEqual(BUILDING_ANCHORS[key].footprint, purchase.footprint_px, key);
+    purchase.anchors.forEach((anchor, i) => {
+      assert.ok(Math.abs(purchase.anchors_uv[i][0] - anchor[0] / ISLAND.width) < 1e-4, `${key} uv x`);
+      assert.ok(Math.abs(purchase.anchors_uv[i][1] - anchor[1] / ISLAND.height) < 1e-4, `${key} uv y`);
+      const wx = (anchor[0] - ISLAND.launchOrigin[0]) * ISLAND.unitsPerPx;
+      const wy = (anchor[1] - ISLAND.launchOrigin[1]) * ISLAND.unitsPerPx;
+      assert.ok(Math.abs(purchase.anchors_world[i][0] - wx) < 0.02 && Math.abs(purchase.anchors_world[i][1] - wy) < 0.02, `${key} world`);
+    });
   }
+  assert.deepEqual(layout.asset_families.B03_landing_guidance, { purchase: 'beacons', zone: 'launch_core' });
 });
 
 test('четырнадцать построек разделены на арт, placeables и программные без пересечений', () => {

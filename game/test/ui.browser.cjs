@@ -95,6 +95,39 @@ async function checkTargets(page, vp, label) {
   assert(res.problems.length === 0, `${vp.name}/${label}: мелкие цели или вне окна: ${res.problems.join('; ')}`);
 }
 
+/** Иконки и фоны загрузились: нет ошибок загрузчика ассетов, у каждой иконки есть непустые пиксели, фон экранов нарисован артом. */
+async function checkAssets(page, vp) {
+  const res = await page.evaluate(() => {
+    const app = globalThis.__VN_APP__;
+    const out = { loadErrors: [...(app.renderer.assets?.errors || [])], empty: [], sprites: [], noSprite: [] };
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = 96;
+    const g = cv.getContext('2d');
+    const names = [...app.iconNames, ...['beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel', 'logistics', 'factory', 'weather', 'control', 'radar', 'energy', 'observation', 'recovery'].map((k) => `bld:${k}:1`)];
+    for (const name of names) {
+      g.clearRect(0, 0, 96, 96);
+      app.kit.icons.draw(g, name, 48, 48, 64, '#ffffff');
+      const d = g.getImageData(0, 0, 96, 96).data;
+      let opaque = 0;
+      for (let i = 3; i < d.length; i += 4) if (d[i] > 40) opaque++;
+      if (opaque < 60) out.empty.push(`${name}:${opaque}`);
+      (app.kit.icons.hasSprite(name) ? out.sprites : out.noSprite).push(name);
+    }
+    return out;
+  });
+  assert(res.loadErrors.length === 0, `${vp.name}: ассеты не загрузились: ${res.loadErrors.slice(0, 5).join(', ')}`);
+  assert(res.empty.length === 0, `${vp.name}: пустые иконки: ${res.empty.join(', ')}`);
+  for (const must of ['coin', 'fuel', 'repair', 'chute', 'capsule', 'booster', 'earth', 'moon', 'bld:gantry:1', 'bld:beacons:1']) {
+    assert(res.sprites.includes(must), `${vp.name}: у иконки «${must}» нет спрайта (рисуется запасной вектор)`);
+  }
+  return res;
+}
+
+async function checkBackdrop(page, vp, screen, expectKind) {
+  const on = await page.evaluate(() => globalThis.__VN_APP__.backdropOn);
+  assert(on === true, `${vp.name}/${screen}: фон экрана не нарисован артом (${expectKind})`);
+}
+
 const shot = (page, vp, name) => page.screenshot({ path: path.join(outDir, `ui-${vp.name}-${name}.png`) });
 
 async function runViewport(browser, vp) {
@@ -126,6 +159,8 @@ async function runViewport(browser, vp) {
   });
   assert(lay.orientation === (vp.height > vp.width ? 'portrait' : 'landscape'), `${vp.name}: ориентация ${lay.orientation}`);
   assert(lay.share < 0.1, `${vp.name}: приборы HUD занимают ${(lay.share * 100).toFixed(1)}% кадра`);
+
+  await checkAssets(page, vp);
 
   // деньги на покупки; новая игра: подсказка «Запуск» видна
   await hook(page, () => {
@@ -189,6 +224,7 @@ async function runViewport(browser, vp) {
   await waitScreen(page, 'rocket');
   await click(page, 'part-legs');
   await shot(page, vp, '06-rocket');
+  await checkBackdrop(page, vp, 'ракета', 'workshop');
   await checkTargets(page, vp, 'ракета');
   await click(page, 'buy-legs', 250);
   p = await hook(page, () => globalThis.__VN_TEST__.profile());
@@ -213,6 +249,7 @@ async function runViewport(browser, vp) {
   for (const tab of ['achievements', 'shop', 'skins', 'contracts']) {
     await click(page, `journal-tabs-${tab}`);
     if (tab === 'shop') await shot(page, vp, '08-journal-shop');
+    if (tab === 'shop') await checkBackdrop(page, vp, 'журнал', 'shop');
   if (tab !== 'contracts') await checkTargets(page, vp, `журнал/${tab}`);
   }
   await click(page, 'back');
@@ -232,6 +269,12 @@ async function runViewport(browser, vp) {
   await click(page, 'dock-launch');
   await waitScreen(page, 'launch');
   await shot(page, vp, '10-launch');
+  await checkBackdrop(page, vp, 'запуск', 'launch-earth');
+  await page.evaluate(() => { globalThis.__VN_APP__.ui.launch.dest = 'moon'; });
+  await page.waitForTimeout(250);
+  await checkBackdrop(page, vp, 'запуск-луна', 'launch-moon');
+  await shot(page, vp, '10b-launch-moon-backdrop');
+  await page.evaluate(() => { globalThis.__VN_APP__.ui.launch.dest = 'earth'; });
   await checkTargets(page, vp, 'запуск');
   await click(page, 'launch-start');
   await page.waitForTimeout(700);

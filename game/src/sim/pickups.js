@@ -5,7 +5,7 @@ import { chance, nextFloat, range } from './rng.js';
 export const COIN_VALUE = 4;
 export const PICKUP_RADIUS = { coin: 28, fuel: 29, repair: 29 }; // reach of the rocket around its centre
 export const MAGNET_BONUS = 90;
-export const RING_RADIUS = 35;
+export const RING_HALF_WIDTH = [55, 85]; // rings are flat horizontal gates the rocket flies up through
 export const RING_IMPULSE = 11; // speed added along the velocity when flying through a ring
 export const RING_BOOST_TIME = 3; // seconds of a slightly raised speed limit
 export const FUEL_PICKUP_SHARE = 0.126; // of the active tank
@@ -40,7 +40,8 @@ export function spawnPickups(rs, ctx) {
   const ringX = ctx.x0 + range(rs, 90, ctx.width - 90);
   const ringAlt = ctx.alt0 + range(rs, 60, ctx.height - 60);
   const nearPad = ringAlt < 300 && Math.abs(ringX - ctx.padX) < 150;
-  if (!nearPad) out.push(makeItem(ctx, 'ring', ringX, ringAlt, RING_RADIUS));
+  const halfWidth = range(rs, RING_HALF_WIDTH[0], RING_HALF_WIDTH[1]);
+  if (!nearPad) out.push({ ...makeItem(ctx, 'ring', ringX, ringAlt, halfWidth), orient: 'horizontal', halfWidth });
 
   const fuelRoll = nextFloat(rs);
   const fuelX = ctx.x0 + range(rs, 60, ctx.width - 60);

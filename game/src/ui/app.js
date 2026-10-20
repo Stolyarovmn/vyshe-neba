@@ -24,6 +24,13 @@ const MAX_FRAME = 0.1;
 const MAX_STEPS = 24;
 const END_DELAY = { landed: 1.5, crashed: 2.4, abandoned: 0.1 };
 
+const BACKDROP_KIND = {
+  rocket: () => 'workshop',
+  journal: () => 'shop',
+  launch: (app) => (app.ui.launch?.dest && app.ui.launch.dest !== 'earth' ? 'launch-moon' : 'launch-earth'),
+};
+const BACKDROP_DIM = { rocket: 0.38, journal: 0.4, launch: 0.32 };
+
 const SCREENS = { hub, rocket, base, journal, launch, flight, results, settings };
 const PULSES = ['parachute', 'canister', 'repair', 'transfer', 'pause'];
 // постройки, открывающие новую механику: при первой покупке показывается карточка «Новое»
@@ -579,6 +586,17 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     const L = app.layout;
     let bg = SCREENS[screen].background || 'hub';
     if (app.countdown) bg = 'hub';
+    app.backdropOn = false;
+    // фоны экранов: мастерская (ракета), лавка (журнал), стартовый комплекс (запуск; на Луну — лунный)
+    const kind = app.countdown ? null : BACKDROP_KIND[screen]?.(app);
+    if (kind && renderer.backdrop?.draw) {
+      try {
+        app.backdropOn = !!renderer.backdrop.draw(ctx, { kind, era: app.profile.era, rect: { x: 0, y: 0, w: L.w, h: L.h }, time: app.time, dim: BACKDROP_DIM[screen] ?? 0.5 });
+      } catch (err) {
+        console.warn('[app] renderer.backdrop.draw:', err);
+      }
+      if (app.backdropOn) return;
+    }
     if (bg === 'flight' && app.session) {
       renderer.flight.draw(ctx, { flight: app.session.flight, config: app.session.config, time: app.time, layout: L, settings: app.settings });
     } else if (bg === 'blueprint') {

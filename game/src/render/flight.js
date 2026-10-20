@@ -4,19 +4,23 @@
 
 import { createCamera, createView } from './camera.js';
 import { applyEvents, createScreenFx } from './events.js';
-import { drawIsland, drawOcean, drawTerrain } from './ground.js';
-import { drawPlacedBuildings } from './buildings.js';
-import { drawLaunchTable } from './launchpad.js';
-import { drawObjects, drawRadarMarks } from './objects.js';
+import { drawTerrain } from './ground.js';
 import {
-  drawFlash, drawLandingZone, drawPadPointer, drawPredict, drawSpeedLines, drawTransferWarp,
+  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundTransform,
+} from './islandmap.js';
+import { drawCloudField, fallbackClouds } from './clouds.js';
+import { drawPlacedBuildings } from './buildings.js';
+import { drawLaunchMount, drawPadRing } from './launchpad.js';
+import { drawObjects, drawObjectsFront, drawRadarMarks } from './objects.js';
+import {
+  drawFlash, drawLandingZone, drawPadPointer, drawPredict, drawSpeedLines, drawTransferWarp, landingZoneAlpha,
 } from './overlays.js';
 import { PALETTE_VARIANT, PARTICLE, createParticles } from './particles.js';
 import {
   ROCKET_SIZE, createRocketPose, drawChute, drawRocket, nozzleOffset, stackHeight,
 } from './rocket.js';
 import {
-  CLOUD_LAYERS_FLIGHT, drawClouds, drawLimb, drawRain, drawSky, drawSkyBodies, drawStars, drawSun,
+  drawLimb, drawRain, drawSky, drawSkyBodies, drawStars, drawSun,
 } from './sky.js';
 import { ensureWorld } from './layout.js';
 import { spriteName } from './manifest.js';
@@ -29,6 +33,7 @@ const CHUTE_FOLD_TIME = 0.7;
 const BODY_GRAVITY = { earth: 45, moon: 9, mars: 20 };
 const PIECE_COUNT = 10;
 const CAMERA_JUMP = 1500;
+const HAZE_COLOR = [150, 205, 236];
 
 function activeStageId(flight) {
   const stages = flight.stages;
@@ -46,6 +51,8 @@ function makePieces() {
 export function createFlightRenderer(painter, shared) {
   const camera = createCamera();
   const view = createView();
+  const mapView = createMapView();
+  const groundTr = { s: 1, ox: 0, oy: 0 };
   const particles = createParticles(900);
   const fx = createScreenFx();
   const rng = createRng(0x51f7);
@@ -350,29 +357,54 @@ export function createFlightRenderer(painter, shared) {
 
   function drawBackdrop(ctx, flight, camAlt, time) {
     const body = flight.body || 'earth';
-    drawSky(ctx, view, body, mood, body === 'earth' ? 150 : null);
+    drawSky(ctx, view, body, mood, null);
     const starAlpha = body === 'moon' ? 1 : body === 'mars' ? smoothstep(1200, 4200, camAlt) : smoothstep(3500, 8500, camAlt);
     drawStars(ctx, view, starAlpha, time);
     if (body === 'earth') drawSun(ctx, view, 0.82, 0.12, (1 - smoothstep(600, 3200, camAlt)) * (1 - mood.cloud * 0.7));
     drawSkyBodies(ctx, painter, view, body, camAlt);
     drawLimb(ctx, view, body, camAlt);
-    if (body === 'earth') {
-      const fade = 1 - smoothstep(2200, 3200, camAlt);
-      drawClouds(ctx, painter, view, CLOUD_LAYERS_FLIGHT, time, 0.3 + 0.7 * mood.cloud, mood.wind, mood.storm, fade);
+  }
+
+  /**
+   * Земля: карта острова в виде сверху-3/4. С высотой карта уменьшается (g) и уходит вниз медленнее
+   * ракеты (параллакс), затем растворяется в дымке и небе — без швов и скачков.
+   */
+  function drawEarthGround(ctx, flight, profile, time) {
+    const altitude = Math.max(0, flight.alt ?? -flight.y);
+    const seaAlpha = 1 - smoothstep(900, 3000, altitude);
+    if (seaAlpha <= 0.01) return;
+    groundTransform(groundTr, altitude, view.S, view.sy(flight.y), view.ax, view.camX);
+    mapView.set(groundTr.ox, groundTr.oy, groundTr.s, view.devW, view.devH);
+    const landAlpha = 1 - smoothstep(450, 2400, altitude);
+    const previous = ctx.globalAlpha;
+    ctx.globalAlpha = previous * seaAlpha;
+    drawSea(ctx, mapView, time, mood, smoothstep(120, 1400, altitude) * 0.8, HAZE_COLOR);
+    if (landAlpha > 0.01) {
+      ctx.globalAlpha = previous * landAlpha;
+      drawIslandHd(ctx, painter, mapView);
+      const shadow = 0.42 * (1 - smoothstep(0, 500, altitude));
+      drawGroundShadow(ctx, mapView, flight.x + 7 + altitude * 0.04, 6 + altitude * 0.03, 17 + altitude * 0.02, 9 + altitude * 0.012, shadow);
+      drawLaunchMount(ctx, mapView, state.era, time);
+      if (profile) drawPlacedBuildings(ctx, painter, mapView, profile, time, null);
     }
+    ctx.globalAlpha = previous;
   }
 
   function drawGround(ctx, flight, profile, time) {
     const body = flight.body || 'earth';
     if (body === 'earth') {
-      drawOcean(ctx, view, time, mood);
-      drawIsland(ctx, painter, view);
-      if (profile) drawPlacedBuildings(ctx, painter, view, profile, time, null);
-      drawLaunchTable(ctx, view, state.era);
+      drawEarthGround(ctx, flight, profile, time);
     } else {
       const pad = flight.pad ? { x: flight.pad.x, w: flight.pad.width || flight.pad.half * 2 } : null;
       drawTerrain(ctx, painter, view, body, state.era, pad, time);
     }
+  }
+
+  /** Облака из sim (state.clouds); если их нет — неподвижное запасное поле. Возвращает список. */
+  function cloudsFor(flight, camAlt) {
+    if (Array.isArray(flight.clouds)) return flight.clouds;
+    if ((flight.body || 'earth') !== 'earth' || camAlt > 4800) return null;
+    return fallbackClouds(view, 0.2 + 0.55 * mood.cloud, mood.storm > 0.4);
   }
 
   const draw = (ctx, params) => {
@@ -438,13 +470,24 @@ export function createFlightRenderer(painter, shared) {
     drawGround(ctx, flight, profile, time);
 
     const pad = flight.pad;
-    if (pad) {
+    const zone = landingZoneAlpha(flight);
+    if (pad && zone > 0.01) {
       const ok = !!(flight.landing && flight.landing.ok) && Math.abs(flight.x - pad.x) <= pad.half;
-      drawLandingZone(ctx, view, pad, !!pad.lit, ok, time, flight.alt, (flight.vy || 0) > -5);
+      if (body === 'earth') {
+        const ringAlpha = zone * (1 - smoothstep(450, 2400, flight.alt ?? 0));
+        drawPadRing(ctx, mapView, pad, !!pad.lit, ok, time, ringAlpha);
+      } else {
+        drawLandingZone(ctx, view, pad, !!pad.lit, ok, time, flight.alt, zone);
+      }
       drawPadPointer(ctx, view, pad, view.ay, time);
     }
+    const clouds = cloudsFor(flight, camAlt);
+    const flashPower = clamp((mood.flash || 0) / 0.08, 0, 1);
+    drawCloudField(ctx, painter, view, clouds, 0, time, flashPower, mood.wind);
     if (mood.rain > 0.05 && camAlt < 2400) drawRain(ctx, view, time, mood.rain, mood.wind);
-    drawPredict(ctx, view, flight.predict, time);
+    drawPredict(
+      ctx, view, flight.predict, time, flight.liftedOff === false ? 0 : smoothstep(8, 45, flight.alt ?? 0), body === 'earth' ? mapView : view,
+    );
     drawObjects(ctx, painter, view, flight.objects, state.era, time);
     drawRadarMarks(ctx, view, flight.objects, time, anchorDev);
 
@@ -453,6 +496,8 @@ export function createFlightRenderer(painter, shared) {
     drawRocket(ctx, painter, view, pose, time);
     drawChute(ctx, painter, view, pose, time);
     particles.draw(ctx, view, 1);
+    drawObjectsFront(ctx, painter, view, flight.objects, state.era);
+    drawCloudField(ctx, painter, view, clouds, 1, time, flashPower, mood.wind);
 
     drawSpeedLines(ctx, view, flight.vx || 0, flight.vy || 0, flight.atmo ?? 1, time);
     if (mood.dust > 0.05 && body === 'mars') {
