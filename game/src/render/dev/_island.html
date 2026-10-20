@@ -1,0 +1,14 @@
+<!doctype html><meta charset=utf-8><body style="margin:0;background:#3a86b8"><canvas id=c width=1650 height=713 style="width:790px"></canvas>
+<script type=module>
+const L=await (await fetch('/art/placeables/BASE_ISLAND_LAYOUT.json')).json();
+const im=new Image();im.src='/art/gen/environment/start_island_e0.png';await im.decode();
+const c=document.getElementById('c'),x=c.getContext('2d');x.imageSmoothingEnabled=false;
+x.fillStyle='#3a86b8';x.fillRect(0,0,1650,713);
+x.fillStyle='rgba(255,255,255,.35)';x.fillRect(0,510-150,1650,2);
+x.drawImage(im,0,0,1650,713);
+// world->canvas: cx = wx+330 ; cy = 510 - wy
+x.font='12px monospace';
+function mark(wx,wy,label,col){x.fillStyle=col;x.fillRect(wx+330-3,510-wy-3,6,6);x.fillStyle='#fff';x.fillText(label,wx+330+5,510-wy-5);}
+mark(0,0,'pad','#f00');
+for(const [k,v] of Object.entries(L.purchases)){for(const a of (v.anchors||[v.anchor]))mark(a[0],a[1],k,'#ff0');}
+</script></body>

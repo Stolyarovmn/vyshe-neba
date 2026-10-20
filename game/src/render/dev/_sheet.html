@@ -1,0 +1,7 @@
+<!doctype html><meta charset=utf-8><body style="margin:0;background:#6a7f8c;color:#fff;font:11px monospace">
+<script>
+const q=new URLSearchParams(location.search);const list=(q.get('l')||'').split(',');const sc=+(q.get('s')||1);
+const base='/outputs/rocket/dist/assets/';
+document.body.style.display='flex';document.body.style.flexWrap='wrap';document.body.style.gap='8px';document.body.style.alignItems='flex-end';
+for(const n of list){const d=document.createElement('div');d.innerHTML=`<img src="${base}${n}.png" style="image-rendering:pixelated;zoom:${sc};display:block;background:rgba(0,0,0,.15)"><div>${n.split('/').pop()}</div>`;document.body.append(d);}
+</script>
