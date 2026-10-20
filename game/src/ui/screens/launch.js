@@ -55,7 +55,8 @@ export default {
         const room = r.y + r.h - pad - y;
         const lineH = kit.fs(14);
         const fit = Math.max(1, Math.floor(room / lineH));
-        const shown = d.reasons.slice(0, d.reasons.length > fit ? fit - 1 : fit);
+        const shownCount = d.reasons.length <= fit ? d.reasons.length : Math.max(1, fit - 1);
+        const shown = d.reasons.slice(0, shownCount);
         const x0 = L.portrait ? tx : r.x + pad;
         const w0 = L.portrait ? tw : r.w - pad * 2;
         for (const rs of shown) {
@@ -63,7 +64,7 @@ export default {
           kit.drawText(app.reasonText(rs), x0 + kit.fs(16), y + lineH / 2, { size: kit.fs(11), color: c.red, maxWidth: w0 - kit.fs(16) });
           y += lineH;
         }
-        if (d.reasons.length > shown.length) kit.drawText(t('launch.more', { n: d.reasons.length - shown.length }), x0 + kit.fs(16), y + lineH / 2, { size: kit.fs(11), color: c.textMute });
+        if (d.reasons.length > shown.length && fit > 1) kit.drawText(t('launch.more', { n: d.reasons.length - shown.length }), x0 + kit.fs(16), y + lineH / 2, { size: kit.fs(11), color: c.textMute });
       }
     });
 
@@ -81,7 +82,7 @@ export default {
       const isFree = !!free[id];
       const usable = have > 0 || isFree;
       const on = usable && (isFree || st.cons[id]);
-      const clicked = kit.button(`cons-${id}`, r, { variant: on ? 'cardOn' : 'card', stack: true, icon: CONS_ICON[id], label: t(`cons.${id}`), size: kit.fs(L.portrait ? 10 : 12), disabled: false, iconColor: usable ? c.text : c.textMute, color: usable ? c.text : c.textMute });
+      const clicked = kit.button(`cons-${id}`, r, { variant: on ? 'cardOn' : 'card', stack: true, icon: CONS_ICON[id], label: t(`cons.${id}`), size: Math.min(kit.fs(L.portrait ? 10 : 12), Math.round(r.w / 6.2)), disabled: false, iconColor: usable ? c.text : c.textMute, color: usable ? c.text : c.textMute });
       kit.drawText(isFree ? t('cons.free') : `×${have}`, r.x + r.w - L.px * 3, r.y + L.px * 4, { size: kit.fs(11), color: isFree ? c.green : have ? c.amber : c.textMute, align: 'right', weight: 900 });
       if (clicked) {
         if (!usable) app.go('journal', { tab: 'shop' }, { push: true });

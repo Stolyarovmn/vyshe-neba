@@ -223,7 +223,7 @@ function drawEras(app, kit, L, r) {
   const size = kit.fs(13);
   kit.scrollArea('base-eras', inner, undefined, (top) => {
     let y = top;
-    const nodeH = Math.round(54 * L.ui);
+    const nodeH = Math.round(66 * L.ui);
     for (let i = 0; i < 6; i++) {
       const done = i < p.era;
       const now = i === p.era;
@@ -236,7 +236,9 @@ function drawEras(app, kit, L, r) {
       const tx = nx + dot / 2 + L.gap * 1.5;
       kit.drawText(String(ERA_YEARS[i]), tx, y + nodeH * 0.3, { size: kit.fs(17), color: now ? c.amber : done ? c.text : c.textMute, weight: 900 });
       kit.drawText(eraName(app, i), tx + Math.round(52 * L.ui), y + nodeH * 0.3, { size: kit.fs(13), color: now ? c.text : c.textDim, maxWidth: inner.w - (tx - inner.x) - Math.round(60 * L.ui) });
-      kit.drawText(eraDesc(app, i), tx, y + nodeH * 0.72, { size: kit.fs(11), color: c.textMute, maxWidth: inner.w - (tx - inner.x) - L.gap });
+      kit.drawText(eraDesc(app, i), tx, y + nodeH * 0.56, { size: kit.fs(11), color: c.textMute, maxWidth: inner.w - (tx - inner.x) - L.gap });
+      const ms = i >= p.era ? app.data.ERAS?.[i]?.advance?.milestone?.text : null;
+      if (ms) kit.drawText(t('era.milestone', { text: ms }), tx, y + nodeH * 0.84, { size: kit.fs(11), color: i === p.era ? c.cyan : c.textMute, maxWidth: inner.w - (tx - inner.x) - L.gap });
       y += nodeH + L.gap;
       if (now && es.next) {
         // карточка перехода

@@ -76,18 +76,31 @@ function padIntervals(shape) {
 }
 
 // Keeps the chord's own stacking (root, third, seventh, ninth...) so extensions
-// stay on top, then moves the whole voicing by octaves towards a drifting centre.
-export function voicePad(profile, info, previousCenter) {
-  const center = previousCenter == null ? profile.padCenter : lerp(previousCenter, profile.padCenter, 0.5);
-  const root = nearestAtOrAbove(info.rootPc, Math.round(center) - 12);
-  const stack = [...new Set(padIntervals(info.shape).map((i) => root + i))].sort((a, b) => a - b);
-  const meanOf = (shift) => stack.reduce((s, n) => s + n + shift, 0) / stack.length;
-  let shift = 0;
-  for (const candidate of [-12, 12]) {
-    if (Math.abs(meanOf(candidate) - center) < Math.abs(meanOf(shift) - center)) shift = candidate;
+// stay on top, then tries octave lifts and inversions and keeps the voicing that
+// moves least from the previous chord while staying in the pad register.
+export function voicePad(profile, info, previous) {
+  const home = profile.padCenter;
+  const rootBase = nearestAtOrAbove(info.rootPc, Math.round(home) - 14);
+  const stack = [...new Set(padIntervals(info.shape))].sort((a, b) => a - b).map((i) => rootBase + i);
+  let best = null;
+  for (const lift of [-12, 0, 12]) {
+    for (let k = 0; k < stack.length; k++) {
+      const notes = [...new Set(stack.map((n, i) => n + lift + (i < k ? 12 : 0)))].sort((x, y) => x - y);
+      const center = notes.reduce((sum, n) => sum + n, 0) / notes.length;
+      const spread = notes[notes.length - 1] - notes[0];
+      let cost = Math.max(0, Math.abs(center - home) - 5) * 4 + Math.max(0, spread - 16) * 2;
+      cost += previous ? voiceMotion(previous.notes, notes) : Math.abs(center - home);
+      if (!best || cost < best.cost) best = { notes, center, cost };
+    }
   }
-  const notes = stack.map((n) => n + shift);
-  return { notes, center: meanOf(shift) };
+  return { notes: best.notes, center: best.center };
+}
+
+function voiceMotion(from, to) {
+  const n = Math.min(from.length, to.length);
+  let total = 2 * Math.abs(from.length - to.length);
+  for (let i = 0; i < n; i++) total += Math.abs(from[from.length - 1 - i] - to[to.length - 1 - i]);
+  return total;
 }
 
 export function mixTargets(profile, s) {
@@ -129,9 +142,10 @@ export function createPlanner({ seed = 1 } = {}) {
   let nextBeatTime = null;
   let step = 0;
   let barCounter = 0;
-  let padCenter = null;
+  let padPrev = null;
   let bar = null; // per-bar latch
   let phrase = null;
+  let leadLast = null;
   let arp = { pool: [], index: 0, dir: 1, toggle: false };
 
   function setTarget(partial) {
@@ -154,8 +168,9 @@ export function createPlanner({ seed = 1 } = {}) {
     profile = PROFILES[id];
     step = 0;
     barCounter = 0;
-    padCenter = null;
+    padPrev = null;
     phrase = null;
+    leadLast = null;
     if (!first) {
       out.push({ t, layer: 'ctl', kind: 'switch', profile: id, bpm: profile.bpm });
       out.push({ t, layer: 'fx', kind: 'impact', vel: 0.7 });
@@ -202,8 +217,8 @@ export function createPlanner({ seed = 1 } = {}) {
   }
 
   function emitPad(t, stepDur, info, out) {
-    const voicing = voicePad(profile, info, padCenter);
-    padCenter = voicing.center;
+    const voicing = voicePad(profile, info, padPrev);
+    padPrev = voicing;
     const dur = profile.chordBars * STEPS_PER_BAR * stepDur + 0.6;
     const n = voicing.notes.length;
     voicing.notes.forEach((midi, i) => {
@@ -233,7 +248,9 @@ export function createPlanner({ seed = 1 } = {}) {
       degree = Math.max(1, Math.min(11, degree + rng.lead.pick(LEAD_WALK)));
       return { step: stepIndex, len, degree };
     });
-    notes[notes.length - 1].degree = rng.lead.pick([0, 2, 4, 7]);
+    const last = notes[notes.length - 1];
+    const before = notes.length > 1 ? notes[notes.length - 2].degree : degree;
+    last.degree = pickClosest([0, 2, 4, 7], before);
     return notes;
   }
 
@@ -328,6 +345,8 @@ export function createPlanner({ seed = 1 } = {}) {
       let midi = scaleMidi(profile, tonic, note.degree + shift);
       while (midi > hi) midi -= 12;
       if (note.step % 8 === 0 || note.len >= 4 || last) midi = snapToChord(midi, bar.info.pcs);
+      midi = limitLeap(midi, leadLast, lo, hi);
+      leadLast = midi;
       out.push({
         t,
         layer: 'lead',
@@ -338,6 +357,16 @@ export function createPlanner({ seed = 1 } = {}) {
         pan: 0.1 * (cycleBar - 1.5),
       });
     }
+  }
+
+  // Keeps the melody singable: no leap wider than a major sixth when an octave shift avoids it.
+  function limitLeap(midi, previous, lo, hi) {
+    if (previous === null) return midi;
+    for (const shift of [-12, 12]) {
+      const moved = midi + shift;
+      if (Math.abs(midi - previous) > 9 && Math.abs(moved - previous) < Math.abs(midi - previous) && moved >= lo && moved <= hi) return moved;
+    }
+    return midi;
   }
 
   function snapToChord(midi, pcs) {
@@ -355,7 +384,7 @@ export function createPlanner({ seed = 1 } = {}) {
     for (const kind of Object.keys(chosen)) {
       const token = chosen[kind]?.[step];
       if (!token || token === '.') continue;
-      if (fillNow && kind !== 'kick' && kind !== 'tom' && kind !== 'snare') continue;
+      if (fillNow && kind !== 'kick' && kind !== 'tom') continue;
       if (kind === 'hat' && chosen.ohat?.[step] && chosen.ohat[step] !== '.') continue;
       const jitter = kind === 'hat' || kind === 'shaker' ? rng.drum.soft() * 0.004 : 0;
       const event = { t: t + swingOffset + jitter, layer: 'drum', kind, vel: DRUM_FEEL[token] };
@@ -428,7 +457,7 @@ export function createPlanner({ seed = 1 } = {}) {
     nextBeatTime = null;
     step = 0;
     barCounter = 0;
-    padCenter = null;
+    padPrev = null;
     phrase = null;
     bar = null;
   }

@@ -23,7 +23,7 @@ function pad(inst, e) {
   lowpass.frequency.setValueAtTime(p.cutoff * 0.45, e.t);
   lowpass.frequency.setTargetAtTime(p.cutoff, e.t, p.attack);
   const stop = end + p.release * 7;
-  const levels = [0.5, 0.5, 0.32];
+  const levels = [0.5, 0.5, 0.2];
   [-p.detune, p.detune, 0].forEach((cents, i) => {
     const osc = v.osc(p.types[i], i === 2 ? f / 2 : f, e.t, stop);
     osc.detune.value = cents;

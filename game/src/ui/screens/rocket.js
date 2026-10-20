@@ -231,11 +231,10 @@ function drawSpots(app, kit, L, G, st) {
       const lx = r.side < 0 ? r.x - L.gap : r.x + r.w + L.gap;
       const align = r.side < 0 ? 'right' : 'left';
       const maxW = r.side < 0 ? lx - G.schematic.x - L.gap * 0.5 : G.schematic.x + G.schematic.w - lx - L.gap * 0.5;
-      const nsize = kit.fs(12);
       const shortName = partShort(app, id);
-      const fitted = shortName.includes(' ') ? null : kit.text.fit(shortName, maxW, nsize, 800, 0.6);
-      const lines = fitted ? [fitted.str] : kit.text.wrap(shortName, maxW, nsize).slice(0, 2);
-      const lh = nsize * 1.15;
+    const nsize = kit.text.fitWords(shortName, maxW, kit.fs(12));
+    const lines = kit.text.wrap(shortName, maxW, nsize).slice(0, 2);
+    const lh = nsize * 1.15;
       const blockH = lines.length * lh + kit.fs(11) * 1.2;
       let ty = r.y + (r.h - blockH) / 2 + lh / 2;
       for (const ln of lines) {

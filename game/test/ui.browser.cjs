@@ -112,6 +112,24 @@ async function runViewport(browser, vp) {
     t.setProfile(p);
   });
 
+  // ---- полная работа с клавиатуры: фокус стрелками, Enter, Esc ----
+  const dockOrder = ['dock-launch', 'dock-rocket', 'dock-base', 'dock-journal', 'dock-more'];
+  let focus = null;
+  for (let i = 0; i < 20 && focus !== 'dock-rocket'; i++) {
+    const at = dockOrder.indexOf(focus);
+    await page.keyboard.press(at < 0 ? 'ArrowDown' : at > 1 ? 'ArrowLeft' : 'ArrowRight');
+    await page.waitForTimeout(110);
+    focus = await hook(page, () => globalThis.__VN_APP__.kit.S.focusId);
+  }
+  assert(focus === 'dock-rocket', `${vp.name}: фокус не дошёл до дока стрелками (${focus})`);
+  await shot(page, vp, '01b-hub-focus');
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(250);
+  assert((await screenName(page)) === 'rocket', `${vp.name}: Enter не открыл экран ракеты`);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(250);
+  assert((await screenName(page)) === 'hub', `${vp.name}: Esc не вернул в хаб`);
+
   // ---- база: купить маяки через интерфейс ----
   await click(page, 'dock-base');
   await waitScreen(page, 'base');

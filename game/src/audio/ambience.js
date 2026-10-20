@@ -3,6 +3,8 @@
 
 import { clamp01, smoothstep } from './util.js';
 
+const AMBIENCE_LEVEL = 0.24;
+
 export function mapAmbience(frame, scene) {
   if (frame.paused || frame.body !== 'earth') return { level: 0 };
   if (scene === 'hub') return { level: 1 };
@@ -82,8 +84,8 @@ export function createAmbience({ ctx, graph, noise, rng }) {
     const { level } = mapAmbience(frame, scene);
     if (Math.abs(level - last) < 0.002) return;
     last = level;
-    if (first) master.gain.setValueAtTime(clamp01(level) * 0.55, when);
-    else master.gain.setTargetAtTime(clamp01(level) * 0.55, when, 1.2);
+    if (first) master.gain.setValueAtTime(clamp01(level) * AMBIENCE_LEVEL, when);
+    else master.gain.setTargetAtTime(clamp01(level) * AMBIENCE_LEVEL, when, 1.2);
     first = false;
   }
 

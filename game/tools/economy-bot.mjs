@@ -16,14 +16,15 @@ import { fresh } from '../src/state/index.js';
 import { mulberry32 } from '../src/sim/rng.js';
 import { canExpedition, playFlight as analyticFlight, safeReach } from './economy-bot-adapter.mjs';
 
-// Minutes of play per era transition. E0 has the explicit 25..35 range of DESIGN 4.7, the others +-30%.
+// Minutes of play per era transition; the tolerance is +-30% (DESIGN 4.7). DESIGN also wants the first era
+// in 25..35 minutes: `design` is that window, which a typical (mean over seeds) run has to meet.
 export const TARGETS = [
-  { era: 0, minutes: 30, min: 25, max: 35 },
+  { era: 0, minutes: 30, design: { min: 25, max: 35 } },
   { era: 1, minutes: 70 },
   { era: 2, minutes: 130 },
   { era: 3, minutes: 200 },
   { era: 4, minutes: 290 },
-].map((t) => ({ ...t, min: t.min ?? Math.round(t.minutes * 0.7), max: t.max ?? Math.round(t.minutes * 1.3) }));
+].map((t) => ({ ...t, min: Math.round(t.minutes * 0.7), max: Math.round(t.minutes * 1.3) }));
 export const CAMPAIGN = { minutes: 720, min: 600, max: 840 }; // DESIGN 4.7: 10..14 hours
 
 const SAFETY_FRACTION = 0.97; // the rational player stays this far under the safe reach
@@ -289,7 +290,8 @@ function shop(profile, log, skill) {
   return current;
 }
 
-export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = false, verbose = false } = {}) {
+// `untilEra` stops the run once that era has been completed (used when calibrating one era at a time).
+export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = false, verbose = false, untilEra = 5 } = {}) {
   goalCache.clear();
   const rng = mulberry32(seed);
   const fly = real ? (await loadRealFlight()) ?? analyticFlight : analyticFlight;
@@ -305,7 +307,7 @@ export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = 
   const eras = [];
   let flights = 0;
 
-  while (profile.era < 5 && seconds / 60 < maxMinutes && flights < 20000) {
+  while (profile.era < Math.min(5, untilEra + 1) && seconds / 60 < maxMinutes && flights < 20000) {
     const before = log.purchases;
     profile = shop(profile, log, skill);
     seconds += (log.purchases - before) * OVERHEAD.purchaseSeconds;

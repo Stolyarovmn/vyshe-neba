@@ -2,6 +2,7 @@
 // интеграция с rules / sim / render / audio, сохранение и команды для экранов.
 
 import { createKit } from './kit.js';
+import { ICON_NAMES } from './icons.js';
 import { computeLayout, mergeLayouts } from './layout.js';
 import { createSfx, reasonText } from './bridge.js';
 import { sfxForEvent } from '../audio/names.js';
@@ -25,6 +26,8 @@ const END_DELAY = { landed: 1.5, crashed: 2.4, abandoned: 0.1 };
 
 const SCREENS = { hub, rocket, base, journal, launch, flight, results, settings };
 const PULSES = ['parachute', 'canister', 'repair', 'transfer', 'pause'];
+// постройки, открывающие новую механику: при первой покупке показывается карточка «Новое»
+const NEW_MECHANICS = ['gantry', 'weather', 'control', 'radar', 'observation', 'recovery', 'logistics'];
 
 export function createApp({ canvas, mods, store, prefs, savePrefs, input, renderer, audio, profile }) {
   const ctx = canvas.getContext('2d', { alpha: false });
@@ -62,6 +65,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     standFrame: null,
     pendingSave: false,
     ui: {},
+    stats: { sceneMs: 0, uiMs: 0 },
+    iconNames: ICON_NAMES,
     hudTargets: {},
     hubSelected: null,
   };
@@ -127,8 +132,9 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
 
   function syncMusic() {
     try {
+      // зона и интенсивность в полёте выводятся звуком из кадров audio.update
       const scene = app.screen === 'flight' ? 'flight' : app.screen === 'results' ? 'results' : 'hub';
-      if (scene !== 'flight') audio.music.set({ scene, zone: 'ground', intensity: 0.4 });
+      audio.music.set({ scene, zone: null, intensity: null });
     } catch {
       /* музыка необязательна */
     }
@@ -237,7 +243,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     app.commit(res.profile);
     sfx(before.buildings[key] === 0 ? 'build-complete' : 'build');
     app.haptic([10, 30, 16]);
-    if (before.buildings[key] === 0) queueCard(`building:${key}`);
+    if (before.buildings[key] === 0 && NEW_MECHANICS.includes(key)) queueCard(`building:${key}`);
     return res;
   };
 
@@ -510,7 +516,6 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     app.commit(settled.profile);
     if (!app.settings.tutorial?.done && (result.outcome === 'landed' || result.outcome === 'crashed')) app.setSetting('tutorial', { done: true, step: 99 });
     app.results = { result, report: settled.report || {}, before, after: settled.profile, config: s.config, destination: s.destination, consumables: s.consumables };
-    audio.music.set?.({ scene: 'results' });
     app.session = null;
     app.go('results');
   };
@@ -560,10 +565,16 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     const events = input.drain(dt);
     kit.begin(ctx, { L, settings: app.settings, time: app.time, dt, events });
     try {
+      const t0 = performance.now();
       drawBackground(app.screen);
+      const t1 = performance.now();
       const screen = SCREENS[app.screen];
       if (app.countdown) drawCountdown();
       else screen.draw(app, kit, L, dt);
+      const t2 = performance.now();
+      // скользящее среднее: сцена (рендер) и интерфейс по отдельности
+      app.stats.sceneMs += (t1 - t0 - app.stats.sceneMs) * 0.05;
+      app.stats.uiMs += (t2 - t1 - app.stats.uiMs) * 0.05;
       if (!app.countdown && app.cards.length && app.screen !== 'flight') {
         if (drawNewCard(app, kit, app.cards[0])) app.dismissCard();
       }

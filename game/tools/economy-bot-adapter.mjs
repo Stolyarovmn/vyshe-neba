@@ -12,7 +12,6 @@ import { travelPay } from '../src/rules/index.js';
 
 const DT = 0.2;
 const MASS_SHED_BONUS = 0.35; // same rule as sim/rocket.js stageAccel
-const RCS_WASTE = 0.06; // fuel the attitude jets burn on top of the main engine
 const APPROACH = { alt: 1400, vMin: 28, vMax: 85 }; // sim/bodies.js approach block of Moon and Mars
 const CACHE = new Map();
 

@@ -125,8 +125,10 @@ export function createAudio(options = {}) {
       if (!running()) return;
       if (ctx.currentTime - lastUpdateAt > 0.12) core.tick();
       keepAlive = setTimeout(loop, KEEP_ALIVE_MS);
+      keepAlive.unref?.();
     };
     keepAlive = setTimeout(loop, KEEP_ALIVE_MS);
+    keepAlive.unref?.();
   }
 
   function stopKeepAlive() {

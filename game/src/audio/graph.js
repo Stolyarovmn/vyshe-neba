@@ -78,7 +78,7 @@ export function createGraph(ctx, { rng, now }) {
 
   // ---- output stage ----
   const mix = gain(1);
-  const dcBlock = filter('highpass', 24, 0.5);
+  const dcBlock = filter('highpass', 30, 0.5);
   const glue = own(ctx.createDynamicsCompressor());
   glue.threshold.value = -20;
   glue.knee.value = 24;

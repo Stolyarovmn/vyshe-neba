@@ -83,6 +83,7 @@ export default {
   'era.upgrade': 'Модернизация до {year}',
   'era.advance': 'Модернизировать',
   'era.done': 'Эпоха {year}!',
+  'era.milestone': 'Веха: {text}',
   'era.cond.coins': 'Монеты: {have} / {need}',
   'era.cond.data': 'Данные: {have} / {need}',
   'era.cond.buildings': 'Построек ур. {level}+: {have} / {need}',

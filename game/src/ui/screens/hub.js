@@ -2,7 +2,7 @@
 
 import { t } from '../../i18n/index.js';
 import { dockLayout, screenFrame, sheetRect, right } from '../layout.js';
-import { drawHeader, drawBuildingCard, suggestNext, buildingIcon, BUILDING_KEYS, PART_KEYS } from './common.js';
+import { drawHeader, drawBuildingCard, suggestNext, BUILDING_KEYS, PART_KEYS } from './common.js';
 
 const DOCK = [
   { id: 'launch', icon: 'launch', variant: 'primary' },
@@ -105,7 +105,7 @@ export default {
     for (const d of DOCK) {
       const r = dock.items[d.id];
       const badge = d.id === 'rocket' && info.canPart ? '!' : d.id === 'base' && info.canBuilding ? '!' : undefined;
-      const clicked = kit.button(`dock-${d.id}`, r, { label: t(`dock.${d.id}`), icon: d.icon, stack: true, variant: d.variant, size: kit.fs(L.portrait ? 11 : 13), badge, tip: t(`dock.${d.id}.tip`) });
+      const clicked = kit.button(`dock-${d.id}`, r, { label: t(`dock.${d.id}`), icon: d.icon, stack: true, variant: d.variant, size: Math.min(kit.fs(L.portrait ? 11 : 13), Math.round(r.w / 5.6)), badge, tip: t(`dock.${d.id}.tip`) });
       if (!clicked) continue;
       if (d.id === 'more') st.more = !st.more;
       else app.go(d.id, {}, { push: true });

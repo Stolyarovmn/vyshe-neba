@@ -92,6 +92,15 @@ export function createText() {
     return { str, size: s };
   }
 
+  /** Размер шрифта, при котором самое длинное слово помещается в maxWidth (но не меньше minScale). */
+  function fitWords(str, maxWidth, size, weight = 800, minScale = 0.62) {
+    const words = String(str).split(/\s+/);
+    let s = size;
+    const min = Math.max(8, size * minScale);
+    while (s > min && words.some((w) => measure(w, s, weight) > maxWidth)) s -= 0.5;
+    return s;
+  }
+
   function bitmapFor(str, size, weight, color, shadow, outline) {
     const key = `${size}|${weight}|${color}|${shadow || ''}|${outline || ''}|${str}`;
     let bm = bitmaps.get(key);
@@ -196,5 +205,5 @@ export function createText() {
     return wrap(str, maxWidth, size, weight).length * size * lineHeight;
   }
 
-  return { draw, block, blockHeight, measure, wrap, fit, setDpr, clear: () => bitmaps.clear(), get cacheSize() { return bitmaps.size; } };
+  return { draw, block, blockHeight, measure, wrap, fit, fitWords, setDpr, clear: () => bitmaps.clear(), get cacheSize() { return bitmaps.size; } };
 }

@@ -224,6 +224,11 @@ export function createKit({ sfx = () => {} } = {}) {
     const cands = S.prevHits.filter((h) => h.focusable && h.layer === topLayer && h.w > 0 && h.h > 0);
     if (!cands.length) return;
     const cur = cands.find((h) => h.id === S.focusId);
+    if (cur?.slider && (dir === 'left' || dir === 'right')) {
+      // на ползунке стрелки меняют значение
+      S.sliderNudge = { id: cur.id, delta: dir === 'right' ? 0.05 : -0.05 };
+      return;
+    }
     if (!cur) {
       cands.sort((a, b) => a.y - b.y || a.x - b.x);
       S.focusId = cands[0].id;
@@ -525,11 +530,14 @@ export function createKit({ sfx = () => {} } = {}) {
   function focusRing(r) {
     const cell = px();
     const ctx = S.ctx;
-    ctx.strokeStyle = S.th.c.amber;
-    ctx.lineWidth = cell;
-    const pulse = 0.65 + 0.35 * Math.sin(S.time * 8);
+    const pulse = S.settings.reduceMotion ? 1 : 0.8 + 0.2 * Math.sin(S.time * 8);
     ctx.globalAlpha = pulse;
-    ctx.strokeRect(r.x - cell, r.y - cell, r.w + cell * 2, r.h + cell * 2);
+    ctx.strokeStyle = S.th.c.edge;
+    ctx.lineWidth = cell * 3;
+    ctx.strokeRect(r.x - cell * 1.5, r.y - cell * 1.5, r.w + cell * 3, r.h + cell * 3);
+    ctx.strokeStyle = S.th.c.amber;
+    ctx.lineWidth = cell * 1.5;
+    ctx.strokeRect(r.x - cell * 1.25, r.y - cell * 1.25, r.w + cell * 2.5, r.h + cell * 2.5);
     ctx.globalAlpha = 1;
   }
 
@@ -623,7 +631,7 @@ export function createKit({ sfx = () => {} } = {}) {
     rect(inner.x, inner.y, Math.round(inner.w * lo), inner.h, mix(c.textDim, c.inset, 0.35));
     if (hi > lo) {
       rect(inner.x + Math.round(inner.w * lo), inner.y, Math.round(inner.w * (hi - lo)), inner.h, accent);
-      if (S.th.colorblind || true) {
+      {
         // штриховка отличает «станет» от «было» и без цвета
         S.ctx.save();
         S.ctx.beginPath();
@@ -641,7 +649,7 @@ export function createKit({ sfx = () => {} } = {}) {
   function slider(id, r, value, o = {}) {
     const c = S.th.c;
     const cell = px();
-    hit(id, r, { capture: true, focusable: true });
+    hit(id, r, { capture: true, focusable: true, slider: true });
     const a = stepAnim(id);
     let v = value;
     const trackH = Math.max(cell * 3, Math.round(r.h * 0.3));
@@ -649,11 +657,11 @@ export function createKit({ sfx = () => {} } = {}) {
     if (S.sliderDrag && S.sliderDrag.id === id) {
       v = clamp((S.sliderDrag.x - track.x) / track.w, 0, 1);
       if (o.step) v = Math.round(v / o.step) * o.step;
-      if (S.sliderDrag.released && !S.press) S.sliderDrag = null;
-    } else if (S.focusVisible && S.focusId === id) {
-      // стрелки меняют значение через nav: см. adjust()
+      if (S.sliderDrag.released) S.sliderDrag = null;
+    } else if (S.sliderNudge && S.sliderNudge.id === id) {
+      v = clamp(Math.round((value + S.sliderNudge.delta) / (o.step || 0.05)) * (o.step || 0.05), 0, 1);
+      S.sliderNudge = null;
     }
-    if (S.sliderDrag?.released && S.sliderDrag.id === id) S.sliderDrag = null;
     meter(track, { value: v, color: o.color || c.amber, bg: c.inset });
     const kx = track.x + track.w * v;
     const kw = Math.round(r.h * 0.5);
@@ -671,7 +679,7 @@ export function createKit({ sfx = () => {} } = {}) {
     const inner = meter(sw, { value: value ? 1 : 0, color: value ? c.green : c.textMute });
     const kx = value ? sw.x + sw.w - cell * 5 : sw.x + cell * 2;
     rect(kx, sw.y + cell, cell * 3, sw.h - cell * 2, c.white);
-    if (S.th.colorblind || true) drawText(value ? t('common.on') : t('common.off'), sw.x - cell * 2, r.y + r.h / 2 - cell, { size: fs(12), color: value ? c.green : c.textMute, align: 'right' });
+    drawText(value ? t('common.on') : t('common.off'), sw.x - cell * 2, r.y + r.h / 2 - cell, { size: fs(12), color: value ? c.green : c.textMute, align: 'right' });
     return clicked ? !value : value;
   }
 
@@ -905,7 +913,7 @@ export function createKit({ sfx = () => {} } = {}) {
       if (button(`modal-${id}-ok`, { x: inner.x, y: y + h - L.pad - bh, w: inner.w, h: bh }, { label: o.button || t('common.ok'), variant: 'primary', size: fs(16) })) closed = true;
       S.ctx.globalAlpha = 1;
     });
-    if (S.back) closed = true;
+    if (S.back || S.clicked === 'barrier') closed = true;
     return closed;
   }
 

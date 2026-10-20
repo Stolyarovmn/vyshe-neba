@@ -27,8 +27,14 @@ test('bot: the default run fits every era window and the 10-14 hour campaign', a
     assert.ok(row.ok, `E${row.era}->E${row.era + 1}: ${row.actual?.minutes.toFixed(1)} min, window ${row.min}-${row.max}`);
   }
   assert.ok(verdict.totalOk, `campaign ${run.minutes.toFixed(0)} min, window ${CAMPAIGN.min}-${CAMPAIGN.max}`);
-  const first = run.eras[0];
-  assert.ok(first.minutes >= 25 && first.minutes <= 35, `first era ${first.minutes.toFixed(1)} min`);
+});
+
+test('bot: the first era takes 25-35 minutes on average (DESIGN 4.7)', async () => {
+  const seeds = [1, 2, 3, 4, 5, 6];
+  let total = 0;
+  for (const seed of seeds) total += (await runBot({ seed, untilEra: 0 })).eras[0].minutes;
+  const mean = total / seeds.length;
+  assert.ok(mean >= TARGETS[0].design.min && mean <= TARGETS[0].design.max, `mean first era ${mean.toFixed(1)} min`);
 });
 
 test('bot: other seeds stay within +-30% of every target', async () => {
@@ -70,7 +76,8 @@ test('the first upgrade costs one or two flights', () => {
 
 test('an era project is a multiple of ordinary purchases, not a trivial price', () => {
   for (const era of ERAS.slice(0, 5)) {
-    assert.ok(era.advance.coins >= 10 * Math.min(...Object.values(BUILDINGS).map((b) => b.levels[era.id].cost)) * 0.5, `E${era.id} project`);
+    const cheapest = Math.min(...Object.values(BUILDINGS).filter((b) => b.minEra <= era.id).map((b) => b.levels[era.id].cost));
+    assert.ok(era.advance.coins >= 5 * cheapest, `E${era.id}: project ${era.advance.coins}, cheapest top-level building ${cheapest}`);
   }
 });
 
