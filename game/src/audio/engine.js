@@ -49,7 +49,7 @@ export function mapEngine(input) {
     rumble: { freq: lerp(36, 66, level) * voice.pitch, gain: 0.14 * loud * voice.body * (0.55 + 0.45 * hull) },
     body: { gain: 0.25 * Math.pow(level, 0.7) * hull * voice.body },
     buzz: { freq: lerp(70, 118, level) * voice.pitch, gain: 0.2 * Math.pow(level, 0.8) * hull * voice.body },
-    whine: { freq: lerp(700, 2400, level) * voice.pitch, gain: 0.03 * level * level },
+    whine: { freq: lerp(700, 2400, level) * voice.pitch, gain: 0.02 * level * level },
     sputter: burning ? clamp01((0.07 - f.fuel01) / 0.07) : 0,
     wind: {
       gain: windBase + breeze + stormy * 0.3,
@@ -74,6 +74,7 @@ export function mapEngine(input) {
 
 const RCS_ON = 0.05;
 const ENGINE_LEVEL = 0.62;
+const SLEEP_AFTER = 5; // seconds of silence before the engine graph is parked
 
 export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
   const nodes = [];
@@ -124,7 +125,14 @@ export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
     return list[list.length - 1];
   };
 
-  const bus = graph.buses.engine;
+  // Everything the engine makes reaches the mix through this switch. While the
+  // game is quiet (hub, pause) it is opened, so the web of noise sources and
+  // filters behind it stops being processed at all.
+  const power = gain(1);
+  power.connect(graph.buses.engine);
+  const bus = power;
+  let awake = true;
+  let idleSince = null;
 
   // Master for the engine voice: stage blips and fuel sputter act here.
   const master = gain(ENGINE_LEVEL);
@@ -257,12 +265,31 @@ export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
   function apply(frameInput, when = now()) {
     const frame = normalizeFrame(frameInput);
     const m = mapEngine(frame);
+    updatePower(m, when);
     applyEngine(m, when);
     applyWind(m, when);
     applyRcs(m, when);
     handleEdges(frame, m, when);
     graph.setEngineDuck(m.duckMusic, when);
     first = false;
+  }
+
+  const busy = (m) => m.level > 0 || m.wind.gain > 1e-4 || m.wind.whistleGain > 1e-4 || m.rcs.left > 0 || m.rcs.right > 0;
+
+  function updatePower(m, when) {
+    if (busy(m)) {
+      idleSince = null;
+      if (!awake) {
+        power.connect(graph.buses.engine);
+        awake = true;
+      }
+      return;
+    }
+    idleSince ??= when;
+    if (awake && when - idleSince > SLEEP_AFTER) {
+      power.disconnect(graph.buses.engine);
+      awake = false;
+    }
   }
 
   function applyEngine(m, when) {
@@ -388,5 +415,5 @@ export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
     }
   }
 
-  return { apply, dispose, nodeCount: () => nodes.length };
+  return { apply, dispose, nodeCount: () => nodes.length, isAwake: () => awake };
 }

@@ -607,7 +607,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
 
   function drawFade(dt) {
     if (app.fade <= 0) return;
-    app.fade = Math.max(0, app.fade - dt / 0.18);
+    app.fade = app.settings.reduceMotion ? 0 : Math.max(0, app.fade - dt / 0.18);
+    if (app.fade <= 0) return;
     ctx.fillStyle = `rgba(4,7,14,${app.fade * 0.85})`;
     ctx.fillRect(0, 0, app.layout.w, app.layout.h);
   }
