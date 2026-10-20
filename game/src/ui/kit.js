@@ -11,16 +11,11 @@ import { intersect } from './layout.js';
 import { t } from '../i18n/index.js';
 
 const TAP_SLOP = 9;
-const NINE = 9; // размер текстуры 9-slice в ячейках
-const CORNER = 4;
 
-// левый верхний квадрант 5×5: . прозрачно, e контур, h скос, f заливка
-const QUADRANT = ['..eee', '.ehhh', 'ehfff', 'ehfff', 'ehfff'];
 
 export function createKit({ sfx = () => {} } = {}) {
   const text = createText();
   const icons = createIcons();
-  const textureCache = new Map();
   const anims = new Map();
   const scrolls = new Map();
   const toasts = [];
@@ -340,66 +335,66 @@ export function createKit({ sfx = () => {} } = {}) {
     return icons.draw(S.ctx, hasIcon(name) ? name : 'info', cx, cy, size, col, alpha);
   }
 
-  function nineTexture(variant) {
-    const key = `${S.th.key}|${variant}`;
-    let tex = textureCache.get(key);
-    if (tex) return tex;
-    const v = S.th.variants[variant] || S.th.variants.panel;
-    tex = document.createElement('canvas');
-    tex.width = tex.height = NINE;
-    const c = tex.getContext('2d');
-    const last = NINE - 1;
-    for (let y = 0; y < NINE; y++) {
-      for (let x = 0; x < NINE; x++) {
-        const mx = Math.min(x, last - x);
-        const my = Math.min(y, last - y);
-        const ch = QUADRANT[my][mx];
-        if (ch === '.') continue;
-        let color = v.fill;
-        if (ch === 'e') color = v.edge;
-        else if (ch === 'h') {
-          const dTop = y;
-          const dBottom = last - y;
-          const dLeft = x;
-          const dRight = last - x;
-          const nearest = Math.min(dTop, dBottom, dLeft, dRight);
-          color = dTop === nearest || dLeft === nearest ? v.hi : v.lo;
-        }
-        c.fillStyle = color;
-        c.fillRect(x, y, 1, 1);
-      }
-    }
-    textureCache.set(key, tex);
-    return tex;
+  function chamferPath(ctx, x, y, w, h, c) {
+    ctx.beginPath();
+    ctx.moveTo(x + c, y);
+    ctx.lineTo(x + w - c, y);
+    ctx.lineTo(x + w, y + c);
+    ctx.lineTo(x + w, y + h - c);
+    ctx.lineTo(x + w - c, y + h);
+    ctx.lineTo(x + c, y + h);
+    ctx.lineTo(x, y + h - c);
+    ctx.lineTo(x, y + c);
+    ctx.closePath();
   }
 
-  /** Панель 9-slice в пиксельном стиле. */
+  /**
+   * Панель «пиксель-HD»: тёмный хроматический контур в 1 ячейку, скошенные углы, вертикальный градиент заливки,
+   * скос — свет сверху-слева (тёплый), тень снизу-справа (холодная), на крупных панелях стеклянный блик.
+   * cellSize — подсказка масштаба скоса (мелкие чипы — меньше).
+   */
   function nine(variant, x, y, w, h, cellSize) {
     const ctx = S.ctx;
-    let cell = cellSize || px();
-    cell = Math.max(1, Math.min(cell, Math.floor(w / (CORNER * 2 + 1)), Math.floor(h / (CORNER * 2 + 1))));
-    const tex = nineTexture(variant);
-    const c = CORNER * cell;
-    const mid = 1;
-    const prev = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = false;
+    const v = S.th.variants[variant] || S.th.variants.panel;
+    const cell = S.L.cell;
     x = Math.round(x);
     y = Math.round(y);
     w = Math.round(w);
     h = Math.round(h);
-    const xs = [0, CORNER, CORNER + mid];
-    const ws = [CORNER, mid, CORNER];
-    const dx = [x, x + c, x + w - c];
-    const dw = [c, w - c * 2, c];
-    const dy = [y, y + c, y + h - c];
-    const dh = [c, h - c * 2, c];
-    for (let j = 0; j < 3; j++) {
-      for (let i = 0; i < 3; i++) {
-        if (dw[i] <= 0 || dh[j] <= 0) continue;
-        ctx.drawImage(tex, xs[i], xs[j], ws[i], ws[j], dx[i], dy[j], dw[i], dh[j]);
-      }
+    if (w < 4 || h < 4) return;
+    const c = clamp(Math.round((cellSize || px()) * 1.4), 2, Math.max(2, Math.floor(Math.min(w, h) / 3)));
+    ctx.fillStyle = v.edge;
+    chamferPath(ctx, x, y, w, h, c);
+    ctx.fill();
+    const i = cell;
+    const iw = w - i * 2;
+    const ih = h - i * 2;
+    const ci = Math.max(1, c - i);
+    if (v.fillTop === v.fillBottom) ctx.fillStyle = v.fillTop;
+    else {
+      const g = ctx.createLinearGradient(0, y + i, 0, y + i + ih);
+      g.addColorStop(0, v.fillTop);
+      g.addColorStop(1, v.fillBottom);
+      ctx.fillStyle = g;
     }
-    ctx.imageSmoothingEnabled = prev;
+    chamferPath(ctx, x + i, y + i, iw, ih, ci);
+    ctx.fill();
+    // скос: свет сверху-слева, тень снизу-справа
+    ctx.fillStyle = v.hi;
+    ctx.fillRect(x + i + ci, y + i, iw - ci * 2, cell);
+    ctx.fillRect(x + i, y + i + ci, cell, ih - ci * 2);
+    ctx.fillStyle = v.lo;
+    ctx.fillRect(x + i + ci, y + h - i - cell, iw - ci * 2, cell);
+    ctx.fillRect(x + w - i - cell, y + i + ci, cell, ih - ci * 2);
+    // стеклянный блик в верхней части крупных непрозрачных панелей
+    if (v.sheen && ih >= 20) {
+      const sh = Math.round(ih * 0.42);
+      const g2 = ctx.createLinearGradient(0, y + i + cell, 0, y + i + cell + sh);
+      g2.addColorStop(0, 'rgba(255,238,205,0.10)');
+      g2.addColorStop(1, 'rgba(255,238,205,0)');
+      ctx.fillStyle = g2;
+      ctx.fillRect(x + i + cell * 2, y + i + cell, iw - cell * 4, sh);
+    }
   }
 
   /** Панель с тенью и необязательным заголовком. Возвращает внутреннюю область. */
@@ -460,13 +455,19 @@ export function createKit({ sfx = () => {} } = {}) {
     if (S.hover === id && !disabled) S.cursor = 'pointer';
     if (tip && S.hover === id) S.tipCandidate = { id, text: tip };
     const cell = px();
-    const lip = cell;
+    const lip = S.L.cell * 2;
     const off = Math.round(a.press * lip);
     const body = { x: r.x, y: r.y + off, w: r.w, h: r.h - lip };
     const name = variantName(active && variant === 'tab' ? 'tabOn' : variant, a, disabled || locked);
     // нижняя «губа» кнопки
     rect(body.x + cell, r.y + r.h - lip - 0, body.w - cell * 2, lip, 'rgba(0,0,0,0.5)');
+    if (variant === 'primary' && !disabled && !locked) {
+      S.ctx.shadowColor = `rgba(255,182,39,${(0.18 + 0.32 * a.hover).toFixed(2)})`;
+      S.ctx.shadowBlur = Math.round(10 * S.L.ui);
+    }
     nine(name, body.x, body.y, body.w, body.h);
+    S.ctx.shadowBlur = 0;
+    S.ctx.shadowColor = 'transparent';
     if (a.hover > 0.01 && !disabled && !S.th.variants[`${variant}Hover`]) {
       S.ctx.globalAlpha = 0.12 * a.hover;
       rect(body.x + cell * 2, body.y + cell * 2, body.w - cell * 4, body.h - cell * 4, '#fff');
@@ -551,7 +552,7 @@ export function createKit({ sfx = () => {} } = {}) {
   function meter(r, o = {}) {
     const c = S.th.c;
     const v = clamp(o.value ?? 0, 0, 1);
-    const cell = Math.max(1, Math.round(px() / 2));
+    const cell = S.L.cell;
     const warn = o.warn !== undefined && v <= o.warn;
     const pulse = warn && !S.settings.reduceMotion ? 0.65 + 0.35 * Math.sin(S.time * 9) : 1;
     const color = warn ? c.red : o.color || c.green;

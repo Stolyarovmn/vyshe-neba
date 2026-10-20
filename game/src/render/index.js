@@ -6,6 +6,8 @@
 //   renderer.flight.draw(ctx, { flight, config, time, layout, settings });
 //   renderer.events(flightEvents);
 //   renderer.layout(w, h, dpr, safeInsets);
+//   renderer.backdrop.draw(ctx, { kind, era, rect, time, dim });
+//   renderer.workshop.drawStations(ctx, { era, rect, time });
 
 import * as manifest from './manifest.js';
 import { loadAssets } from './assets.js';
@@ -13,6 +15,8 @@ import { createPainter } from './painter.js';
 import { computeLayout } from './layout.js';
 import { createHub } from './hub.js';
 import { createFlightRenderer } from './flight.js';
+import { createBackdrop } from './backdrop.js';
+import { createWorkshop } from './workshop.js';
 
 export { manifest, loadAssets, computeLayout };
 
@@ -21,6 +25,8 @@ export function createRenderer(canvas, assets) {
   const shared = { profile: null };
   const hub = createHub(painter, shared);
   const flight = createFlightRenderer(painter, shared);
+  const backdrop = createBackdrop(painter);
+  const workshop = createWorkshop(painter);
 
   return {
     canvas,
@@ -28,6 +34,8 @@ export function createRenderer(canvas, assets) {
     painter,
     hub,
     flight,
+    backdrop,
+    workshop,
     layout(w, h, dpr, safe) {
       return computeLayout(w, h, dpr, safe);
     },

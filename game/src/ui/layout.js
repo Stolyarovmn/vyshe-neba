@@ -38,6 +38,8 @@ export function computeLayout(w, h, dpr = 1, safe = NO_SAFE) {
     portrait,
     ui,
     px: Math.max(2, R(ui * 2)),
+    // ячейка «пиксель-HD» для контуров и скосов: 1 CSS px (2 физических на телефоне), на больших окнах — 2
+    cell: Math.max(1, R(ui / 1.5)),
     safe: s,
     area,
     gap: R(8 * ui),

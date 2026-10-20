@@ -11,7 +11,7 @@ export const BODIES = {
     gravity: 52, // units/s² at the surface
     wellRadius: 10000, // altitude where gravity has faded to zero
     atmo: { ceiling: 10000, curve: 2, density: 1 }, // density(alt) = density * (1 - alt/ceiling)^curve
-    wind: 2, // steady swaying gust, units/s² at density 1
+    wind: 30, // strongest steady wind in the jet streams, units/s (profile and gusts: weather.js)
     surface: 'island',
     pad: { half: 85 },
     approach: null,
@@ -31,7 +31,7 @@ export const BODIES = {
     gravity: 20,
     wellRadius: 4500,
     atmo: { ceiling: 4500, curve: 2, density: 0.16 },
-    wind: 0.6,
+    wind: 8,
     surface: 'dust',
     pad: { half: 70 },
     approach: { alt: 1400, vMin: 28, vMax: 85, padOffset: 350 },

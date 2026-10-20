@@ -634,6 +634,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     ctx.imageSmoothingEnabled = false;
 
     L.hud.touchVisible = app.touchUi;
+    kit.icons.setEra(app.profile.era);
+    kit.icons.setPainter(renderer.painter);
     kit.setToastAnchor(...toastAnchor(L));
     if (app.countdown) tickCountdown(dt);
     if (app.screen === 'flight') flightTick(dt);

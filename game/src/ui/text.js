@@ -45,7 +45,7 @@ export function ellipsize(str, maxWidth, measure) {
 }
 
 export function createText() {
-  let scale = 2;
+  let scale = 1;
   let dpr = 1;
   let mctx = null;
   const widths = new Map();
@@ -61,7 +61,7 @@ export function createText() {
   function setDpr(value) {
     if (value === dpr) return;
     dpr = value;
-    scale = Math.max(2, Math.ceil(dpr));
+    scale = Math.max(1, Math.ceil(dpr));
     bitmaps.clear();
   }
 

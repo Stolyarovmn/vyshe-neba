@@ -79,7 +79,18 @@ export function getTheme(settings = {}) {
   const resolve = (v) => (typeof v === 'string' && c[v] ? c[v] : v);
   const variants = {};
   for (const [name, v] of Object.entries(VARIANTS)) {
-    variants[name] = { fill: resolve(v.fill), hi: resolve(v.hi), lo: resolve(v.lo), edge: c.edge };
+    const fill = resolve(v.fill);
+    const solid = fill.startsWith('#');
+    variants[name] = {
+      fill,
+      hi: resolve(v.hi),
+      lo: resolve(v.lo),
+      // контур — тёмный хроматический оттенок самой заливки, а не чёрный
+      edge: solid ? mix(fill, '#02040c', 0.84) : 'rgba(2,4,12,0.7)',
+      fillTop: solid ? mix(fill, '#fff0d0', 0.09) : fill,
+      fillBottom: solid ? mix(fill, '#050a1c', 0.22) : fill,
+      sheen: solid && /^(panel|raised|card|inset|warn|good|danger|primary|btn)/.test(name) && !/Press$/.test(name),
+    };
   }
   theme = {
     key,

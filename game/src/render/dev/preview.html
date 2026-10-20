@@ -21,7 +21,7 @@
 </head>
 <body>
 <div id="bar">
-  <label>Режим <select id="mode"><option value="hub">хаб</option><option value="flight">полёт</option></select></label>
+  <label>Режим <select id="mode"><option value="hub">хаб</option><option value="flight">полёт</option><option value="backdrop">фон</option></select></label>
   <label>Кадр <select id="frameSel">
     <option value="fit">по размеру окна</option>
     <option value="960x540@2">ландшафт 960x540 @2</option>
@@ -57,6 +57,11 @@
     <label>Скорость sim <select id="simSpeed"><option>1</option><option>2</option><option>4</option><option>8</option></select></label>
     <label>Ступень <select id="stage"><option value="booster">booster</option><option value="core">core</option><option value="capsule">capsule</option></select></label>
     <button id="evBtn">событие: удар</button><button id="sepBtn">событие: ступень</button>
+  </span>
+  <span id="backdropControls" hidden>
+    <label>Фон <select id="bkind"><option>workshop</option><option>shop</option><option>launch-earth</option><option>launch-moon</option></select></label>
+    <label>Затемнение <input id="bdim" type="range" min="0" max="0.9" step="0.05" value="0.2"></label>
+    <label><input type="checkbox" id="bstations" checked> станции</label>
   </span>
   <span id="status"></span>
 </div>

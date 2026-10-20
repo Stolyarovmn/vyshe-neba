@@ -26,6 +26,9 @@ if (params.has('reduce')) ui.reduce.checked = params.get('reduce') === '1';
 if (params.has('booster')) ui.booster.checked = params.get('booster') === '1';
 if (params.has('capsule')) ui.capsuleP.checked = params.get('capsule') === '1';
 if (params.get('objs') === '0') ui.objs.checked = false;
+if (params.has('bkind')) $('bkind').value = params.get('bkind');
+if (params.has('bdim')) $('bdim').value = params.get('bdim');
+if (params.get('bstations') === '0') $('bstations').checked = false;
 
 for (const key of BUILDINGS) {
   const label = document.createElement('label');
@@ -129,7 +132,16 @@ function renderFrame(dt) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const weather = { kind: ui.weather.value, wind: ui.weather.value === 'storm' ? 6 : 2, storm: ui.weather.value === 'storm' ? 1 : 0 };
-    if (ui.mode.value === 'hub') {
+    if (ui.mode.value === 'backdrop') {
+      const rect = { x: 0, y: 0, w: layout.w, h: layout.h };
+      ctx.setTransform(layout.dpr, 0, 0, layout.dpr, 0, 0);
+      renderer.backdrop.draw(ctx, { kind: $('bkind').value, era: Number(ui.era.value), rect, time, dim: Number($('bdim').value) });
+      if ($('bstations').checked) {
+        const inner = { x: 0, y: layout.h * 0.3, w: layout.w, h: layout.h * 0.68 };
+        renderer.workshop.drawStations(ctx, { era: Number(ui.era.value), rect: inner, time });
+      }
+      hud.textContent = `backdrop ${$('bkind').value} era ${ui.era.value}`;
+    } else if (ui.mode.value === 'hub') {
       renderer.hub.draw(ctx, { profile: profileFromUi(), time, layout, weather, selected: ui.selected.value || null });
       hud.textContent = `hub px=${layout.world.hubPx} ${layout.orientation} ${layout.w}x${layout.h}@${layout.dpr}`;
     } else if (renderer.flight) {
@@ -202,7 +214,8 @@ function eventFor(type) {
 
 function syncPanels() {
   const flight = ui.mode.value === 'flight';
-  $('hubControls').hidden = flight;
+  $('hubControls').hidden = ui.mode.value !== 'hub';
+  $('backdropControls').hidden = ui.mode.value !== 'backdrop';
   $('flightControls').hidden = !flight;
 }
 

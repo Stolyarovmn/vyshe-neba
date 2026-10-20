@@ -13,6 +13,9 @@ const INFRA_DIR = 'outputs/rocket/dist/assets/infrastructure/';
 const PLACEABLE_DIR = 'outputs/rocket/dist/assets/placeables/';
 
 export const ISLAND_FILE = 'art/gen/environment/start_island_e0.png';
+// Фоны экранов: лёгкие WebP-копии утверждённого арта (game/tools/prepare-backdrops.py).
+export const BACKDROP_INTERIOR_FILE = 'art/gen/environment/backdrop_interior_eras.webp';
+export const BACKDROP_ENV_FILE = 'art/gen/environment/backdrop_environments.webp';
 export const AIRCRAFT_FX_FILE = 'outputs/rocket/dist/assets/aircraft/effects.json';
 
 /** Спрайты, у которых есть вариант на каждую эпоху: имя_ГОД. */
@@ -34,6 +37,29 @@ export const PLACEABLE_BUILDINGS = {
   factory: 'workshop/manufacturing_cell',
   control: 'workshop/telemetry_post',
 };
+/**
+ * Станции мастерской вокруг схемы ракеты (placeables/workshop). manufacturing_cell и telemetry_post
+ * уже в каталоге как bld_factory_* и bld_control_* и повторно не перечисляются.
+ */
+export const STATION_DIRS = {
+  service_lift: 'workshop/service_lift',
+  engine_test_stand: 'workshop/engine_test_stand',
+  hull_diagnostics: 'workshop/hull_diagnostics',
+};
+/** Размеры [w, h] PNG станций (одинаковы для всех эпох). */
+export const STATION_SIZES = {
+  service_lift: [190, 230],
+  engine_test_stand: [190, 126],
+  hull_diagnostics: [184, 220],
+  manufacturing_cell: [176, 134],
+  telemetry_post: [156, 124],
+};
+/** Размеры фонов [w, h] и сетки [колонки, ряды]. */
+export const BACKDROP_ATLAS = {
+  backdrop_interior: { size: [1774, 887], grid: [3, 2] },
+  backdrop_env: { size: [1536, 1024], grid: [2, 2] },
+};
+
 /**
  * Постройки, которые пока рисуются кодом (арта нет). Как только в ASSET_FILES появятся
  * bld_<ключ>_<год>, рендер возьмёт спрайт, а силуэт останется запасным.
@@ -72,6 +98,13 @@ function buildAssetFiles() {
       files[`bld_${key}_${year}`] = `${PLACEABLE_DIR}${dir}/e${i}_${year}.png`;
     });
   }
+  for (const [id, dir] of Object.entries(STATION_DIRS)) {
+    ERA_YEARS.forEach((year, i) => {
+      files[`station_${id}_${year}`] = `${PLACEABLE_DIR}${dir}/e${i}_${year}.png`;
+    });
+  }
+  files.backdrop_interior = BACKDROP_INTERIOR_FILE;
+  files.backdrop_env = BACKDROP_ENV_FILE;
   files.island_start = ISLAND_FILE;
   files.aircraft_fx = { file: AIRCRAFT_FX_FILE, kind: 'json' };
   return files;
