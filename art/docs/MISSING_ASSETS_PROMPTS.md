@@ -38,3 +38,17 @@
 ## Позже
 
 Для подвижных частей (азимут радара, стрела эвакуатора, тележка крана, купол) понадобится отдельный лист частей по эпохе (один вызов — один лист). Для первой версии игры достаточно якорного арта целого объекта.
+
+## Битые файлы мастерской (нужна перегенерация)
+
+Пять спрайтов мастерской повреждены прямо в коммите `11d4e32` (ошибка контрольных сумм потока PNG, часть данных потеряна, восстановить без исходника нельзя). Игра подменяет их ближайшей целой эпохой (`BROKEN_PLACEABLE_ERAS` в `game/src/render/manifest.js`); тест `render.manifest` проверяет целостность каждого PNG. Когда будут новые файлы, замените их и уберите запись из `BROKEN_PLACEABLE_ERAS`.
+
+| Семейство | Эпоха | Файл | Промпт-основа |
+| --- | --- | --- | --- |
+| W01 service_lift | E2 1998 | `art/gen/placeables/workshop/service_lift/e2_1998.png` | `art/prompts/w01_service_lift.txt` |
+| W01 service_lift | E3 2015 | `art/gen/placeables/workshop/service_lift/e3_2015.png` | `art/prompts/w01_service_lift.txt` |
+| W01 service_lift | E5 2060 | `art/gen/placeables/workshop/service_lift/e5_2060.png` | `art/prompts/w01_service_lift.txt` |
+| W05 manufacturing_cell | E1 1986 | `art/gen/placeables/workshop/manufacturing_cell/e1_1986.png` | запись W05 в `art/placeables/PRODUCTION_MANIFEST.md` + рецепт промпта (раздел 6) |
+| W03 telemetry_post | E2 1998 | `art/gen/placeables/workshop/telemetry_post/e2_1998.png` | запись W03 в `art/placeables/PRODUCTION_MANIFEST.md` + рецепт промпта (раздел 6) |
+
+Генерируйте эпоху по цепочке от соседних целых эпох того же семейства (они лежат рядом в `art/gen/placeables/workshop/<семейство>/`), как для остальных семейств.
