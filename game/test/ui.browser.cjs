@@ -71,6 +71,30 @@ async function touch(cdp, type, x, y, id = 1) {
   await cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id }] });
 }
 
+/** Все интерактивные цели экрана (кнопки, вкладки, ползунки, органы управления полётом) ≥ 44×44 CSS px и внутри окна. */
+async function checkTargets(page, vp, label) {
+  const res = await page.evaluate(() => {
+    const app = globalThis.__VN_APP__;
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const MIN = 44;
+    const problems = [];
+    let count = 0;
+    const test = (id, x, y, w, h, fw, fh) => {
+      count++;
+      const issues = [];
+      if ((fw ?? w) < MIN - 0.5 || (fh ?? h) < MIN - 0.5) issues.push(`размер ${Math.round(fw ?? w)}×${Math.round(fh ?? h)}`);
+      if (x < -0.5 || y < -0.5 || x + w > W + 0.5 || y + h > H + 0.5) issues.push(`за окном (${Math.round(x)},${Math.round(y)} ${Math.round(w)}×${Math.round(h)})`);
+      if (issues.length) problems.push(`${id}: ${issues.join(', ')}`);
+    };
+    for (const h of app.kit.hitsSnapshot) if (h.focusable) test(h.id, h.x, h.y, h.w, h.h, h.fw, h.fh);
+    if (app.screen === 'flight') for (const [id, r] of Object.entries(app.hudTargets || {})) test(id, r.x, r.y, r.w, r.h);
+    return { problems, count };
+  });
+  assert(res.count >= 3, `${vp.name}/${label}: найдено слишком мало целей (${res.count})`);
+  assert(res.problems.length === 0, `${vp.name}/${label}: мелкие цели или вне окна: ${res.problems.join('; ')}`);
+}
+
 const shot = (page, vp, name) => page.screenshot({ path: path.join(outDir, `ui-${vp.name}-${name}.png`) });
 
 async function runViewport(browser, vp) {
@@ -93,6 +117,7 @@ async function runViewport(browser, vp) {
   await page.waitForTimeout(700);
   assert((await screenName(page)) === 'hub', `${vp.name}: после загрузки должен быть хаб`);
   await shot(page, vp, '01-hub');
+  await checkTargets(page, vp, 'хаб');
 
   // раскладка: ориентация, безопасные зоны и доля приборов HUD
   const lay = await hook(page, () => {
@@ -134,6 +159,7 @@ async function runViewport(browser, vp) {
   await click(page, 'dock-base');
   await waitScreen(page, 'base');
   await shot(page, vp, '02-base');
+  await checkTargets(page, vp, 'база');
   await click(page, 'bld-beacons');
   await shot(page, vp, '03-base-card');
   await click(page, 'build-beacons', 250);
@@ -163,6 +189,7 @@ async function runViewport(browser, vp) {
   await waitScreen(page, 'rocket');
   await click(page, 'part-legs');
   await shot(page, vp, '06-rocket');
+  await checkTargets(page, vp, 'ракета');
   await click(page, 'buy-legs', 250);
   p = await hook(page, () => globalThis.__VN_TEST__.profile());
   assert(p.parts.legs === 1, `${vp.name}: опоры не куплены через интерфейс`);
@@ -186,6 +213,7 @@ async function runViewport(browser, vp) {
   for (const tab of ['achievements', 'shop', 'skins', 'contracts']) {
     await click(page, `journal-tabs-${tab}`);
     if (tab === 'shop') await shot(page, vp, '08-journal-shop');
+  if (tab !== 'contracts') await checkTargets(page, vp, `журнал/${tab}`);
   }
   await click(page, 'back');
   await click(page, 'dock-more');
@@ -196,6 +224,7 @@ async function runViewport(browser, vp) {
   const mode = await hook(page, () => globalThis.__VN_TEST__.profile().settings.controlMode);
   assert(mode === 'pilot', `${vp.name}: режим «Пилот» не включился`);
   await shot(page, vp, '09-settings');
+  await checkTargets(page, vp, 'настройки');
   await clickScrolling(page, 'set-mode-arcade', scrollAt);
   await click(page, 'back');
 
@@ -203,12 +232,14 @@ async function runViewport(browser, vp) {
   await click(page, 'dock-launch');
   await waitScreen(page, 'launch');
   await shot(page, vp, '10-launch');
+  await checkTargets(page, vp, 'запуск');
   await click(page, 'launch-start');
   await page.waitForTimeout(700);
   await shot(page, vp, '11-countdown');
   await waitScreen(page, 'flight');
   await page.waitForTimeout(400);
   await shot(page, vp, '12-flight-pad');
+  await checkTargets(page, vp, 'полёт');
 
   // тяга: касанием рычага (сенсорный макет) или клавишей W
   const alt0 = await hook(page, () => globalThis.__VN_TEST__.flight().alt);
@@ -280,6 +311,7 @@ async function runViewport(browser, vp) {
   await waitScreen(page, 'results', 20000);
   await page.waitForTimeout(2200);
   await shot(page, vp, '15-results');
+  await checkTargets(page, vp, 'итоги');
   await click(page, 'results-again', 300);
   await page.waitForTimeout(500);
   await waitScreen(page, 'flight', 20000);

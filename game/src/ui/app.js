@@ -3,7 +3,7 @@
 
 import { createKit } from './kit.js';
 import { ICON_NAMES } from './icons.js';
-import { computeLayout, mergeLayouts, dockLayout, sheetRect } from './layout.js';
+import { computeLayout, mergeLayouts, dockLayout, sheetRect, screenFrame } from './layout.js';
 import { createSfx, reasonText } from './bridge.js';
 import { sfxForEvent } from '../audio/names.js';
 import { clamp } from './format.js';
@@ -600,25 +600,29 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     }
   }
 
-  /** В ландшафте с открытой карточкой постройки справа уведомления центрируются в свободной левой части. */
-  function toastArea(L) {
-    if (app.screen === 'hub' && app.hubSelected && !L.portrait && !app.countdown) {
-      const sheet = sheetRect(L, { dock: true });
-      return { x: L.area.x, y: L.area.y, w: Math.max(120, sheet.x - L.area.x), h: L.area.h };
-    }
-    return null;
-  }
-
-  /** Уведомления встают внизу по центру: над доком в хабе, над органами управления в полёте. */
-  function toastBottom(L) {
+  /**
+   * Якорь уведомлений. Хаб и полёт — внизу (над доком / над органами управления; в ландшафте с карточкой постройки —
+   * в свободной левой части). Экраны без дока — сверху по центру над шапкой, правее кнопки «назад».
+   */
+  function toastAnchor(L) {
     const safeBottom = L.area.y + L.area.h - L.gap * 1.5;
-    if (app.screen === 'hub' && !app.countdown) return dockLayout(L).bar.y - L.gap;
+    if (app.screen === 'hub' && !app.countdown) {
+      let area = null;
+      if (app.hubSelected && !L.portrait) {
+        const sheet = sheetRect(L, { dock: true });
+        area = { x: L.area.x, y: L.area.y, w: Math.max(120, sheet.x - L.area.x), h: L.area.h };
+      }
+      return ['bottom', dockLayout(L).bar.y - L.gap, area];
+    }
     if (app.screen === 'flight') {
       const hud = L.hud;
-      if (L.portrait) return Math.min(hud.lever.y, hud.buttons.transfer.y, hud.disc.cy - hud.disc.r) - L.gap * 2;
-      return safeBottom - (app.touchUi ? 0 : Math.round(30 * L.ui));
+      if (L.portrait) return ['bottom', Math.min(hud.lever.y, hud.buttons.transfer.y, hud.disc.cy - hud.disc.r) - L.gap * 2, null];
+      return ['bottom', safeBottom - (app.touchUi ? 0 : Math.round(30 * L.ui)), null];
     }
-    return safeBottom;
+    if (app.screen === 'results') return ['top', L.area.y + L.gap + 24 * L.ui, null];
+    const hdr = screenFrame(L, { header: true }).header;
+    const left = hdr.x + hdr.h + L.gap;
+    return ['top', hdr.y + hdr.h / 2, { x: left, y: hdr.y, w: L.area.x + L.area.w - left - L.gap, h: hdr.h }];
   }
 
   app.frame = (dt, nowSec) => {
@@ -630,7 +634,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     ctx.imageSmoothingEnabled = false;
 
     L.hud.touchVisible = app.touchUi;
-    kit.setToastBottom(toastBottom(L), toastArea(L));
+    kit.setToastAnchor(...toastAnchor(L));
     if (app.countdown) tickCountdown(dt);
     if (app.screen === 'flight') flightTick(dt);
     else if (app.standFrame) {

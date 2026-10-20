@@ -266,7 +266,7 @@ export function createKit({ sfx = () => {} } = {}) {
       rr = intersect(r, clip);
       if (!rr) return;
     }
-    S.hits.push({ id, x: rr.x, y: rr.y, w: rr.w, h: rr.h, layer: S.layer, ...flags });
+    S.hits.push({ id, x: rr.x, y: rr.y, w: rr.w, h: rr.h, fw: r.w, fh: r.h, layer: S.layer, ...flags });
   }
 
   function pushClip(r) {
@@ -823,17 +823,24 @@ export function createKit({ sfx = () => {} } = {}) {
     if (pending.length > 4) pending.shift();
   }
 
-  /** Нижняя граница стопки уведомлений (y, CSS px); экраны задают её над доком или над управлением. */
-  function setToastBottom(y, area = null) {
-    S.toastBottom = y;
+  /**
+   * Якорь стопки уведомлений. edge 'bottom': y — нижняя граница, стопка растёт вверх (до двух сразу);
+   * edge 'top': y — центр первого, видно по одному (экраны без дока: поверх шапки, правее кнопки «назад»).
+   * area — область по горизонтали (по умолчанию вся безопасная).
+   */
+  function setToastAnchor(edge, y, area = null) {
+    S.toastEdge = edge;
+    S.toastY = y;
     S.toastArea = area;
   }
 
   function drawToasts() {
     const L = S.L;
     const c = S.th.c;
+    const top = S.toastEdge === 'top';
+    const limit = top ? 1 : MAX_TOASTS;
     for (let i = toasts.length - 1; i >= 0; i--) if (S.time - toasts[i].t0 > toasts[i].ttl) toasts.splice(i, 1);
-    while (pending.length && toasts.length < MAX_TOASTS) {
+    while (pending.length && toasts.length < limit) {
       const next = pending.shift();
       next.t0 = S.time;
       toasts.push(next);
@@ -841,23 +848,22 @@ export function createKit({ sfx = () => {} } = {}) {
     if (!toasts.length) return;
     const size = fs(14);
     const h = Math.round(size * 2.4);
-    let bottom = S.toastBottom ?? L.area.y + L.area.h - L.gap * 1.5;
-    bottom = Math.min(bottom, L.area.y + L.area.h - L.gap);
+    const zone = S.toastArea || L.area;
+    const anchor = S.toastY ?? L.area.y + L.area.h - L.gap * 1.5;
     toasts.forEach((tt, i) => {
       const age = S.time - tt.t0;
       const inK = easeOutCubic(age / 0.2);
       const outK = clamp((tt.ttl - age) / 0.25, 0, 1);
-      const w = Math.min(L.area.w - L.gap * 2, text.measure(tt.message, size) + size * 3.4);
-      const zone = S.toastArea || L.area;
-      const w2 = Math.min(w, zone.w - L.gap * 2);
-      const x = zone.x + (zone.w - w2) / 2;
-      const y = bottom - h - i * (h + L.gap) + (1 - inK) * 18 + (1 - outK) * 10;
+      const w = Math.min(zone.w - L.gap * 2, text.measure(tt.message, size) + size * 3.4);
+      const x = zone.x + (zone.w - w) / 2;
+      const slide = (1 - inK) * 18 + (1 - outK) * 10;
+      const y = top ? anchor - h / 2 - slide : Math.min(anchor, L.area.y + L.area.h - L.gap) - h - i * (h + L.gap) + slide;
       S.ctx.globalAlpha = Math.min(inK, outK);
       const variant = tt.kind === 'bad' ? 'warn' : tt.kind === 'good' ? 'good' : 'raised';
-      nine(variant, x, y, w2, h, Math.max(1, Math.round(px() * 0.75)));
+      nine(variant, x, y, w, h, Math.max(1, Math.round(px() * 0.75)));
       const ic = tt.icon || (tt.kind === 'bad' ? 'warn' : tt.kind === 'good' ? 'check' : 'info');
       icon(ic, x + size * 1.2, y + h / 2, size * 1.2, tt.kind === 'bad' ? c.red : tt.kind === 'good' ? c.white : c.amber);
-      drawText(tt.message, x + size * 2.2, y + h / 2, { size, color: c.text, maxWidth: w2 - size * 3 });
+      drawText(tt.message, x + size * 2.2, y + h / 2, { size, color: c.text, maxWidth: w - size * 3 });
       S.ctx.globalAlpha = 1;
     });
   }
@@ -961,7 +967,7 @@ export function createKit({ sfx = () => {} } = {}) {
     resourceChip,
     modal,
     toast,
-    setToastBottom,
+    setToastAnchor,
     badge,
     icon,
     drawText,
@@ -989,7 +995,7 @@ export function createKit({ sfx = () => {} } = {}) {
     get cursor() { return S.cursor; },
     get hoverId() { return S.hover; },
     get hitCount() { return S.prevHits.length; },
-    get hitsSnapshot() { return S.prevHits.map((h) => ({ id: h.id, x: h.x, y: h.y, w: h.w, h: h.h, layer: h.layer })); },
+    get hitsSnapshot() { return S.prevHits.map((h) => ({ id: h.id, x: h.x, y: h.y, w: h.w, h: h.h, fw: h.fw, fh: h.fh, layer: h.layer, focusable: !!h.focusable })); },
     get scrolling() { for (const s of scrolls.values()) if (s.dragging || !s.settled) return true; return false; },
     get modalOpen() { return S.modalOpen; },
     setFocus(id) { S.focusId = id; },

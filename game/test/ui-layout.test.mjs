@@ -74,6 +74,17 @@ test('HUD: постоянные приборы занимают меньше 10%
   }
 });
 
+test('HUD: радар не перекрывает полосу рубежей, подсказку, паузу и приборы', () => {
+  for (const { w, h, L } of layouts()) {
+    const hud = hudLayout(L);
+    const r = hud.radar;
+    const box = { x: r.cx - r.r, y: r.cy - r.r, w: r.r * 2, h: r.r * 2 };
+    const others = { strip: hud.strip, hint: hud.hint, pause: hud.buttons.pause, ...Object.fromEntries(Object.entries(hud.instruments).map(([k, v]) => [`прибор ${k}`, v])) };
+    for (const [name, o] of Object.entries(others)) assert.ok(!overlaps(box, o), `${w}x${h}: радар перекрывает ${name}`);
+    assert.ok(inside(box, L.area), `${w}x${h}: радар вне безопасной области`);
+  }
+});
+
 test('HUD: зеркальная раскладка меняет диск и рычаг местами, пауза остаётся справа', () => {
   const L = computeLayout(844, 390, 2);
   const a = hudLayout(L);

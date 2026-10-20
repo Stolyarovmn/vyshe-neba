@@ -42,8 +42,9 @@ export default {
 
     drawFlash(app, kit, L, s);
     drawInstruments(app, kit, L, f, hud);
-    drawStrip(app, kit, L, f, hud);
-    if (f.cfg.base.radar > 0) drawRadar(app, kit, L, f, hud);
+    const hasRadar = f.cfg.base.radar > 0;
+    drawStrip(app, kit, L, f, hud, hasRadar ? hud.radar : null);
+    if (hasRadar) drawRadar(app, kit, L, f, hud);
     drawPredict(app, kit, L, f);
     const hint = tutorialHint(app, s);
     drawHint(app, kit, L, s, f, hud, hint);
@@ -155,7 +156,7 @@ function drawInstruments(app, kit, L, f, hud) {
 
 // ---------- высотные рубежи ----------
 
-function drawStrip(app, kit, L, f, hud) {
+function drawStrip(app, kit, L, f, hud, radar) {
   const r = hud.strip;
   if (r.h < 40) return;
   const c = kit.c;
@@ -180,11 +181,19 @@ function drawStrip(app, kit, L, f, hud) {
   ctx.lineTo(r.x + r.w * 0.55, y + 5 * L.ui);
   ctx.closePath();
   ctx.fill();
-  // подпись ближайшего рубежа сверху
+  // подпись ближайшего рубежа слева от полосы; радар и сама полоса её не перекрывают
   const next = zones.find((z) => z.from > f.alt);
   if (next && !L.portrait) {
-    const name = t(`zone.${next.id}`);
-    kit.drawText(name === `zone.${next.id}` ? next.id : name, r.x - L.gap, Math.max(r.y + 8, pos(next.from) - 8), { size: kit.fs(10), color: c.textDim, align: 'right', shadow: 'rgba(0,0,0,0.8)' });
+    const key = `zone.${next.id}`;
+    const name = t(key) === key ? next.id : t(key);
+    const size = kit.fs(10);
+    const tw = Math.min(kit.text.measure(name, size), r.x - L.gap * 2 - L.area.x);
+    let ly = Math.max(r.y + 8, pos(next.from) - 8);
+    if (radar) {
+      const hitsRadar = ly > radar.cy - radar.r - 8 && ly < radar.cy + radar.r + 8 && r.x - L.gap - tw < radar.cx + radar.r + 4;
+      if (hitsRadar) ly = radar.cy + radar.r + 14;
+    }
+    if (ly < r.y + r.h - 4) kit.drawText(name, r.x - L.gap, ly, { size, color: c.textDim, align: 'right', shadow: 'rgba(0,0,0,0.8)', maxWidth: tw });
   }
 }
 

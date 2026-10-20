@@ -295,8 +295,8 @@ export function hudLayout(L, opts = {}) {
     instruments.hull = rect(left + barW + g, barsY, span - barW - g, barH);
     const topBlock = bottom(instruments.hull);
     hint = rect(a.x + R(a.w * 0.12), topBlock + g * 2, R(a.w * 0.76), R(34 * u));
-    radar = { cx: right(a) - g - R(34 * u), cy: bottom(pause) + g + R(34 * u) + g, r: R(34 * u) };
-    if (radar.cy - radar.r < topBlock + g) radar.cy = topBlock + g + radar.r;
+    // радар под подсказкой справа: длинная подсказка его не перекрывает
+    radar = { cx: right(a) - g - R(34 * u), cy: hint.y + hint.h + g + R(34 * u), r: R(34 * u) };
     // кнопки: два столбца между диском и рычагом
     const colX = [disc.cx + discR + g, 0];
     const free = gridRight - colX[0];

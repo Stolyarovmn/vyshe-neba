@@ -51,6 +51,7 @@ jobs:
         run: |
           node game/test/browser.cjs
           node game/test/ui.browser.cjs
+          node game/test/moon.browser.cjs
           node game/test/render.browser.cjs
           node game/test/audio.browser.cjs
 

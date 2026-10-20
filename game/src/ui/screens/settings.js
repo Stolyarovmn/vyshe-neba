@@ -45,9 +45,10 @@ export default {
         y += kit.fs(30);
       };
       const controlW = Math.round(innerW * (L.portrait ? 0.5 : 0.44));
-      const row = (label, draw, h = rowH) => {
-        kit.drawText(label, x, y + h / 2, { size: kit.fs(14), color: c.text, maxWidth: innerW - controlW - L.gap });
-        draw({ x: x + innerW - controlW, y: y + (h - Math.min(h, L.touch(48))) / 2, w: controlW, h: Math.min(h, L.touch(48)) });
+      const row = (label, draw, h = rowH, minW = 0) => {
+        const cw = Math.min(innerW - L.gap, Math.max(controlW, minW));
+        kit.drawText(label, x, y + h / 2, { size: kit.fs(14), color: c.text, maxWidth: innerW - cw - L.gap });
+        draw({ x: x + innerW - cw, y: y + (h - Math.min(h, L.touch(48))) / 2, w: cw, h: Math.min(h, L.touch(48)) });
         y += h + L.gap * 0.4;
       };
 
@@ -96,7 +97,7 @@ export default {
             savePrefs(app.prefs);
           }
         });
-      });
+      }, rowH, L.touch(48) * 3 + L.gap);
       row(t('settings.help'), (r) => {
         if (kit.button('set-help', r, { label: t('settings.helpShow'), icon: 'info', variant: 'btn', size: kit.fs(13) })) app.queueCard('help', true);
       });
@@ -115,7 +116,7 @@ export default {
         }
       });
       row(t('settings.textScale'), (r) => {
-        const bw = Math.round(r.w * 0.28);
+        const bw = Math.max(L.touch(48), Math.round(r.w * 0.28));
         if (kit.button('set-text-minus', { x: r.x, y: r.y, w: bw, h: r.h }, { label: 'A−', variant: 'btn', size: kit.fs(14), disabled: s.textScale <= 0.8 })) app.setSetting('textScale', Math.max(0.8, Math.round((s.textScale - 0.1) * 10) / 10));
         kit.drawText(`${Math.round(s.textScale * 100)}%`, r.x + r.w / 2, r.y + r.h / 2, { size: kit.fs(14), color: c.text, align: 'center', dynamic: true });
         if (kit.button('set-text-plus', { x: r.x + r.w - bw, y: r.y, w: bw, h: r.h }, { label: 'A+', variant: 'btn', size: kit.fs(14), disabled: s.textScale >= 1.6 })) app.setSetting('textScale', Math.min(1.6, Math.round((s.textScale + 0.1) * 10) / 10));
