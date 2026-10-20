@@ -186,11 +186,11 @@ function drawRcs(ctx, view, pose, time) {
   }
 }
 
-function easeOutBack(t) {
-  const c1 = 1.70158;
-  const c3 = c1 + 1;
-  const u = t - 1;
-  return 1 + c3 * u * u * u + c1 * u * u;
+/** Раскрытие купола 0..1 с небольшим перелётом в конце (купол «вздыхает»). */
+export function canopyOpening(p) {
+  const base = smoothstep(0, 0.75, p);
+  const overshoot = 0.07 * Math.sin(clamp((p - 0.55) / 0.45, 0, 1) * Math.PI);
+  return base + overshoot;
 }
 
 /**
@@ -205,8 +205,8 @@ export function drawChute(ctx, painter, view, pose, time) {
   const topX = pose.x + Math.sin(pose.angle) * h;
   const topY = pose.y - Math.cos(pose.angle) * h;
   const sway = Math.sin(time * 2.7) * 3 * p;
-  const open = easeOutBack(smoothstep(0, 1, p));
-  const lift = ROCKET_SIZE.canopyLift * smoothstep(0, 0.85, p);
+  const open = canopyOpening(p);
+  const lift = ROCKET_SIZE.canopyLift * smoothstep(0, 0.8, p);
   const canopyY = topY - lift;
   const w = ROCKET_SIZE.canopyW * clamp(lerp(0.3, 1, open), 0.2, 1.12);
   const canopy = painter.assets.get(spriteName('canopy', era));

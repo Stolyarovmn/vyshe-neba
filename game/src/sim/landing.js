@@ -10,10 +10,6 @@ const PERFECT = { v: 0.46, h: 0.34, ang: 0.44 }; // share of the tolerance a per
 const SOFT_DAMAGE_MAX = 0.22; // share of max hull lost by a touchdown right at the tolerance limit
 const SOFT_DAMAGE_FROM = 0.55; // below this share of the tolerance a touchdown is free
 
-export function padHalfWidth(s) {
-  return s.pad.half;
-}
-
 export function isOnPad(s) {
   return Math.abs(s.x - s.pad.x) <= s.pad.half;
 }

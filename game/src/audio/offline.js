@@ -52,7 +52,7 @@ export async function renderOffline({
   const total = seconds + tail;
   const ctx = new OfflineContext(2, Math.ceil(total * sampleRate), sampleRate);
   const clock = { t: 0 };
-  const core = createCore({ ctx, seed, now: () => clock.t, volumes });
+  const core = createCore({ ctx, seed, now: () => clock.t, volumes, offline: true });
 
   const items = script.map((item, index) => ({ item, index })).sort((a, b) => a.item.t - b.item.t || a.index - b.index).map((x) => x.item);
   const keys = items.filter((item) => item.frame);

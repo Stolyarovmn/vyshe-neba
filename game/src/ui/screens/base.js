@@ -83,7 +83,8 @@ function drawMap(app, kit, L, r, st) {
   kit.drawText(t('base.power', { use: Math.round(pb.demand), supply: Math.round(pb.supply) }), area.x + area.w, area.y + meterH / 2, { size: kit.fs(12), color: pb.ratio < 1 ? c.red : c.green, align: 'right', maxWidth: labelW - L.gap });
   if (pb.ratio < 1) kit.drawText(t('base.powerLow', { pct: Math.round((1 - pb.ratio) * 100) }), area.x, area.y + meterH + kit.fs(10), { size: kit.fs(11), color: c.red, maxWidth: area.w });
 
-  // остров
+  // остров (рисуется внутри рамки карты)
+  kit.pushClip({ x: r.x + 2, y: r.y + 2, w: r.w - 4, h: r.h - 4 });
   const mapTop = area.y + meterH + kit.fs(24);
   const groundY = area.y + area.h - Math.round(30 * L.ui);
   const scale = area.w / (WORLD_MAX - WORLD_MIN);
@@ -116,13 +117,14 @@ function drawMap(app, kit, L, r, st) {
   ctx.fillRect(sx(0) - 2, groundY - Math.round(26 * L.ui), 4, Math.round(24 * L.ui));
   ctx.fillStyle = '#d33';
   ctx.fillRect(sx(0) - 2, groundY - Math.round(30 * L.ui), 4, 4);
+  kit.popClip();
 
   // маркеры
   const size = L.touch(48);
   const lanes = L.portrait ? 3 : 3;
   const items = BUILDING_KEYS.map((key) => ({ key, x: sx(ANCHORS[key].x) }));
   const laneOf = assignLanes(items, size, lanes);
-  const laneGap = Math.min(size + 2, Math.round((groundY - mapTop - size) / lanes));
+  const laneGap = size + 2;
   const pbRatio = pb.ratio;
   for (const it of items) {
     const key = it.key;

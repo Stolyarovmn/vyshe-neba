@@ -5,7 +5,7 @@
 //   node game/tools/economy-bot.mjs [--seed 1] [--skill 0.8] [--json] [--verbose] [--real]
 //
 // Flights come from economy-bot-adapter.mjs (analytic estimate). `--real` switches to the real simulation
-// through game/src/sim/autopilot.js when that file exists (see loadRealFlight below).
+// (game/src/sim/run.js + autopilot.js) when those files exist (see loadRealFlight below).
 
 import { existsSync } from 'node:fs';
 import { pathToFileURL, fileURLToPath } from 'node:url';
@@ -27,7 +27,7 @@ export const TARGETS = [
 export const CAMPAIGN = { minutes: 720, min: 600, max: 840 }; // DESIGN 4.7: 10..14 hours
 
 const SAFETY_FRACTION = 0.97; // the rational player stays this far under the safe reach
-const MILESTONE_MARGIN = 1.03;
+const MILESTONE_MARGIN = 1.05;
 
 function unitsOf(item) {
   return item.min / 10; // milestone altitudes are meters, the adapter works in game units
@@ -155,6 +155,23 @@ function gateGoals(profile) {
 
 const goalCache = new Map();
 
+// Coins above the era project that cannot be used for it yet (data or milestone still missing) go into the
+// module whose next levels raise the income rate the most per coin.
+function surplusGoal(profile, skill) {
+  const base = bestPlan(profile, skill).rate;
+  let best = null;
+  for (const id of PART_IDS) {
+    const level = profile.parts[id] + 1;
+    if (level > 18) continue;
+    const chain = planChain(profile, 'part', id, level);
+    if (!chain) continue;
+    const after = bestPlan(chain.result, skill).rate;
+    const score = (after - base) / (chain.cost + 1);
+    if (score > 0 && (!best || score > best.score)) best = { kind: 'part', id, level, score, cost: chain.cost };
+  }
+  return best;
+}
+
 function needs(profile) {
   const key = structureKey(profile);
   if (goalCache.has(key)) return goalCache.get(key);
@@ -222,16 +239,17 @@ function choosePlan(profile, skill) {
 // Optional real simulation
 // ---------------------------------------------------------------------------------------------------
 
+// With `--real` every flight runs through game/src/sim (createFlight/step) steered by sim/autopilot.js.
+// Planning (reach, which destination) still uses the analytic estimate; the outcome, the payout inputs and
+// the flight time come from the real simulation, so a wrong estimate shows up as crashes.
 async function loadRealFlight() {
-  const file = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'src', 'sim', 'autopilot.js');
-  if (!existsSync(file)) return null;
-  const mod = await import(pathToFileURL(file).href);
-  const run = mod.playFlight ?? mod.runAutopilot ?? mod.flyConfig ?? mod.autopilot;
-  if (typeof run !== 'function') return null;
-  // Expected shape: run(config, { destination, target, skill, rng }) -> FlightResult (+ duration seconds).
+  const file = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'src', 'sim', 'run.js');
+  if (!existsSync(file) || !existsSync(path.join(path.dirname(file), 'autopilot.js'))) return null;
+  const { runFlight } = await import(pathToFileURL(file).href);
   return (config, plan) => {
-    const result = run(config, plan);
-    return { duration: result.time ?? result.duration ?? 90, ...result };
+    const mission = plan.destination === 'earth' ? 'hop' : 'space';
+    const { result } = runFlight(config, { skill: plan.skill, mission, targetAlt: plan.target, seed: config.seed, maxTime: 420 });
+    return { ...result, duration: result.time + (plan.destination === 'earth' ? 8 : 12), real: true };
   };
 }
 
@@ -239,10 +257,15 @@ async function loadRealFlight() {
 // The campaign
 // ---------------------------------------------------------------------------------------------------
 
-function shop(profile, log) {
+function shop(profile, log, skill) {
   let current = profile;
   for (let guard = 0; guard < 80; guard++) {
-    const goals = needs(current);
+    const goals = [...needs(current)];
+    const advance = ERAS[current.era].advance;
+    if (goals.length === 0 && advance && current.coins > advance.coins) {
+      const extra = surplusGoal(current, skill);
+      if (extra && current.coins - advance.coins >= extra.cost) goals.push(extra);
+    }
     let acted = false;
     let saving = false;
     for (const goal of goals) {
@@ -251,6 +274,7 @@ function shop(profile, log) {
       const step = chain.steps[0];
       const bought = buyOf(current, step.kind, step.id);
       if (bought.ok) {
+        log.items?.push(`${step.kind === 'part' ? 'P' : 'B'}:${step.id}${levelOf(bought.profile, step.kind, step.id)}=${step.cost}`);
         current = bought.profile;
         log.purchases += 1;
         acted = true;
@@ -275,13 +299,15 @@ export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = 
   let eraFlights = 0;
   let eraLandings = 0;
   let eraEarned = 0;
-  const log = { purchases: 0 };
+  let eraStartEarned = 0;
+  let eraDestinations = {};
+  const log = { purchases: 0, items: [] };
   const eras = [];
   let flights = 0;
 
   while (profile.era < 5 && seconds / 60 < maxMinutes && flights < 20000) {
     const before = log.purchases;
-    profile = shop(profile, log);
+    profile = shop(profile, log, skill);
     seconds += (log.purchases - before) * OVERHEAD.purchaseSeconds;
 
     const eraState = R.getEraState(profile);
@@ -295,6 +321,10 @@ export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = 
           flights: eraFlights,
           landings: eraLandings,
           coinsPerFlight: eraFlights ? eraEarned / eraFlights : 0,
+          earnedTotal: profile.stats.earned - eraStartEarned,
+          dataAtAdvance: profile.data,
+          destinations: eraDestinations,
+          items: log.items.splice(0),
           purchases: log.purchases,
           cumulative: seconds / 60,
         });
@@ -304,6 +334,8 @@ export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = 
         eraFlights = 0;
         eraLandings = 0;
         eraEarned = 0;
+        eraStartEarned = profile.stats.earned;
+        eraDestinations = {};
         continue;
       }
     }
@@ -316,6 +348,7 @@ export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = 
     seconds += result.duration + OVERHEAD.cycleSeconds;
     flights += 1;
     eraFlights += 1;
+    eraDestinations[plan.destination] = (eraDestinations[plan.destination] ?? 0) + 1;
     if (result.outcome === 'landed') eraLandings += 1;
     eraEarned += settled.report.coins.gross;
   }

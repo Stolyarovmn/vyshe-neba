@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Звук: ручная проверка</title>
+<style>
+  :root { color-scheme: dark; --bg: #14161a; --panel: #1e2127; --line: #2f343d; --text: #e8e6e1; --dim: #9aa0aa; --amber: #f0a840; --cyan: #5fd0e0; --red: #e0605a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 13px; margin: 0 0 10px; color: var(--amber); text-transform: uppercase; letter-spacing: .08em; }
+  p.note { margin: 0 0 14px; color: var(--dim); }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  label { display: flex; align-items: center; gap: 8px; min-width: 250px; }
+  label span.name { width: 78px; color: var(--dim); }
+  label output { width: 42px; text-align: right; font-variant-numeric: tabular-nums; }
+  input[type=range] { flex: 1; min-width: 120px; accent-color: var(--amber); }
+  button, select { background: #2a2f38; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; font: inherit; cursor: pointer; min-height: 40px; }
+  button:hover { border-color: var(--amber); }
+  button.on { background: var(--amber); color: #1a1a1a; border-color: var(--amber); }
+  button.primary { background: var(--amber); color: #1a1a1a; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  canvas { width: 100%; background: #0b0c0e; border: 1px solid var(--line); border-radius: 6px; display: block; }
+  pre { margin: 0; color: var(--cyan); white-space: pre-wrap; font: 12px/1.45 ui-monospace, monospace; }
+  #state { color: var(--dim); }
+  #state b { color: var(--cyan); font-weight: 600; }
+  audio { width: 100%; margin-top: 8px; }
+</style>
+</head>
+<body>
+<h1>Звук «Выше неба» — ручная проверка</h1>
+<p class="note">Страница использует ES-модули: открывайте её через статический сервер из корня репозитория (например <code>npx http-server</code> и адрес <code>/game/test/audio-demo.html</code>). Звук включается первой кнопкой.</p>
+
+<section>
+  <div class="row">
+    <button id="unlock" class="primary">Включить звук</button>
+    <span id="state">контекст: <b id="ctxState">нет</b></span>
+    <button id="suspend">Пауза (suspend)</button>
+    <button id="resume">Продолжить (resume)</button>
+  </div>
+  <canvas id="meter" width="900" height="40" style="height:40px"></canvas>
+</section>
+
+<section>
+  <h2>Громкость</h2>
+  <div class="row">
+    <label><span class="name">общая</span><input type="range" id="vMaster" min="0" max="1" step="0.01" value="0.8"><output></output></label>
+    <label><span class="name">музыка</span><input type="range" id="vMusic" min="0" max="1" step="0.01" value="0.6"><output></output></label>
+    <label><span class="name">эффекты</span><input type="range" id="vSfx" min="0" max="1" step="0.01" value="0.9"><output></output></label>
+    <label style="min-width:0"><input type="checkbox" id="mute"> без звука</label>
+  </div>
+</section>
+
+<section>
+  <h2>Двигатель и воздух</h2>
+  <div class="row">
+    <label><span class="name">тяга</span><input type="range" id="fThrottle" min="0" max="1" step="0.01" value="0"><output></output></label>
+    <label><span class="name">атмосфера</span><input type="range" id="fAtmo" min="0" max="1" step="0.01" value="1"><output></output></label>
+    <label><span class="name">скорость</span><input type="range" id="fSpeed" min="0" max="1" step="0.01" value="0"><output></output></label>
+    <label><span class="name">высота</span><input type="range" id="fAlt" min="0" max="1" step="0.005" value="0"><output></output></label>
+    <label><span class="name">топливо</span><input type="range" id="fFuel" min="0" max="1" step="0.01" value="1"><output></output></label>
+    <label><span class="name">опасность</span><input type="range" id="fDanger" min="0" max="1" step="0.01" value="0"><output></output></label>
+    <label><span class="name">шторм</span><input type="range" id="fStorm" min="0" max="1" step="0.01" value="0"><output></output></label>
+  </div>
+  <div class="row">
+    <label style="min-width:0">ступень
+      <select id="fStage"><option value="0">0 разгонный</option><option value="1">1 маршевая</option><option value="2">2 капсула</option></select></label>
+    <label style="min-width:0">фаза
+      <select id="fPhase"><option>hub</option><option>pad</option><option selected>ascent</option><option>space</option><option>transfer</option><option>descent</option><option>landed</option><option>crashed</option></select></label>
+    <label style="min-width:0">тело
+      <select id="fBody"><option>earth</option><option>moon</option><option>mars</option></select></label>
+    <label style="min-width:0"><input type="checkbox" id="fPaused"> пауза игры</label>
+    <button id="rcsLeft">РСУ слева (держать)</button>
+    <button id="rcsRight">РСУ справа (держать)</button>
+  </div>
+  <div class="row">
+    <span style="color:var(--dim)">Пресеты:</span>
+    <button data-preset="pad">Площадка</button>
+    <button data-preset="climb">Подъём</button>
+    <button data-preset="high">Стратосфера</button>
+    <button data-preset="space">Космос</button>
+    <button data-preset="descent">Посадка</button>
+    <button data-preset="low">Топливо на нуле</button>
+  </div>
+</section>
+
+<section>
+  <h2>Музыка</h2>
+  <div class="row" id="sceneButtons"></div>
+  <div class="row" id="zoneButtons"></div>
+  <div class="row">
+    <label><span class="name">интенсивн.</span><input type="range" id="mIntensity" min="0" max="1" step="0.01" value="0.5"><output></output></label>
+    <label style="min-width:0"><input type="checkbox" id="mAuto" checked> авто по кадру</label>
+    <label style="min-width:0"><input type="checkbox" id="mFail"> тема неудачи (итоги)</label>
+  </div>
+  <pre id="musicInfo"></pre>
+</section>
+
+<section>
+  <h2>Эффекты</h2>
+  <div class="grid" id="sfxButtons"></div>
+  <p class="note" style="margin:8px 0 0">Монеты: быстрые нажатия поднимают высоту ноты (серия).</p>
+</section>
+
+<section>
+  <h2>Оффлайн-рендер и сценарии</h2>
+  <div class="row">
+    <button id="renderFlight">Полёт (10 с)</button>
+    <button id="renderHub">Хаб (8 с)</button>
+    <button id="renderSfx">Все эффекты</button>
+    <button id="playScript">Сценарий полёта в реальном времени</button>
+  </div>
+  <pre id="renderInfo">нажмите кнопку, чтобы отрендерить и послушать</pre>
+  <canvas id="spectrogram" width="1000" height="260" style="margin-top:8px"></canvas>
+  <audio id="player" controls></audio>
+  <a id="download" download="vyshe-neba-audio.wav" style="color:var(--cyan)"></a>
+</section>
+
+<script type="module">
+import { createAudio, SFX_NAMES, ZONES, SCENES, analyze, encodeWav } from '../src/audio/index.js';
+import {
+  FLIGHT_SCRIPT, FLIGHT_SECONDS, HUB_SCRIPT, HUB_SECONDS,
+  PAUSE_SCRIPT, PAUSE_SECONDS, PAUSE_FROM, SFX_SLOT_SECONDS, sfxSweepScript,
+} from './audio-scenario.mjs';
+import { frameAt } from '../src/audio/offline.js';
+
+const $ = (id) => document.getElementById(id);
+const audio = createAudio({ autoUnlock: true });
+window.audioDemo = audio;
+
+// ---- helpers ----
+function hashChannels(channels) {
+  let h = 2166136261;
+  for (const data of channels) {
+    for (let i = 0; i < data.length; i += 7) {
+      h = Math.imul(h ^ ((data[i] * 32768) | 0), 16777619);
+    }
+  }
+  return (h >>> 0).toString(16);
+}
+
+function maxDifference(a, b) {
+  let worst = 0;
+  for (let c = 0; c < a.length; c++) {
+    for (let i = 0; i < a[c].length; i++) worst = Math.max(worst, Math.abs(a[c][i] - b[c][i]));
+  }
+  return worst;
+}
+
+function summary(result) {
+  const { analysis, stats } = result;
+  const { windowsDb, ...rest } = analysis;
+  return { ...rest, windows: windowsDb.length, stats, hash: hashChannels(result.channels) };
+}
+
+// ---- spectrogram (small radix-2 FFT) ----
+function fft(re, im) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) {
+    let bit = n >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; }
+  }
+  for (let len = 2; len <= n; len <<= 1) {
+    const ang = (-2 * Math.PI) / len;
+    for (let i = 0; i < n; i += len) {
+      for (let k = 0; k < len / 2; k++) {
+        const wr = Math.cos(ang * k), wi = Math.sin(ang * k);
+        const ur = re[i + k], ui = im[i + k];
+        const vr = re[i + k + len / 2] * wr - im[i + k + len / 2] * wi;
+        const vi = re[i + k + len / 2] * wi + im[i + k + len / 2] * wr;
+        re[i + k] = ur + vr; im[i + k] = ui + vi;
+        re[i + k + len / 2] = ur - vr; im[i + k + len / 2] = ui - vi;
+      }
+    }
+  }
+}
+
+function drawSpectrogram(canvas, data, sampleRate) {
+  const size = 1024;
+  const hop = Math.max(512, Math.floor(data.length / canvas.width));
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const re = new Float64Array(size), im = new Float64Array(size);
+  const bins = size / 2;
+  for (let x = 0; x < canvas.width; x++) {
+    const start = x * hop;
+    if (start + size > data.length) break;
+    for (let i = 0; i < size; i++) { re[i] = data[start + i] * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / size)); im[i] = 0; }
+    fft(re, im);
+    for (let y = 0; y < canvas.height; y++) {
+      // log-frequency axis from 40 Hz to 16 kHz
+      const f = 40 * Math.pow(400, 1 - y / canvas.height);
+      const bin = Math.min(bins - 1, Math.round((f / (sampleRate / 2)) * bins));
+      const db = 20 * Math.log10(Math.hypot(re[bin], im[bin]) / size + 1e-9);
+      const v = Math.max(0, Math.min(1, (db + 100) / 70));
+      ctx.fillStyle = `hsl(${240 - v * 240}, 100%, ${v * 55}%)`;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+}
+
+async function renderAndShow(label, options) {
+  $('renderInfo').textContent = `${label}: рендер…`;
+  const result = await audio.renderOffline(options);
+  const s = summary(result);
+  $('renderInfo').textContent = `${label}\n` + JSON.stringify({ peakDb: +s.peakDb.toFixed(2), rmsDb: +s.rmsDb.toFixed(2), longestSilence: s.longestSilence, invalid: s.invalid, voicesPeak: s.stats.peakVoices, hash: s.hash }, null, 1);
+  drawSpectrogram($('spectrogram'), result.channels[0], result.sampleRate);
+  const wav = new Blob([encodeWav(result.channels, result.sampleRate)], { type: 'audio/wav' });
+  const url = URL.createObjectURL(wav);
+  $('player').src = url;
+  $('download').href = url;
+  $('download').textContent = 'скачать wav';
+  return result;
+}
+
+// ---- test hooks used by audio.browser.cjs ----
+window.audioTest = {
+  version: 1,
+  SFX_NAMES,
+  async flight() {
+    const a = await audio.renderOffline({ seconds: FLIGHT_SECONDS, script: FLIGHT_SCRIPT });
+    const b = await audio.renderOffline({ seconds: FLIGHT_SECONDS, script: FLIGHT_SCRIPT });
+    const other = await audio.renderOffline({ seconds: FLIGHT_SECONDS, script: FLIGHT_SCRIPT, seed: 99 });
+    return { ...summary(a), repeatDifference: maxDifference(a.channels, b.channels), otherSeedDifference: maxDifference(a.channels, other.channels), windowsDb: a.analysis.windowsDb };
+  },
+  async hub() {
+    return summary(await audio.renderOffline({ seconds: HUB_SECONDS, script: HUB_SCRIPT }));
+  },
+  async pause() {
+    const result = await audio.renderOffline({ seconds: PAUSE_SECONDS, script: PAUSE_SCRIPT });
+    const before = analyze(result.channels, result.sampleRate, { from: 0.8, to: PAUSE_FROM });
+    const after = analyze(result.channels, result.sampleRate, { from: PAUSE_FROM + 0.8, to: PAUSE_SECONDS });
+    return { beforeRmsDb: before.rmsDb, afterRmsDb: after.rmsDb, afterPeakDb: after.peakDb };
+  },
+  async sfxSweep() {
+    const names = SFX_NAMES;
+    const seconds = names.length * SFX_SLOT_SECONDS + 1;
+    const result = await audio.renderOffline({ seconds, script: sfxSweepScript(names) });
+    return names.map((name, i) => {
+      const from = 0.3 + i * SFX_SLOT_SECONDS;
+      const slot = analyze(result.channels, result.sampleRate, { from, to: from + SFX_SLOT_SECONDS - 0.05 });
+      return { name, peakDb: slot.peakDb, rmsDb: slot.rmsDb, invalid: slot.invalid };
+    });
+  },
+  // Real-time context: unlock, run frames, suspend, resume, dispose.
+  async realtime() {
+    const live = createAudio({ autoUnlock: false });
+    const log = {};
+    log.before = live.state;
+    log.unlocked = await live.unlock();
+    log.afterUnlock = live.state;
+    live.music.set({ scene: 'flight' });
+    live.sfx('ui-press');
+    const start = performance.now();
+    let frames = 0;
+    await new Promise((resolve) => {
+      const loop = () => {
+        const s = (performance.now() - start) / 1000;
+        live.update(1 / 60, { phase: 'ascent', throttle: Math.min(1, s), atmo: Math.max(0, 1 - s / 2), speed01: Math.min(1, s / 2), alt01: s / 3, stage: 0, fuel01: 1, rcs: { left: s > 0.8 ? 1 : 0, right: 0 } });
+        if (frames++ % 20 === 0) live.sfx('coin');
+        if (s < 2.2) requestAnimationFrame(loop); else resolve();
+      };
+      requestAnimationFrame(loop);
+    });
+    log.statsRunning = live.stats;
+    await live.suspend();
+    log.suspended = live.state;
+    await live.resume();
+    log.resumed = live.state;
+    live.setMuted(true);
+    live.update(1 / 60, { phase: 'ascent', throttle: 1 });
+    live.setMuted(false);
+    log.muteOk = live.isMuted() === false;
+    live.dispose();
+    log.disposed = live.state;
+    return log;
+  },
+};
+
+// ---- manual UI ----
+const frame = { phase: 'ascent', throttle: 0, atmo: 1, speed01: 0, alt01: 0, fuel01: 1, danger01: 0, storm: 0, stage: 0, body: 'earth', paused: false, rcs: { left: 0, right: 0 } };
+
+function bindSlider(id, apply) {
+  const input = $(id);
+  const output = input.parentElement.querySelector('output');
+  const update = () => { output.textContent = (+input.value).toFixed(2); apply(+input.value); };
+  input.addEventListener('input', update);
+  update();
+  return (value) => { input.value = value; update(); };
+}
+
+bindSlider('vMaster', (v) => audio.setVolumes({ master: v }));
+bindSlider('vMusic', (v) => audio.setVolumes({ music: v }));
+bindSlider('vSfx', (v) => audio.setVolumes({ sfx: v }));
+$('mute').addEventListener('change', (e) => audio.setMuted(e.target.checked));
+
+const setters = {
+  throttle: bindSlider('fThrottle', (v) => { frame.throttle = v; }),
+  atmo: bindSlider('fAtmo', (v) => { frame.atmo = v; }),
+  speed01: bindSlider('fSpeed', (v) => { frame.speed01 = v; }),
+  alt01: bindSlider('fAlt', (v) => { frame.alt01 = v; }),
+  fuel01: bindSlider('fFuel', (v) => { frame.fuel01 = v; }),
+  danger01: bindSlider('fDanger', (v) => { frame.danger01 = v; }),
+  storm: bindSlider('fStorm', (v) => { frame.storm = v; }),
+};
+$('fStage').addEventListener('change', (e) => { frame.stage = +e.target.value; });
+$('fPhase').addEventListener('change', (e) => { frame.phase = e.target.value; });
+$('fBody').addEventListener('change', (e) => { frame.body = e.target.value; });
+$('fPaused').addEventListener('change', (e) => { frame.paused = e.target.checked; });
+
+for (const [id, side] of [['rcsLeft', 'left'], ['rcsRight', 'right']]) {
+  const button = $(id);
+  const set = (v) => { frame.rcs[side] = v; };
+  button.addEventListener('pointerdown', () => set(1));
+  for (const type of ['pointerup', 'pointerleave', 'pointercancel']) button.addEventListener(type, () => set(0));
+}
+
+const PRESETS = {
+  pad: { phase: 'pad', throttle: 0.3, atmo: 1, speed01: 0, alt01: 0, fuel01: 1, danger01: 0 },
+  climb: { phase: 'ascent', throttle: 1, atmo: 0.9, speed01: 0.4, alt01: 0.03, fuel01: 0.9, danger01: 0 },
+  high: { phase: 'ascent', throttle: 0.8, atmo: 0.2, speed01: 0.75, alt01: 0.5, fuel01: 0.7, danger01: 0 },
+  space: { phase: 'space', throttle: 0.5, atmo: 0, speed01: 0.7, alt01: 1, fuel01: 0.5, danger01: 0 },
+  descent: { phase: 'descent', throttle: 0.6, atmo: 0.8, speed01: 0.5, alt01: 0.04, fuel01: 0.3, danger01: 0.4 },
+  low: { phase: 'ascent', throttle: 0.7, atmo: 1, speed01: 0.3, alt01: 0.02, fuel01: 0.05, danger01: 0.2 },
+};
+for (const button of document.querySelectorAll('[data-preset]')) {
+  button.addEventListener('click', () => {
+    const preset = PRESETS[button.dataset.preset];
+    Object.assign(frame, preset);
+    $('fPhase').value = preset.phase;
+    for (const [key, set] of Object.entries(setters)) if (preset[key] !== undefined) set(preset[key]);
+  });
+}
+
+const music = { scene: null, zone: null };
+function pushMusic() {
+  audio.music.set({
+    scene: music.scene,
+    zone: music.zone,
+    mood: $('mFail').checked ? 'fail' : 'win',
+    intensity: $('mAuto').checked ? null : +$('mIntensity').value,
+  });
+  for (const b of $('sceneButtons').children) b.classList.toggle('on', b.dataset.value === String(music.scene));
+  for (const b of $('zoneButtons').children) b.classList.toggle('on', b.dataset.value === String(music.zone));
+}
+function addChoice(container, label, key, value) {
+  const b = document.createElement('button');
+  b.textContent = label;
+  b.dataset.value = String(value);
+  b.addEventListener('click', () => { music[key] = value; pushMusic(); });
+  container.appendChild(b);
+}
+addChoice($('sceneButtons'), 'сцена: авто', 'scene', null);
+for (const scene of SCENES) addChoice($('sceneButtons'), `сцена: ${scene}`, 'scene', scene);
+addChoice($('zoneButtons'), 'зона: авто', 'zone', null);
+for (const zone of ZONES) addChoice($('zoneButtons'), `зона: ${zone}`, 'zone', zone);
+bindSlider('mIntensity', pushMusic);
+$('mAuto').addEventListener('change', pushMusic);
+$('mFail').addEventListener('change', pushMusic);
+pushMusic();
+
+for (const name of SFX_NAMES) {
+  const b = document.createElement('button');
+  b.textContent = name;
+  b.addEventListener('click', () => audio.sfx(name, name === 'warn' ? { kind: ['hull', 'speed', 'tilt', 'altitude', 'radar', ''][Math.floor(performance.now() / 700) % 6] } : {}));
+  $('sfxButtons').appendChild(b);
+}
+
+$('unlock').addEventListener('click', () => audio.unlock());
+$('suspend').addEventListener('click', () => audio.suspend());
+$('resume').addEventListener('click', () => audio.resume());
+
+$('renderFlight').addEventListener('click', () => renderAndShow('Полёт 10 с', { seconds: FLIGHT_SECONDS, script: FLIGHT_SCRIPT }));
+$('renderHub').addEventListener('click', () => renderAndShow('Хаб 8 с', { seconds: HUB_SECONDS, script: HUB_SCRIPT }));
+$('renderSfx').addEventListener('click', () => {
+  const seconds = SFX_NAMES.length * SFX_SLOT_SECONDS + 1;
+  return renderAndShow('Все эффекты', { seconds, script: sfxSweepScript(SFX_NAMES) });
+});
+
+// Plays the flight script through the live engine (no offline render).
+let scriptRun = null;
+$('playScript').addEventListener('click', () => {
+  if (scriptRun) cancelAnimationFrame(scriptRun.raf);
+  const keys = FLIGHT_SCRIPT.filter((i) => i.frame);
+  const events = FLIGHT_SCRIPT.filter((i) => !i.frame);
+  let next = 0;
+  const started = performance.now();
+  const loop = () => {
+    const t = (performance.now() - started) / 1000;
+    while (next < events.length && events[next].t <= t) {
+      const e = events[next++];
+      if (e.sfx) audio.sfx(e.sfx, e.params);
+      if (e.music) audio.music.set(e.music);
+    }
+    Object.assign(frame, frameAt(keys, t));
+    if (t < FLIGHT_SECONDS + 1) scriptRun = { raf: requestAnimationFrame(loop) }; else scriptRun = null;
+  };
+  audio.music.set({ scene: 'flight' });
+  loop();
+});
+
+// ---- frame loop, meter, readouts ----
+let last = performance.now();
+let lastInfo = 0;
+const meter = $('meter').getContext('2d');
+const samples = new Float32Array(1024);
+function tick(now) {
+  const dt = Math.min(0.1, (now - last) / 1000);
+  last = now;
+  audio.update(dt, frame);
+  const analyser = audio.analyser;
+  meter.fillStyle = '#0b0c0e';
+  meter.fillRect(0, 0, 900, 40);
+  if (analyser) {
+    analyser.getFloatTimeDomainData(samples);
+    let peak = 0, sum = 0;
+    for (const v of samples) { peak = Math.max(peak, Math.abs(v)); sum += v * v; }
+    const rms = Math.sqrt(sum / samples.length);
+    meter.fillStyle = peak > 0.891 ? '#e0605a' : '#5fd0e0';
+    meter.fillRect(0, 6, Math.min(1, rms * 3) * 900, 12);
+    meter.fillStyle = '#f0a840';
+    meter.fillRect(0, 24, Math.min(1, peak) * 900, 8);
+  }
+  if (now - lastInfo > 250) {
+    lastInfo = now;
+    $('ctxState').textContent = audio.state;
+    const s = audio.stats;
+    $('musicInfo').textContent = s
+      ? `профиль: ${s.music.profile}  темп: ${s.music.bpm}  такт: ${s.music.bar}  аккорд: ${JSON.stringify(s.music.chord)}\nинтенсивность: ${s.music.intensity.toFixed(2)}  напряжение: ${s.music.tension.toFixed(2)}  голосов: ${s.voices} (пик ${s.peakVoices}, вытеснено ${s.stolen})  нот: ${s.music.events}  ошибок: ${s.music.errors}`
+      : 'звук ещё не включён';
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

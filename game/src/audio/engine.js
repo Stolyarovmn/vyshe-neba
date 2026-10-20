@@ -35,18 +35,20 @@ export function mapEngine(input) {
   return {
     level,
     roar: {
-      gain: 0.95 * loud * air * voice.roar,
-      cutoff: lerp(380, 2600, Math.pow(level, 0.9)) * voice.bright * (0.55 + 0.45 * air),
+      gain: 1.5 * loud * air * voice.roar,
+      cutoff: lerp(450, 4200, Math.pow(level, 0.9)) * voice.bright * (0.55 + 0.45 * air),
     },
     formants: [
       { freq: lerp(210, 520, level) * voice.pitch, q: 2.2, gain: 0.8 },
       { freq: lerp(620, 1500, level) * voice.pitch, q: 3, gain: 0.55 },
       { freq: lerp(1500, 3300, level) * voice.bright, q: 4, gain: 0.3 * level },
     ],
-    formantGain: 0.9 * loud * air,
+    formantGain: 1.2 * loud * air,
+    rush: 0.2 * Math.pow(level, 1.3) * air,
     crackle: { rate: lerp(14, 31, level), depth: level > 0 ? 0.22 + 0.2 * level : 0 },
-    rumble: { freq: lerp(36, 66, level) * voice.pitch, gain: 0.5 * loud * voice.body * (0.55 + 0.45 * hull) },
-    body: { gain: 0.6 * Math.pow(level, 0.7) * hull * voice.body },
+    rumble: { freq: lerp(36, 66, level) * voice.pitch, gain: 0.14 * loud * voice.body * (0.55 + 0.45 * hull) },
+    body: { gain: 0.25 * Math.pow(level, 0.7) * hull * voice.body },
+    buzz: { freq: lerp(70, 118, level) * voice.pitch, gain: 0.2 * Math.pow(level, 0.8) * hull * voice.body },
     whine: { freq: lerp(700, 2400, level) * voice.pitch, gain: 0.03 * level * level },
     sputter: burning ? clamp01((0.07 - f.fuel01) / 0.07) : 0,
     wind: {
@@ -71,6 +73,7 @@ export function mapEngine(input) {
 // Node graph
 
 const RCS_ON = 0.05;
+const ENGINE_LEVEL = 0.62;
 
 export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
   const nodes = [];
@@ -124,7 +127,7 @@ export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
   const bus = graph.buses.engine;
 
   // Master for the engine voice: stage blips and fuel sputter act here.
-  const master = gain(1);
+  const master = gain(ENGINE_LEVEL);
   const sputterGain = gain(1);
   const sputterLfo = osc('sine', 11);
   const sputterDepth = gain(0);
@@ -159,17 +162,21 @@ export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
   chain(formantSum, crackle, formantMaster, master);
 
   // Low rumble: detuned saws plus a sub sine through a low-pass.
-  const rumbleLow = filter('lowpass', 190, 0.7);
+  const rumbleLow = filter('lowpass', 260, 0.7);
   const rumbleGain = gain(0);
   const sawA = osc('sawtooth', 40);
   const sawB = osc('sawtooth', 60.5);
   const sub = osc('sine', 20);
   const sawBGain = gain(0.55);
-  const subGain = gain(0.8);
+  const subGain = gain(0.5);
   chain(sawA, rumbleLow);
   chain(sawB, sawBGain, rumbleLow);
   chain(sub, subGain, rumbleLow);
   chain(rumbleLow, rumbleGain, master);
+
+  // Air rush: a hiss on top of the roar so the engine has presence on small speakers.
+  const rushGain = gain(0);
+  chain(loop('white'), filter('highpass', 1800, 0.5), filter('lowpass', 7500, 0.5), rushGain, master);
 
   // Hull vibration: resonant brown noise and two beating hum tones.
   const bodyIn = gain(1);
@@ -185,6 +192,12 @@ export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
   chain(bodyLfo, bodyLfoDepth, bodyAm.gain);
   const bodyGain = gain(0);
   chain(bodyIn, bodyAm, bodyGain, master);
+
+  // Structure-borne buzz: the vibration's harmonics, audible even in a vacuum.
+  const buzzOsc = osc('sawtooth', 80);
+  const buzzBand = filter('bandpass', 260, 1.6);
+  const buzzGain = gain(0);
+  chain(buzzOsc, buzzBand, buzzGain, master);
 
   // Turbopump whine, kept far below the roar.
   const whineOsc = osc('triangle', 900);
@@ -264,6 +277,9 @@ export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
       set(formants[i].g.gain, fm.gain, 0.3, when);
     });
     set(formantMaster.gain, m.formantGain, rise, when);
+    set(rushGain.gain, m.rush, rise, when);
+    set(buzzOsc.frequency, m.buzz.freq, 0.35, when);
+    set(buzzGain.gain, m.buzz.gain, rise, when);
     set(lfoA.frequency, m.crackle.rate, 0.4, when);
     set(lfoB.frequency, m.crackle.rate * 1.618, 0.4, when);
     set(crackleDepth.gain, m.crackle.depth, 0.3, when);
@@ -331,8 +347,8 @@ export function createEngine({ ctx, graph, noise, toolkit, rng, now }) {
   // The old stage drops away: the note stutters and settles into the next.
   function stageBlip(when) {
     master.gain.cancelScheduledValues(when);
-    master.gain.setValueAtTime(0.25, when);
-    master.gain.setTargetAtTime(1, when + 0.1, 0.16);
+    master.gain.setValueAtTime(ENGINE_LEVEL * 0.25, when);
+    master.gain.setTargetAtTime(ENGINE_LEVEL, when + 0.1, 0.16);
   }
 
   // Ignition accent: a soft thump and a swell of low noise.

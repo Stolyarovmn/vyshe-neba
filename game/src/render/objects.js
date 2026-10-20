@@ -140,49 +140,78 @@ export function drawObjects(ctx, painter, view, objects, era, time) {
   }
 }
 
+const POINTER_LIMIT = 5;
+const POINTER_RANGE = 700;
+const nearest = { d: new Float32Array(POINTER_LIMIT), x: new Float32Array(POINTER_LIMIT), y: new Float32Array(POINTER_LIMIT), count: 0 };
+
+function keepNearest(distance, sx, sy) {
+  let i;
+  if (nearest.count < POINTER_LIMIT) i = nearest.count++;
+  else if (distance < nearest.d[POINTER_LIMIT - 1]) i = POINTER_LIMIT - 1;
+  else return;
+  while (i > 0 && nearest.d[i - 1] > distance) {
+    nearest.d[i] = nearest.d[i - 1];
+    nearest.x[i] = nearest.x[i - 1];
+    nearest.y[i] = nearest.y[i - 1];
+    i--;
+  }
+  nearest.d[i] = distance;
+  nearest.x[i] = sx;
+  nearest.y[i] = sy;
+}
+
 /**
  * Подсветка радаром: кольцо вокруг помеченных опасных объектов на экране и стрелки на краю кадра
- * для тех, что за краем. Радар строится на базе: sim выставляет o.marked.
+ * для ближайших (не более пяти) за краем. Радар строится на базе: sim выставляет o.marked.
  */
 export function drawRadarMarks(ctx, view, objects, time, anchorDev) {
   if (!objects) return;
   const px = view.px;
   const pulse = 0.55 + 0.45 * Math.sin(time * 6);
+  nearest.count = 0;
   ctx.save();
   ctx.lineWidth = Math.max(1, px);
+  ctx.strokeStyle = `rgba(255,170,60,${(0.45 + 0.4 * pulse).toFixed(2)})`;
+  ctx.setLineDash([3 * px, 3 * px]);
+  ctx.beginPath();
   for (const o of objects) {
     if (!o.active || !o.hazard || !o.marked) continue;
     const sx = view.sx(o.x);
     const sy = view.sy(o.y);
     const inside = sx > 0 && sx < view.devW && sy > 0 && sy < view.devH;
-    ctx.strokeStyle = `rgba(255,170,60,${(0.45 + 0.4 * pulse).toFixed(2)})`;
-    ctx.fillStyle = ctx.strokeStyle;
     if (inside) {
-      ctx.setLineDash([3 * px, 3 * px]);
-      ctx.beginPath();
+      ctx.moveTo(sx + (o.r + 8) * view.S, sy);
       ctx.arc(sx, sy, (o.r + 8) * view.S, 0, TAU);
-      ctx.stroke();
     } else {
-      ctx.setLineDash([]);
-      const dx = sx - anchorDev.x;
-      const dy = sy - anchorDev.y;
-      const len = Math.hypot(dx, dy) || 1;
-      const margin = 22 * px;
-      const scale = Math.min(
-        (dx > 0 ? view.devW - margin - anchorDev.x : margin - anchorDev.x) / (dx || 1e-6),
-        (dy > 0 ? view.devH - margin - anchorDev.y : margin - anchorDev.y) / (dy || 1e-6),
-      );
-      const ex = anchorDev.x + dx * Math.min(scale, 1e6);
-      const ey = anchorDev.y + dy * Math.min(scale, 1e6);
-      const ux = dx / len;
-      const uy = dy / len;
-      ctx.beginPath();
-      ctx.moveTo(ex + ux * 7 * px, ey + uy * 7 * px);
-      ctx.lineTo(ex - ux * 5 * px - uy * 5 * px, ey - uy * 5 * px + ux * 5 * px);
-      ctx.lineTo(ex - ux * 5 * px + uy * 5 * px, ey - uy * 5 * px - ux * 5 * px);
-      ctx.closePath();
-      ctx.fill();
+      const wx = o.x - view.camX;
+      const wy = o.y - view.camY;
+      const distance = Math.hypot(wx, wy);
+      if (distance < POINTER_RANGE) keepNearest(distance, sx, sy);
     }
   }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = `rgba(255,170,60,${(0.55 + 0.4 * pulse).toFixed(2)})`;
+  for (let k = 0; k < nearest.count; k++) drawPointer(ctx, view, nearest.x[k], nearest.y[k], anchorDev, px);
   ctx.restore();
+}
+
+function drawPointer(ctx, view, sx, sy, anchorDev, px) {
+  const dx = sx - anchorDev.x;
+  const dy = sy - anchorDev.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const margin = 22 * px;
+  const scaleX = dx > 0 ? (view.devW - margin - anchorDev.x) / dx : dx < 0 ? (margin - anchorDev.x) / dx : Infinity;
+  const scaleY = dy > 0 ? (view.devH - margin - anchorDev.y) / dy : dy < 0 ? (margin - anchorDev.y) / dy : Infinity;
+  const scale = Math.min(scaleX, scaleY);
+  const ex = anchorDev.x + dx * scale;
+  const ey = anchorDev.y + dy * scale;
+  const ux = dx / len;
+  const uy = dy / len;
+  ctx.beginPath();
+  ctx.moveTo(ex + ux * 7 * px, ey + uy * 7 * px);
+  ctx.lineTo(ex - ux * 5 * px - uy * 5 * px, ey - uy * 5 * px + ux * 5 * px);
+  ctx.lineTo(ex - ux * 5 * px + uy * 5 * px, ey - uy * 5 * px - ux * 5 * px);
+  ctx.closePath();
+  ctx.fill();
 }

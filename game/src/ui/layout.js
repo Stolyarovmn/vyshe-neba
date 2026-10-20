@@ -157,42 +157,53 @@ export const ROCKET_SPOTS = [
 
 export function rocketLayout(L) {
   const { body } = screenFrame(L, { header: true });
-  const { a: schematic, b: panel } = splitBody(L, body, L.portrait ? 0.5 : 0.56);
-  const spot = Math.max(MIN_TOUCH, R(52 * L.ui));
-  const rocketH = Math.min(schematic.h - L.gap * 2, R(schematic.w * (L.portrait ? 1.1 : 1.2)), R(420 * L.ui));
-  const rocketW = R(rocketH * 0.16);
+  const spot = MIN_TOUCH + (L.portrait || L.h < 420 ? 0 : R(4 * L.ui));
+  const needH = 5 * spot + 4 * R(L.gap * 0.4) + L.gap * 3;
+  const ratio = L.portrait ? clamp(needH / Math.max(1, body.h), 0.5, 0.62) : 0.56;
+  const { a: schematic, b: panel } = splitBody(L, body, ratio);
+  const standH = L.touch(46);
+  const stripH = standH + L.gap * 2;
+  const rocketH = Math.min(schematic.h - stripH - L.gap * 2, R(schematic.w * (L.portrait ? 1.05 : 1.2)), R(400 * L.ui));
+  const rocketW = R(rocketH * 0.26);
   const cx = schematic.x + schematic.w / 2;
-  const top = schematic.y + (schematic.h - rocketH) / 2;
-  const colGap = L.gap * 2;
+  const roomy = schematic.h > 5 * spot + 4 * L.gap + L.gap * 3;
+  const top = schematic.y + (roomy ? L.gap * 1.5 : 1);
+  const limit = schematic.y + schematic.h - (roomy ? L.gap : 1);
+  const perCol = Math.max(3, Math.floor((limit - top + 2) / (spot + 2)));
+  let colGap = L.gap * 1.5;
+  if (perCol < 5) colGap = clamp(Math.floor(schematic.w / 2 - 2 - rocketW / 2 - 2 * spot - R(L.gap * 0.5)), 2, colGap);
+  const spacing = clamp((limit - top - spot) / (Math.min(5, perCol) - 1), spot, spot + R(L.gap * 0.4));
   const spots = {};
-  const spacing = spot + L.gap;
+  let compact = false;
   const bySide = { '-1': [], 1: [] };
   for (const s of ROCKET_SPOTS) bySide[s.side].push(s);
   for (const list of Object.values(bySide)) {
-    let prevBottom = -Infinity;
-    for (const s of list) {
-      let y = top + s.t * rocketH - spot / 2;
-      y = Math.max(y, prevBottom + L.gap * 0.5);
-      prevBottom = y + spot;
-      const x = s.side < 0 ? cx - rocketW / 2 - colGap - spot : cx + rocketW / 2 + colGap;
-      spots[s.id] = { ...rect(x, y, spot, spot), side: s.side };
+    // в тесной раскладке лишние точки уходят во второй столбец дальше от ракеты (без подписей)
+    for (let start = 0, col = 0; start < list.length; start += perCol, col++) {
+      const chunk = list.slice(start, start + perCol);
+      if (col > 0) compact = true;
+      const ys = chunk.map((s) => Math.max(top, top + s.t * rocketH - spot / 2));
+      for (let i = 1; i < ys.length; i++) ys[i] = Math.max(ys[i], ys[i - 1] + spacing);
+      const last = ys.length - 1;
+      ys[last] = Math.min(ys[last], limit - spot);
+      for (let i = last - 1; i >= 0; i--) ys[i] = Math.min(ys[i], ys[i + 1] - spacing);
+      chunk.forEach((s, i) => {
+        const off = col * (spot + R(L.gap * 0.5));
+        const x = s.side < 0 ? cx - rocketW / 2 - colGap - spot - off : cx + rocketW / 2 + colGap + off;
+        spots[s.id] = { ...rect(x, ys[i], spot, spot), side: s.side, col };
+      });
     }
   }
-  // если низ вышел за схему — ужать вертикальные зазоры
-  const maxBottom = Math.max(...Object.values(spots).map(bottom));
-  const overflow = maxBottom - (bottom(schematic) - L.gap);
-  if (overflow > 0) {
-    const k = clamp(1 - overflow / (rocketH + 1), 0.6, 1);
-    for (const s of Object.values(spots)) s.y = R(top + (s.y - top) * k);
-  }
+  const centerGap = rocketW + colGap * 2;
+  const standW = Math.max(MIN_TOUCH, Math.min(L.touch(112), centerGap));
   return {
     schematic,
     panel,
     spot,
-    spacing,
     rocket: rect(cx - rocketW / 2, top, rocketW, rocketH),
     spots,
-    stand: rect(schematic.x + L.gap, bottom(schematic) - L.touch(44) - L.gap, L.touch(110), L.touch(44)),
+    compact,
+    stand: rect(cx - standW / 2, limit - standH, standW, standH),
   };
 }
 
@@ -200,7 +211,7 @@ export function rocketLayout(L) {
 
 export function baseLayout(L) {
   const { body } = screenFrame(L, { header: true });
-  const { a: map, b: side } = splitBody(L, body, L.portrait ? 0.4 : 0.52);
+  const { a: map, b: side } = splitBody(L, body, L.portrait ? 0.46 : 0.52);
   const tabsH = L.touch(44);
   return { map, side, tabs: rect(side.x, side.y, side.w, tabsH), list: rect(side.x, side.y + tabsH + L.gap, side.w, side.h - tabsH - L.gap) };
 }
@@ -224,7 +235,7 @@ export function settingsLayout(L) {
 export function launchLayout(L) {
   const { body } = screenFrame(L, { header: true });
   const startH = L.touch(64);
-  const consH = L.touch(72);
+  const consH = L.touch(112);
   if (L.portrait) {
     const start = rect(body.x, bottom(body) - startH, body.w, startH);
     const cons = rect(body.x, start.y - L.gap - consH, body.w, consH);
@@ -317,7 +328,7 @@ export function hudLayout(L, opts = {}) {
     hint = rect(a.x + R(a.w * 0.3), a.y + g, R(a.w * 0.4), R(34 * u));
     radar = { cx: right(a) - g - R(12 * u) - g - R(34 * u), cy: bottom(pause) + g + R(34 * u), r: R(34 * u) };
     strip = rect(right(a) - g - R(12 * u), bottom(pause) + g, R(12 * u), Math.max(0, lever.y - g - bottom(pause) - g));
-    const bw = Math.min(btn, R((Math.min(gridRight - (a.x + a.w * 0.55), btn * 3 + g * 2) - g * 2) / 3));
+    const bw = Math.min(btn, R((gridRight - (disc.cx + discR + g * 2) - g * 2) / 3));
     const startX = gridRight - bw * 3 - g * 2;
     const rowY = [bottom(a) - g - bw * 2 - g, bottom(a) - g - bw];
     buttons.boost = rect(startX + (bw + g) * 2, rowY[1], bw, bw);

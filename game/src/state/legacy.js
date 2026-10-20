@@ -22,7 +22,7 @@ const MODULE_MAP = {
 };
 
 export function isLegacySave(raw) {
-  return raw !== null && typeof raw === 'object' && raw.upgrades && typeof raw.upgrades === 'object'
+  return raw !== null && typeof raw === 'object' && !!raw.upgrades && typeof raw.upgrades === 'object'
     && Number.isFinite(raw.base) && !raw.parts;
 }
 

@@ -17,11 +17,11 @@ import { environmentFor } from './zones.js';
 
 const CONTROL_INTERVAL = 1 / 30;
 
-export function createCore({ ctx, seed = 1, now = () => ctx.currentTime, volumes, muted = false }) {
+export function createCore({ ctx, seed = 1, now = () => ctx.currentTime, volumes, muted = false, offline = false }) {
   const rng = createRng(seed);
   const noise = createNoiseBank(ctx, rng.fork('noise'));
   const graph = createGraph(ctx, { rng: rng.fork('graph'), now });
-  const toolkit = createToolkit({ ctx, noise, rng: rng.fork('voices'), now });
+  const toolkit = createToolkit({ ctx, noise, rng: rng.fork('voices'), now, offline });
   const engine = createEngine({ ctx, graph, noise, toolkit, rng: rng.fork('engine'), now });
   const ambience = createAmbience({ ctx, graph, noise, rng: rng.fork('ambience') });
   const music = createMusic({ ctx, graph, toolkit, now, seed: seed ^ 0x5eed });
@@ -56,6 +56,7 @@ export function createCore({ ctx, seed = 1, now = () => ctx.currentTime, volumes
     const scene = deriveMusicTarget(frame, music.get()).scene;
     environment = environmentFor(frame);
     graph.setEnvironment(environment, t);
+    graph.setPaused(frame.paused, t);
     const flying = scene === 'flight';
     engine.apply(flying ? frame : { ...frame, phase: 'hub', throttle: 0, rcs: { left: 0, right: 0 } }, t);
     ambience.apply(frame, scene, t);

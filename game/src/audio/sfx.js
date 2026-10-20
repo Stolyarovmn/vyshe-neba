@@ -52,7 +52,7 @@ function tremolo(v, t, end, rate, depth, output) {
 
 const ui = {
   'ui-hover': {
-    bus: 'ui', gain: 0.25, cooldown: 0.04, maxVoices: 3, priority: 0,
+    bus: 'ui', gain: 0.273, cooldown: 0.04, maxVoices: 3, priority: 0,
     play(S) {
       const v = S.voice();
       tone(v, S.t, { f: S.f(1400), f2: S.f(1520), attack: 0.003, decay: 0.05, peak: 0.6 });
@@ -61,7 +61,7 @@ const ui = {
   },
 
   'ui-press': {
-    bus: 'ui', gain: 0.5, cooldown: 0.03, maxVoices: 4, priority: 1,
+    bus: 'ui', gain: 0.335, cooldown: 0.03, maxVoices: 4, priority: 1,
     play(S) {
       const v = S.voice();
       tone(v, S.t, { f: S.f(210), f2: 95, decay: 0.09, peak: 1 });
@@ -71,7 +71,7 @@ const ui = {
   },
 
   'ui-deny': {
-    bus: 'ui', gain: 0.45, cooldown: 0.12, maxVoices: 2, priority: 2,
+    bus: 'ui', gain: 0.32, cooldown: 0.12, maxVoices: 2, priority: 2,
     play(S) {
       const v = S.voice();
       for (const offset of [0, 0.12]) {
@@ -82,7 +82,7 @@ const ui = {
   },
 
   'ui-back': {
-    bus: 'ui', gain: 0.4, cooldown: 0.05, maxVoices: 3, priority: 1,
+    bus: 'ui', gain: 0.24, cooldown: 0.05, maxVoices: 3, priority: 1,
     play(S) {
       const v = S.voice();
       tone(v, S.t, { type: 'triangle', f: S.f(600), f2: S.f(400), decay: 0.09, peak: 0.6 });
@@ -91,7 +91,7 @@ const ui = {
   },
 
   purchase: {
-    bus: 'ui', gain: 0.55, cooldown: 0.1, maxVoices: 2, priority: 3,
+    bus: 'ui', gain: 0.429, cooldown: 0.1, maxVoices: 2, priority: 3,
     duck: { depth: 0.65, hold: 0.25, release: 0.5 },
     play(S) {
       const v = S.voice();
@@ -105,7 +105,7 @@ const ui = {
   },
 
   build: {
-    bus: 'ui', gain: 0.6, cooldown: 0.2, maxVoices: 2, priority: 2,
+    bus: 'ui', gain: 0.36, cooldown: 0.2, maxVoices: 2, priority: 2,
     play(S) {
       const v = S.voice();
       [[0, 520, 1], [0.22, 480, 0.9], [0.44, 440, 1.1]].forEach(([at, f, power]) => {
@@ -121,7 +121,7 @@ const ui = {
   },
 
   'build-complete': {
-    bus: 'ui', gain: 0.55, cooldown: 0.3, maxVoices: 1, priority: 4,
+    bus: 'ui', gain: 0.616, cooldown: 0.3, maxVoices: 1, priority: 4,
     duck: { depth: 0.6, hold: 0.7, release: 0.8 },
     play(S) {
       const v = S.voice();
@@ -134,7 +134,7 @@ const ui = {
   },
 
   'era-up': {
-    bus: 'ui', gain: 0.7, cooldown: 1, maxVoices: 1, priority: 5,
+    bus: 'ui', gain: 0.357, cooldown: 1, maxVoices: 1, priority: 5,
     duck: { depth: 0.3, hold: 2.2, release: 1.2 },
     play(S) {
       const v = S.voice();
@@ -161,7 +161,7 @@ const ui = {
   },
 
   achievement: {
-    bus: 'ui', gain: 0.55, cooldown: 0.4, maxVoices: 1, priority: 4,
+    bus: 'ui', gain: 0.435, cooldown: 0.4, maxVoices: 1, priority: 4,
     duck: { depth: 0.5, hold: 0.8, release: 0.8 },
     play(S) {
       const v = S.voice();
@@ -173,7 +173,7 @@ const ui = {
   },
 
   coin: {
-    bus: 'ui', gain: 0.5, cooldown: 0.02, maxVoices: 8, priority: 2,
+    bus: 'ui', gain: 0.39, cooldown: 0.02, maxVoices: 8, priority: 2,
     play(S) {
       const step = COIN_LADDER[Math.min(S.series, COIN_LADDER.length - 1)];
       const base = COIN_BASE + step;
@@ -185,7 +185,7 @@ const ui = {
   },
 
   ring: {
-    bus: 'ui', gain: 0.55, cooldown: 0.08, maxVoices: 3, priority: 3,
+    bus: 'ui', gain: 0.435, cooldown: 0.08, maxVoices: 3, priority: 3,
     play(S) {
       const v = S.voice();
       S.wet(v, 0.3);
@@ -197,7 +197,7 @@ const ui = {
   },
 
   'fuel-pickup': {
-    bus: 'ui', gain: 0.55, cooldown: 0.15, maxVoices: 2, priority: 3,
+    bus: 'ui', gain: 0.49, cooldown: 0.15, maxVoices: 2, priority: 3,
     play(S) {
       const v = S.voice();
       const pour = tremolo(v, S.t, S.t + 0.45, 24, 0.5, v.out);
@@ -210,7 +210,7 @@ const ui = {
   },
 
   repair: {
-    bus: 'ui', gain: 0.5, cooldown: 0.2, maxVoices: 2, priority: 3,
+    bus: 'ui', gain: 0.55, cooldown: 0.2, maxVoices: 2, priority: 3,
     play(S) {
       const v = S.voice();
       S.wet(v, 0.2);
@@ -226,7 +226,7 @@ const ui = {
   },
 
   'low-fuel-alarm': {
-    bus: 'ui', gain: 0.5, cooldown: 0.35, maxVoices: 1, priority: 4,
+    bus: 'ui', gain: 0.535, cooldown: 0.35, maxVoices: 1, priority: 4,
     duck: { depth: 0.75, hold: 0.3, release: 0.3 },
     play(S) {
       const v = S.voice();
@@ -239,7 +239,7 @@ const ui = {
   },
 
   warn: {
-    bus: 'ui', gain: 0.5, cooldown: 0.3, maxVoices: 1, priority: 4,
+    bus: 'ui', gain: 0.395, cooldown: 0.3, maxVoices: 1, priority: 4,
     duck: { depth: 0.8, hold: 0.2, release: 0.3 },
     play(S) {
       const v = S.voice();
@@ -268,7 +268,7 @@ const ui = {
   },
 
   'countdown-tick': {
-    bus: 'ui', gain: 0.45, cooldown: 0.1, maxVoices: 2, priority: 3,
+    bus: 'ui', gain: 0.338, cooldown: 0.1, maxVoices: 2, priority: 3,
     play(S) {
       const v = S.voice();
       tone(v, S.t, { f: S.f(880), attack: 0.002, decay: 0.05, peak: 0.6 });
@@ -278,7 +278,7 @@ const ui = {
   },
 
   'countdown-go': {
-    bus: 'ui', gain: 0.65, cooldown: 0.3, maxVoices: 1, priority: 5,
+    bus: 'ui', gain: 0.332, cooldown: 0.3, maxVoices: 1, priority: 5,
     duck: { depth: 0.55, hold: 0.4, release: 0.6 },
     play(S) {
       const v = S.voice();
@@ -295,7 +295,7 @@ const ui = {
   },
 
   toast: {
-    bus: 'ui', gain: 0.35, cooldown: 0.12, maxVoices: 2, priority: 1,
+    bus: 'ui', gain: 0.536, cooldown: 0.12, maxVoices: 2, priority: 1,
     play(S) {
       const v = S.voice();
       S.wet(v, 0.2);
@@ -310,7 +310,7 @@ const ui = {
 
 const world = {
   'stage-sep': {
-    bus: 'world', gain: 0.85, cooldown: 0.3, maxVoices: 2, priority: 4,
+    bus: 'world', gain: 0.544, cooldown: 0.3, maxVoices: 2, priority: 4,
     duck: { depth: 0.55, hold: 0.3, release: 0.8 },
     play(S) {
       const v = S.voice();
@@ -332,7 +332,7 @@ const world = {
   },
 
   liftoff: {
-    bus: 'world', gain: 0.85, cooldown: 1, maxVoices: 1, priority: 5,
+    bus: 'world', gain: 0.484, cooldown: 1, maxVoices: 1, priority: 5,
     duck: { depth: 0.6, hold: 1.0, release: 1.2 },
     play(S) {
       const v = S.voice();
@@ -346,7 +346,7 @@ const world = {
   },
 
   'thrust-cut': {
-    bus: 'world', gain: 0.6, cooldown: 0.2, maxVoices: 2, priority: 3,
+    bus: 'world', gain: 0.552, cooldown: 0.2, maxVoices: 2, priority: 3,
     play(S) {
       const v = S.voice();
       noiseHit(v, S.t, { color: 'pink', decay: 0.5, peak: 0.6, filter: { f: 2200, f2: 120 } });
@@ -356,7 +356,7 @@ const world = {
   },
 
   'parachute-open': {
-    bus: 'world', gain: 0.75, cooldown: 0.5, maxVoices: 1, priority: 4,
+    bus: 'world', gain: 0.42, cooldown: 0.5, maxVoices: 1, priority: 4,
     duck: { depth: 0.75, hold: 0.2, release: 0.6 },
     play(S) {
       const v = S.voice();
@@ -371,7 +371,7 @@ const world = {
   },
 
   'touch-soft': {
-    bus: 'world', gain: 0.8, cooldown: 0.1, maxVoices: 2, priority: 3,
+    bus: 'world', gain: 0.296, cooldown: 0.1, maxVoices: 2, priority: 3,
     play(S) {
       const v = S.voice();
       const dusty = S.body !== 'earth';
@@ -383,7 +383,7 @@ const world = {
   },
 
   'touch-hard': {
-    bus: 'world', gain: 0.9, cooldown: 0.1, maxVoices: 2, priority: 4,
+    bus: 'world', gain: 0.342, cooldown: 0.1, maxVoices: 2, priority: 4,
     duck: { depth: 0.5, hold: 0.3, release: 0.7 },
     play(S) {
       const v = S.voice();
@@ -401,7 +401,7 @@ const world = {
   },
 
   crash: {
-    bus: 'world', gain: 1, cooldown: 0.5, maxVoices: 1, priority: 6,
+    bus: 'world', gain: 0.43, cooldown: 0.5, maxVoices: 1, priority: 6,
     duck: { depth: 0.25, hold: 1.8, release: 1.5 },
     play(S) {
       const v = S.voice();
@@ -420,7 +420,7 @@ const world = {
   },
 
   explosion: {
-    bus: 'world', gain: 0.9, cooldown: 0.15, maxVoices: 2, priority: 5,
+    bus: 'world', gain: 0.396, cooldown: 0.15, maxVoices: 2, priority: 5,
     duck: { depth: 0.45, hold: 0.6, release: 0.8 },
     play(S) {
       const size = clamp(S.p.size ?? 1, 0.4, 1.6);
@@ -434,7 +434,7 @@ const world = {
   },
 
   'transfer-start': {
-    bus: 'world', gain: 0.8, cooldown: 1, maxVoices: 1, priority: 5,
+    bus: 'world', gain: 0.504, cooldown: 1, maxVoices: 1, priority: 5,
     duck: { depth: 0.5, hold: 1.5, release: 1.2 },
     play(S) {
       const v = S.voice();
@@ -453,7 +453,7 @@ const world = {
   },
 
   'transfer-done': {
-    bus: 'world', gain: 0.75, cooldown: 1, maxVoices: 1, priority: 5,
+    bus: 'world', gain: 0.405, cooldown: 1, maxVoices: 1, priority: 5,
     duck: { depth: 0.55, hold: 1.2, release: 1.2 },
     play(S) {
       const v = S.voice();
@@ -466,7 +466,7 @@ const world = {
   },
 
   'storm-thunder': {
-    bus: 'world', gain: 1, cooldown: 1, maxVoices: 2, priority: 3,
+    bus: 'world', gain: 0.76, cooldown: 1, maxVoices: 2, priority: 3,
     duck: { depth: 0.5, hold: 1.2, release: 1.2 },
     play(S) {
       const side = S.rng.range(-0.5, 0.5);
@@ -492,7 +492,7 @@ const world = {
   },
 
   'near-miss': {
-    bus: 'world', gain: 0.75, cooldown: 0.3, maxVoices: 2, priority: 3,
+    bus: 'world', gain: 0.668, cooldown: 0.3, maxVoices: 2, priority: 3,
     play(S) {
       const side = S.p.side === -1 || S.p.side === 1 ? S.p.side : S.rng.sign();
       const v = S.voice({ pan: 0 });
@@ -525,7 +525,7 @@ const world = {
   },
 
   hit: {
-    bus: 'world', gain: 0.85, cooldown: 0.12, maxVoices: 2, priority: 4,
+    bus: 'world', gain: 0.272, cooldown: 0.12, maxVoices: 2, priority: 4,
     duck: { depth: 0.5, hold: 0.25, release: 0.5 },
     play(S) {
       const v = S.voice();

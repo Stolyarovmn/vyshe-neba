@@ -22,7 +22,7 @@ test('fuel balance: what leaves the tank equals burn rate times the throttle act
 test('fuel balance: idle engine burns nothing, turning burns a little, afterburner burns more', () => {
   const idle = airborne(5000);
   advance(idle, { throttle: 0 }, 3);
-  assert.equal(idle.fuelTotal, idle.fuelTotal);
+  assert.equal(idle.fuelTotal, idle.stages[0].maxFuel + idle.stages[1].maxFuel);
   assert.equal(idle.stages[0].fuel, idle.stages[0].maxFuel);
 
   const turning = airborne(5000);

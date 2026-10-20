@@ -116,12 +116,12 @@ const islandSharp = new WeakMap();
  * плавное приведение к экранному размеру. Края пикселей остаются чёткими при любом масштабе,
  * а крупные неровные «кирпичи» от нецелого коэффициента (4,3 ед. на пиксель) пропадают.
  */
-function sharpIsland(asset) {
+function sharpIsland(asset, makeCanvas) {
   let canvas = islandSharp.get(asset);
   if (!canvas) {
     const w = asset.w * ISLAND_PREUPSCALE;
     const h = asset.h * ISLAND_PREUPSCALE;
-    canvas = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(w, h) : Object.assign(document.createElement('canvas'), { width: w, height: h });
+    canvas = makeCanvas(w, h);
     const g = canvas.getContext('2d');
     g.imageSmoothingEnabled = false;
     g.drawImage(asset.img, 0, 0, w, h);
@@ -142,7 +142,7 @@ export function drawIsland(ctx, painter, view) {
   const y1 = view.sy(ISLAND_Y_TOP + height);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'low';
-  ctx.drawImage(sharpIsland(asset), x0, y0, x1 - x0, y1 - y0);
+  ctx.drawImage(sharpIsland(asset, painter.makeCanvas), x0, y0, x1 - x0, y1 - y0);
   ctx.imageSmoothingEnabled = false;
   return true;
 }

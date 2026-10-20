@@ -2,12 +2,15 @@
 // ракета на столе, облака, волны, погода, самолёты и дроны; тап по постройкам и подсветка выбора.
 
 import { createView } from './camera.js';
-import { BUILDING_ANCHORS, BUILDING_KEYS, ISLAND, spriteName } from './manifest.js';
+import { ensureWorld } from './layout.js';
+import {
+  BUILDING_ANCHORS, BUILDING_KEYS, ISLAND, eraYear, spriteName,
+} from './manifest.js';
 import { CLOUD_LAYERS_HUB, drawClouds, drawRain, drawSky, drawSun } from './sky.js';
 import { drawIsland, drawOcean } from './ground.js';
 import { drawPlacedBuildings } from './buildings.js';
 import { createRocketPose, drawRocket, stackHeight } from './rocket.js';
-import { aircraftChoice, drawAircraft, drawDrone } from './traffic.js';
+import { drawAircraft, drawDrone } from './traffic.js';
 import { drawLaunchTable } from './launchpad.js';
 import { fillWorldRect } from './painter.js';
 import { clamp, damp, hash2 } from './util.js';
@@ -18,7 +21,7 @@ const FOCUS_RATE = 5;
 const MIN_TOUCH_CSS = 48;
 const CAPSULE_DISPLAY_X = -50;
 
-export function createHub(painter) {
+export function createHub(painter, shared) {
   const view = createView();
   const pose = createRocketPose();
   const rects = new Map();
@@ -64,8 +67,8 @@ export function createHub(painter) {
   }
 
   function clampFocus(x, vw) {
-    const lo = ISLAND.left + vw * 0.3;
-    const hi = ISLAND.left + ISLAND.width - vw * 0.3;
+    const lo = ISLAND.left + vw * 0.12;
+    const hi = ISLAND.left + ISLAND.width - vw * 0.12;
     return clamp(x, Math.min(lo, hi), Math.max(lo, hi));
   }
 
@@ -136,12 +139,13 @@ export function createHub(painter) {
     draw(ctx, params) {
       const { profile, time, layout } = params;
       const weather = params.weather || null;
+      if (shared) shared.profile = profile;
       if (params.selected !== undefined) state.selected = params.selected;
       const canvas = ctx.canvas;
       const devW = canvas.width;
       const devH = canvas.height;
       const devPerCss = devW / layout.w;
-      const px = layout.world.hubPx;
+      const px = ensureWorld(layout).hubPx;
       const vw = devW / px;
       const dt = state.lastTime === null ? 0 : clamp(time - state.lastTime, 0, 0.1);
       state.lastTime = time;
@@ -238,8 +242,8 @@ function drawHubPlanes(ctx, painter, view, time, profile) {
     const t = (time * lane.speed + lane.phase * span) % span;
     const wx = lane.dir > 0 ? -span / 2 + t : span / 2 - t;
     const lineage = i === 1 ? 'medium_passenger' : i === 2 ? 'high_fighter' : 'low_primary';
-    const choice = aircraftChoice(i * 91 + 7, lineage === 'high_fighter' ? 1300 : lineage === 'medium_passenger' ? 700 : 100, era);
-    const name = `${lineage}_${choice ? choice.name.slice(-4) : '1978'}`;
+    // Второй самолёт — техника предыдущей эпохи: небо не меняется целиком за один шаг.
+    const name = `${lineage}_${eraYear(i === 1 ? era - 1 : era)}`;
     const world = -lane.alt - Math.sin(time * 0.3 + i) * 3;
     drawAircraft(ctx, painter, view, name, lineage, wx, world, lane.dir, time, lane.width);
   }

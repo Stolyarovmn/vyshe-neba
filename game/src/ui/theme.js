@@ -27,8 +27,8 @@ const BASE = {
 
 // палитра для дальтоников (Окабе–Ито): сине-оранжевая пара вместо зелёно-красной
 const COLORBLIND = {
-  green: '#56b4e9',
-  red: '#ff8a3d',
+  green: '#6cc3f2',
+  red: '#ff7a30',
   amber: '#f0e442',
   amberDeep: '#8a7d00',
 };
@@ -48,7 +48,7 @@ const VARIANTS = {
   dangerHover: { fill: '#d4413a', hi: '#ffa294', lo: '#6d1519' },
   dangerPress: { fill: '#8e2420', hi: '#6d1519', lo: '#ff8b7c' },
   good: { fill: '#1f7a46', hi: '#5fd18a', lo: '#0e4125' },
-  goodHover: { fill: '#278f55', hi: '#7fe3a5', lo: '#0e4125' },
+  goodHover: { fill: '#22804b', hi: '#7fe3a5', lo: '#0e4125' },
   goodPress: { fill: '#175c35', hi: '#0e4125', lo: '#5fd18a' },
   disabled: { fill: '#1a2238', hi: '#27324e', lo: '#0d1424' },
   tab: { fill: '#18223a', hi: '#2a3a5c', lo: '#0a1020' },

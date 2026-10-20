@@ -23,7 +23,11 @@
 <div id="bar">
   <label>Режим <select id="mode"><option value="hub">хаб</option><option value="flight">полёт</option></select></label>
   <label>Кадр <select id="frameSel">
+    <option value="fit">по размеру окна</option>
     <option value="960x540@2">ландшафт 960x540 @2</option>
+    <option value="640x360@3">мини 640x360 @3</option>
+    <option value="480x270@2">мини 480x270 @2</option>
+    <option value="270x480@2">мини портрет 270x480 @2</option>
     <option value="844x390@2">телефон гориз. 844x390 @2</option>
     <option value="360x640@2">портрет 360x640 @2</option>
     <option value="390x844@1">портрет 390x844 @1</option>
@@ -45,11 +49,12 @@
     <label>Сценарий <select id="scenario">
       <option value="pad">на столе</option><option value="launch">старт</option><option value="ascent">подъём</option>
       <option value="space">космос</option><option value="descent">спуск</option><option value="chute">парашют</option><option value="landing">посадка</option>
-      <option value="loop">полный цикл</option><option value="free">ручной</option></select></label>
+      <option value="loop">полный цикл</option><option value="sim">настоящая sim</option><option value="free">ручной</option></select></label>
     <label>Высота <input id="alt" type="range" min="0" max="12000" value="0" step="10"><span id="altv">0</span></label>
     <label>Тяга <input id="thr" type="range" min="0" max="1" value="0" step="0.05"></label>
     <label>Угол <input id="ang" type="range" min="-1.2" max="1.2" value="0" step="0.05"></label>
     <label><input type="checkbox" id="objs" checked> объекты</label>
+    <label>Скорость sim <select id="simSpeed"><option>1</option><option>2</option><option>4</option><option>8</option></select></label>
     <label>Ступень <select id="stage"><option value="booster">booster</option><option value="core">core</option><option value="capsule">capsule</option></select></label>
     <button id="evBtn">событие: удар</button><button id="sepBtn">событие: ступень</button>
   </span>

@@ -4,7 +4,7 @@
 import {
   AIRCRAFT_DISPLAY_WIDTH, AIRCRAFT_LAYERS, AIRCRAFT_PREVIOUS_ERA_MIX, BASE_DRONES, eraYear,
 } from './manifest.js';
-import { clamp, hash2 } from './util.js';
+import { hash2 } from './util.js';
 
 function weighted(weights, r) {
   let acc = 0;
@@ -217,4 +217,3 @@ export function drawDrone(ctx, painter, view, index, wx, wy, widthUnits, time) {
   return true;
 }
 
-export { clamp };

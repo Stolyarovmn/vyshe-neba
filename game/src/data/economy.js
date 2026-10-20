@@ -18,23 +18,26 @@ export const START_DATA = 0;
 // The launch table brings its own small generator, so the first buildings work without an energy node.
 export const BASE_POWER_SUPPLY = 12;
 
+// Every module and building price is multiplied by this before rounding.
+export const PRICE_SCALE = 1.15;
+
 // The sum of all discounts (era, factory, service) never exceeds this share of the price.
 export const MAX_DISCOUNT = 0.5;
 
 // Flight payout. travel = (K * (km + OFFSET) ^ EXP + SQRT_DIST * sqrt(meters)) * body multiplier * income.
 export const PAYOUT = {
-  travelK: 26,
+  travelK: 6.5,
   travelOffsetKm: 0.3,
-  travelExp: 0.68,
-  distanceK: 0.3,
-  landingBonus: 18, // soft touchdown, before the era scale
-  perfectBonus: 30, // extra for a perfect touchdown, multiplied by the beacon bonus
+  travelExp: 0.85,
+  distanceK: 0.2,
+  landingBonus: 12, // soft touchdown, before the era scale
+  perfectBonus: 20, // extra for a perfect touchdown, multiplied by the beacon bonus
   crashTravelShare: 0.5, // share of the path payout kept after a crash
   eraScale: 0.2, // every era adds this share to landing bonuses
   body: {
     earth: { mult: 1, expedition: 0 },
-    moon: { mult: 1.25, expedition: 700 },
-    mars: { mult: 1.6, expedition: 2200 },
+    moon: { mult: 1.25, expedition: 900 },
+    mars: { mult: 1.6, expedition: 1500 },
   },
 };
 
@@ -46,8 +49,8 @@ export const DATA_GAIN = {
   landingBase: 0.5,
   landingPerSqrtKm: 0.28,
   abandoned: 0,
-  firstLanding: { moon: 90, mars: 220 },
-  repeatLanding: { moon: 7, mars: 14 },
+  firstLanding: { moon: 110, mars: 280 },
+  repeatLanding: { moon: 12, mars: 26 },
 };
 
 // Altitude zones (meters) with the data paid when the profile crosses them for the first time.

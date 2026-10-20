@@ -36,16 +36,16 @@ export default {
       const r = G.destCards[i];
       const on = st.dest === d.id;
       const variant = on ? 'cardOn' : 'card';
-      const clicked = kit.button(`dest-${d.id}`, r, { variant, locked: !d.ok });
+      const clicked = kit.button(`launch-dest-${d.id}`, r, { variant, locked: !d.ok });
       if (clicked) st.dest = d.id;
-      else if (kit.denied === `dest-${d.id}`) kit.toast(t('launch.closed'), { kind: 'bad', icon: 'lock' });
+      else if (kit.denied === `launch-dest-${d.id}`) kit.toast(t('launch.closed'), { kind: 'bad', icon: 'lock' });
       const pad = L.pad;
       const ic = Math.round((L.portrait ? 40 : 52) * L.ui);
       kit.icon(DEST_ICON[d.id], r.x + pad + ic / 2, r.y + pad + ic / 2, ic, d.ok ? c.text : c.textMute, d.ok ? 1 : 0.6);
       const tx = r.x + pad + ic + L.gap;
       const tw = r.w - (tx - r.x) - pad;
       kit.drawText(d.name, tx, r.y + pad + kit.fs(10), { size: kit.fs(17), color: d.ok ? (on ? c.amber : c.text) : c.textDim, maxWidth: tw });
-      const used = kit.paragraph(d.desc, L.portrait ? tx : r.x + pad, L.portrait ? r.y + pad + kit.fs(24) : r.y + pad + ic + L.gap, L.portrait ? tw : r.w - pad * 2, { size: kit.fs(12), color: c.textDim, maxLines: 2, lineHeight: 1.2 });
+      const used = kit.paragraph(d.desc, L.portrait ? tx : r.x + pad, L.portrait ? r.y + pad + kit.fs(24) : r.y + pad + ic + L.gap, L.portrait ? tw : r.w - pad * 2, { size: kit.fs(12), color: c.textDim, maxLines: L.portrait ? 2 : 4, lineHeight: 1.2 });
       let y = (L.portrait ? r.y + pad + kit.fs(24) : r.y + pad + ic + L.gap) + used + L.gap * 0.5;
       if (d.ok) {
         kit.icon('check', (L.portrait ? tx : r.x + pad) + kit.fs(7), y + kit.fs(8), kit.fs(14), c.green);

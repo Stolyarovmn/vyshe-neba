@@ -58,9 +58,12 @@ const COLOR_VARIANTS = [
   ramp([[226, 160, 120], [184, 112, 84], [128, 76, 62]]), // 7: марсианская пыль
   ramp([[255, 240, 200], [255, 160, 70], [90, 40, 30]]), // 8: огонь взрыва
   ramp([[96, 92, 92], [62, 60, 62], [34, 34, 38]]), // 9: чёрный дым
+  ramp([[238, 238, 230], [206, 206, 200], [150, 150, 148]]), // 10: белая обшивка
+  ramp([[226, 74, 62], [180, 56, 50], [110, 44, 44]]), // 11: красная обшивка
 ];
 export const PALETTE_VARIANT = Object.freeze({
   DEFAULT: 0, PLASMA: 1, GREEN: 2, GOLD: 3, RED: 4, CYAN: 5, MOON_DUST: 6, MARS_DUST: 7, FIREBALL: 8, BLACK_SMOKE: 9,
+  HULL_WHITE: 10, HULL_RED: 11,
 });
 
 export function createParticles(capacity = 900) {

@@ -146,6 +146,7 @@ export function createAutopilot(options = {}) {
     if (mode === 'wait') {
       out.tilt = tiltToward(s, 0);
       if (s.canTransfer) out.transfer = true;
+      else if (s.fuelTotal < s.transferCostFuel) mode = 'flip'; // not enough fuel to go: turn back
       return out;
     }
 

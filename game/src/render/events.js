@@ -68,21 +68,24 @@ function sparks(env, x, y, count, power = 1, variant = 0) {
 
 function explosion(env, x, y) {
   const { particles, rng, reduceMotion } = env;
-  particles.emit(PARTICLE.FLASH, x, y, 0, 0, 0.35, 12, 70, 0, 0, PALETTE_VARIANT.FIREBALL);
-  particles.emit(PARTICLE.FLASH, x, y, 0, 0, 0.5, 6, 44, 0, 0, PALETTE_VARIANT.DEFAULT);
+  particles.emit(PARTICLE.FLASH, x, y, 0, 0, 0.45, 14, 96, 0, 0, PALETTE_VARIANT.FIREBALL);
+  particles.emit(PARTICLE.FLASH, x, y, 0, 0, 0.65, 8, 62, 0, 0, PALETTE_VARIANT.DEFAULT);
   emitBurst(particles, rng, {
-    kind: PARTICLE.FLAME, x, y, count: scaled(36, reduceMotion), speed: [20, 110], ttl: [0.4, 0.9], size: [4, 9],
-    gravity: 20, drag: 1.2, variant: PALETTE_VARIANT.FIREBALL, angle: -Math.PI / 2, spread: Math.PI, shrink: 0.2,
+    kind: PARTICLE.FLAME, x, y, count: scaled(46, reduceMotion), speed: [20, 130], ttl: [0.45, 1.1], size: [5, 12],
+    gravity: 18, drag: 1.1, variant: PALETTE_VARIANT.FIREBALL, angle: -Math.PI / 2, spread: Math.PI, shrink: 0.2,
   });
   emitBurst(particles, rng, {
-    kind: PARTICLE.SMOKE, x, y, count: scaled(30, reduceMotion), speed: [8, 55], ttl: [1.4, 3.2], size: [6, 12],
+    kind: PARTICLE.SMOKE, x, y, count: scaled(34, reduceMotion), speed: [8, 60], ttl: [1.6, 3.8], size: [7, 15],
     gravity: -10, drag: 0.8, variant: PALETTE_VARIANT.BLACK_SMOKE, angle: -Math.PI / 2, spread: Math.PI, shrink: 2.4,
   });
-  emitBurst(particles, rng, {
-    kind: PARTICLE.DEBRIS, x, y, count: scaled(26, reduceMotion), speed: [40, 190], ttl: [1.6, 3.6], size: [2, 5],
-    gravity: 170, drag: 0.3, angle: -Math.PI / 2, spread: Math.PI * 0.85, shrink: 1,
-  });
-  sparks(env, x, y, 26, 1.4, PALETTE_VARIANT.DEFAULT);
+  // Осколки обшивки: белые и красные, часть остаётся лежать на земле надолго.
+  for (const variant of [PALETTE_VARIANT.HULL_WHITE, PALETTE_VARIANT.HULL_RED]) {
+    emitBurst(particles, rng, {
+      kind: PARTICLE.DEBRIS, x, y, count: scaled(11, reduceMotion), speed: [40, 200], ttl: [4, 14], size: [2.5, 6],
+      gravity: 170, drag: 0.3, variant, angle: -Math.PI / 2, spread: Math.PI * 0.85, shrink: 1,
+    });
+  }
+  sparks(env, x, y, 30, 1.5, PALETTE_VARIANT.DEFAULT);
 }
 
 /**
@@ -182,11 +185,11 @@ function applyEvent(e, env) {
       break;
     }
     case 'transfer-start':
-      flash(env, 0.75, 215, 235, 255);
+      flash(env, 0.5, 215, 235, 255);
       camera.addTrauma(0.5);
       break;
     case 'transfer-done':
-      flash(env, 1, 235, 245, 255);
+      flash(env, 0.7, 235, 245, 255);
       camera.addTrauma(0.3);
       break;
     case 'touch': {

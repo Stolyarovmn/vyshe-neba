@@ -135,7 +135,8 @@ class Voice {
     this.add(node);
     this.sources.push(node);
     this.pending++;
-    node.onended = () => this.sourceEnded();
+    // Offline renders never touch the graph while it renders: keeps them repeatable.
+    if (!this.toolkit.offline) node.onended = () => this.sourceEnded();
     if (offset === undefined) node.start(start);
     else node.start(start, offset);
     node.stop(stop);
@@ -180,18 +181,20 @@ class Voice {
   dispose() {
     if (this.finished) return;
     this.finished = true;
-    for (const node of this.nodes) {
-      try {
-        node.disconnect();
-      } catch {
-        // already disconnected
+    if (!this.toolkit.offline) {
+      for (const node of this.nodes) {
+        try {
+          node.disconnect();
+        } catch {
+          // already disconnected
+        }
       }
     }
     this.toolkit.forget(this);
   }
 }
 
-export function createToolkit({ ctx, noise, rng, now, limits = {} }) {
+export function createToolkit({ ctx, noise, rng, now, limits = {}, offline = false }) {
   const voices = new Set();
   const capacity = { sfx: 36, music: 72, ...limits };
   const stats = { created: 0, stolen: 0, peak: 0 };
@@ -201,6 +204,7 @@ export function createToolkit({ ctx, noise, rng, now, limits = {} }) {
     noise,
     rng,
     now,
+    offline,
     stats,
 
     voice(options) {

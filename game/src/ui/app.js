@@ -61,6 +61,9 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     errors: [],
     standFrame: null,
     pendingSave: false,
+    ui: {},
+    hudTargets: {},
+    hubSelected: null,
   };
 
   // ---------- размеры ----------
@@ -79,6 +82,23 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
   };
 
   Object.defineProperty(app, 'settings', { get: () => app.profile.settings });
+
+  // сенсорные элементы: по настройке, а в режиме «авто» — когда замечено касание или экран сенсорный
+  const coarse = () => {
+    try {
+      return !!globalThis.matchMedia?.('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
+    } catch {
+      return false;
+    }
+  };
+  Object.defineProperty(app, 'touchUi', {
+    get() {
+      const pref = app.prefs.touchControls;
+      if (pref === 'on') return true;
+      if (pref === 'off') return false;
+      return input.touchSeen || coarse();
+    },
+  });
 
   app.relayout = () => {
     if (app.layoutInputs) app.layout = mergeLayouts(app.layoutInputs.base0, app.layoutInputs.rl, { mirror: app.settings.touchLayout === 'left' });
@@ -166,6 +186,32 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
   };
 
   app.toast = (msg, o) => kit.toast(msg, o);
+
+  /** Заменить профиль целиком (импорт сохранения): состояние интерфейса сбрасывается. */
+  app.replaceProfile = (p) => {
+    let next = p;
+    try {
+      next = app.rules.refillContracts ? app.rules.refillContracts(p) : p;
+    } catch {
+      next = p;
+    }
+    app.commit(next);
+    app.ui = {};
+    app.history.length = 0;
+    applySettings();
+    app.relayout();
+  };
+
+  app.resetProgress = () => {
+    const fresh = store.create();
+    app.prefs.seen = {};
+    savePrefs(app.prefs);
+    app.replaceProfile({ ...fresh, settings: { ...app.settings, tutorial: { done: false, step: 0 } } });
+    app.go('hub');
+  };
+
+  /** Прямоугольник цели интерфейса по id (для тестов): области кадра или геометрия полётных элементов. */
+  app.target = (id) => kit.rectOf(id) || app.hudTargets[id] || null;
 
   // ---------- команды экранов ----------
 
@@ -462,6 +508,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       console.error('[app] settleFlight:', err);
     }
     app.commit(settled.profile);
+    if (!app.settings.tutorial?.done && (result.outcome === 'landed' || result.outcome === 'crashed')) app.setSetting('tutorial', { done: true, step: 99 });
     app.results = { result, report: settled.report || {}, before, after: settled.profile, config: s.config, destination: s.destination, consumables: s.consumables };
     audio.music.set?.({ scene: 'results' });
     app.session = null;
@@ -472,14 +519,15 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
 
   function drawBackground(screen) {
     const L = app.layout;
-    const bg = SCREENS[screen].background || 'hub';
+    let bg = SCREENS[screen].background || 'hub';
+    if (app.countdown) bg = 'hub';
     if (bg === 'flight' && app.session) {
       renderer.flight.draw(ctx, { flight: app.session.flight, config: app.session.config, time: app.time, layout: L, settings: app.settings });
     } else if (bg === 'blueprint') {
       drawBlueprint(ctx, L, app.time, app.profile.era);
     } else {
       try {
-        renderer.hub.draw(ctx, { profile: app.profile, time: app.time, layout: L });
+        renderer.hub.draw(ctx, { profile: app.profile, time: app.time, layout: L, selected: app.screen === 'hub' ? app.hubSelected : null });
       } catch (err) {
         drawBlueprint(ctx, L, app.time, app.profile.era);
         if (!app.hubErrored) {
@@ -502,6 +550,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     ctx.setTransform(L.dpr, 0, 0, L.dpr, 0, 0);
     ctx.imageSmoothingEnabled = false;
 
+    L.hud.touchVisible = app.touchUi;
     if (app.countdown) tickCountdown(dt);
     if (app.screen === 'flight') flightTick(dt);
     else if (app.standFrame) {

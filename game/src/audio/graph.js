@@ -14,7 +14,10 @@ import { clamp, clamp01, lerp, volumeToGain } from './util.js';
 export const CEILING = 0.83;
 const KNEE = 0.6;
 
-const MUSIC_TRIM = 0.85;
+const ECHO_TAPS = 5;
+const ECHO_MAX = 2.9;
+
+const MUSIC_TRIM = 0.45;
 const SFX_TRIM = 1;
 
 // Gentle at low levels, saturating smoothly into the ceiling.
@@ -119,9 +122,13 @@ export function createGraph(ctx, { rng, now }) {
   const airFilter = filter('lowpass', 18000, 0.5);
   const worldIn = gain(1);
   const engineIn = gain(1);
+  // Everything diegetic passes this gate, so a paused game goes quiet at once,
+  // reverb tails included.
+  const diegeticGate = gain(1);
   worldIn.connect(airFilter);
   engineIn.connect(airFilter);
-  airFilter.connect(sfxVolume);
+  airFilter.connect(diegeticGate);
+  diegeticGate.connect(sfxVolume);
 
   const worldConvolver = own(ctx.createConvolver());
   worldConvolver.buffer = makeImpulse(ctx, rng.fork('world-room'), { seconds: 2.4, decay: 2.1 });
@@ -139,7 +146,7 @@ export function createGraph(ctx, { rng, now }) {
   uiIn.connect(uiReverbSend);
   uiReverbSend.connect(worldConvolver);
   worldConvolver.connect(worldReverbReturn);
-  worldReverbReturn.connect(sfxVolume);
+  worldReverbReturn.connect(diegeticGate);
 
   // ---- music ----
   const musicTone = filter('lowpass', 9000, 0.5);
@@ -162,35 +169,39 @@ export function createGraph(ctx, { rng, now }) {
   musicConvolver.connect(musicReverbReturn);
   musicReverbReturn.connect(musicTone);
 
-  // Ping-pong echo: left tap feeds the right tap, which feeds back to the left.
+  // Ping-pong echo built from unrolled taps instead of a feedback loop: a loop
+  // with two delay nodes is rendered in a pointer-dependent order by Chrome,
+  // which shifts the echoes by a render quantum and breaks repeatable renders.
   const echoIn = gain(1);
   const echoHigh = filter('highpass', 220, 0.5);
-  const echoLeft = own(ctx.createDelay(3));
-  const echoRight = own(ctx.createDelay(3));
-  const echoDarkL = filter('lowpass', 3600, 0.5);
-  const echoDarkR = filter('lowpass', 3200, 0.5);
-  const echoFeedL = gain(0.38);
-  const echoFeedR = gain(0.38);
-  const echoPanL = own(ctx.createStereoPanner());
-  const echoPanR = own(ctx.createStereoPanner());
-  echoPanL.pan.value = -0.65;
-  echoPanR.pan.value = 0.65;
-  const echoReturn = gain(0.75);
-  echoLeft.delayTime.value = 0.4;
-  echoRight.delayTime.value = 0.4;
   echoIn.connect(echoHigh);
-  echoHigh.connect(echoLeft);
-  echoLeft.connect(echoDarkL);
-  echoDarkL.connect(echoPanL);
-  echoPanL.connect(echoReturn);
-  echoDarkL.connect(echoFeedL);
-  echoFeedL.connect(echoRight);
-  echoRight.connect(echoDarkR);
-  echoDarkR.connect(echoPanR);
-  echoPanR.connect(echoReturn);
-  echoDarkR.connect(echoFeedR);
-  echoFeedR.connect(echoLeft);
+  const echoReturn = gain(0.75);
   echoReturn.connect(musicTone);
+  const echoTaps = Array.from({ length: ECHO_TAPS }, (_, i) => {
+    const delay = own(ctx.createDelay(ECHO_MAX));
+    delay.delayTime.value = 0.4 * (i + 1);
+    const dark = filter('lowpass', 3800 / (1 + 0.45 * i), 0.5);
+    const level = gain(0);
+    const pan = own(ctx.createStereoPanner());
+    pan.pan.value = i % 2 === 0 ? -0.65 : 0.65;
+    echoHigh.connect(delay);
+    delay.connect(dark);
+    dark.connect(level);
+    level.connect(pan);
+    pan.connect(echoReturn);
+    return { delay, level };
+  });
+  let echoState = { time: 0.4, feedback: 0.38 };
+
+  function setEcho(time, feedback, when) {
+    echoState = { time, feedback };
+    echoTaps.forEach((tap, i) => {
+      const at = time * (i + 1);
+      tau(tap.delay.delayTime, Math.min(at, ECHO_MAX), when, 0.35);
+      tau(tap.level.gain, at <= ECHO_MAX ? Math.pow(feedback, i) * 0.9 : 0, when, 0.3);
+    });
+  }
+  setEcho(0.4, 0.38, 0);
 
   // ---- control surface ----
   let duck = { depth: 1, until: 0 };
@@ -209,6 +220,10 @@ export function createGraph(ctx, { rng, now }) {
       graph.volumes = { ...graph.volumes, ...definedOnly({ master: m, music, sfx }) };
     },
 
+    setPaused(paused, when = now()) {
+      tau(diegeticGate.gain, paused ? 0 : 1, when, paused ? 0.03 : 0.12);
+    },
+
     setMuted(muted, when = now()) {
       graph.muted = Boolean(muted);
       tau(master.gain, graph.muted ? 0 : volumeToGain(graph.volumes.master), when, 0.03);
@@ -224,13 +239,8 @@ export function createGraph(ctx, { rng, now }) {
     setMusicSpace({ cutoff, reverb, echoTime, echoFeedback }, when = now()) {
       if (cutoff !== undefined) tau(musicTone.frequency, clamp(cutoff, 200, 20000), when, 0.6);
       if (reverb !== undefined) tau(musicReverbSend.gain, clamp01(reverb) * 1.4, when, 0.5);
-      if (echoTime !== undefined) {
-        tau(echoLeft.delayTime, clamp(echoTime, 0.05, 2.9), when, 0.35);
-        tau(echoRight.delayTime, clamp(echoTime, 0.05, 2.9), when, 0.35);
-      }
-      if (echoFeedback !== undefined) {
-        tau(echoFeedL.gain, clamp(echoFeedback, 0, 0.7), when, 0.3);
-        tau(echoFeedR.gain, clamp(echoFeedback, 0, 0.7), when, 0.3);
+      if (echoTime !== undefined || echoFeedback !== undefined) {
+        setEcho(clamp(echoTime ?? echoState.time, 0.05, ECHO_MAX), clamp(echoFeedback ?? echoState.feedback, 0, 0.7), when);
       }
     },
 

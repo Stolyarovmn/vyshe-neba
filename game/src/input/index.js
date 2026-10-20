@@ -167,6 +167,10 @@ export function createInput(canvas, getLayout, opts = {}) {
       if (mode !== 'flight') return mergeInputs([]);
       return mergeInputs([keyboard.poll(d, settings.controlMode), touchModel.poll(t, settings.controlMode), gamepad.pollFlight(settings.controlMode)]);
     },
+    /** Разовое действие из интерфейса (кнопки HUD при управлении мышью). */
+    pulse(name) {
+      keyboard.model.pulses.add(name);
+    },
     /** События интерфейса с прошлого кадра. */
     drain(dt = 1 / 60) {
       if (mode === 'ui') for (const e of gamepad.pollUi(dt)) queue.push(e);

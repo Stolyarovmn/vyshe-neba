@@ -1,0 +1,109 @@
+// Balance checks: the rational-player bot has to finish every era near its target time (DESIGN 4.7).
+
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { BUILDINGS, ERAS, PARTS } from '../src/data/index.js';
+import { fresh } from '../src/state/index.js';
+import { getBuildingState, makeFlightConfig, settleFlight } from '../src/rules/index.js';
+import { CAMPAIGN, evaluate, runBot, TARGETS } from '../tools/economy-bot.mjs';
+import { playFlight, safeReach, simulateSortie } from '../tools/economy-bot-adapter.mjs';
+import { makeProfile, landedResult } from './rules-helpers.mjs';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const botFile = path.join(here, '..', 'tools', 'economy-bot.mjs');
+
+function describe(run) {
+  return run.eras.map((e) => `E${e.era}: ${e.minutes.toFixed(1)} min`).join(', ');
+}
+
+test('bot: the default run fits every era window and the 10-14 hour campaign', async () => {
+  const run = await runBot({ seed: 1 });
+  const verdict = evaluate(run);
+  assert.equal(run.reachedFinalEra, true, 'E5 is reached');
+  for (const row of verdict.rows) {
+    assert.ok(row.ok, `E${row.era}->E${row.era + 1}: ${row.actual?.minutes.toFixed(1)} min, window ${row.min}-${row.max}`);
+  }
+  assert.ok(verdict.totalOk, `campaign ${run.minutes.toFixed(0)} min, window ${CAMPAIGN.min}-${CAMPAIGN.max}`);
+  const first = run.eras[0];
+  assert.ok(first.minutes >= 25 && first.minutes <= 35, `first era ${first.minutes.toFixed(1)} min`);
+});
+
+test('bot: other seeds stay within +-30% of every target', async () => {
+  for (const seed of [2, 3, 4]) {
+    const run = await runBot({ seed });
+    assert.equal(run.reachedFinalEra, true, `seed ${seed}`);
+    for (const target of TARGETS) {
+      const actual = run.eras.find((e) => e.era === target.era).minutes;
+      assert.ok(Math.abs(actual - target.minutes) / target.minutes <= 0.3, `seed ${seed}: E${target.era} took ${actual.toFixed(1)} min (target ${target.minutes}); ${describe(run)}`);
+    }
+    assert.ok(run.minutes >= CAMPAIGN.min && run.minutes <= CAMPAIGN.max, `seed ${seed}: campaign ${run.minutes.toFixed(0)} min`);
+  }
+});
+
+test('bot: a clumsier pilot is slower but still finishes', async () => {
+  const careful = await runBot({ seed: 1, skill: 0.9 });
+  const clumsy = await runBot({ seed: 1, skill: 0.4 });
+  assert.equal(clumsy.reachedFinalEra, true);
+  assert.ok(clumsy.minutes >= careful.minutes * 0.9, 'skill does not make the game faster');
+  assert.ok(clumsy.minutes <= CAMPAIGN.max * 1.6, `clumsy campaign ${clumsy.minutes.toFixed(0)} min`);
+});
+
+test('bot: crashes never wipe the progress', async () => {
+  const run = await runBot({ seed: 3, skill: 0.4 });
+  assert.ok(run.profile.stats.crashes > 0, 'the clumsy pilot crashes sometimes');
+  assert.ok(run.profile.coins >= 0);
+  assert.ok(run.profile.era === 5);
+});
+
+test('the first upgrade costs one or two flights', () => {
+  const cheapest = Math.min(...Object.keys(BUILDINGS).map((key) => getBuildingState(fresh(), key)).filter((s) => s.next.requires.every((r) => r.era == null || r.era === 0)).map((s) => s.next.cost));
+  const profile = fresh();
+  const afterFirst = settleFlight(profile, landedResult({ maxAlt: 90, distance: 150, coinsPicked: 6, rings: 0, pickups: 1 })).profile;
+  const twoFlights = settleFlight(afterFirst, landedResult({ maxAlt: 90, distance: 150, coinsPicked: 6, rings: 0, pickups: 1 })).profile;
+  assert.ok(twoFlights.coins >= cheapest, `two flights ${twoFlights.coins} coins, cheapest building ${cheapest}`);
+  const cheapestPart = PARTS.legs.levels[0].cost;
+  assert.ok(cheapestPart <= twoFlights.coins);
+});
+
+test('an era project is a multiple of ordinary purchases, not a trivial price', () => {
+  for (const era of ERAS.slice(0, 5)) {
+    assert.ok(era.advance.coins >= 10 * Math.min(...Object.values(BUILDINGS).map((b) => b.levels[era.id].cost)) * 0.5, `E${era.id} project`);
+  }
+});
+
+test('the economy bot exits with a non-zero code when a target is missed', () => {
+  const ok = spawnSync(process.execPath, ['--no-warnings', botFile, '--seed', '1'], { encoding: 'utf8' });
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+  assert.match(ok.stdout, /E0->E1/);
+  assert.match(ok.stdout, /Campaign:/);
+  const stopped = spawnSync(process.execPath, ['--no-warnings', botFile, '--seed', '1', '--max-minutes', '10'], { encoding: 'utf8' });
+  assert.equal(stopped.status, 1);
+  assert.match(stopped.stdout, /OUT OF RANGE|NOT reached/);
+});
+
+test('adapter: flights are deterministic and shaped like a FlightResult', () => {
+  const config = makeFlightConfig(makeProfile({ buildings: { fuel: 1 }, parts: { tank: 3 } }));
+  const plan = () => ({ destination: 'earth', target: 150, skill: 0.8, rng: (() => { let i = 0; return () => [0.3, 0.6, 0.1, 0.9, 0.5, 0.2, 0.7, 0.4, 0.8][i++ % 9]; })() });
+  const a = playFlight(config, plan());
+  const b = playFlight(config, plan());
+  assert.deepEqual(a, b);
+  for (const key of ['outcome', 'perfect', 'destination', 'maxAlt', 'distance', 'time', 'fuelLeft01', 'hpLeft01', 'coinsPicked', 'rings', 'pickups', 'near', 'stormTime', 'usedChute', 'reason', 'landing']) {
+    assert.ok(key in a, key);
+  }
+  assert.ok(['landed', 'crashed'].includes(a.outcome));
+  assert.ok(a.maxAlt > 0 && a.maxAlt <= 150 + 1e-6);
+});
+
+test('adapter: more fuel and a stronger engine reach higher, a stronger capsule opens the Moon', () => {
+  const base = makeProfile({ era: 3, buildings: { fuel: 4, service: 4, factory: 4, rescue: 4, energy: 6 } });
+  const reach = (parts) => safeReach(makeFlightConfig({ ...base, parts: { ...base.parts, ...parts } }));
+  assert.ok(reach({ tank: 3 }) > reach({}));
+  assert.ok(reach({ engine: 6 }) > reach({ engine: 2 }));
+  const weak = makeFlightConfig({ ...base, parts: { ...base.parts } });
+  assert.equal(simulateSortie(weak, 'moon', 10000).ok, false, 'the stock rocket cannot reach the Moon');
+  const strong = makeFlightConfig({ ...base, parts: { ...base.parts, engine: 12, tank: 12, capsule: 12, legs: 6 } });
+  assert.equal(simulateSortie(strong, 'moon', 10000).ok, true);
+});

@@ -1,75 +1,59 @@
-// Связка с чужими модулями: динамическая загрузка (с заглушками при отсутствии), адаптеры имён и сохранение.
-// Контракт: game/docs/ARCHITECTURE.md. Всё, чего в контракте нет, помечено «адаптер» и подменяемо.
+// Связка с соседними модулями (статические импорты: сборка esbuild в IIFE) и мелкие адаптеры.
+// Контракт: game/docs/ARCHITECTURE.md. Заглушки лежат только в ui/dev/ и подставляются
+// лишь там, где настоящая реализация не отдала нужный кусок (например, render.flight, пока рендер дописывается).
 
-import { stubData, stubRules, stubSim, createStubProfile, createNullAudio, createStubRenderer } from './dev/stubs.js';
+import * as data from '../data/index.js';
+import * as rules from '../rules/index.js';
+import * as state from '../state/index.js';
+import * as sim from '../sim/index.js';
+import * as audioMod from '../audio/index.js';
+import * as renderMod from '../render/index.js';
+import { createNullAudio, createStubRenderer } from './dev/stubs.js';
 
-async function tryImport(loader) {
-  try {
-    return await loader();
-  } catch (err) {
-    if (!/Failed to fetch|Cannot find|Failed to resolve|error loading|404|Unexpected token|not found/i.test(String(err?.message || err))) {
-      console.warn('[bridge] модуль не загрузился:', err);
-    }
-    return null;
-  }
+export function getModules() {
+  return { data, rules, sim, state, audioMod, renderMod };
 }
 
-/** Загружает настоящие модули, где они есть; остальное подменяется заглушками. flags — что реальное. */
-export async function loadModules() {
-  const [data, rules, state, sim, audio, render] = await Promise.all([
-    tryImport(() => import('../data/index.js')),
-    tryImport(() => import('../rules/index.js')),
-    tryImport(() => import('../state/index.js')),
-    tryImport(() => import('../sim/index.js')),
-    tryImport(() => import('../audio/index.js')),
-    tryImport(() => import('../render/index.js')),
-  ]);
-  const realRules = rules && typeof rules.getPartState === 'function' ? rules : null;
-  const realSim = sim && typeof sim.createFlight === 'function' ? sim : null;
-  return {
-    data: data && data.PARTS ? data : stubData,
-    rules: realRules || stubRules,
-    sim: realSim || stubSim,
-    state: state || null,
-    audioMod: audio && typeof audio.createAudio === 'function' ? audio : null,
-    renderMod: render && typeof render.createRenderer === 'function' ? render : null,
-    flags: {
-      data: !!(data && data.PARTS),
-      rules: !!realRules,
-      sim: !!realSim,
-      state: !!state,
-      audio: !!(audio && audio.createAudio),
-      render: !!(render && render.createRenderer),
-    },
-  };
-}
-
-export async function createAudioSafe(mods) {
+export function createAudioSafe() {
   try {
-    if (mods.audioMod) return mods.audioMod.createAudio();
+    return audioMod.createAudio();
   } catch (err) {
     console.warn('[bridge] аудио не создалось:', err);
+    return createNullAudio();
   }
-  return createNullAudio();
 }
 
-export async function createRendererSafe(mods, canvas) {
-  if (mods.renderMod) {
-    try {
-      let assets = null;
-      try {
-        const manifest = await import('../render/manifest.js');
-        const loader = mods.renderMod.loadAssets || (await import('../render/assets.js')).loadAssets;
-        assets = await loader(manifest.default || manifest.MANIFEST || manifest);
-      } catch (err) {
-        console.warn('[bridge] ассеты не загрузились:', err);
-      }
-      return mods.renderMod.createRenderer(canvas, assets);
-    } catch (err) {
-      console.warn('[bridge] рендер не создался:', err);
-    }
+const noop = () => {};
+
+/**
+ * Рендер: настоящий, дополненный недостающими частями заглушки (flight / events), пока их нет.
+ * Возвращает { renderer, missing } — missing перечисляет подставленное.
+ */
+export async function createRendererSafe(canvas) {
+  const stub = createStubRenderer();
+  let real = null;
+  try {
+    const assets = await renderMod.loadAssets(renderMod.manifest);
+    real = renderMod.createRenderer(canvas, assets);
+  } catch (err) {
+    console.warn('[bridge] рендер не создался:', err);
   }
-  return createStubRenderer();
+  if (!real) return { renderer: stub, missing: ['all'] };
+  const missing = [];
+  const pick = (name, fallback) => {
+    if (real[name]) return real[name];
+    missing.push(name);
+    return fallback;
+  };
+  const renderer = {
+    canvas,
+    real,
+    layout: pick('layout', stub.layout),
+    hub: pick('hub', stub.hub),
+    flight: pick('flight', stub.flight),
+    events: pick('events', noop),
+  };
+  return { renderer, missing };
 }
 
 // ---------- имена звуков интерфейса ----------
@@ -110,57 +94,29 @@ function storage() {
 }
 
 /** Хранилище профиля поверх state/: createSaveStore (localStorage), экспорт и импорт текста. */
-export function createStore(stateMod) {
-  const native = stateMod?.createSaveStore ? stateMod.createSaveStore() : null;
-  const fresh = stateMod?.fresh || createStubProfile;
-
-  function load() {
-    if (native) {
-      const res = native.load();
-      return { profile: res.profile, status: res.status, issues: res.issues || [] };
-    }
-    try {
-      const raw = storage()?.getItem('vyshe-neba:stub-save');
-      if (raw) return { profile: JSON.parse(raw), status: 'loaded', issues: [] };
-    } catch {
-      /* повреждённое сохранение игнорируем */
-    }
-    return { profile: fresh(), status: 'empty', issues: [] };
-  }
-
-  function save(profile) {
-    if (native) return native.save(profile).ok;
-    try {
-      storage()?.setItem('vyshe-neba:stub-save', JSON.stringify(profile));
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  const exportText = (profile) => (native ? native.exportJson(profile) : JSON.stringify(profile));
-
-  /** { ok, profile, issues } — профиль нормализован state/ или принят как есть. */
-  function importText(text) {
-    if (native) return native.importJson(text);
-    try {
-      return { ok: true, profile: JSON.parse(text), issues: [] };
-    } catch {
-      return { ok: false, profile: null, issues: ['Файл повреждён'] };
-    }
-  }
-
-  return { create: fresh, load, save, exportText, importText, native: !!native };
+export function createStore() {
+  const native = state.createSaveStore();
+  return {
+    create: state.fresh,
+    load: () => native.load(),
+    save: (profile) => native.save(profile).ok,
+    exportText: (profile) => native.exportJson(profile),
+    /** { ok, profile, issues } — нормализовано и мигрировано state/ (принимает и сохранение старой редакции). */
+    importText: (text) => native.importJson(text),
+    clear: () => native.clear(),
+  };
 }
 
 // ---------- настройки интерфейса (не часть профиля) ----------
 
+const DEFAULT_PREFS = { seen: {}, touchControls: 'auto', muted: false, sensitivity: 1 };
+
 export function loadPrefs() {
   try {
     const raw = storage()?.getItem(PREFS_KEY);
-    return { seen: {}, touchControls: 'auto', ...(raw ? JSON.parse(raw) : null) };
+    return { ...DEFAULT_PREFS, seen: {}, ...(raw ? JSON.parse(raw) : null) };
   } catch {
-    return { seen: {}, touchControls: 'auto' };
+    return { ...DEFAULT_PREFS, seen: {} };
   }
 }
 
@@ -176,11 +132,11 @@ export function savePrefs(prefs) {
 
 /** Товары лавки из data.SHOP: { id, name, desc, price }. */
 export function shopItems(mods) {
-  return (mods.data.SHOP || []).map((it) => ({ id: it.id, name: it.name, desc: it.desc, price: it.price ?? it.cost ?? 0 }));
+  return (mods.data.SHOP || []).map((it) => ({ id: it.id, name: it.name, desc: it.desc, price: it.price }));
 }
 
 export function skinItems(mods) {
-  return (mods.data.SKINS || []).map((it) => ({ id: it.id, name: it.name, color: it.color, price: it.price ?? it.cost ?? 0 }));
+  return (mods.data.SKINS || []).map((it) => ({ id: it.id, name: it.name, color: it.color, price: it.price }));
 }
 
 /** Тексты причин: строки или объекты { text }. */

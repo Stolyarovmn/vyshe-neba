@@ -107,7 +107,7 @@ function fly(config, target, { orbit = false, waste = 0.3 } = {}) {
       const gAvg = Math.max(0.5, gravityAt(earth, state.alt + (state.v * state.v) / (4 * Math.max(g, 1))));
       const apex = state.alt + (state.v * state.v) / (2 * gAvg);
       const high = target >= SPACE_ALT * 0.95;
-      if (state.alt >= goal || fuelLeft(stages) <= 0 || (!high && state.v > 0 && apex >= goal * 0.97)) phase = 'coast';
+      if (state.alt >= goal || fuelLeft(stages) <= 0 || (!high && state.v > 0 && apex >= goal)) phase = 'coast';
       else throttle = clamp((g + dens * 0.22 * (1 - dragCut) * state.v + 3 * (climbCap - state.v)) / a, 0, 1);
     }
     if (phase === 'coast' && !orbit && g < 1.5 && state.v > 1 && fuelLeft(stages) > 0) {
@@ -251,8 +251,8 @@ export function playFlight(config, plan) {
   const perfect = landed && rng() < 0.2 + 0.45 * (chance - 0.5) + 0.2 * config.base.beacons;
   const km = altM / 1000;
   const reference = travelPay(altM, distM, destination, 1);
-  const rings = Math.floor(rng() * (2.2 + Math.min(4, km ** 0.4)));
-  const pickups = Math.floor(2 + rng() * (3 + Math.min(8, km ** 0.45))) + rings;
+  const rings = Math.floor(rng() * (1.2 + Math.min(3, km ** 0.3)));
+  const pickups = Math.floor(1 + rng() * (2 + Math.min(6, km ** 0.4))) + rings;
   const duration = flightSeconds(sortie.time, destination);
   return {
     outcome,

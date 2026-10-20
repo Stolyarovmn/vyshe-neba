@@ -3,7 +3,7 @@
 // The requirements of every module follow the table in DESIGN.md section 4.3.
 
 import { STAGE_DEFAULTS } from '../sim/config.js';
-import { MAX_PART_LEVEL, PART_LEVELS_PER_ERA } from './economy.js';
+import { MAX_PART_LEVEL, PART_LEVELS_PER_ERA, PRICE_SCALE } from './economy.js';
 
 const core = STAGE_DEFAULTS.core;
 const capsule = STAGE_DEFAULTS.capsule;
@@ -22,12 +22,12 @@ function nice(value) {
 }
 
 // Data needed for a level, before the module weight. Cheap levels are free: data is a late-game brake.
-const DATA_CURVE = [0, 0, 0, 2, 3, 5, 8, 12, 18, 27, 40, 60, 90, 130, 190, 280, 400, 580];
+const DATA_CURVE = [0, 0, 0, 0, 0, 0, 2, 3, 5, 8, 12, 18, 26, 38, 55, 80, 115, 165];
 
 function costs(base, growth) {
   const out = [];
   for (const level of LEVELS) {
-    const value = nice(base * growth ** (level - 1));
+    const value = nice(PRICE_SCALE * base * growth ** (level - 1));
     out.push(out.length && value <= out[out.length - 1] ? out[out.length - 1] + 5 : value);
   }
   return out;

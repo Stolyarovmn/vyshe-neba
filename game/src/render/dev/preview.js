@@ -4,6 +4,7 @@
 
 import { createRenderer, loadAssets, manifest } from '../index.js';
 import { createStubFlight } from './stub-flight.js';
+import { createSimFlight } from './sim-flight.js';
 
 const params = new URLSearchParams(location.search);
 const $ = (id) => document.getElementById(id);
@@ -13,11 +14,11 @@ const ui = {
   mode: $('mode'), frameSel: $('frameSel'), era: $('era'), weather: $('weather'), reduce: $('reduce'),
   selected: $('selected'), level: $('level'), booster: $('booster'), capsuleP: $('capsuleP'),
   body: $('body'), scenario: $('scenario'), alt: $('alt'), altv: $('altv'), thr: $('thr'), ang: $('ang'),
-  objs: $('objs'), stage: $('stage'),
+  objs: $('objs'), stage: $('stage'), simSpeed: $('simSpeed'),
 };
 
 const owned = new Set(params.get('buildings') === 'none' ? [] : params.get('buildings') === 'all' || !params.get('buildings') ? BUILDINGS.slice(0, 6) : params.get('buildings').split(','));
-for (const key of ['mode', 'era', 'weather', 'level', 'body', 'scenario', 'alt', 'thr', 'ang', 'stage']) {
+for (const key of ['mode', 'era', 'weather', 'level', 'body', 'scenario', 'alt', 'thr', 'ang', 'stage', 'simSpeed']) {
   if (params.has(key)) ui[key].value = params.get(key);
 }
 if (params.has('frame')) ui.frameSel.value = params.get('frame');
@@ -54,18 +55,26 @@ else if (params.get('buildings') && params.get('buildings') !== 'none') {
   [...$('buildings').querySelectorAll('input')].forEach((box, i) => (box.checked = owned.has(BUILDINGS[i])));
 }
 
+if (params.get('embed') === '1') {
+  $('bar').style.display = 'none';
+  document.body.style.margin = '0';
+  $('stage').style.padding = '0';
+}
 const canvas = $('canvas');
 const hud = $('hud');
+if (params.get('hud') === '0') hud.style.display = 'none';
 let renderer = null;
 let layout = null;
 let frame = { w: 960, h: 540, dpr: 2 };
 const stub = createStubFlight();
+let simRunner = null;
 const pendingEvents = [];
 
 function applyFrame() {
-  const [size, dprText] = ui.frameSel.value.split('@');
-  const [w, h] = size.split('x').map(Number);
-  const dpr = params.has('dpr') ? Number(params.get('dpr')) : Number(dprText);
+  const fit = ui.frameSel.value === 'fit';
+  const [size, dprText] = fit ? ['', ''] : ui.frameSel.value.split('@');
+  const [w, h] = fit ? [window.innerWidth, window.innerHeight] : size.split('x').map(Number);
+  const dpr = params.has('dpr') ? Number(params.get('dpr')) : fit ? window.devicePixelRatio || 1 : Number(dprText);
   frame = { w, h, dpr };
   $('frame').style.width = `${w}px`;
   $('frame').style.height = `${h}px`;
@@ -93,14 +102,27 @@ function settings() {
   return { reduceMotion: ui.reduce.checked };
 }
 
+// fire=hit@2,crashed@5: события в заданные секунды после загрузки (для скриншотов).
+const scheduled = (params.get('fire') || '').split(',').filter(Boolean).map((item) => {
+  const [type, at] = item.split('@');
+  return { type, at: Number(at) || 0, done: false };
+});
+
 let frozen = params.has('t') ? Number(params.get('t')) : null;
 let last = performance.now();
 let clock = 0;
 
-function tick(now) {
-  const dt = Math.min(0.1, (now - last) / 1000);
-  last = now;
+const manual = params.get('manual') === '1';
+
+/** Один кадр стенда. dt — секунды; в ручном режиме всегда 1/60. */
+function renderFrame(dt) {
   clock += dt;
+  for (const item of scheduled) {
+    if (!item.done && clock >= item.at) {
+      item.done = true;
+      pendingEvents.push(eventFor(item.type));
+    }
+  }
   const time = frozen !== null ? frozen : clock;
   if (renderer && layout) {
     const ctx = canvas.getContext('2d');
@@ -112,24 +134,32 @@ function tick(now) {
       hud.textContent = `hub px=${layout.world.hubPx} ${layout.orientation} ${layout.w}x${layout.h}@${layout.dpr}`;
     } else if (renderer.flight) {
       const scenario = ui.scenario.value;
-      const state = stub.update(frozen !== null ? 1 / 60 : dt, {
+      const fixed = frozen !== null || manual;
+      const runner = scenario === 'sim' && simRunner ? simRunner : stub;
+      const state = runner.update(fixed ? 1 / 60 : dt, {
         scenario, body: ui.body.value, era: Number(ui.era.value), alt: Number(ui.alt.value), throttle: Number(ui.thr.value),
-        angle: Number(ui.ang.value), stage: ui.stage.value, weather, objects: ui.objs.checked, time,
+        angle: Number(ui.ang.value), stage: ui.stage.value, weather, objects: ui.objs.checked, time, speed: Number(ui.simSpeed.value),
       });
       ui.altv.textContent = Math.round(state.flight.alt);
       if (pendingEvents.length) renderer.events(pendingEvents.splice(0), state.flight);
       if (state.events.length) renderer.events(state.events, state.flight);
       renderer.flight.draw(ctx, {
-        flight: state.flight, config: state.config, time, layout, settings: settings(), profile: profileFromUi(), dt: frozen !== null ? 1 / 60 : undefined,
+        flight: state.flight, config: state.config, time, layout, settings: settings(), profile: profileFromUi(), dt: fixed ? 1 / 60 : undefined,
       });
       hud.textContent = `flight ${state.flight.body} ${state.flight.phase} alt=${Math.round(state.flight.alt)} v=${state.flight.speed.toFixed(1)} px=${layout.world.px}`;
     }
   }
+}
+
+function tick(now) {
+  const dt = Math.min(0.1, (now - last) / 1000);
+  last = now;
+  renderFrame(dt);
   requestAnimationFrame(tick);
 }
 
-$('evBtn').onclick = () => pendingEvents.push({ type: 'hit' });
-$('sepBtn').onclick = () => pendingEvents.push({ type: 'stage-sep', stage: 'booster' });
+$('evBtn').onclick = () => pendingEvents.push(eventFor('hit'));
+$('sepBtn').onclick = () => pendingEvents.push(eventFor('stage-sep'));
 
 function attachDrag() {
   let drag = null;
@@ -154,6 +184,22 @@ function attachDrag() {
   });
 }
 
+function eventFor(type) {
+  const f = (ui.scenario.value === 'sim' && simRunner ? simRunner : stub).last.flight;
+  const at = f ? { x: f.x, y: f.y, vx: f.vx, vy: f.vy, angle: f.angle } : {};
+  if (ui.scenario.value !== 'loop' && ui.scenario.value !== 'sim') {
+    at.vx = 0;
+    at.vy = 0;
+  }
+  if (type === 'stage-sep') return { type, stage: 'booster', ...at };
+  if (type === 'crashed') return { type, reason: 'landing-speed', x: at.x, y: at.y };
+  if (type === 'touch') return { type, ok: false, x: at.x };
+  if (type === 'pickup') return { type, kind: 'coin' };
+  if (type === 'landed') return { type, perfect: true };
+  if (type === 'parachute') return { type, ...at };
+  return { type, ...at };
+}
+
 function syncPanels() {
   const flight = ui.mode.value === 'flight';
   $('hubControls').hidden = flight;
@@ -162,21 +208,29 @@ function syncPanels() {
 
 async function start() {
   $('status').textContent = 'загрузка…';
+  try {
+    simRunner = await createSimFlight();
+  } catch (error) {
+    console.warn('sim недоступна:', error.message);
+  }
   const assets = await loadAssets(manifest);
   $('status').textContent = assets.errors.length ? `ошибок ассетов: ${assets.errors.length}` : `ассетов: ${assets.size}`;
   renderer = createRenderer(canvas, assets);
-  window.__preview = { renderer, assets, ui, owned, stub, state: () => stub.last, events: (list) => pendingEvents.push(...list), setFrozen: (t) => { frozen = t; } };
+  window.__preview = { advance(frames) { for (let i = 0; i < frames; i++) renderFrame(1 / 60); }, renderer, assets, ui, owned, stub, state: () => (ui.scenario.value === 'sim' && simRunner ? simRunner : stub).last, events: (list) => pendingEvents.push(...list), setFrozen: (t) => { frozen = t; } };
   applyFrame();
   syncPanels();
   if (params.has('focus')) renderer.hub.focus(params.get('focus').match(/^-?\d+(\.\d+)?$/) ? Number(params.get('focus')) : params.get('focus'), true);
   attachDrag();
-  requestAnimationFrame(tick);
+  if (!manual) requestAnimationFrame(tick);
   document.title = 'Render preview ready';
 }
 
 ui.frameSel.addEventListener('change', applyFrame);
+window.addEventListener('resize', () => {
+  if (ui.frameSel.value === 'fit') applyFrame();
+});
 ui.mode.addEventListener('change', syncPanels);
-ui.scenario.addEventListener('change', () => stub.reset());
+ui.scenario.addEventListener('change', () => { stub.reset(); if (simRunner) simRunner.reset(); });
 ui.body.addEventListener('change', () => stub.reset());
 ui.stage.addEventListener('change', () => stub.reset());
 window.addEventListener('error', (e) => {

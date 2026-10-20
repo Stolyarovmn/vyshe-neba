@@ -4,7 +4,7 @@
 // Все функции рисуют в единицах мира через view; (wx, wy) — точка опоры (низ по центру).
 
 import {
-  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, PROCEDURAL_BUILDINGS, buildingSpriteName,
+  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
 } from './manifest.js';
 import { clamp, hash2 } from './util.js';
 import { fillWorldRect } from './painter.js';
@@ -17,8 +17,11 @@ export const ART_HEIGHT = {
   service: 60,
   rescue: 64,
   fuel: 58,
-  weather: 108,
+  weather: 96,
+  factory: 62,
+  control: 56,
 };
+const DEFAULT_ART_HEIGHT = 64;
 
 /** Габариты программного силуэта (ед. мира) — используются для hit-test и подсветки. */
 export const PROCEDURAL_SIZE = {
@@ -46,7 +49,7 @@ const GREEN = '#87c99c';
 const WINDOW_OFF = '#172536';
 
 export function isArtBuilding(key) {
-  return ART_BUILDINGS.includes(key) || key === 'weather';
+  return ART_BUILDINGS.includes(key) || key in PLACEABLE_BUILDINGS;
 }
 
 export function isProceduralBuilding(key) {
@@ -55,13 +58,13 @@ export function isProceduralBuilding(key) {
 
 /** Размер в единицах мира [ширина, высота] для постройки (для рамок и тапов). */
 export function buildingSize(painter, key, level) {
-  if (isProceduralBuilding(key)) {
-    const size = PROCEDURAL_SIZE[key];
-    return [size.w, size.h];
-  }
-  const h = ART_HEIGHT[key] || 60;
   const asset = painter.assets.get(buildingSpriteName(key, level));
-  return [asset ? h * asset.w / asset.h : h * 0.8, h];
+  if (asset) {
+    const h = ART_HEIGHT[key] || DEFAULT_ART_HEIGHT;
+    return [h * asset.w / asset.h, h];
+  }
+  const size = PROCEDURAL_SIZE[key];
+  return size ? [size.w, size.h] : [48, 48];
 }
 
 /**
@@ -71,10 +74,9 @@ export function buildingSize(painter, key, level) {
 export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts = {}) {
   const lv = clamp(level | 0, 1, 6);
   drawShadow(ctx, view, wx, wy, buildingSize(painter, key, lv)[0]);
-  if (!isProceduralBuilding(key)) {
-    const name = buildingSpriteName(key, lv);
-    const drawn = painter.sprite(ctx, view, name, wx, wy, { h: ART_HEIGHT[key] || 60, flipX: !!opts.mirror });
-    if (drawn) return true;
+  const name = buildingSpriteName(key, lv);
+  if (painter.has(name)) {
+    return painter.sprite(ctx, view, name, wx, wy, { h: ART_HEIGHT[key] || DEFAULT_ART_HEIGHT, flipX: !!opts.mirror });
   }
   drawProcedural(ctx, view, key, lv, wx, wy, time);
   return false;
@@ -402,7 +404,9 @@ export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect) {
     const [w, h] = buildingSize(painter, item.key, item.level);
     if (wx + w < view.left || wx - w > view.right) continue;
     drawBuilding(ctx, painter, view, item.key, item.level, wx, wy, time, { mirror: item.mirror });
-    if (isProceduralBuilding(item.key)) drawBuildingBadge(ctx, view, item.key, wx, wy - h, time);
+    if (isProceduralBuilding(item.key) && !painter.has(buildingSpriteName(item.key, item.level))) {
+      drawBuildingBadge(ctx, view, item.key, wx, wy - h, time);
+    }
     if (onRect) onRect(item.key, view.sx(wx - w / 2), view.sy(wy - h), view.sx(wx + w / 2), view.sy(wy));
   }
 }

@@ -26,10 +26,19 @@ export const FLAT_SPRITES = [
   'cloud_0', 'cloud_1', 'cloud_2', 'cloud_3', 'rock_0', 'rock_1', 'rock_2', 'rock_3',
   'earth', 'moon', 'terrain_moon', 'terrain_mars', 'base_drone_0', 'base_drone_1',
 ];
-/** Постройки с готовым артом: infrastructure/<ключ>/<год>.png (+ метеокомплекс из placeables). */
+/** Постройки с готовым артом: infrastructure/<ключ>/<год>.png. */
 export const ART_BUILDINGS = ['beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel'];
-/** Постройки, которые рисуются кодом (арта пока нет). */
-export const PROCEDURAL_BUILDINGS = ['logistics', 'factory', 'control', 'radar', 'energy', 'observation', 'recovery'];
+/** Постройки, арт которых лежит в placeables: ключ -> каталог (файлы e<эпоха>_<год>.png). */
+export const PLACEABLE_BUILDINGS = {
+  weather: 'base/weather_complex',
+  factory: 'workshop/manufacturing_cell',
+  control: 'workshop/telemetry_post',
+};
+/**
+ * Постройки, которые пока рисуются кодом (арта нет). Как только в ASSET_FILES появятся
+ * bld_<ключ>_<год>, рендер возьмёт спрайт, а силуэт останется запасным.
+ */
+export const PROCEDURAL_BUILDINGS = ['logistics', 'radar', 'energy', 'observation', 'recovery'];
 export const BUILDING_KEYS = [
   'beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel', 'logistics', 'factory',
   'weather', 'control', 'radar', 'energy', 'observation', 'recovery',
@@ -58,9 +67,11 @@ function buildAssetFiles() {
   for (const key of ART_BUILDINGS) {
     for (const year of ERA_YEARS) files[`bld_${key}_${year}`] = `${INFRA_DIR}${key}/${year}.png`;
   }
-  ERA_YEARS.forEach((year, i) => {
-    files[`bld_weather_${year}`] = `${PLACEABLE_DIR}base/weather_complex/e${i}_${year}.png`;
-  });
+  for (const [key, dir] of Object.entries(PLACEABLE_BUILDINGS)) {
+    ERA_YEARS.forEach((year, i) => {
+      files[`bld_${key}_${year}`] = `${PLACEABLE_DIR}${dir}/e${i}_${year}.png`;
+    });
+  }
   files.island_start = ISLAND_FILE;
   files.aircraft_fx = { file: AIRCRAFT_FX_FILE, kind: 'json' };
   return files;

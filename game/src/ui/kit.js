@@ -72,6 +72,7 @@ export function createKit({ sfx = () => {} } = {}) {
     S.clicked = null;
     S.clickPos = null;
     S.emptyTap = null;
+    S.dragDx = 0;
     S.denied = null;
     S.back = false;
     S.tipCandidate = null;
@@ -144,6 +145,10 @@ export function createKit({ sfx = () => {} } = {}) {
           S.sliderDrag.x = e.x;
           S.sliderDrag.y = e.y;
           break;
+        }
+        if (!p.id) {
+          S.dragDx += e.x - (p.lastX ?? p.x);
+          p.lastX = e.x;
         }
         const dist = Math.hypot(e.x - p.x, e.y - p.y);
         if (!p.moved && dist > TAP_SLOP) {
@@ -960,6 +965,7 @@ export function createKit({ sfx = () => {} } = {}) {
     get back() { return S.back; },
     get denied() { return S.denied; },
     get emptyTap() { return S.emptyTap; },
+    get dragDx() { return S.dragDx; },
     get cursor() { return S.cursor; },
     get hoverId() { return S.hover; },
     get hitCount() { return S.prevHits.length; },

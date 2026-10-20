@@ -3,18 +3,12 @@
 // Painter знает хранилище ассетов и кэш уменьшенных спрайтов. Все методы принимают
 // `view` (см. camera.js): преобразование мир -> пиксели устройства.
 
-import { createSpriteCache } from './assets.js';
+import { createSpriteCache, defaultMakeCanvas } from './assets.js';
 
 export function createPainter(assets, makeCanvas) {
   const cache = createSpriteCache(makeCanvas);
   const tintCache = new Map();
-  const create = makeCanvas || ((w, h) => {
-    if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(w, h);
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    return canvas;
-  });
+  const create = makeCanvas || defaultMakeCanvas;
 
   /** Размер спрайта в единицах мира по заданной высоте или ширине. */
   function unitSize(asset, h, w) {
@@ -27,6 +21,7 @@ export function createPainter(assets, makeCanvas) {
   const painter = {
     assets,
     cache,
+    makeCanvas: create,
 
     has(name) {
       return assets.has(name);

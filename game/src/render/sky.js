@@ -3,18 +3,19 @@
 
 import { clamp, hash2, mixColor, rgbString, rgbaString, sampleStops, smoothstep } from './util.js';
 
+// Высоты в единицах мира: 10 000 ед. = 100 км (граница космоса в sim).
 const EARTH_STOPS = [
-  [0, [62, 178, 228]], [1200, [38, 130, 208]], [2600, [18, 82, 164]], [4500, [6, 24, 76]], [6400, [3, 8, 24]],
+  [0, [62, 178, 228]], [1200, [38, 130, 208]], [3000, [18, 82, 164]], [5200, [8, 34, 96]], [7600, [4, 14, 46]], [9600, [3, 8, 24]],
 ];
 const MARS_STOPS = [
   [0, [208, 150, 112]], [900, [172, 106, 88]], [2600, [98, 58, 68]], [5200, [26, 14, 24]],
 ];
 const SPACE = [3, 8, 24];
 const STORM_SKY = [76, 86, 100];
+const DUST_SKY = [166, 104, 74];
 const HAZE = [176, 226, 240];
 
 const colorA = [0, 0, 0];
-const colorB = [0, 0, 0];
 
 /** Цвет неба на высоте alt (ед. мира) для тела; mood = { storm }. */
 export function skyColor(body, alt, mood, out) {
@@ -28,7 +29,7 @@ export function skyColor(body, alt, mood, out) {
   sampleStops(body === 'mars' ? MARS_STOPS : EARTH_STOPS, alt, target);
   if (mood && mood.storm > 0) {
     const low = 1 - smoothstep(1500, 4200, alt);
-    mixColor(target, STORM_SKY, mood.storm * 0.75 * low, target);
+    mixColor(target, body === 'mars' ? DUST_SKY : STORM_SKY, mood.storm * 0.75 * low, target);
   }
   return target;
 }
@@ -173,7 +174,7 @@ export function drawSkyBodies(ctx, painter, view, body, alt) {
 // --- дуга планеты внизу кадра при большой высоте ----------------------------------
 
 const LIMB = {
-  earth: { from: 2200, to: 9000, body: [22, 74, 142], rim: [138, 202, 248], haze: [96, 168, 240], radius: 1.7 },
+  earth: { from: 6000, to: 14000, body: [22, 74, 142], rim: [138, 202, 248], haze: [96, 168, 240], radius: 1.7 },
   moon: { from: 450, to: 3200, body: [96, 100, 110], rim: [168, 172, 182], haze: [120, 126, 140], radius: 1.15 },
   mars: { from: 450, to: 3800, body: [124, 66, 48], rim: [226, 152, 108], haze: [196, 112, 82], radius: 1.3 },
 };

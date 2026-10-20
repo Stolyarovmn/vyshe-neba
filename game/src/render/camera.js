@@ -84,7 +84,7 @@ export function createCamera() {
       const look = lookOffset(target, layout, camera.zoom);
       camera.x = damp(camera.x, target.x + look.x, CAMERA_TUNING.followX, dt);
       camera.y = damp(camera.y, target.y + look.y, CAMERA_TUNING.followY, dt);
-      camera.trauma = Math.max(0, camera.trauma - CAMERA_TUNING.traumaDecay * dt);
+      camera.trauma = camera.reduceMotion ? 0 : Math.max(0, camera.trauma - CAMERA_TUNING.traumaDecay * dt);
       updateShake(camera);
     },
 

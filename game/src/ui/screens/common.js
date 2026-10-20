@@ -32,6 +32,7 @@ const fromKey = (key, fallback) => {
   return s === key ? fallback : s;
 };
 export const partName = (app, id) => app.data.PARTS?.[id]?.name || fromKey(`part.${id}.name`, id);
+export const partShort = (app, id) => fromKey(`part.short.${id}`, partName(app, id));
 export const partDesc = (app, id) => app.data.PARTS?.[id]?.desc || fromKey(`part.${id}.desc`, '');
 export const buildingName = (app, key) => app.data.BUILDINGS?.[key]?.name || fromKey(`building.${key}.name`, key);
 export const buildingDesc = (app, key) => app.data.BUILDINGS?.[key]?.desc || fromKey(`building.${key}.desc`, '');
@@ -167,7 +168,7 @@ export function levelPips(kit, r, level, max, cap) {
     const filled = i < level;
     const reachable = cap === undefined || i < cap;
     kit.rect(x, r.y, ww, r.h, c.edge);
-    kit.rect(x + 1, r.y + 1, ww - 2, r.h - 2, filled ? c.amber : reachable ? c.inset : '#080c16');
+    kit.rect(x + 1, r.y + 1, ww - 2, r.h - 2, filled ? c.amber : reachable ? '#2b3b5e' : '#121a2c');
     if (filled) kit.rect(x + 1, r.y + 1, ww - 2, Math.max(1, Math.round(r.h * 0.3)), '#ffe9a8');
   }
 }
@@ -246,7 +247,7 @@ export function drawBuildingCard(app, kit, r, key, o = {}) {
     }
     if (st.next && st.next.power) {
       kit.icon('bolt', bodyRect.x + size * 0.7, y + size * 0.7, size * 1.2, c.green);
-      kit.drawText(t('card.power', { n: st.next.power.use, supply: st.next.power.supply }), bodyRect.x + size * 1.7, y + size * 0.7, { size, color: c.green, maxWidth: bodyRect.w - size * 2 });
+      kit.drawText(st.next.power.supply ? t('card.powerSupply', { supply: st.next.power.supply }) : t('card.power', { n: st.next.power.use }), bodyRect.x + size * 1.7, y + size * 0.7, { size, color: c.green, maxWidth: bodyRect.w - size * 2 });
       y += size * 1.8;
     }
     if (pb && pb.ratio < 1 && st.level > 0) {

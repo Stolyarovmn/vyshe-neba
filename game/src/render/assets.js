@@ -48,7 +48,7 @@ export function createAssetStore(images, jsons, errors) {
 
 /**
  * Загружает все ассеты каталога. `manifest` — модуль manifest.js (или объект с ASSET_FILES).
- * options: { resolveUrl, loadImage, loadJson, onProgress(done,total) }.
+ * options: { resolveUrl, loadImage, loadJson, onProgress(done,total), concurrency (по умолчанию 16) }.
  * Ошибки отдельных файлов собираются в store.errors, загрузка не прерывается.
  */
 export async function loadAssets(manifest, options = {}) {
@@ -62,7 +62,7 @@ export async function loadAssets(manifest, options = {}) {
   const entries = Object.entries(files);
   let done = 0;
 
-  const tasks = entries.map(async ([name, spec]) => {
+  const loadOne = async ([name, spec]) => {
     const file = typeof spec === 'string' ? spec : spec.file;
     const kind = typeof spec === 'string' ? 'image' : spec.kind || 'image';
     try {
@@ -80,8 +80,14 @@ export async function loadAssets(manifest, options = {}) {
     }
     done++;
     if (options.onProgress) options.onProgress(done, entries.length);
+  };
+
+  // Ограниченный параллелизм: сотни одновременных запросов переполняют очередь простых dev-серверов.
+  const queue = entries.slice();
+  const workers = Array.from({ length: Math.min(options.concurrency || 16, queue.length) }, async () => {
+    while (queue.length) await loadOne(queue.shift());
   });
-  await Promise.all(tasks);
+  await Promise.all(workers);
   return createAssetStore(images, jsons, errors);
 }
 
@@ -91,15 +97,17 @@ export async function loadAssets(manifest, options = {}) {
  * шумную картинку, а сглаженное — мыло. Один раз уменьшаем с хорошим фильтром и затем рисуем
  * без сглаживания, получая чёткий «пиксельный» спрайт нужного размера.
  */
+export function defaultMakeCanvas(w, h) {
+  if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(w, h);
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  return canvas;
+}
+
 export function createSpriteCache(makeCanvas) {
   const cache = new Map();
-  const create = makeCanvas || ((w, h) => {
-    if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(w, h);
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    return canvas;
-  });
+  const create = makeCanvas || defaultMakeCanvas;
   return {
     get size() {
       return cache.size;
@@ -121,7 +129,7 @@ export function createSpriteCache(makeCanvas) {
         const g = entry.getContext('2d');
         g.imageSmoothingEnabled = true;
         g.imageSmoothingQuality = 'high';
-        drawProgressive(g, asset, width, height);
+        drawProgressive(g, asset, width, height, create);
         cache.set(key, entry);
       }
       return entry;
@@ -130,14 +138,14 @@ export function createSpriteCache(makeCanvas) {
 }
 
 /** Уменьшение ступенями не более чем вдвое: так фильтр браузера не пропускает пиксели. */
-function drawProgressive(g, asset, width, height) {
+function drawProgressive(g, asset, width, height, create) {
   let srcW = asset.w;
   let srcH = asset.h;
   let source = asset.img;
   while (srcW > width * 2 || srcH > height * 2) {
     const nextW = Math.max(width, Math.ceil(srcW / 2));
     const nextH = Math.max(height, Math.ceil(srcH / 2));
-    const step = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(nextW, nextH) : Object.assign(document.createElement('canvas'), { width: nextW, height: nextH });
+    const step = create(nextW, nextH);
     const sg = step.getContext('2d');
     sg.imageSmoothingEnabled = true;
     sg.imageSmoothingQuality = 'high';

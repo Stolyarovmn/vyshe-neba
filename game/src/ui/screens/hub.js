@@ -62,7 +62,8 @@ export default {
     const c = kit.c;
     const info = derive(app, st);
 
-    // тап по сцене: постройка или ракета
+    // перетаскивание сцены и тап: постройка или ракета
+    if (kit.dragDx && !kit.modalOpen) app.renderer.hub.pan?.(kit.dragDx);
     const tap = kit.emptyTap;
     if (tap && !kit.modalOpen) {
       const key = worldHit(app, tap.x, tap.y);
@@ -72,6 +73,11 @@ export default {
         st.selected = key;
         app.sfx('press');
       } else st.selected = null;
+    }
+    if (st.selected !== app.hubSelected) {
+      app.hubSelected = st.selected;
+      app.renderer.hub.setSelected?.(st.selected);
+      if (st.selected) app.renderer.hub.focus?.(st.selected);
     }
 
     drawHeader(app, kit, F.header, { era: true });

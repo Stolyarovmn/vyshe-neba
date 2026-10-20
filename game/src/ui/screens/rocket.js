@@ -4,7 +4,7 @@
 import { t } from '../../i18n/index.js';
 import { screenFrame, rocketLayout, ROCKET_SPOTS } from '../layout.js';
 import { clamp, lerp } from '../format.js';
-import { drawHeader, drawReasons, isFundsReason, levelPips, partIcon, partName, partDesc, deltaRows, PART_KEYS } from './common.js';
+import { drawHeader, drawReasons, isFundsReason, levelPips, partIcon, partName, partDesc, deltaRows, partShort, PART_KEYS } from './common.js';
 
 const ERA_PALETTES = [
   { body: '#d9d2bd', shade: '#a8a08a', accent: '#c0392b', glass: '#6fb5d6' },
@@ -81,7 +81,7 @@ function drawSchematic(app, kit, L, G, st, thr) {
   const p = app.profile;
   const pal = ERA_PALETTES[p.era] || ERA_PALETTES[0];
   const r = G.rocket;
-  const q = Math.max(2, Math.floor(r.w / 11));
+  const q = Math.max(2, Math.floor(r.h / 46));
   const rows = Math.floor(r.h / q);
   const cx = Math.round(r.x + r.w / 2);
   const shake = thr > 0 && !app.settings.reduceMotion ? Math.round((Math.sin(app.time * 90) * thr) * (q / 2)) : 0;
@@ -95,7 +95,7 @@ function drawSchematic(app, kit, L, G, st, thr) {
     ctx.fillRect(cx - halfCells * q + off + shake, r.y + y * q, halfCells * 2 * q, q);
   };
   const lvl = p.parts;
-  const bodyHalf = 4;
+  const bodyHalf = 5;
   const noseRows = Math.round(rows * 0.2);
   const bodyEnd = Math.round(rows * 0.8);
   const boosterStart = Math.round(rows * 0.58);
@@ -109,9 +109,9 @@ function drawSchematic(app, kit, L, G, st, thr) {
   }
 
   // опоры и стабилизаторы
-  const legs = lvl.legs;
-  if (legs) {
-    ctx.fillStyle = pal.shade;
+  const legs = Math.max(1, lvl.legs);
+  {
+    ctx.fillStyle = lvl.legs ? pal.shade : '#6d7380';
     const spread = 2 + Math.min(4, Math.ceil(legs / 4));
     for (let i = 0; i < 4; i++) {
       for (const side of [-1, 1]) {
@@ -120,11 +120,11 @@ function drawSchematic(app, kit, L, G, st, thr) {
     }
     fill(bodyEnd + 2, bodyHalf + spread / 2, pal.shade);
   }
-  if (lvl.fins) {
-    const size = 2 + Math.min(4, Math.ceil(lvl.fins / 4));
+  {
+    const size = 2 + Math.min(4, Math.ceil(Math.max(1, lvl.fins) / 4));
     for (let i = 0; i < size * 2; i++) {
       const w = Math.round(((size * 2 - i) / (size * 2)) * size);
-      ctx.fillStyle = pal.accent;
+      ctx.fillStyle = lvl.fins ? pal.accent : '#7a2f2a';
       ctx.fillRect(cx - (bodyHalf + w) * q + shake, r.y + (bodyEnd - size * 2 + i + 1) * q, w * q, q);
       ctx.fillRect(cx + bodyHalf * q + shake, r.y + (bodyEnd - size * 2 + i + 1) * q, w * q, q);
     }
@@ -136,7 +136,7 @@ function drawSchematic(app, kit, L, G, st, thr) {
     if (y < noseRows) half = Math.max(1, Math.round(lerp(1, bodyHalf, Math.sin((y / noseRows) * Math.PI * 0.5))));
     else half = y >= boosterStart && lvl.booster ? bodyHalf + 1 : bodyHalf;
     const stage = y >= boosterStart && lvl.booster;
-    fill(y, half, stage ? '#c7c0aa' : pal.body);
+    fill(y, half, y < noseRows * 0.85 ? pal.accent : stage ? '#c7c0aa' : pal.body);
     fill(y, 1, pal.shade, half * q - q * 1.2 + (half - 1) * 0); // тень справа
     ctx.fillStyle = 'rgba(255,255,255,0.35)';
     ctx.fillRect(cx - half * q + shake, r.y + y * q, q, q); // блик слева
@@ -223,12 +223,27 @@ function drawSpots(app, kit, L, G, st) {
 
     const clicked = kit.button(`part-${id}`, r, { icon: partIcon(id), variant: on ? 'cardOn' : 'card', iconSize: Math.round(r.w * 0.52), tip: partName(app, id), badge: upgradable ? '!' : undefined, iconColor: ps.level ? c.text : c.textMute });
     if (clicked) st.selected = id;
-    // подпись снаружи
-    const lx = r.side < 0 ? r.x - L.gap : r.x + r.w + L.gap;
-    const align = r.side < 0 ? 'right' : 'left';
-    const maxW = r.side < 0 ? lx - G.schematic.x - L.gap : G.schematic.x + G.schematic.w - lx - L.gap;
-    kit.drawText(partName(app, id), lx, r.y + r.h * 0.34, { size: kit.fs(12), color: on ? c.amber : c.text, align, maxWidth: maxW });
-    kit.drawText(ps.level ? t('rocket.lvl', { n: ps.level }) : t('rocket.none'), lx, r.y + r.h * 0.68, { size: kit.fs(11), color: lockedReq ? c.red : c.textMute, align, maxWidth: maxW });
+    if (G.compact) {
+      // тесная раскладка: без подписей, уровень цифрой в углу
+      if (ps.level) kit.drawText(String(ps.level), r.x + L.px * 3, r.y + r.h - Math.round(8 * L.ui), { size: kit.fs(12), color: c.amber, weight: 900, shadow: 'rgba(0,0,0,0.9)' });
+    } else {
+      // подпись снаружи: название в одну-две строки и уровень
+      const lx = r.side < 0 ? r.x - L.gap : r.x + r.w + L.gap;
+      const align = r.side < 0 ? 'right' : 'left';
+      const maxW = r.side < 0 ? lx - G.schematic.x - L.gap * 0.5 : G.schematic.x + G.schematic.w - lx - L.gap * 0.5;
+      const nsize = kit.fs(12);
+      const shortName = partShort(app, id);
+      const fitted = shortName.includes(' ') ? null : kit.text.fit(shortName, maxW, nsize, 800, 0.6);
+      const lines = fitted ? [fitted.str] : kit.text.wrap(shortName, maxW, nsize).slice(0, 2);
+      const lh = nsize * 1.15;
+      const blockH = lines.length * lh + kit.fs(11) * 1.2;
+      let ty = r.y + (r.h - blockH) / 2 + lh / 2;
+      for (const ln of lines) {
+        kit.drawText(ln, lx, ty, { size: nsize, color: on ? c.amber : c.text, align, maxWidth: maxW });
+        ty += lh;
+      }
+      kit.drawText(ps.level ? t('rocket.lvl', { n: ps.level }) : t('rocket.none'), lx, ty + kit.fs(2), { size: kit.fs(11), color: ps.level ? c.amber : c.textMute, align, maxWidth: maxW });
+    }
     if (lockedReq) kit.icon('lock', r.side < 0 ? r.x + 8 * L.ui : r.x + r.w - 8 * L.ui, r.y + r.h - 8 * L.ui, Math.round(12 * L.ui), c.amber);
   }
 }
@@ -254,8 +269,11 @@ function drawPanel(app, kit, L, G, st) {
     y += size * 1.5;
     levelPips(kit, { x: body.x, y, w: body.w - L.px * 3, h: Math.round(L.ui * 7) }, ps.level, ps.max, ps.cap);
     y += Math.round(L.ui * 7) + L.gap;
-    y += kit.paragraph(partDesc(app, id), body.x, y, body.w - L.px * 3, { size, color: c.textDim, lineHeight: 1.25 }) + L.gap;
     if (ps.next) {
+      if (blocking.length) {
+        y += L.gap * 0.5;
+        y += drawReasons(app, kit, body.x, y, body.w - L.px * 3, blocking, { goto: (key) => app.go('base', { select: key }, { push: true }) });
+      }
       if (rows.length) {
         kit.drawText(t('rocket.change'), body.x, y + size * 0.6, { size: kit.fs(12), color: c.textMute });
         y += size * 1.4;
@@ -265,14 +283,11 @@ function drawPanel(app, kit, L, G, st) {
           y += rowH + L.gap * 0.5;
         }
       }
-      if (blocking.length) {
-        y += L.gap * 0.5;
-        y += drawReasons(app, kit, body.x, y, body.w - L.px * 3, blocking, { goto: (key) => app.go('base', { select: key }, { push: true }) });
-      }
     } else {
       kit.drawText(t('rocket.maxed'), body.x, y + size * 0.7, { size: kit.fs(14), color: c.green });
       y += size * 1.8;
     }
+    y += kit.paragraph(partDesc(app, id), body.x, y, body.w - L.px * 3, { size, color: c.textDim, lineHeight: 1.25 }) + L.gap;
     return y - top + L.gap;
   });
 
