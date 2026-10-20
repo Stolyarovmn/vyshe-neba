@@ -1,3 +1,5 @@
+import { MODULE_VIEW, ASSEMBLY_WIDTH, ASSEMBLY_HEIGHT } from '../render/rocket-view.js';
+
 // Раскладки экранов: портрет и ландшафт, безопасные зоны, цели нажатия ≥ 48 CSS px.
 // Чистые функции без DOM. Все размеры — в CSS-пикселях; масштаб интерфейса ui = clamp(min(w,h)/420, 1, 3).
 
@@ -142,18 +144,11 @@ export function sheetRect(L, { dock = true } = {}) {
 
 // --- ракета ---
 
-/** Девять горячих точек вдоль силуэта. t — положение по высоте (0 — верх), side — сторона подписи. */
-export const ROCKET_SPOTS = [
-  { id: 'parachute', t: 0.06, side: 1 },
-  { id: 'capsule', t: 0.2, side: -1 },
-  { id: 'avionics', t: 0.3, side: 1 },
-  { id: 'tank', t: 0.46, side: -1 },
-  { id: 'hull', t: 0.52, side: 1 },
-  { id: 'booster', t: 0.72, side: 1 },
-  { id: 'engine', t: 0.74, side: -1 },
-  { id: 'legs', t: 0.92, side: 1 },
-  { id: 'fins', t: 0.92, side: -1 },
-];
+/** Девять горячих точек вдоль сборки. t — положение по высоте (0 — верх), берётся из render/rocket-view.js; side — сторона подписи. */
+const SPOT_SIDE = { parachute: 1, capsule: -1, avionics: 1, tank: -1, hull: 1, booster: 1, engine: -1, legs: 1, fins: -1 };
+export const ROCKET_SPOTS = Object.entries(SPOT_SIDE)
+  .map(([id, side]) => ({ id, side, t: MODULE_VIEW[id].tAnchor }))
+  .sort((p, q) => p.t - q.t);
 
 export function rocketLayout(L) {
   const { body } = screenFrame(L, { header: true });
@@ -163,8 +158,9 @@ export function rocketLayout(L) {
   const { a: schematic, b: panel } = splitBody(L, body, ratio);
   const standH = L.touch(46);
   const stripH = standH + L.gap * 2;
-  const rocketH = Math.min(schematic.h - stripH - L.gap * 2, R(schematic.w * (L.portrait ? 1.05 : 1.2)), R(400 * L.ui));
-  const rocketW = R(rocketH * 0.26);
+  const flameRoom = R(Math.min(schematic.h, schematic.w * 1.05) * 0.1);
+  const rocketH = Math.min(schematic.h - stripH - flameRoom - L.gap * 2, R(schematic.w * (L.portrait ? 1.05 : 1.2)), R(400 * L.ui));
+  const rocketW = R((rocketH * ASSEMBLY_WIDTH) / ASSEMBLY_HEIGHT);
   const cx = schematic.x + schematic.w / 2;
   const roomy = schematic.h > 5 * spot + 4 * L.gap + L.gap * 3;
   const top = schematic.y + (roomy ? L.gap * 1.5 : 1);

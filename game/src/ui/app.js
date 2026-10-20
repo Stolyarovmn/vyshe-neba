@@ -3,7 +3,7 @@
 
 import { createKit } from './kit.js';
 import { ICON_NAMES } from './icons.js';
-import { computeLayout, mergeLayouts } from './layout.js';
+import { computeLayout, mergeLayouts, dockLayout, sheetRect } from './layout.js';
 import { createSfx, reasonText } from './bridge.js';
 import { sfxForEvent } from '../audio/names.js';
 import { clamp } from './format.js';
@@ -309,7 +309,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
   app.startLaunch = ({ destination = 'earth', consumables = {} } = {}) => {
     let config;
     try {
-      config = app.rules.makeFlightConfig(app.profile, { destination, consumables, seed: (Math.random() * 1e9) | 0 });
+      config = app.rules.makeFlightConfig(app.profile, { destination, consumables, seed: app.fixedSeed ?? ((Math.random() * 1e9) | 0) });
     } catch (err) {
       console.error('[app] makeFlightConfig:', err);
       kit.toast(t('launch.error'), { kind: 'bad' });
@@ -353,6 +353,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       hintUntil: 0,
       shake: 0,
       warn: {},
+      cues: {},
+      alarmUntil: 0,
       flash: 0,
       lowFuelShown: false,
     };
@@ -371,11 +373,12 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     return out;
   };
 
-  /** Выполнить n шагов симуляции с входом inp. Возвращает события. */
+  /** Выполнить n шагов симуляции с входом inp (или автопилота, если он включён). Возвращает события. */
   function simulate(s, n, inp) {
     const events = [];
     let cur = inp;
     for (let i = 0; i < n; i++) {
+      if (s.autopilot) cur = s.autopilot.next(s.flight, DT);
       const ev = app.sim.step(s.flight, cur, DT) || [];
       for (const e of ev) events.push(e);
       cur = stripPulses(inp);
@@ -383,6 +386,25 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       if (ph === 'landed' || ph === 'crashed') s.phase = 'ending';
     }
     return events;
+  }
+
+  // визуальные дубли звуковых сигналов: подписи событий и красная пульсация по краям при тревоге
+  const CUES = {
+    'stage-sep': { key: 'cue.stageSep', icon: 'launch', kind: 'tip' },
+    parachute: { key: 'cue.parachute', icon: 'chute', kind: 'good' },
+    'fuel-empty': { key: 'cue.fuelEmpty', icon: 'fuel', kind: 'bad' },
+    hit: { key: 'cue.hit', icon: 'warn', kind: 'bad', pri: 3 },
+    'transfer-start': { key: 'cue.transferStart', icon: 'transfer', kind: 'good' },
+    'transfer-done': { key: 'cue.transferDone', icon: 'transfer', kind: 'good' },
+    touch: { key: 'cue.touch', icon: 'down', kind: 'tip' },
+    storm: { key: 'cue.storm', icon: 'wind', kind: 'bad' },
+  };
+  function visualCue(s, e) {
+    const cue = CUES[e.type];
+    if (cue) s.cues[e.type] = { ...cue, text: t(cue.key), at: app.time };
+    if (e.type === 'thrust-cut' && e.reason === 'fuel') s.cues['fuel-empty'] = { ...CUES['fuel-empty'], text: t('cue.fuelEmpty'), at: app.time };
+    const alarm = e.type === 'low-fuel' || e.type === 'hit' || (e.type === 'warn' && (e.kind === 'hull' || e.kind === 'hazard' || e.kind === 'brake'));
+    if (alarm) s.alarmUntil = app.time + (e.type === 'low-fuel' ? 2.4 : 1.2);
   }
 
   function handleFlightEvents(s, events) {
@@ -402,6 +424,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       if (e.type === 'landed') app.haptic([20, 30, 20]);
       if (e.type === 'hit') app.haptic(40);
       if (e.type === 'warn') s.warn[e.kind] = app.time;
+      visualCue(s, e);
       if (e.type === 'low-fuel') s.warn.fuel = app.time;
       if (e.type === 'pickup' || e.type === 'ring') s.flash = 1;
     }
@@ -433,10 +456,14 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     }
   }
 
+  const simulateIdle = () => ({ throttle: 0, tilt: 0, stabilize: false, boost: false, parachute: false, canister: false, repair: false, transfer: false, pause: false });
+
   function flightTick(dt) {
     const s = app.session;
     if (!s) return;
-    const inp = input.poll(dt);
+    let inp = input.poll(dt);
+    // под автопилотом ввод игрока игнорируется, кроме паузы
+    if (s.autopilot) inp = { ...simulateIdle(), pause: inp.pause };
     s.lastInput = inp;
     if (inp.pause && !s.paused && s.phase === 'flying') app.pause();
     if (s.paused) {
@@ -463,13 +490,37 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     audioFrame(s, dt);
   }
 
-  /** Для тестов и ускоренной перемотки: n шагов без отрисовки. */
+  /** Для тестов и ускоренной перемотки: n шагов без отрисовки (с автопилотом, если он включён). */
   app.advanceFlight = (n) => {
     const s = app.session;
     if (!s || s.paused) return;
     const inp = input.poll(DT);
     if (s.phase === 'flying') handleFlightEvents(s, simulate(s, n, inp));
     else if (s.phase === 'ending') handleFlightEvents(s, simulate(s, n, stripPulses(inp)));
+  };
+
+  /**
+   * Включает на текущем полёте драйвер ввода из sim.createAutopilot вместо клавиатуры и касаний:
+   * { mission: 'hop'|'space'|'land', skill, targetAlt }. Работает до конца полёта; ввод игрока игнорируется.
+   */
+  app.autoplay = (o = {}) => {
+    const s = app.session;
+    if (!s || !app.sim.createAutopilot) return false;
+    s.autopilot = app.sim.createAutopilot({ seed: s.config.seed, skill: o.skill ?? 1, mission: o.mission ?? 'hop', targetAlt: o.targetAlt });
+    return true;
+  };
+
+  /** Крутит симуляцию без отрисовки до конца полёта или на seconds секунд игрового времени; возвращает краткое состояние. */
+  app.fastForward = (seconds = Infinity) => {
+    const s = app.session;
+    if (!s) return null;
+    if (!s.autopilot) app.autoplay({});
+    const limit = s.flight.time + seconds;
+    const idle = { throttle: 0, tilt: 0, stabilize: false, boost: false, parachute: false, canister: false, repair: false, transfer: false, pause: false };
+    s.paused = false;
+    while (!s.flight.ended && s.flight.time < limit && s.flight.time < 1500) handleFlightEvents(s, simulate(s, 120, idle));
+    const f = s.flight;
+    return { ended: f.ended, phase: f.phase, body: f.body, time: f.time, alt: f.alt, outcome: f.outcome, reason: f.reason };
   };
 
   app.pause = () => {
@@ -549,6 +600,27 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     }
   }
 
+  /** В ландшафте с открытой карточкой постройки справа уведомления центрируются в свободной левой части. */
+  function toastArea(L) {
+    if (app.screen === 'hub' && app.hubSelected && !L.portrait && !app.countdown) {
+      const sheet = sheetRect(L, { dock: true });
+      return { x: L.area.x, y: L.area.y, w: Math.max(120, sheet.x - L.area.x), h: L.area.h };
+    }
+    return null;
+  }
+
+  /** Уведомления встают внизу по центру: над доком в хабе, над органами управления в полёте. */
+  function toastBottom(L) {
+    const safeBottom = L.area.y + L.area.h - L.gap * 1.5;
+    if (app.screen === 'hub' && !app.countdown) return dockLayout(L).bar.y - L.gap;
+    if (app.screen === 'flight') {
+      const hud = L.hud;
+      if (L.portrait) return Math.min(hud.lever.y, hud.buttons.transfer.y, hud.disc.cy - hud.disc.r) - L.gap * 2;
+      return safeBottom - (app.touchUi ? 0 : Math.round(30 * L.ui));
+    }
+    return safeBottom;
+  }
+
   app.frame = (dt, nowSec) => {
     const L = app.layout;
     if (!L) return;
@@ -558,6 +630,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     ctx.imageSmoothingEnabled = false;
 
     L.hud.touchVisible = app.touchUi;
+    kit.setToastBottom(toastBottom(L), toastArea(L));
     if (app.countdown) tickCountdown(dt);
     if (app.screen === 'flight') flightTick(dt);
     else if (app.standFrame) {

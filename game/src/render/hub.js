@@ -10,6 +10,7 @@ import { CLOUD_LAYERS_HUB, drawClouds, drawRain, drawSky, drawSun } from './sky.
 import { drawIsland, drawOcean } from './ground.js';
 import { drawPlacedBuildings } from './buildings.js';
 import { createRocketPose, drawRocket, stackHeight } from './rocket.js';
+import { rocketKind } from './rocket-view.js';
 import { drawAircraft, drawDrone } from './traffic.js';
 import { drawLaunchTable } from './launchpad.js';
 import { fillWorldRect } from './painter.js';
@@ -202,7 +203,7 @@ function drawLaunchPad(ctx, painter, view, profile, pose, time, devPerCss, addRe
   pose.y = 0;
   pose.angle = 0;
   pose.era = era;
-  pose.kind = (parts.booster | 0) > 0 ? 'booster' : 'core';
+  pose.kind = rocketKind(parts);
   pose.throttle = 0;
   pose.atmo = 1;
   pose.skin = (profile && profile.skin) || 'classic';

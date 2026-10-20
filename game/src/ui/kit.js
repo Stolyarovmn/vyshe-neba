@@ -6,7 +6,7 @@ import { createText } from './text.js';
 import { createIcons, hasIcon } from './icons.js';
 import { getTheme, mix, withAlpha } from './theme.js';
 import * as Scroll from './scroll.js';
-import { clamp, damp, easeOutBack, easeOutCubic, fmtCompact, fmtStat, fmtInt } from './format.js';
+import { clamp, damp, easeOutCubic, fmtCompact, fmtStat, fmtInt } from './format.js';
 import { intersect } from './layout.js';
 import { t } from '../i18n/index.js';
 
@@ -813,42 +813,53 @@ export function createKit({ sfx = () => {} } = {}) {
 
   // ---------- подсказки и уведомления ----------
 
+  const MAX_TOASTS = 2;
+  const pending = [];
+
+  /** Уведомление: одновременно видны не больше двух, остальные ждут своей очереди. */
   function toast(message, o = {}) {
-    toasts.push({ message, kind: o.kind || 'info', icon: o.icon, ttl: o.ttl || 2.8, t0: S.time, id: Math.random() });
-    if (toasts.length > 4) toasts.shift();
+    if (toasts.some((x) => x.message === message) || pending.some((x) => x.message === message)) return;
+    pending.push({ message, kind: o.kind || 'info', icon: o.icon, ttl: o.ttl || 2.3, t0: 0 });
+    if (pending.length > 4) pending.shift();
+  }
+
+  /** Нижняя граница стопки уведомлений (y, CSS px); экраны задают её над доком или над управлением. */
+  function setToastBottom(y, area = null) {
+    S.toastBottom = y;
+    S.toastArea = area;
   }
 
   function drawToasts() {
-    if (!toasts.length) return;
     const L = S.L;
     const c = S.th.c;
+    for (let i = toasts.length - 1; i >= 0; i--) if (S.time - toasts[i].t0 > toasts[i].ttl) toasts.splice(i, 1);
+    while (pending.length && toasts.length < MAX_TOASTS) {
+      const next = pending.shift();
+      next.t0 = S.time;
+      toasts.push(next);
+    }
+    if (!toasts.length) return;
     const size = fs(14);
-    let y = L.area.y + L.gap + (L.portrait ? Math.max(48, 44 * L.ui) + L.gap * 2 : L.touch(48) + L.gap * 2);
-    for (let i = toasts.length - 1; i >= 0; i--) {
-      const tt = toasts[i];
+    const h = Math.round(size * 2.4);
+    let bottom = S.toastBottom ?? L.area.y + L.area.h - L.gap * 1.5;
+    bottom = Math.min(bottom, L.area.y + L.area.h - L.gap);
+    toasts.forEach((tt, i) => {
       const age = S.time - tt.t0;
-      if (age > tt.ttl) {
-        toasts.splice(i, 1);
-        continue;
-      }
-    }
-    for (const tt of toasts) {
-      const age = S.time - tt.t0;
-      const inK = easeOutBack(age / 0.25);
-      const outK = clamp((tt.ttl - age) / 0.3, 0, 1);
+      const inK = easeOutCubic(age / 0.2);
+      const outK = clamp((tt.ttl - age) / 0.25, 0, 1);
       const w = Math.min(L.area.w - L.gap * 2, text.measure(tt.message, size) + size * 3.4);
-      const h = Math.round(size * 2.4);
-      const x = L.area.x + (L.area.w - w) / 2;
-      const yy = y - (1 - inK) * 24;
-      S.ctx.globalAlpha = outK * clamp(inK, 0, 1);
+      const zone = S.toastArea || L.area;
+      const w2 = Math.min(w, zone.w - L.gap * 2);
+      const x = zone.x + (zone.w - w2) / 2;
+      const y = bottom - h - i * (h + L.gap) + (1 - inK) * 18 + (1 - outK) * 10;
+      S.ctx.globalAlpha = Math.min(inK, outK);
       const variant = tt.kind === 'bad' ? 'warn' : tt.kind === 'good' ? 'good' : 'raised';
-      nine(variant, x, yy, w, h, Math.max(1, Math.round(px() * 0.75)));
+      nine(variant, x, y, w2, h, Math.max(1, Math.round(px() * 0.75)));
       const ic = tt.icon || (tt.kind === 'bad' ? 'warn' : tt.kind === 'good' ? 'check' : 'info');
-      icon(ic, x + size * 1.2, yy + h / 2, size * 1.2, tt.kind === 'bad' ? c.red : tt.kind === 'good' ? c.white : c.amber);
-      drawText(tt.message, x + size * 2.2, yy + h / 2, { size, color: c.text, maxWidth: w - size * 3 });
+      icon(ic, x + size * 1.2, y + h / 2, size * 1.2, tt.kind === 'bad' ? c.red : tt.kind === 'good' ? c.white : c.amber);
+      drawText(tt.message, x + size * 2.2, y + h / 2, { size, color: c.text, maxWidth: w2 - size * 3 });
       S.ctx.globalAlpha = 1;
-      y += h + L.gap;
-    }
+    });
   }
 
   function drawTooltip() {
@@ -950,6 +961,7 @@ export function createKit({ sfx = () => {} } = {}) {
     resourceChip,
     modal,
     toast,
+    setToastBottom,
     badge,
     icon,
     drawText,

@@ -48,6 +48,8 @@ export async function createRendererSafe(canvas) {
   const renderer = {
     canvas,
     real,
+    painter: real.painter,
+    assets: real.assets,
     layout: pick('layout', stub.layout),
     hub: pick('hub', stub.hub),
     flight: pick('flight', stub.flight),

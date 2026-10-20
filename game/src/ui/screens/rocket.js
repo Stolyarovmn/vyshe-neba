@@ -2,18 +2,10 @@
 // («было → станет», стоимость, требования базы, причина блокировки) и «стенд» двигателя.
 
 import { t } from '../../i18n/index.js';
-import { screenFrame, rocketLayout, ROCKET_SPOTS } from '../layout.js';
+import { screenFrame, rocketLayout } from '../layout.js';
+import { drawAssembly, MODULE_VIEW } from '../../render/rocket-view.js';
 import { clamp, lerp } from '../format.js';
 import { drawHeader, drawReasons, isFundsReason, levelPips, partIcon, partName, partDesc, deltaRows, partShort, PART_KEYS } from './common.js';
-
-const ERA_PALETTES = [
-  { body: '#d9d2bd', shade: '#a8a08a', accent: '#c0392b', glass: '#6fb5d6' },
-  { body: '#cfd6dc', shade: '#9aa5ae', accent: '#e8892b', glass: '#6fc1e0' },
-  { body: '#e9edf2', shade: '#aeb8c4', accent: '#2f7fd0', glass: '#7fd0f0' },
-  { body: '#f2f4f6', shade: '#b9c2cc', accent: '#2b2f3a', glass: '#52d8ff' },
-  { body: '#dfeee9', shade: '#9bbdb4', accent: '#1fb89a', glass: '#7ff0e0' },
-  { body: '#f6e6b8', shade: '#c9ae6a', accent: '#8a5be0', glass: '#c9a8ff' },
-];
 
 const STAND = { ramp: 0.5, hold: 1.4, fall: 0.7 };
 
@@ -76,120 +68,56 @@ export default {
 
 // ---------- схема ----------
 
+/** Сборка настоящими спрайтами эпохи (render/rocket-view.js), подсветка выбранного модуля, вспышка при улучшении. */
 function drawSchematic(app, kit, L, G, st, thr) {
   const ctx = kit.S.ctx;
+  const c = kit.c;
   const p = app.profile;
-  const pal = ERA_PALETTES[p.era] || ERA_PALETTES[0];
   const r = G.rocket;
-  const q = Math.max(2, Math.floor(r.h / 46));
-  const rows = Math.floor(r.h / q);
-  const cx = Math.round(r.x + r.w / 2);
-  const shake = thr > 0 && !app.settings.reduceMotion ? Math.round((Math.sin(app.time * 90) * thr) * (q / 2)) : 0;
-  const flash = st.flash;
-
-  // площадка под схемой
   kit.nine('inset', G.schematic.x, G.schematic.y, G.schematic.w, G.schematic.h);
+  const shake = thr > 0 && !app.settings.reduceMotion ? Math.sin(app.time * 90) * thr * 1.2 : 0;
+  const cx = r.x + r.w / 2 + shake;
+  drawAssembly(ctx, app.renderer.painter, {
+    era: p.era,
+    parts: p.parts,
+    skin: p.skin,
+    cx,
+    bottom: r.y + r.h,
+    height: r.h,
+    dpr: L.dpr,
+    time: app.time,
+    throttle: thr,
+  });
 
-  const fill = (y, halfCells, color, off = 0) => {
-    ctx.fillStyle = color;
-    ctx.fillRect(cx - halfCells * q + off + shake, r.y + y * q, halfCells * 2 * q, q);
-  };
-  const lvl = p.parts;
-  const bodyHalf = 5;
-  const noseRows = Math.round(rows * 0.2);
-  const bodyEnd = Math.round(rows * 0.8);
-  const boosterStart = Math.round(rows * 0.58);
-
-  // «призраки» пустых слотов
-  if (!lvl.booster) {
-    ctx.strokeStyle = 'rgba(82,216,255,0.35)';
-    ctx.setLineDash([q, q]);
-    ctx.strokeRect(cx - (bodyHalf + 1) * q + 0.5, r.y + boosterStart * q + 0.5, (bodyHalf + 1) * 2 * q, (bodyEnd - boosterStart) * q);
-    ctx.setLineDash([]);
-  }
-
-  // опоры и стабилизаторы
-  const legs = Math.max(1, lvl.legs);
-  {
-    ctx.fillStyle = lvl.legs ? pal.shade : '#6d7380';
-    const spread = 2 + Math.min(4, Math.ceil(legs / 4));
-    for (let i = 0; i < 4; i++) {
-      for (const side of [-1, 1]) {
-        ctx.fillRect(cx + side * (bodyHalf + 1 + i * (spread / 4)) * q - (side > 0 ? 0 : q) + shake, r.y + (bodyEnd - 2 + i) * q, q, q);
-      }
+  // подсветка выбранного модуля: уголки вокруг его области на сборке
+  const view = MODULE_VIEW[st.selected];
+  if (view) {
+    const pulse = app.settings.reduceMotion ? 1 : 0.7 + 0.3 * Math.sin(app.time * 5);
+    const pad = Math.round(4 * L.ui);
+    const x0 = Math.round(r.x - pad);
+    const x1 = Math.round(r.x + r.w + pad);
+    const y0 = Math.round(r.y + view.region[0] * r.h - pad);
+    const y1 = Math.round(r.y + view.region[1] * r.h + pad);
+    const arm = Math.max(8, Math.round(Math.min(x1 - x0, y1 - y0) * 0.3));
+    const t = Math.max(2, Math.round(L.px * 0.8));
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    ctx.fillStyle = c.amber;
+    for (const [px, py, sx, sy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) {
+      ctx.fillRect(sx > 0 ? px : px - arm, sy > 0 ? py : py - t, arm, t);
+      ctx.fillRect(sx > 0 ? px : px - t, sy > 0 ? py : py - arm, t, arm);
     }
-    fill(bodyEnd + 2, bodyHalf + spread / 2, pal.shade);
-  }
-  {
-    const size = 2 + Math.min(4, Math.ceil(Math.max(1, lvl.fins) / 4));
-    for (let i = 0; i < size * 2; i++) {
-      const w = Math.round(((size * 2 - i) / (size * 2)) * size);
-      ctx.fillStyle = lvl.fins ? pal.accent : '#7a2f2a';
-      ctx.fillRect(cx - (bodyHalf + w) * q + shake, r.y + (bodyEnd - size * 2 + i + 1) * q, w * q, q);
-      ctx.fillRect(cx + bodyHalf * q + shake, r.y + (bodyEnd - size * 2 + i + 1) * q, w * q, q);
-    }
-  }
-
-  // корпус
-  for (let y = 0; y < bodyEnd; y++) {
-    let half;
-    if (y < noseRows) half = Math.max(1, Math.round(lerp(1, bodyHalf, Math.sin((y / noseRows) * Math.PI * 0.5))));
-    else half = y >= boosterStart && lvl.booster ? bodyHalf + 1 : bodyHalf;
-    const stage = y >= boosterStart && lvl.booster;
-    fill(y, half, y < noseRows * 0.85 ? pal.accent : stage ? '#c7c0aa' : pal.body);
-    fill(y, 1, pal.shade, half * q - q * 1.2 + (half - 1) * 0); // тень справа
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
-    ctx.fillRect(cx - half * q + shake, r.y + y * q, q, q); // блик слева
-  }
-  // полоса ступеней и обшивка
-  const plates = Math.min(6, 1 + Math.floor((lvl.hull || 0) / 3));
-  for (let i = 0; i < plates; i++) {
-    const yy = Math.round(rows * 0.3) + i * 2;
-    ctx.fillStyle = pal.accent;
-    ctx.fillRect(cx - bodyHalf * q + shake, r.y + yy * q, bodyHalf * 2 * q, Math.max(1, q / 2));
-  }
-  // капсульное остекление
-  ctx.fillStyle = pal.glass;
-  ctx.fillRect(cx - q + shake, r.y + Math.round(noseRows * 0.9) * q, q * 2, q * 2);
-  // парашют (колпак) и антенна
-  if (lvl.parachute) {
-    ctx.fillStyle = pal.accent;
-    ctx.fillRect(cx - q + shake, r.y - q * 2, q * 2, q * 2);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(cx - q + shake, r.y - q * 2, q * 2, Math.max(1, q / 2));
-  }
-  if (lvl.avionics) {
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(cx + 2 * q + shake, r.y + Math.round(noseRows * 0.2) * q - q * 3, Math.max(1, q / 2), q * 3);
-    ctx.fillStyle = kit.c.green;
-    ctx.fillRect(cx + 2 * q + shake - 1, r.y + Math.round(noseRows * 0.2) * q - q * 3 - 2, 4, 3);
-  }
-  // сопло
-  const nozzle = 2 + Math.min(3, Math.ceil((lvl.engine || 0) / 5));
-  for (let i = 0; i < 4; i++) fill(bodyEnd + i, Math.round(lerp(nozzle - 1, nozzle + 1, i / 3)), i < 1 ? '#555b66' : '#3b4049');
-  // пламя
-  if (thr > 0.02) {
-    const fl = Math.round((6 + (lvl.engine || 0) * 0.4) * thr);
-    for (let i = 0; i < fl; i++) {
-      const half = Math.max(1, Math.round(nozzle * (1 - i / (fl + 1)) * (0.8 + 0.2 * Math.sin(app.time * 40 + i))));
-      fill(bodyEnd + 4 + i, half, i < fl * 0.35 ? '#fff3c4' : i < fl * 0.7 ? '#ffb627' : '#e8602b');
-    }
-    ctx.globalAlpha = 0.18 * thr;
-    ctx.fillStyle = '#ffb627';
-    ctx.beginPath();
-    ctx.arc(cx, r.y + (bodyEnd + 6) * q, q * 14, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
+    ctx.restore();
   }
   // вспышка улучшения
-  if (flash > 0) {
-    ctx.globalAlpha = flash * 0.6;
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(cx - (bodyHalf + 2) * q, r.y, (bodyHalf + 2) * 2 * q, rows * q);
-    ctx.globalAlpha = 1;
+  if (st.flash > 0) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = st.flash * 0.5;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(r.x - 4, r.y, r.w + 8, r.h);
+    ctx.restore();
   }
-  // подпись эпохи
-  kit.drawText(String(app.rules.eraYear?.(p.era) ?? [1978, 1986, 1998, 2015, 2035, 2060][p.era]), G.schematic.x + G.schematic.w / 2, G.schematic.y + G.schematic.h - kit.fs(14), { size: kit.fs(12), color: kit.c.textMute, align: 'center' });
 }
 
 // ---------- горячие точки ----------
@@ -198,7 +126,6 @@ function drawSpots(app, kit, L, G, st) {
   const c = kit.c;
   const ctx = kit.S.ctx;
   const p = app.profile;
-  const spotById = Object.fromEntries(ROCKET_SPOTS.map((s) => [s.id, s]));
   const cx = G.rocket.x + G.rocket.w / 2;
   for (const id of PART_KEYS) {
     const r = G.spots[id];
@@ -208,7 +135,7 @@ function drawSpots(app, kit, L, G, st) {
     const upgradable = ps.next && !ps.locked.length;
     const lockedReq = ps.next && ps.locked.some((x) => !isFundsReason(x));
     // линия-выноска к силуэту
-    const mark = { x: cx, y: G.rocket.y + spotById[id].t * G.rocket.h };
+    const mark = { x: cx + r.side * G.rocket.w * 0.3, y: G.rocket.y + MODULE_VIEW[id].tAnchor * G.rocket.h };
     ctx.strokeStyle = on ? c.amber : 'rgba(138,151,181,0.55)';
     ctx.lineWidth = Math.max(1, Math.round(L.px / 2));
     ctx.setLineDash([L.px, L.px]);

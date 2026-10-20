@@ -43,7 +43,18 @@ export default {
     const hdrH = Math.round(54 * L.ui);
     kit.nine(landed ? 'good' : crashed ? 'warn' : 'raised', G.card.x + L.px * 2, G.card.y + L.px * 2, G.card.w - L.px * 4, hdrH, Math.max(1, Math.round(L.px * 0.75)));
     kit.icon(landed ? (result.perfect ? 'star' : 'check') : crashed ? 'warn' : 'close', G.card.x + L.pad + hdrH * 0.4, G.card.y + L.px * 2 + hdrH / 2, Math.round(hdrH * 0.55), landed ? c.white : crashed ? c.red : c.textDim);
-    kit.drawText(t(titleKey), G.card.x + L.pad * 2 + hdrH * 0.7, G.card.y + L.px * 2 + hdrH / 2, { size: kit.fs(20), color: c.text, shadow: 'rgba(0,0,0,0.6)', maxWidth: G.card.w - hdrH - L.pad * 4 });
+    kit.drawText(t(titleKey), G.card.x + L.pad * 2 + hdrH * 0.7, G.card.y + L.px * 2 + hdrH / 2, { size: kit.fs(20), color: c.text, shadow: 'rgba(0,0,0,0.6)', maxWidth: G.card.w * 0.5 });
+
+    // тело, на которое летели: «Луна», «Марс», «Атмосфера»
+    const bodyId = res.report.body || result.body || res.destination;
+    const bodyName = app.data.DESTINATIONS?.[res.destination]?.name || app.data.BODIES?.[bodyId]?.name;
+    if (bodyName) {
+      const bx = G.card.x + G.card.w - L.pad * 2;
+      const by = G.card.y + L.px * 2 + hdrH / 2;
+      const nameW = kit.text.measure(bodyName, kit.fs(16));
+      kit.drawText(bodyName, bx, by, { size: kit.fs(16), color: c.text, align: 'right', shadow: 'rgba(0,0,0,0.6)', maxWidth: G.card.w * 0.3 });
+      kit.icon(bodyId === 'moon' || bodyId === 'mars' ? bodyId : 'earth', bx - Math.min(nameW, G.card.w * 0.3) - kit.fs(14), by, kit.fs(24), c.text);
+    }
 
     const bodyTop = G.card.y + L.px * 2 + hdrH + L.gap;
     const body = { x: G.content.x, y: bodyTop, w: G.content.w, h: G.content.y + G.content.h - bodyTop };

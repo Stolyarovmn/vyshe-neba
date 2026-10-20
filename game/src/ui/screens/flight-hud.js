@@ -61,8 +61,21 @@ export default {
 const hudPanel = (kit, r) => kit.nine('hud', r.x, r.y, r.w, r.h, Math.max(1, Math.round(kit.L.px / 2)));
 
 function drawFlash(app, kit, L, s) {
-  if (s.flash <= 0 || app.settings.reduceMotion) return;
   const ctx = kit.S.ctx;
+  // тревога (мало топлива, столкновение, опасность): красная рамка по краям, дубль звукового сигнала
+  if (app.time < s.alarmUntil) {
+    const k = Math.min(1, (s.alarmUntil - app.time) / 0.4);
+    const pulse = app.settings.reduceMotion ? 0.7 : 0.55 + 0.45 * Math.sin(app.time * 14);
+    const e = Math.round(10 * L.ui);
+    ctx.globalAlpha = 0.5 * k * pulse;
+    ctx.fillStyle = kit.c.red;
+    ctx.fillRect(0, 0, L.w, e);
+    ctx.fillRect(0, L.h - e, L.w, e);
+    ctx.fillRect(0, 0, e, L.h);
+    ctx.fillRect(L.w - e, 0, e, L.h);
+    ctx.globalAlpha = 1;
+  }
+  if (s.flash <= 0 || app.settings.reduceMotion) return;
   ctx.globalAlpha = s.flash * 0.18;
   ctx.fillStyle = kit.c.gold;
   const e = Math.round(8 * L.ui);
@@ -277,6 +290,9 @@ function pickHint(app, s, f, tut) {
   const out = [];
   for (const kind of DANGER_WARNS) {
     if (s.warn[kind] !== undefined && now - s.warn[kind] < 2.4) out.push({ pri: 3, key: `w:${kind}`, text: t(WARN_KEYS[kind]), icon: WARN_ICON[kind], kind: 'bad' });
+  }
+  for (const [type, cue] of Object.entries(s.cues || {})) {
+    if (now - cue.at < 2.2) out.push({ pri: cue.pri ?? 2, key: `cue:${type}:${cue.at}`, text: cue.text, icon: cue.icon, kind: cue.kind });
   }
   if (tut) out.push({ pri: 2, key: `tut:${tut.text}`, text: tut.text, icon: tut.icon, kind: 'tip' });
   if (f.canTransfer) out.push({ pri: 2, key: 'transfer', text: app.touchUi ? t('hint.transfer.touch') : t('hint.transfer'), icon: 'transfer', kind: 'good' });

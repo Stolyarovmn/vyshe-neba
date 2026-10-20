@@ -241,6 +241,22 @@ async function runViewport(browser, vp) {
   const alt1 = await hook(page, () => globalThis.__VN_TEST__.flight().alt);
   assert(alt1 > alt0 + 3, `${vp.name}: ракета не набирает высоту (${alt0} → ${alt1})`);
 
+  // смена ориентации во время полёта: полёт, время и органы управления сохраняются
+  {
+    const before = await hook(page, () => ({ t: globalThis.__VN_TEST__.flight().time, alt: globalThis.__VN_TEST__.flight().alt }));
+    const flip = vp.height > vp.width ? { width: vp.height, height: vp.width } : { width: 390, height: 844 };
+    await page.setViewportSize(flip);
+    await page.waitForTimeout(500);
+    const mid = await hook(page, () => ({ t: globalThis.__VN_TEST__.flight().time, o: globalThis.__VN_APP__.layout.orientation, screen: globalThis.__VN_TEST__.screen(), paused: globalThis.__VN_APP__.session.paused }));
+    assert(mid.screen === 'flight' && mid.t >= before.t, `${vp.name}: полёт потерян при смене ориентации`);
+    assert(mid.o === (flip.height > flip.width ? 'portrait' : 'landscape'), `${vp.name}: ориентация в полёте не сменилась`);
+    await target(page, 'flight-pause');
+    await shot(page, vp, '13b-flight-flipped');
+    await page.setViewportSize({ width: vp.width, height: vp.height });
+    await page.waitForTimeout(400);
+    await target(page, 'flight-pause');
+  }
+
   // потеря фокуса окна отпускает управление
   await page.keyboard.down('KeyW');
   await page.evaluate(() => window.dispatchEvent(new Event('blur')));

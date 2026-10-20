@@ -111,6 +111,8 @@ function installTestHook(app) {
     seed: (n) => {
       app.fixedSeed = n;
     },
+    autoplay: (opts) => app.autoplay(opts),
+    fastForward: (seconds) => app.fastForward(seconds),
     app,
   };
 }
