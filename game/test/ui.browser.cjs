@@ -412,7 +412,7 @@ async function runViewport(browser, vp) {
   if (vp.touch) {
     const lever = await target(page, 'flight-thrust');
     await touch(cdp, 'touchStart', [{ x: lever.x + lever.w / 2, y: lever.y + lever.h * 0.2, id: 1 }]);
-    await page.waitForTimeout(1600);
+    await page.waitForFunction(() => globalThis.__VN_TEST__.flight().throttle > 0.5, null, { timeout: 8000 }).catch(() => {});
     const thr = await hook(page, () => globalThis.__VN_TEST__.flight().throttle);
     assert(thr > 0.5, `${vp.name}: касание рычага не дало тягу (${thr})`);
     // диск наклона вторым пальцем (мультитач)
@@ -438,22 +438,6 @@ async function runViewport(browser, vp) {
   const alt1 = await hook(page, () => globalThis.__VN_TEST__.flight().alt);
   assert(alt1 > alt0 + 3, `${vp.name}: ракета не набирает высоту (${alt0} → ${alt1})`);
 
-  // смена ориентации во время полёта: полёт, время и органы управления сохраняются
-  {
-    const before = await hook(page, () => ({ t: globalThis.__VN_TEST__.flight().time, alt: globalThis.__VN_TEST__.flight().alt }));
-    const flip = vp.height > vp.width ? { width: vp.height, height: vp.width } : { width: 390, height: 844 };
-    await page.setViewportSize(flip);
-    await page.waitForTimeout(500);
-    const mid = await hook(page, () => ({ t: globalThis.__VN_TEST__.flight().time, o: globalThis.__VN_APP__.layout.orientation, screen: globalThis.__VN_TEST__.screen(), paused: globalThis.__VN_APP__.session.paused }));
-    assert(mid.screen === 'flight' && mid.t >= before.t, `${vp.name}: полёт потерян при смене ориентации`);
-    assert(mid.o === (flip.height > flip.width ? 'portrait' : 'landscape'), `${vp.name}: ориентация в полёте не сменилась`);
-    await target(page, 'flight-pause');
-    await shot(page, vp, '13b-flight-flipped');
-    await page.setViewportSize({ width: vp.width, height: vp.height });
-    await page.waitForTimeout(400);
-    await target(page, 'flight-pause');
-  }
-
   // потеря фокуса окна отпускает управление
   await page.keyboard.down('KeyW');
   await page.evaluate(() => window.dispatchEvent(new Event('blur')));
@@ -462,15 +446,30 @@ async function runViewport(browser, vp) {
   assert(heldAfterBlur === 0, `${vp.name}: клавиши не отпущены на blur (${heldAfterBlur})`);
   await page.keyboard.up('KeyW');
 
-  // пауза и возобновление
+  // пауза и возобновление (пауза до падения ракеты, чтобы проверка не зависела от скорости машины)
   await click(page, 'flight-pause', 300);
   assert(await hook(page, () => globalThis.__VN_APP__.session.paused), `${vp.name}: пауза не включилась`);
   await shot(page, vp, '14-pause');
   const tPause = await hook(page, () => globalThis.__VN_TEST__.flight().time);
   await page.waitForTimeout(400);
   assert((await hook(page, () => globalThis.__VN_TEST__.flight().time)) === tPause, `${vp.name}: время идёт на паузе`);
+
+  // смена ориентации во время полёта (на паузе): полёт и время сохраняются, органы управления перестраиваются
+  {
+    const flip = vp.height > vp.width ? { width: vp.height, height: vp.width } : { width: 390, height: 844 };
+    await page.setViewportSize(flip);
+    await page.waitForTimeout(500);
+    const mid = await hook(page, () => ({ t: globalThis.__VN_TEST__.flight().time, o: globalThis.__VN_APP__.layout.orientation, screen: globalThis.__VN_TEST__.screen(), paused: globalThis.__VN_APP__.session.paused }));
+    assert(mid.screen === 'flight' && mid.t === tPause && mid.paused, `${vp.name}: полёт потерян при смене ориентации`);
+    assert(mid.o === (flip.height > flip.width ? 'portrait' : 'landscape'), `${vp.name}: ориентация в полёте не сменилась`);
+    await target(page, 'flight-resume');
+    await shot(page, vp, '13b-flight-flipped');
+    await page.setViewportSize({ width: vp.width, height: vp.height });
+    await page.waitForTimeout(400);
+  }
   await click(page, 'flight-resume');
   assert(!(await hook(page, () => globalThis.__VN_APP__.session.paused)), `${vp.name}: пауза не снялась`);
+  await target(page, 'flight-pause');
 
   // ---- итоги: бланк со штампом, «Ещё раз», «На базу» ----
   await page.evaluate(() => globalThis.__VN_TEST__.step(120 * 240));

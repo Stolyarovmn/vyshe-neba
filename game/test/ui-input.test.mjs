@@ -6,6 +6,7 @@ import {
 } from '../src/input/mapping.js';
 import { createTouchModel } from '../src/input/touch.js';
 import { createGamepad } from '../src/input/gamepad.js';
+import { createInput } from '../src/input/index.js';
 import { computeLayout, hudLayout } from '../src/ui/layout.js';
 
 const hudFor = (w, h) => hudLayout(computeLayout(w, h, 2));
@@ -247,4 +248,68 @@ test('геймпад в интерфейсе: крестовина — нави�
   state.buttons[0].pressed = false;
   state.buttons[1].pressed = true;
   assert.deepEqual(gp.pollUi(0.016), [{ type: 'back' }]);
+});
+
+// ---- жесты камеры хаба: щипок и двойной тап ----
+
+function fakeInput() {
+  const listeners = {};
+  const canvas = {
+    addEventListener: (type, fn) => { (listeners[type] ||= []).push(fn); },
+    removeEventListener() {},
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: 400, height: 800 }),
+    setPointerCapture() {},
+  };
+  const win = { addEventListener() {}, removeEventListener() {} };
+  const prevDoc = globalThis.document;
+  globalThis.document = { addEventListener() {}, removeEventListener() {}, hidden: false };
+  const input = createInput(canvas, () => ({ w: 400, h: 800, hud: null }), { window: win });
+  const fire = (type, id, x, y, pointerType = 'touch') => {
+    for (const fn of listeners[type] || []) fn({ pointerId: id, clientX: x, clientY: y, pointerType, preventDefault() {}, deltaMode: 0 });
+  };
+  return {
+    input,
+    fire,
+    restore: () => {
+      input.dispose();
+      if (prevDoc === undefined) delete globalThis.document;
+      else globalThis.document = prevDoc;
+    },
+  };
+}
+
+test('два пальца в интерфейсе: щипок даёт событие pinch, одиночные нажатия отменяются', () => {
+  const { input, fire, restore } = fakeInput();
+  fire('pointerdown', 1, 150, 300);
+  fire('pointerdown', 2, 250, 300);
+  fire('pointermove', 1, 100, 300);
+  fire('pointermove', 2, 300, 300);
+  fire('pointerup', 1, 100, 300);
+  fire('pointerup', 2, 300, 300);
+  const ev = input.drain(0.016);
+  restore();
+  const pinches = ev.filter((e) => e.type === 'pinch');
+  assert.ok(pinches.length >= 1, 'нет событий pinch');
+  const total = pinches.reduce((k, e) => k * e.factor, 1);
+  assert.ok(Math.abs(total - 2) < 0.05, `общий коэффициент ${total}`);
+  assert.ok(ev.some((e) => e.type === 'cancel'), 'первое нажатие не отменено');
+  assert.ok(!ev.some((e) => e.type === 'up'), 'щипок не должен давать тап');
+});
+
+test('двойной тап: два быстрых касания рядом дают dtap, медленные — нет', async () => {
+  const { input, fire, restore } = fakeInput();
+  fire('pointerdown', 1, 200, 400, 'mouse');
+  fire('pointerup', 1, 200, 400, 'mouse');
+  fire('pointerdown', 1, 204, 402, 'mouse');
+  fire('pointerup', 1, 204, 402, 'mouse');
+  const quick = input.drain(0.016);
+  assert.equal(quick.filter((e) => e.type === 'dtap').length, 1);
+  await new Promise((r) => setTimeout(r, 420));
+  fire('pointerdown', 1, 200, 400, 'mouse');
+  fire('pointerup', 1, 200, 400, 'mouse');
+  fire('pointerdown', 1, 200, 400, 'mouse');
+  fire('pointerup', 1, 200, 400, 'mouse');
+  const slow = input.drain(0.016);
+  restore();
+  assert.equal(slow.filter((e) => e.type === 'dtap').length, 1, 'вторая пара тоже быстрая');
 });
