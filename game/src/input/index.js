@@ -19,6 +19,8 @@ export function createInput(canvas, getLayout, opts = {}) {
   const touchModel = createTouchModel();
   const gamepad = createGamepad();
   let touchSeen = false;
+  let pinch = null; // два пальца в режиме интерфейса: щипок для камеры
+  let lastTap = null; // для двойного тапа
   let lastPoll = performance.now() / 1000;
 
   const emit = (type, payload) => {
@@ -45,6 +47,7 @@ export function createInput(canvas, getLayout, opts = {}) {
     keyboard.releaseAll();
     for (const id of uiPointers.keys()) push({ type: 'cancel', pointerId: id });
     uiPointers.clear();
+    pinch = null;
   }
 
   function onDown(e) {
@@ -63,6 +66,16 @@ export function createInput(canvas, getLayout, opts = {}) {
         return;
       }
     }
+    if (mode === 'ui' && e.pointerType === 'touch' && uiPointers.size === 1 && !pinch) {
+      // второй палец: жест щипка; первое нажатие отменяется, чтобы не стать тапом или сдвигом
+      const [[firstId, first]] = [...uiPointers.entries()];
+      pinch = { a: firstId, b: e.pointerId, pos: { [firstId]: { x: first.cx ?? first.x0, y: first.cy ?? first.y0 }, [e.pointerId]: { x, y } } };
+      pinch.dist = Math.hypot(pinch.pos[firstId].x - x, pinch.pos[firstId].y - y);
+      first.pinched = true;
+      push({ type: 'cancel', pointerId: firstId });
+      uiPointers.set(e.pointerId, { x0: x, y0: y, t0: now(), moved: 999, type: e.pointerType, pinched: true });
+      return;
+    }
     uiPointers.set(e.pointerId, { x0: x, y0: y, t0: now(), moved: 0, type: e.pointerType });
     push({ type: 'down', x, y, pointerId: e.pointerId, pointerType: e.pointerType });
     emit('press', { x, y });
@@ -75,8 +88,19 @@ export function createInput(canvas, getLayout, opts = {}) {
       e.preventDefault();
       return;
     }
+    if (pinch && (e.pointerId === pinch.a || e.pointerId === pinch.b)) {
+      pinch.pos[e.pointerId] = { x, y };
+      const A = pinch.pos[pinch.a];
+      const B = pinch.pos[pinch.b];
+      const d = Math.hypot(A.x - B.x, A.y - B.y);
+      if (pinch.dist > 8 && d > 8) push({ type: 'pinch', factor: d / pinch.dist, x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 });
+      pinch.dist = d;
+      return;
+    }
     const p = uiPointers.get(e.pointerId);
     if (p) {
+      p.cx = x;
+      p.cy = y;
       p.moved = Math.max(p.moved, Math.hypot(x - p.x0, y - p.y0));
       emit('drag', { x, y, dx: x - p.x0, dy: y - p.y0 });
       push({ type: 'move', x, y, pointerId: e.pointerId, pointerType: e.pointerType });
@@ -94,13 +118,30 @@ export function createInput(canvas, getLayout, opts = {}) {
     const p = uiPointers.get(e.pointerId);
     if (!p) return;
     uiPointers.delete(e.pointerId);
+    if (p.pinched) {
+      if (pinch && (e.pointerId === pinch.a || e.pointerId === pinch.b)) pinch = null;
+      return;
+    }
     push({ type: 'up', x, y, pointerId: e.pointerId, pointerType: e.pointerType });
-    if (p.moved < TAP_MOVE && now() - p.t0 < TAP_TIME) emit('tap', { x, y });
+    if (p.moved < TAP_MOVE && now() - p.t0 < TAP_TIME) {
+      emit('tap', { x, y });
+      const t = now();
+      if (lastTap && t - lastTap.t < 0.32 && Math.hypot(x - lastTap.x, y - lastTap.y) < 28) {
+        push({ type: 'dtap', x, y });
+        lastTap = null;
+      } else lastTap = { t, x, y };
+    }
   }
 
   function onCancel(e) {
     if (touchModel.owns(e.pointerId)) {
       touchModel.up(e.pointerId, now(), true);
+      return;
+    }
+    const q = uiPointers.get(e.pointerId);
+    if (q?.pinched) {
+      uiPointers.delete(e.pointerId);
+      if (pinch && (e.pointerId === pinch.a || e.pointerId === pinch.b)) pinch = null;
       return;
     }
     if (uiPointers.delete(e.pointerId)) push({ type: 'cancel', pointerId: e.pointerId });

@@ -3,22 +3,61 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  ART_BUILDINGS, ASSET_FILES, BUILDING_ANCHORS, BUILDING_KEYS, ERA_SPRITE_SIZES, ERA_YEARS, FLAT_SPRITE_SIZES,
-  ISLAND, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName, eraYear, spriteAnchor, spriteName, spriteSize,
+  ART_BUILDINGS, ASSET_FILES, BROKEN_PLACEABLE_ERAS, BUILDING_ANCHORS, BUILDING_KEYS, ENTRY_KEYS, ERA_SPRITE_SIZES, ERA_YEARS,
+  FLAT_SPRITE_SIZES, ISLAND, ISLAND_ROADS, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, WORLD_ENTRIES, buildingSpriteName, eraYear,
+  placeableFile, spriteAnchor, spriteName, spriteSize,
 } from '../src/render/manifest.js';
-import { pngSize, repoRoot } from './render-helpers.mjs';
+import { pngProblem, pngSize, repoRoot } from './render-helpers.mjs';
 
 const fileOf = (spec) => (typeof spec === 'string' ? spec : spec.file);
 
-test('все файлы каталога существуют, пути не повторяются', () => {
+/** Имя спрайта placeables -> [каталог, эпоха], если его файл подменён вместо битого (дубликаты путей допустимы только там). */
+function substitutedNames() {
+  const names = new Set();
+  for (const [key, dir] of Object.entries({ ...PLACEABLE_BUILDINGS, service_lift: 'workshop/service_lift' })) {
+    for (const era of BROKEN_PLACEABLE_ERAS[dir] || []) {
+      names.add(PLACEABLE_BUILDINGS[key] ? `bld_${key}_${ERA_YEARS[era]}` : `station_${key}_${ERA_YEARS[era]}`);
+    }
+  }
+  return names;
+}
+
+test('все файлы каталога существуют, пути не повторяются (кроме подмены битых файлов)', () => {
   const seen = new Map();
+  const substituted = substitutedNames();
   for (const [name, spec] of Object.entries(ASSET_FILES)) {
     const file = fileOf(spec);
     assert.ok(fs.existsSync(path.join(repoRoot, file)), `нет файла ${file} для ${name}`);
-    assert.ok(!seen.has(file), `${file} указан дважды: ${seen.get(file)} и ${name}`);
-    seen.set(file, name);
+    assert.ok(!seen.has(file) || substituted.has(name) || substituted.has(seen.get(file)), `${file} указан дважды: ${seen.get(file)} и ${name}`);
+    if (!seen.has(file)) seen.set(file, name);
   }
   assert.ok(Object.keys(ASSET_FILES).length > 150);
+});
+
+test('каждый PNG каталога цел: контрольные суммы и распаковка (битый файл браузер рисует пустым)', () => {
+  const problems = [];
+  const files = new Set(Object.values(ASSET_FILES).map(fileOf).filter((file) => file.endsWith('.png')));
+  for (const file of files) {
+    const problem = pngProblem(path.join(repoRoot, file));
+    if (problem) problems.push(`${file}: ${problem}`);
+  }
+  assert.deepEqual(problems, []);
+});
+
+test('подмена битых файлов placeables: берётся ближайшая целая эпоха, а в таблице лишь действительно битые файлы', (t) => {
+  assert.equal(placeableFile('workshop/service_lift', 0).endsWith('e0_1978.png'), true);
+  assert.equal(placeableFile('workshop/service_lift', 3).endsWith('e4_2035.png'), true);
+  assert.equal(placeableFile('workshop/service_lift', 2).endsWith('e1_1986.png'), true);
+  assert.equal(placeableFile('workshop/service_lift', 5).endsWith('e4_2035.png'), true);
+  assert.equal(placeableFile('workshop/manufacturing_cell', 1).endsWith('e0_1978.png'), true);
+  assert.equal(placeableFile('workshop/telemetry_post', 2).endsWith('e1_1986.png'), true);
+  assert.equal(placeableFile('base/weather_complex', 3).endsWith('e3_2015.png'), true);
+  for (const [dir, eras] of Object.entries(BROKEN_PLACEABLE_ERAS)) {
+    for (const era of eras) {
+      const original = path.join(repoRoot, 'outputs/rocket/dist/assets/placeables', dir, `e${era}_${ERA_YEARS[era]}.png`);
+      if (!pngProblem(original)) t.diagnostic(`${dir} e${era} теперь цел: уберите из BROKEN_PLACEABLE_ERAS`);
+    }
+  }
 });
 
 test('размеры в манифесте совпадают с заголовками PNG (crop/scale уже применены)', () => {
@@ -93,6 +132,21 @@ test('якоря спрайтов: ступени снизу, площадки �
   assert.equal(spriteAnchor('pad_moon_1978')[1], 0.1382);
   assert.equal(spriteAnchor('terrain_mars')[1], 0.2486);
   assert.deepEqual(spriteAnchor('coin_1978'), [0.5, 0.5]);
+});
+
+test('объекты-входы: раскладка в манифесте совпадает с JSON, ключи для UI заданы', () => {
+  const layout = JSON.parse(fs.readFileSync(path.join(repoRoot, 'art', 'placeables', 'BASE_ISLAND_LAYOUT.json'), 'utf8'));
+  assert.deepEqual(ENTRY_KEYS, ['workshop', 'board', 'shop', 'monument']);
+  assert.deepEqual(Object.keys(layout.entries).sort(), [...ENTRY_KEYS].sort());
+  for (const key of ENTRY_KEYS) {
+    const entry = layout.entries[key];
+    assert.deepEqual(WORLD_ENTRIES[key].anchors, entry.anchors, key);
+    assert.deepEqual(WORLD_ENTRIES[key].size, entry.sprite_px, key);
+    assert.deepEqual(WORLD_ENTRIES[key].footprint, entry.footprint_px, key);
+    assert.equal(WORLD_ENTRIES[key].zone, entry.zone, key);
+    assert.ok(!BUILDING_KEYS.includes(key), `${key} не должен совпадать с ключом постройки`);
+  }
+  assert.ok(ISLAND_ROADS.length >= 1 && ISLAND_ROADS.every((road) => road.points.length >= 2));
 });
 
 test('манифест чистый: читается Node без DOM (как в tools/build.mjs)', () => {

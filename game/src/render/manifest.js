@@ -14,6 +14,7 @@ const PLACEABLE_DIR = 'outputs/rocket/dist/assets/placeables/';
 
 export const ISLAND_FILE = 'art/gen/environment/start_island_hd.png';
 // Фоны экранов: лёгкие WebP-копии утверждённого арта (game/tools/prepare-backdrops.py).
+export const ISLAND_LAND_FILE = 'art/gen/environment/start_island_hd.land.json';
 export const BACKDROP_INTERIOR_FILE = 'art/gen/environment/backdrop_interior_eras.webp';
 export const BACKDROP_ENV_FILE = 'art/gen/environment/backdrop_environments.webp';
 export const AIRCRAFT_FX_FILE = 'outputs/rocket/dist/assets/aircraft/effects.json';
@@ -84,6 +85,30 @@ export function buildingSpriteName(key, level) {
   return `bld_${key}_${eraYear((level | 0) - 1)}`;
 }
 
+/**
+ * Битые PNG в арте placeables (контрольная сумма IDAT не сходится, браузер рисует пустоту):
+ * каталог -> индексы эпох. Для них берётся ближайшая целая эпоха того же каталога (размеры у всех эпох
+ * одинаковы). Когда арт перегенерируют, запись удаляют: тест render.manifest подскажет, что файл снова цел.
+ */
+export const BROKEN_PLACEABLE_ERAS = {
+  'workshop/service_lift': [2, 3, 5],
+  'workshop/manufacturing_cell': [1],
+  'workshop/telemetry_post': [2],
+};
+
+/** Файл спрайта placeables для каталога и эпохи 0..5 с подменой битых файлов ближайшей целой эпохой. */
+export function placeableFile(dir, eraIndex) {
+  const broken = BROKEN_PLACEABLE_ERAS[dir] || [];
+  let index = eraIndex;
+  for (let step = 1; broken.includes(index) && step < ERA_YEARS.length; step++) {
+    const lower = eraIndex - step;
+    const higher = eraIndex + step;
+    if (lower >= 0 && !broken.includes(lower)) index = lower;
+    else if (higher < ERA_YEARS.length && !broken.includes(higher)) index = higher;
+  }
+  return `${PLACEABLE_DIR}${dir}/e${index}_${ERA_YEARS[index]}.png`;
+}
+
 function buildAssetFiles() {
   const files = {};
   for (const base of ERA_SPRITES) {
@@ -95,17 +120,18 @@ function buildAssetFiles() {
   }
   for (const [key, dir] of Object.entries(PLACEABLE_BUILDINGS)) {
     ERA_YEARS.forEach((year, i) => {
-      files[`bld_${key}_${year}`] = `${PLACEABLE_DIR}${dir}/e${i}_${year}.png`;
+      files[`bld_${key}_${year}`] = placeableFile(dir, i);
     });
   }
   for (const [id, dir] of Object.entries(STATION_DIRS)) {
     ERA_YEARS.forEach((year, i) => {
-      files[`station_${id}_${year}`] = `${PLACEABLE_DIR}${dir}/e${i}_${year}.png`;
+      files[`station_${id}_${year}`] = placeableFile(dir, i);
     });
   }
   files.backdrop_interior = BACKDROP_INTERIOR_FILE;
   files.backdrop_env = BACKDROP_ENV_FILE;
   files.island_start = ISLAND_FILE;
+  files.island_land = { file: ISLAND_LAND_FILE, kind: 'json' };
   files.aircraft_fx = { file: AIRCRAFT_FX_FILE, kind: 'json' };
   return files;
 }
@@ -220,6 +246,20 @@ export const BUILDING_ANCHORS = {
   observation: { zone: 'perimeter_east', anchors: [[1380, 320]], size: [150, 175], footprint: [120, 34] },
   recovery: { zone: 'recovery_east', anchors: [[1610, 478]], size: [200, 112], footprint: [180, 34] },
 };
+
+// Объекты-входы в мире (не покупаются): тап открывает экран. Раздел entries в BASE_ISLAND_LAYOUT.json.
+export const ENTRY_KEYS = ['workshop', 'board', 'shop', 'monument'];
+export const WORLD_ENTRIES = {
+  workshop: { zone: 'launch_core', anchors: [[330, 262]], size: [130, 157], footprint: [114, 28] },
+  monument: { zone: 'launch_core', anchors: [[232, 276]], size: [50, 120], footprint: [44, 22] },
+  board: { zone: 'launch_core', anchors: [[210, 352]], size: [78, 72], footprint: [60, 20] },
+  shop: { zone: 'launch_core', anchors: [[578, 352]], size: [120, 98], footprint: [110, 30] },
+};
+
+// Дороги острова (пиксели острова): по ним ездят машины и летают дроны.
+export const ISLAND_ROADS = [
+  { id: 'east', points: [[525, 392], [745, 392], [745, 338]] },
+];
 
 // Слои движения самолётов по высоте (ед. мира) — как art/aircraft/traffic.json и live/aircraft.js.
 export const AIRCRAFT_LAYERS = [

@@ -1,5 +1,6 @@
 // Общие помощники тестов рендера: заглушка 2D-контекста и поддельное хранилище ассетов.
 import fs from 'node:fs';
+import zlib from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createAssetStore } from '../src/render/assets.js';
@@ -59,4 +60,54 @@ export function fakeAssets(options = {}) {
 export function pngSize(file) {
   const buffer = fs.readFileSync(file);
   return [buffer.readUInt32BE(16), buffer.readUInt32BE(20)];
+}
+
+/**
+ * Проверка целостности PNG: подпись, контрольные суммы всех блоков, распаковка IDAT и размер данных.
+ * Возвращает текст проблемы или null, если файл цел. Битые файлы браузер показывает пустыми без ошибки.
+ */
+export function pngProblem(file) {
+  const buffer = fs.readFileSync(file);
+  if (buffer.length < 33 || buffer.readUInt32BE(0) !== 0x89504e47) return 'нет подписи PNG';
+  const idat = [];
+  let colorType = -1;
+  let bitDepth = 0;
+  let interlace = 0;
+  let width = 0;
+  let height = 0;
+  let offset = 8;
+  let ended = false;
+  while (offset + 12 <= buffer.length) {
+    const length = buffer.readUInt32BE(offset);
+    const type = buffer.toString('latin1', offset + 4, offset + 8);
+    if (offset + 12 + length > buffer.length) return `блок ${type} обрезан`;
+    const data = buffer.subarray(offset + 8, offset + 8 + length);
+    if (zlib.crc32(buffer.subarray(offset + 4, offset + 8 + length)) !== buffer.readUInt32BE(offset + 8 + length)) return `контрольная сумма блока ${type}`;
+    if (type === 'IHDR') {
+      width = data.readUInt32BE(0);
+      height = data.readUInt32BE(4);
+      bitDepth = data[8];
+      colorType = data[9];
+      interlace = data[12];
+    }
+    if (type === 'IDAT') idat.push(data);
+    offset += 12 + length;
+    if (type === 'IEND') {
+      ended = true;
+      break;
+    }
+  }
+  if (!ended) return 'нет блока IEND';
+  let raw;
+  try {
+    raw = zlib.inflateSync(Buffer.concat(idat));
+  } catch (error) {
+    return `IDAT не распаковывается: ${error.message}`;
+  }
+  const channels = { 0: 1, 2: 3, 3: 1, 4: 2, 6: 4 }[colorType];
+  if (channels && interlace === 0) {
+    const expected = height * (1 + Math.ceil((width * channels * bitDepth) / 8));
+    if (raw.length !== expected) return `размер данных ${raw.length} вместо ${expected}`;
+  }
+  return null;
 }

@@ -7,18 +7,18 @@ const KEY_ROWS = [
   [['W', '↑'], 'help.k.thrust'],
   [['A', 'D'], 'help.k.tilt'],
   [['Q', 'E', 'S'], 'help.k.stab'],
-  [['␣'], 'help.k.boost'],
+  [['_'], 'help.k.boost'],
   [['X'], 'help.k.chute'],
   [['F', 'R'], 'help.k.items'],
   [['T'], 'help.k.transfer'],
   [['P', 'Esc'], 'help.k.pause'],
 ];
 const TOUCH_ROWS = [
-  [['◐'], 'help.t.disc'],
-  [['↕'], 'help.t.lever'],
-  [['◎◎'], 'help.t.stab'],
-  [['⚡'], 'help.t.boost'],
-  [['☂'], 'help.t.items'],
+  [['<>'], 'help.t.disc'],
+  [['↑↓'], 'help.t.lever'],
+  [['2×'], 'help.t.stab'],
+  [['F'], 'help.t.boost'],
+  [['P'], 'help.t.items'],
   [['II'], 'help.t.pause'],
 ];
 

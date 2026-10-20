@@ -3,6 +3,8 @@
 // body, scenario, alt, thr, ang, stage, objs, t (заморозить время), dpr.
 
 import { createRenderer, loadAssets, manifest } from '../index.js';
+import { drawAssembly } from '../rocket-view.js';
+import { defaultRocketRect } from '../workshop.js';
 import { createStubFlight } from './stub-flight.js';
 import { createSimFlight } from './sim-flight.js';
 
@@ -105,6 +107,20 @@ function settings() {
   return { reduceMotion: ui.reduce.checked };
 }
 
+/** Контуры хитбоксов модулей (?modules=1): жёлтые — станции, голубые — части ракеты. */
+function drawModuleBoxes(ctx, modules) {
+  ctx.save();
+  ctx.lineWidth = 1;
+  ctx.font = '10px monospace';
+  for (const [id, box] of Object.entries(modules)) {
+    ctx.strokeStyle = box.source === 'station' ? '#efc263' : '#52d8ff';
+    ctx.strokeRect(Math.round(box.x) + 0.5, Math.round(box.y) + 0.5, Math.round(box.w), Math.round(box.h));
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.fillText(id, box.x + 2, box.y + 10);
+  }
+  ctx.restore();
+}
+
 // fire=hit@2,crashed@5: события в заданные секунды после загрузки (для скриншотов).
 const scheduled = (params.get('fire') || '').split(',').filter(Boolean).map((item) => {
   const [type, at] = item.split('@');
@@ -123,7 +139,10 @@ function renderFrame(dt) {
   for (const item of scheduled) {
     if (!item.done && clock >= item.at) {
       item.done = true;
-      pendingEvents.push(eventFor(item.type));
+      if (ui.mode.value === 'hub' && renderer && (item.type.startsWith('build:') || item.type === 'era')) {
+        if (item.type === 'era') renderer.hub.playEra();
+        else renderer.hub.playBuild(item.type.slice(6));
+      } else pendingEvents.push(eventFor(item.type));
     }
   }
   const time = frozen !== null ? frozen : clock;
@@ -138,11 +157,21 @@ function renderFrame(dt) {
       renderer.backdrop.draw(ctx, { kind: $('bkind').value, era: Number(ui.era.value), rect, time, dim: Number($('bdim').value) });
       if ($('bstations').checked) {
         const inner = { x: 0, y: layout.h * 0.3, w: layout.w, h: layout.h * 0.68 };
-        renderer.workshop.drawStations(ctx, { era: Number(ui.era.value), rect: inner, time });
+        const era = Number(ui.era.value);
+        const showModules = params.get('modules') === '1';
+        const rocket = showModules ? defaultRocketRect(inner) : undefined;
+        const items = renderer.workshop.drawStations(ctx, { era, rect: inner, time, rocket });
+        if (showModules) {
+          drawAssembly(ctx, renderer.painter, {
+            era, parts: { booster: 1, capsule: 1 }, skin: 'classic', cx: rocket.x + rocket.w / 2, bottom: rocket.y + rocket.h,
+            height: rocket.h, dpr: layout.dpr, time,
+          });
+          drawModuleBoxes(ctx, items.modules);
+        }
       }
       hud.textContent = `backdrop ${$('bkind').value} era ${ui.era.value}`;
     } else if (ui.mode.value === 'hub') {
-      renderer.hub.draw(ctx, { profile: profileFromUi(), time, layout, weather, selected: ui.selected.value || null });
+      renderer.hub.draw(ctx, { profile: profileFromUi(), time, layout, weather, selected: ui.selected.value || null, settings: settings() });
       hud.textContent = `hub px=${layout.world.hubPx} ${layout.orientation} ${layout.w}x${layout.h}@${layout.dpr}`;
     } else if (renderer.flight) {
       const scenario = ui.scenario.value;
@@ -245,6 +274,8 @@ async function start() {
   applyFrame();
   syncPanels();
   if (params.has('focus')) renderer.hub.focus(params.get('focus'), true);
+  if (params.has('daylight')) renderer.hub.setDaylight(Number(params.get('daylight')));
+  if (params.has('hints')) renderer.hub.setHints(params.get('hints') === '1');
   attachDrag();
   if (!manual) requestAnimationFrame(tick);
   document.title = 'Render preview ready';

@@ -116,6 +116,118 @@ async function checkHub(browser, base, vp) {
   await context.close();
 }
 
+/** Объекты-входы, стройка, праздник эпохи, ночь и хитбоксы модулей мастерской в реальном браузере. */
+async function checkWorld(browser, base, vp) {
+  const { page, context, errors } = await openPreview(browser, base, vp, 'mode=hub&buildings=gantry,deluge,beacons&era=3&booster=1&capsule=1&weather=clear&hints=1&daylight=1&focus=gantry');
+  const entries = await page.evaluate(() => {
+    const p = window.__preview;
+    p.advance(30);
+    p.renderer.hub.reset(true);
+    p.advance(30);
+    const hub = p.renderer.hub;
+    const out = { w: innerWidth, h: innerHeight };
+    for (const key of ['workshop', 'board', 'shop', 'monument']) {
+      const pos = hub.screenPos(key);
+      const rect = hub.screenRects(key)[0];
+      out[key] = pos ? { hit: hub.hitTest(pos.x, pos.y), rect } : null;
+    }
+    return out;
+  });
+  for (const key of ['workshop', 'board', 'shop', 'monument']) {
+    assert(entries[key], `${vp.name}: объект-вход ${key} не нарисован`);
+    assert(entries[key].hit === key, `${vp.name}: тап по ${key} → ${entries[key].hit}`);
+    const r = entries[key].rect;
+    assert(r.x0 >= 0 && r.x1 <= entries.w && r.y0 >= 0 && r.y1 <= entries.h, `${vp.name}: ${key} не помещается в стартовый кадр`);
+  }
+  await page.screenshot({ path: path.join(outDir, `render-world-entries-${vp.name}.png`) });
+
+  // стройка: идёт ~1,2 с, затем завершается без исключений
+  const build = await page.evaluate(() => {
+    const p = window.__preview;
+    const hub = p.renderer.hub;
+    hub.playBuild('gantry');
+    p.advance(36);
+    const mid = hub.animating;
+    p.advance(400);
+    return { mid, end: hub.animating, duration: hub.buildDuration };
+  });
+  assert(build.mid && !build.end && Math.abs(build.duration - 1.2) < 1e-9, `${vp.name}: playBuild ${JSON.stringify(build)}`);
+  await page.evaluate(() => {
+    const p = window.__preview;
+    p.renderer.hub.playBuild('gantry');
+    p.advance(34);
+  });
+  await page.screenshot({ path: path.join(outDir, `render-world-build-${vp.name}.png`) });
+
+  // праздник эпохи и reduceMotion
+  const era = await page.evaluate(() => {
+    const p = window.__preview;
+    const hub = p.renderer.hub;
+    hub.playEra();
+    p.advance(90);
+    const mid = hub.animating;
+    p.advance(600);
+    return { mid, end: hub.animating };
+  });
+  assert(era.mid && !era.end, `${vp.name}: playEra ${JSON.stringify(era)}`);
+  await page.evaluate(() => {
+    window.__preview.renderer.hub.playEra();
+    window.__preview.advance(80);
+  });
+  await page.screenshot({ path: path.join(outDir, `render-world-era-${vp.name}.png`) });
+  const calm = await page.evaluate(() => {
+    const p = window.__preview;
+    p.ui.reduce.checked = true;
+    p.advance(2);
+    p.renderer.hub.playBuild('gantry');
+    p.renderer.hub.playEra();
+    p.advance(60);
+    p.advance(500);
+    const done = !p.renderer.hub.animating;
+    p.ui.reduce.checked = false;
+    return done;
+  });
+  assert(calm, `${vp.name}: анимации при reduceMotion не завершились`);
+
+  // ночь: огни включены, картинка не пустая
+  await page.evaluate(() => {
+    window.__preview.renderer.hub.setDaylight(0.2);
+    window.__preview.advance(20);
+  });
+  const nightColors = await distinctColors(page);
+  assert(nightColors > 15, `${vp.name}: ночной хаб выглядит пустым (${nightColors} цветов)`);
+  await page.screenshot({ path: path.join(outDir, `render-world-night-${vp.name}.png`) });
+  assert(errors.length === 0, `${vp.name}/мир: ошибки страницы: ${errors.join('; ')}`);
+  await context.close();
+}
+
+/** Станции мастерской и хитбоксы девяти модулей: рамки в кадре, рисуются поверх станций и сборки. */
+async function checkModules(browser, base, vp) {
+  const { page, context, errors } = await openPreview(browser, base, vp, 'mode=backdrop&bkind=workshop&era=3&bdim=0.15&modules=1');
+  const info = await page.evaluate(() => {
+    const p = window.__preview;
+    p.advance(20);
+    const w = innerWidth;
+    const h = innerHeight;
+    const rect = { x: 0, y: h * 0.3, w, h: h * 0.68 };
+    const boxes = p.renderer.workshop.moduleBoxes({ era: 3, rect });
+    return { boxes, w, h };
+  });
+  const ids = ['engine', 'tank', 'hull', 'booster', 'capsule', 'legs', 'fins', 'parachute', 'avionics'];
+  assert(JSON.stringify(Object.keys(info.boxes).sort()) === JSON.stringify([...ids].sort()), `${vp.name}: модули ${Object.keys(info.boxes)}`);
+  for (const id of ids) {
+    const b = info.boxes[id];
+    assert(b.w > 0 && b.h > 0 && b.x >= -1 && b.y >= -1 && b.x + b.w <= info.w + 1 && b.y + b.h <= info.h + 1, `${vp.name}: хитбокс ${id} вне кадра`);
+  }
+  assert(info.boxes.engine.source === 'station' && info.boxes.hull.source === 'station' && info.boxes.avionics.source === 'station', `${vp.name}: станции у engine/hull/avionics`);
+  assert(info.boxes.capsule.source === 'rocket' && info.boxes.legs.source === 'rocket', `${vp.name}: части ракеты`);
+  const colors = await distinctColors(page);
+  assert(colors > 20, `${vp.name}: мастерская с хитбоксами выглядит пустой (${colors} цветов)`);
+  await page.screenshot({ path: path.join(outDir, `render-workshop-modules-${vp.name}.png`) });
+  assert(errors.length === 0, `${vp.name}/модули: ошибки страницы: ${errors.join('; ')}`);
+  await context.close();
+}
+
 async function checkBackdrops(browser, base) {
   for (const vp of [VIEWPORTS[0], VIEWPORTS[1]]) {
     for (const kind of ['workshop', 'shop', 'launch-earth', 'launch-moon']) {
@@ -205,6 +317,10 @@ async function frameBudget(browser, base) {
     for (const vp of VIEWPORTS) {
       await checkHub(browser, url, vp);
       console.log(`ok: хаб ${vp.name}`);
+      await checkWorld(browser, url, vp);
+      console.log(`ok: входы, стройка, праздник, ночь ${vp.name}`);
+      await checkModules(browser, url, vp);
+      console.log(`ok: хитбоксы модулей ${vp.name}`);
       await checkFlight(browser, url, vp);
       console.log(`ok: полёт ${vp.name}`);
     }

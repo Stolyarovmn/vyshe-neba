@@ -1,9 +1,7 @@
-// Текст на canvas: жирный гротеск системного шрифта, растеризация в повышенном разрешении
-// с кэшем (статичные строки) и прямым выводом (меняющиеся числа HUD), перенос слов, измерение.
+// Текст интерфейса: пиксельный шрифт (font-pixel.js), целый масштаб без сглаживания, атласы глифов в offscreen,
+// перенос слов, измерение. Системный шрифт и fillText не используются.
 
-import { FONT_FAMILY } from './theme.js';
-
-const MAX_CACHE = 500;
+import { GLYPH_CHARS, GLYPH_H, ADVANCE, advanceOf, glyphRows, normalize, textUnits } from './font-pixel.js';
 
 /** Перенос по словам. measure(str) -> ширина. Длинные слова режутся по символам. Чистая функция. */
 export function wrapWords(str, maxWidth, measure) {
@@ -44,166 +42,152 @@ export function ellipsize(str, maxWidth, measure) {
   return `${str.slice(0, lo).trimEnd()}…`;
 }
 
+const MAX_ATLASES = 40;
+
 export function createText() {
-  let scale = 1;
   let dpr = 1;
-  let mctx = null;
-  const widths = new Map();
-  const bitmaps = new Map();
+  const atlases = new Map();
+  const unitCache = new Map();
 
-  function measureCtx() {
-    if (!mctx) mctx = document.createElement('canvas').getContext('2d');
-    return mctx;
+  /** Масштаб шрифта (CSS-пикселей на пиксель глифа) по «размеру» в CSS px: ≤ 9 — крошечный ×1, иначе не меньше ×2. */
+  const scaleFor = (size) => (size <= 9 ? 1 : Math.max(2, Math.round(size / 7)));
+
+  /** Пикселей устройства на пиксель глифа и тот же шаг в CSS-пикселях. */
+  function stepFor(size) {
+    const dev = Math.max(1, Math.round(scaleFor(size) * dpr));
+    return { dev, css: dev / dpr };
   }
 
-  const fontOf = (size, weight) => `${weight} ${size}px ${FONT_FAMILY}`;
-
-  function setDpr(value) {
-    if (value === dpr) return;
-    dpr = value;
-    scale = Math.max(1, Math.ceil(dpr));
-    bitmaps.clear();
-  }
-
-  function measure(str, size, weight = 800) {
-    const key = `${size}|${weight}|${str}`;
-    let w = widths.get(key);
-    if (w === undefined) {
-      const c = measureCtx();
-      c.font = fontOf(size, weight);
-      w = c.measureText(str).width;
-      if (widths.size > 4000) widths.clear();
-      widths.set(key, w);
+  function units(str) {
+    let u = unitCache.get(str);
+    if (u === undefined) {
+      u = textUnits(str);
+      if (unitCache.size > 6000) unitCache.clear();
+      unitCache.set(str, u);
     }
-    return w;
+    return u;
   }
 
-  const measurer = (size, weight) => (s) => measure(s, size, weight);
-
-  function wrap(str, maxWidth, size, weight = 800) {
-    return wrapWords(str, maxWidth, measurer(size, weight));
-  }
-
-  function fit(str, maxWidth, size, weight = 800, minScale = 0.72) {
-    let s = size;
-    const min = Math.max(8, size * minScale);
-    while (s > min && measure(str, s, weight) > maxWidth) s -= 0.5;
-    if (measure(str, s, weight) > maxWidth) return { str: ellipsize(str, maxWidth, measurer(s, weight)), size: s };
-    return { str, size: s };
-  }
-
-  /** Размер шрифта, при котором самое длинное слово помещается в maxWidth (но не меньше minScale). */
-  function fitWords(str, maxWidth, size, weight = 800, minScale = 0.62) {
-    const words = String(str).split(/\s+/);
-    let s = size;
-    const min = Math.max(8, size * minScale);
-    while (s > min && words.some((w) => measure(w, s, weight) > maxWidth)) s -= 0.5;
-    return s;
-  }
-
-  function bitmapFor(str, size, weight, color, shadow, outline) {
-    const key = `${size}|${weight}|${color}|${shadow || ''}|${outline || ''}|${str}`;
-    let bm = bitmaps.get(key);
-    if (bm) {
-      bitmaps.delete(key);
-      bitmaps.set(key, bm);
-      return bm;
+  function atlasFor(dev, color, shadow) {
+    const key = `${dev}|${color}|${shadow || ''}`;
+    let at = atlases.get(key);
+    if (at) {
+      atlases.delete(key);
+      atlases.set(key, at);
+      return at;
     }
-    const pad = Math.ceil(size * 0.2) + (shadow ? Math.ceil(size * 0.12) : 0) + (outline ? 2 : 0);
-    const w = Math.ceil(measure(str, size, weight)) + pad * 2;
-    const h = Math.ceil(size * 1.4) + pad * 2;
+    const cellW = ADVANCE * dev;
+    const cellH = (GLYPH_H + 1) * dev;
     const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.ceil(w * scale));
-    canvas.height = Math.max(1, Math.ceil(h * scale));
-    const c = canvas.getContext('2d');
-    c.scale(scale, scale);
-    c.font = fontOf(size, weight);
-    c.textBaseline = 'middle';
-    c.textAlign = 'left';
-    c.lineJoin = 'round';
-    const cy = h / 2;
-    if (shadow) {
-      c.fillStyle = shadow;
-      c.fillText(str, pad, cy + Math.max(1, size * 0.09));
-    }
-    if (outline) {
-      c.strokeStyle = outline;
-      c.lineWidth = Math.max(2, size * 0.16);
-      c.strokeText(str, pad, cy);
-    }
-    c.fillStyle = color;
-    c.fillText(str, pad, cy);
-    bm = { canvas, w, h, pad };
-    bitmaps.set(key, bm);
-    if (bitmaps.size > MAX_CACHE) bitmaps.delete(bitmaps.keys().next().value);
-    return bm;
+    canvas.width = cellW * GLYPH_CHARS.length;
+    canvas.height = cellH;
+    const g = canvas.getContext('2d');
+    const index = new Map();
+    GLYPH_CHARS.forEach((ch, i) => {
+      index.set(ch, i);
+      const rows = glyphRows(ch);
+      for (const [pass, col] of shadow ? [[1, shadow], [0, color]] : [[0, color]]) {
+        g.fillStyle = col;
+        rows.forEach((row, y) => {
+          for (let x = 0; x < row.length; x++) if (row[x] === '#') g.fillRect(i * cellW + (x + pass) * dev, (y + pass) * dev, dev, dev);
+        });
+      }
+    });
+    at = { canvas, index, cellW, cellH };
+    atlases.set(key, at);
+    if (atlases.size > MAX_ATLASES) atlases.delete(atlases.keys().next().value);
+    return at;
   }
 
-  const snap = (v) => Math.round(v * dpr) / dpr;
+  function setDpr(v) {
+    if (v !== dpr) {
+      dpr = v;
+      atlases.clear();
+    }
+  }
+
+  const measure = (str, size) => units(normalize(str)) * stepFor(size).css;
+  const measurer = (size) => (s) => measure(s, size);
+  const wrap = (str, maxWidth, size) => wrapWords(str, maxWidth, measurer(size));
+
+  /** Подбор масштаба под ширину: уменьшает шаг до ×2 (до ×1 для крошечных), затем обрезает. size — условный размер результата. */
+  function fit(str, maxWidth, size, _weight, _minScale) {
+    const s0 = scaleFor(size);
+    const floor = s0 === 1 ? 1 : 2;
+    let s = s0;
+    while (s > floor && measure(str, s * 7) > maxWidth) s--;
+    const sz = s === 1 ? 7 : s * 7;
+    if (measure(str, sz) <= maxWidth) return { str, size: sz };
+    // не влезает даже в ×2: целиком в ×1 читаемее, чем обрезанное многоточием
+    if (s0 > 1 && measure(str, 7) <= maxWidth) return { str, size: 7 };
+    return { str: ellipsize(str, maxWidth, measurer(sz)), size: sz };
+  }
+
+  /** Размер, при котором самое длинное слово помещается (не меньше ×1). */
+  function fitWords(str, maxWidth, size) {
+    const words = String(str).split(/\s+/);
+    let s = scaleFor(size);
+    while (s > 1 && words.some((w) => measure(w, s * 7) > maxWidth)) s--;
+    return s === 1 ? 7 : s * 7;
+  }
 
   /**
-   * Одна строка. Возвращает { w, h } занятой области (в CSS-пикселях).
-   * o: size, weight, color, align (left|center|right), baseline (top|middle|bottom), shadow, outline,
-   *    maxWidth (ужать/обрезать), alpha, dynamic (не кэшировать)
+   * Одна строка. Возвращает { w, h }. o: size, color, align (left|center|right), baseline (top|middle|bottom),
+   * shadow (цвет тени), maxWidth (ужать/обрезать), alpha.
    */
   function draw(ctx, str, x, y, o = {}) {
-    str = String(str ?? '');
-    let { size = 16 } = o;
-    const { weight = 800, color = '#fff', align = 'left', baseline = 'middle', shadow, outline, alpha = 1, dynamic } = o;
-    if (!str) return { w: 0, h: size };
+    let size = o.size ?? 14;
+    const { color = '#fff', align = 'left', baseline = 'middle', alpha = 1 } = o;
+    let text = normalize(str);
+    if (!text) return { w: 0, h: size };
     if (o.maxWidth) {
-      const f = fit(str, o.maxWidth, size, weight);
-      str = f.str;
+      const f = fit(text, o.maxWidth, size);
+      text = normalize(f.str);
       size = f.size;
     }
-    const tw = measure(str, size, weight);
+    const { dev, css } = stepFor(size);
+    const total = units(text) * css;
     const lineH = size * 1.2;
-    const cy = baseline === 'top' ? y + lineH / 2 : baseline === 'bottom' ? y - lineH / 2 : y;
+    const glyphH = GLYPH_H * css;
+    const top = baseline === 'top' ? y + (lineH - glyphH) / 2 : baseline === 'bottom' ? y - (lineH + glyphH) / 2 : y - glyphH / 2;
+    let cx = align === 'center' ? x - total / 2 : align === 'right' ? x - total : x;
+    const shadow = o.shadow || o.outline ? (typeof (o.shadow || o.outline) === 'string' ? o.shadow || o.outline : '#05070e') : null;
+    const at = atlasFor(dev, color, shadow ? '#05070e' : null);
     const prevAlpha = ctx.globalAlpha;
     if (alpha !== 1) ctx.globalAlpha = prevAlpha * alpha;
-    if (dynamic) {
-      ctx.font = fontOf(size, weight);
-      ctx.textBaseline = 'middle';
-      ctx.textAlign = align;
-      ctx.lineJoin = 'round';
-      const px = snap(x);
-      const py = snap(cy);
-      if (shadow) {
-        ctx.fillStyle = shadow;
-        ctx.fillText(str, px, py + Math.max(1, size * 0.09));
-      }
-      if (outline) {
-        ctx.strokeStyle = outline;
-        ctx.lineWidth = Math.max(2, size * 0.16);
-        ctx.strokeText(str, px, py);
-      }
-      ctx.fillStyle = color;
-      ctx.fillText(str, px, py);
-    } else {
-      const bm = bitmapFor(str, size, weight, color, shadow, outline);
-      const left = align === 'center' ? x - bm.w / 2 : align === 'right' ? x - (bm.w - bm.pad) : x - bm.pad;
-      ctx.drawImage(bm.canvas, snap(left), snap(cy - bm.h / 2), bm.w, bm.h);
+    const prevSmooth = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = false;
+    const snap = (v) => Math.round(v * dpr) / dpr;
+    const dy = snap(top);
+    for (const ch of text) {
+      const i = at.index.get(ch);
+      if (i !== undefined) ctx.drawImage(at.canvas, i * at.cellW, 0, at.cellW, at.cellH, snap(cx), dy, at.cellW / dpr, at.cellH / dpr);
+      cx += advanceOf(ch) * css;
     }
+    ctx.imageSmoothingEnabled = prevSmooth;
     if (alpha !== 1) ctx.globalAlpha = prevAlpha;
-    return { w: tw, h: lineH };
+    return { w: total, h: lineH };
   }
 
   /** Абзац с переносом. Возвращает занятую высоту. */
   function block(ctx, str, x, y, maxWidth, o = {}) {
-    const size = o.size ?? 16;
-    const lh = size * (o.lineHeight ?? 1.25);
-    const lines = wrap(str, maxWidth, size, o.weight ?? 800);
+    const size = o.size ?? 14;
+    const lh = Math.max(size * (o.lineHeight ?? 1.4), stepFor(size).css * 9);
+    const lines = wrap(str, maxWidth, size);
     const max = o.maxLines ?? Infinity;
     const shown = lines.length > max ? lines.slice(0, max) : lines;
-    if (lines.length > max) shown[max - 1] = ellipsize(`${shown[max - 1]} ${lines[max]}`, maxWidth, measurer(size, o.weight ?? 800));
+    if (lines.length > max) shown[max - 1] = ellipsize(`${shown[max - 1]} ${lines[max]}`, maxWidth, measurer(size));
     const ax = o.align === 'center' ? x + maxWidth / 2 : o.align === 'right' ? x + maxWidth : x;
     shown.forEach((ln, i) => draw(ctx, ln, ax, y + i * lh, { ...o, baseline: 'top', maxWidth: undefined }));
     return shown.length * lh;
   }
 
-  function blockHeight(str, maxWidth, size, lineHeight = 1.25, weight = 800) {
-    return wrap(str, maxWidth, size, weight).length * size * lineHeight;
+  function blockHeight(str, maxWidth, size, lineHeight = 1.4) {
+    return wrap(str, maxWidth, size).length * Math.max(size * lineHeight, stepFor(size).css * 9);
   }
 
-  return { draw, block, blockHeight, measure, wrap, fit, fitWords, setDpr, clear: () => bitmaps.clear(), get cacheSize() { return bitmaps.size; } };
+  return {
+    draw, block, blockHeight, measure, wrap, fit, fitWords, setDpr, scaleFor, stepFor, clear: () => atlases.clear(),
+    get cacheSize() { return atlases.size; },
+  };
 }

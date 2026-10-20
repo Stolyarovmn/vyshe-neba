@@ -3,20 +3,21 @@
 
 import { createKit } from './kit.js';
 import { ICON_NAMES } from './icons.js';
-import { computeLayout, mergeLayouts, dockLayout, sheetRect, screenFrame } from './layout.js';
+import { computeLayout, mergeLayouts, dockLayout, chromeLayout } from './layout.js';
 import { createSfx, reasonText } from './bridge.js';
 import { sfxForEvent } from '../audio/names.js';
-import { clamp } from './format.js';
+import { clamp, easeOutCubic } from './format.js';
 import { t } from '../i18n/index.js';
 import hub from './screens/hub.js';
 import rocket from './screens/rocket.js';
 import base from './screens/base.js';
 import journal from './screens/journal.js';
+import shop from './screens/shop.js';
 import launch from './screens/launch.js';
 import flight from './screens/flight-hud.js';
 import results from './screens/results.js';
 import settings from './screens/settings.js';
-import { drawBlueprint } from './screens/common.js';
+import { drawFallbackBackground, buildingShort, buildingIcon, ERA_YEARS } from './screens/common.js';
 import { drawNewCard } from './screens/newcards.js';
 
 export const DT = 1 / 120;
@@ -26,12 +27,14 @@ const END_DELAY = { landed: 1.5, crashed: 2.4, abandoned: 0.1 };
 
 const BACKDROP_KIND = {
   rocket: () => 'workshop',
-  journal: () => 'shop',
+  journal: () => 'workshop',
+  shop: () => 'shop',
   launch: (app) => (app.ui.launch?.dest && app.ui.launch.dest !== 'earth' ? 'launch-moon' : 'launch-earth'),
 };
-const BACKDROP_DIM = { rocket: 0.38, journal: 0.4, launch: 0.32 };
+const BACKDROP_DIM = { rocket: 0.3, journal: 0.5, shop: 0.3, launch: 0.32 };
+const IRIS_TIME = 0.22; // раскрытие «ирисом» при смене сцены, не дольше 250 мс
 
-const SCREENS = { hub, rocket, base, journal, launch, flight, results, settings };
+const SCREENS = { hub, rocket, base, journal, shop, launch, flight, results, settings };
 const PULSES = ['parachute', 'canister', 'repair', 'transfer', 'pause'];
 // постройки, открывающие новую механику: при первой покупке показывается карточка «Новое»
 const NEW_MECHANICS = ['gantry', 'weather', 'control', 'radar', 'observation', 'recovery', 'logistics'];
@@ -61,7 +64,9 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     screen: 'hub',
     params: {},
     history: [],
-    fade: 1,
+    iris: null,
+    shakeT: 0,
+    uiDrawing: false,
     session: null,
     countdown: null,
     results: null,
@@ -124,7 +129,11 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     if (push) app.history.push({ name: app.screen, params: app.params });
     app.screen = name;
     app.params = params;
-    app.fade = 1;
+    // сцена раскрывается кругом от места нажатия (камерный переход); при «меньше движения» — без анимации
+    if (!app.settings.reduceMotion && app.layout) {
+      const pos = kit.clickPos;
+      app.iris = { t: 0, cx: pos?.x ?? app.layout.w / 2, cy: pos?.y ?? app.layout.h / 2 };
+    }
     SCREENS[name].enter?.(app, params);
     input.setMode(name === 'flight' ? 'flight' : 'ui');
     syncMusic();
@@ -200,6 +209,11 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
 
   app.toast = (msg, o) => kit.toast(msg, o);
 
+  /** Короткое дрожание кадра (отказ, авария). */
+  app.shake = (amount = 1) => {
+    if (!app.settings.reduceMotion) app.shakeT = Math.max(app.shakeT, 0.3 * amount);
+  };
+
   /** Заменить профиль целиком (импорт сохранения): состояние интерфейса сбрасывается. */
   app.replaceProfile = (p) => {
     let next = p;
@@ -263,6 +277,11 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     app.commit(res.profile);
     sfx('era');
     app.haptic([20, 40, 30]);
+    try {
+      renderer.hub.playEra?.();
+    } catch {
+      /* праздник необязателен */
+    }
     queueCard(`era:${res.profile.era}`);
     return res;
   };
@@ -299,6 +318,15 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
   // карточки «Новое»
   function queueCard(id, force = false) {
     if ((!force && app.prefs.seen[id]) || app.cards.includes(id)) return;
+    // «Новое»: плашка-уведомление без модального окна; справка по управлению — по запросу игрока
+    if (id.startsWith('building:') || id.startsWith('era:')) {
+      const [kind, key] = id.split(':');
+      app.prefs.seen[id] = 1;
+      savePrefs(app.prefs);
+      if (kind === 'building') kit.toast(`${t('new.kicker')}: ${buildingShort(app, key)}`, { kind: 'info', icon: buildingIcon(key, 1), ttl: 4 });
+      else kit.toast(`${t('new.era')} ${ERA_YEARS[Number(key)]}`, { kind: 'good', icon: 'era', ttl: 4 });
+      return;
+    }
     app.cards.push(id);
   }
   app.queueCard = queueCard;
@@ -587,7 +615,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     let bg = SCREENS[screen].background || 'hub';
     if (app.countdown) bg = 'hub';
     app.backdropOn = false;
-    // фоны экранов: мастерская (ракета), лавка (журнал), стартовый комплекс (запуск; на Луну — лунный)
+    // фоны экранов: мастерская (ракета, доска), лавка, стартовый комплекс (запуск; на Луну — лунный)
     const kind = app.countdown ? null : BACKDROP_KIND[screen]?.(app);
     if (kind && renderer.backdrop?.draw) {
       try {
@@ -600,47 +628,42 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     if (bg === 'flight' && app.session) {
       renderer.flight.draw(ctx, { flight: app.session.flight, config: app.session.config, time: app.time, layout: L, settings: app.settings });
     } else if (bg === 'blueprint') {
-      drawBlueprint(ctx, L, app.time, app.profile.era);
+      drawFallbackBackground(ctx, L, kit);
     } else {
       try {
-        renderer.hub.draw(ctx, { profile: app.profile, time: app.time, layout: L, selected: app.screen === 'hub' ? app.hubSelected : null });
+        renderer.hub.draw(ctx, { profile: app.profile, time: app.time, layout: L, settings: app.settings, selected: app.screen === 'hub' || app.screen === 'base' ? app.hubSelected : null });
       } catch (err) {
-        drawBlueprint(ctx, L, app.time, app.profile.era);
+        drawFallbackBackground(ctx, L, kit);
         if (!app.hubErrored) {
           app.hubErrored = true;
           console.error('[app] renderer.hub.draw:', err);
         }
       }
       if (bg === 'hubdim') {
-        ctx.fillStyle = 'rgba(5,8,16,0.82)';
+        // приглушение шашечным узором тёмных пикселей, без полупрозрачности
+        ctx.fillStyle = kit.ditherPattern(kit.c.ink, L.cell);
         ctx.fillRect(0, 0, L.w, L.h);
       }
     }
   }
 
   /**
-   * Якорь уведомлений. Хаб и полёт — внизу (над доком / над органами управления; в ландшафте с карточкой постройки —
-   * в свободной левой части). Экраны без дока — сверху по центру над шапкой, правее кнопки «назад».
+   * Якорь уведомлений. Хаб и полёт — внизу (над нижней панелью / над органами управления).
+   * Остальные сцены — сверху по центру между угловыми табличками.
    */
   function toastAnchor(L) {
     const safeBottom = L.area.y + L.area.h - L.gap * 1.5;
-    if (app.screen === 'hub' && !app.countdown) {
-      let area = null;
-      if (app.hubSelected && !L.portrait) {
-        const sheet = sheetRect(L, { dock: true });
-        area = { x: L.area.x, y: L.area.y, w: Math.max(120, sheet.x - L.area.x), h: L.area.h };
-      }
-      return ['bottom', dockLayout(L).bar.y - L.gap, area];
-    }
+    if (app.screen === 'hub' && !app.countdown) return ['bottom', dockLayout(L).bar.y - L.gap, null];
     if (app.screen === 'flight') {
       const hud = L.hud;
       if (L.portrait) return ['bottom', Math.min(hud.lever.y, hud.buttons.transfer.y, hud.disc.cy - hud.disc.r) - L.gap * 2, null];
       return ['bottom', safeBottom - (app.touchUi ? 0 : Math.round(30 * L.ui)), null];
     }
     if (app.screen === 'results') return ['top', L.area.y + L.gap + 24 * L.ui, null];
-    const hdr = screenFrame(L, { header: true }).header;
-    const left = hdr.x + hdr.h + L.gap;
-    return ['top', hdr.y + hdr.h / 2, { x: left, y: hdr.y, w: L.area.x + L.area.w - left - L.gap, h: hdr.h }];
+    const G = chromeLayout(L, { back: true, era: app.screen === 'base' });
+    const left = (G.era ? G.era.x + G.era.w : G.back.x + G.back.w) + L.gap;
+    const right = G.coins.x - L.gap;
+    return ['top', G.y + G.h / 2, { x: left, y: G.y, w: Math.max(80, right - left), h: G.h }];
   }
 
   app.frame = (dt, nowSec) => {
@@ -661,6 +684,13 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       /* экран ракеты сам озвучивает стенд через app.standFrame */
     }
 
+    // дрожание кадра: сдвиг кратен клетке интерфейса
+    if (app.shakeT > 0) {
+      app.shakeT = Math.max(0, app.shakeT - dt);
+      const amp = Math.round((app.shakeT / 0.3) * 3) * L.cell;
+      ctx.translate(Math.round(Math.sin(nowSec * 83) * amp), Math.round(Math.cos(nowSec * 71) * amp));
+    }
+
     const events = input.drain(dt);
     kit.begin(ctx, { L, settings: app.settings, time: app.time, dt, events });
     try {
@@ -668,6 +698,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       drawBackground(app.screen);
       const t1 = performance.now();
       const screen = SCREENS[app.screen];
+      app.uiDrawing = true;
       if (app.countdown) drawCountdown();
       else screen.draw(app, kit, L, dt);
       const t2 = performance.now();
@@ -684,8 +715,10 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       if (app.errors.length < 20) app.errors.push(String(err?.stack || err));
       console.error('[app] draw:', err);
     }
-    drawFade(dt);
+    app.uiDrawing = true;
+    drawIris(dt);
     kit.end();
+    app.uiDrawing = false;
     canvas.style.cursor = kit.cursor;
 
     if (!app.session && app.screen !== 'flight') {
@@ -704,24 +737,29 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     }
   };
 
-  function drawFade(dt) {
-    if (app.fade <= 0) return;
-    app.fade = app.settings.reduceMotion ? 0 : Math.max(0, app.fade - dt / 0.18);
-    if (app.fade <= 0) return;
-    ctx.fillStyle = `rgba(4,7,14,${app.fade * 0.85})`;
-    ctx.fillRect(0, 0, app.layout.w, app.layout.h);
+  /** Раскрытие сцены кругом из клеток от места нажатия за ≈ 220 мс. */
+  function drawIris(dt) {
+    const iris = app.iris;
+    if (!iris) return;
+    iris.t += dt;
+    const k = iris.t / IRIS_TIME;
+    if (k >= 1 || app.settings.reduceMotion) {
+      app.iris = null;
+      return;
+    }
+    kit.iris(1 - easeOutCubic(k), iris.cx, iris.cy);
   }
 
   function drawCountdown() {
     const L = app.layout;
     const c = app.countdown;
-    const label = c.n > 0 ? String(c.n) : t('launch.go');
     const k = (c.t % 0.8) / 0.8;
-    const size = Math.round(Math.min(L.w, L.h) * (0.22 + 0.06 * (1 - k)));
-    ctx.globalAlpha = 1 - k * 0.6;
-    kit.drawText(label, L.w / 2, L.h * 0.38, { size, color: c.n > 0 ? kit.c.amber : kit.c.green, align: 'center', weight: 900, shadow: 'rgba(0,0,0,0.7)', outline: 'rgba(0,0,0,0.5)', dynamic: true });
-    ctx.globalAlpha = 1;
-    kit.drawText(t('launch.countdown'), L.w / 2, L.h * 0.38 + size * 0.75, { size: kit.fs(16), color: kit.c.text, align: 'center', shadow: 'rgba(0,0,0,0.8)' });
+    const h = Math.round(Math.min(L.w, L.h) * (0.3 + 0.05 * (1 - k)));
+    const off = kit.cell() * 2;
+    if (c.n > 0) {
+      kit.bigNumber(String(c.n), L.w / 2 + off, L.h * 0.34 - h / 2 + off, h, kit.c.ink, 'center');
+      kit.bigNumber(String(c.n), L.w / 2, L.h * 0.34 - h / 2, h, k < 0.7 ? kit.c.amberLight : kit.c.amber, 'center');
+    } else kit.drawText(t('launch.go'), L.w / 2, L.h * 0.34, { size: Math.round(h * 0.42), color: kit.c.green, align: 'center', shadow: true });
     const r = { x: L.w / 2 - L.touch(70), y: L.h - L.area.y - L.touch(64) - L.gap, w: L.touch(140), h: L.touch(48) };
     if (kit.button('countdown-cancel', r, { label: t('common.cancel'), variant: 'btn' })) {
       app.countdown = null;

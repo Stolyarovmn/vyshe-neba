@@ -2,8 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  computeLayout, mergeLayouts, hudLayout, hudTouchTargets, dockLayout, screenFrame, rocketLayout, baseLayout,
-  launchLayout, resultsLayout, journalLayout, settingsLayout, splitBody, assignLanes, intersect, MIN_TOUCH, DOCK_ITEMS, ROCKET_SPOTS,
+  computeLayout, mergeLayouts, hudLayout, hudTouchTargets, dockLayout, chromeLayout, screenFrame, rocketLayout, baseLayout,
+  launchLayout, resultsLayout, journalLayout, shopLayout, settingsLayout, splitBody, assignLanes, intersect, MIN_TOUCH, DOCK_ITEMS, ROCKET_SPOTS, BUILD_COUNT,
 } from '../src/ui/layout.js';
 
 const SIZES = [
@@ -35,7 +35,7 @@ test('масштаб интерфейса: clamp(min(w,h)/420, 1, 3) и орие
   assert.equal(computeLayout(4000, 3000, 1).ui, 3);
 });
 
-test('док: пять кнопок ≥ 48 px, внутри безопасной области, без перекрытий', () => {
+test('нижняя панель хаба: ПУСК и четыре кнопки-иконки ≥ 48 px, внутри безопасной области, без перекрытий', () => {
   for (const { w, h, L } of layouts()) {
     const dock = dockLayout(L);
     const items = DOCK_ITEMS.map((k) => dock.items[k]);
@@ -43,7 +43,23 @@ test('док: пять кнопок ≥ 48 px, внутри безопасной
       assert.ok(r.w >= MIN_TOUCH && r.h >= MIN_TOUCH, `${w}x${h}: ${DOCK_ITEMS[i]} ${r.w}x${r.h}`);
       assert.ok(inside(r, L.area), `${w}x${h}: ${DOCK_ITEMS[i]} вне безопасной области`);
     }
-    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) assert.ok(!overlaps(items[i], items[j]), `${w}x${h}: перекрытие в доке`);
+    assert.ok(dock.button.w >= MIN_TOUCH && dock.button.h >= MIN_TOUCH && inside(dock.button, dock.launch), `${w}x${h}: кнопка ПУСК внутри планки`);
+    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) assert.ok(!overlaps(items[i], items[j]), `${w}x${h}: перекрытие в нижней панели`);
+  }
+});
+
+test('угловые таблички: кнопки ≥ 48 px, таблички внутри области и не перекрываются', () => {
+  for (const { w, h, L } of layouts()) {
+    for (const o of [{ back: true }, { back: true, era: true }, { era: true, gear: true }]) {
+      const G = chromeLayout(L, o);
+      const list = ['back', 'era', 'gear', 'coins', 'data'].filter((k) => G[k]);
+      for (const k of list) {
+        assert.ok(inside(G[k], L.area), `${w}x${h}: ${k} вне области`);
+        assert.ok(G[k].h >= MIN_TOUCH, `${w}x${h}: ${k} высота ${G[k].h}`);
+        if (k === 'back' || k === 'gear') assert.ok(G[k].w >= MIN_TOUCH, `${w}x${h}: ${k} ширина`);
+      }
+      for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) assert.ok(!overlaps(G[list[i]], G[list[j]]), `${w}x${h}: ${list[i]} и ${list[j]} перекрываются`);
+    }
   }
 });
 
@@ -103,9 +119,9 @@ test('mergeLayouts сохраняет поля рендера и добавля�
   assert.ok(merged.hud.lever && merged.hud.disc);
 });
 
-test('рамка экрана: шапка, тело и док не пересекаются и лежат в области', () => {
+test('рамка экрана: ряд табличек, тело и нижняя панель не пересекаются и лежат в области', () => {
   for (const { w, h, L } of layouts()) {
-    const f = screenFrame(L, { header: true, dock: true });
+    const f = screenFrame(L, { header: true, dock: true, back: false, era: true, gear: true });
     assert.ok(!overlaps(f.header, f.body), `${w}x${h}`);
     assert.ok(!overlaps(f.body, f.dock), `${w}x${h}: тело и док`);
     assert.ok(inside(f.body, L.area) && inside(f.header, L.area) && inside(f.dock, L.area), `${w}x${h}`);
@@ -129,19 +145,33 @@ test('экран ракеты: девять горячих точек ≥ 48 px,
   }
 });
 
-test('остальные экраны: области внутри безопасной зоны, вкладки ≥ 48 px', () => {
+test('строительство: четырнадцать плиток ≥ 48 px внутри стойки, стойка не перекрывает табличку энергии', () => {
   for (const { w, h, L } of layouts()) {
-    const base = baseLayout(L);
-    assert.ok(base.tabs.h >= MIN_TOUCH && inside(base.energy, L.area) && inside(base.list, L.area) && inside(base.detail, L.area), `${w}x${h}: база`);
-    assert.ok(!overlaps(base.energy, base.list) && !overlaps(base.energy, base.tabs), `${w}x${h}: энергия перекрывает список`);
-    if (base.wide) assert.ok(!overlaps(base.list, base.detail) && !overlaps(base.tabs, base.detail), `${w}x${h}: список и карточка пересекаются`);
+    const G = baseLayout(L);
+    assert.equal(G.tiles.length, BUILD_COUNT);
+    assert.ok(inside(G.rack, L.area) && inside(G.energy, L.area), `${w}x${h}: стойка или энергия вне области`);
+    for (const r of G.tiles) assert.ok(r.w >= MIN_TOUCH && r.h >= MIN_TOUCH && inside(r, G.rack), `${w}x${h}: плитка ${JSON.stringify(r)}`);
+    for (let i = 0; i < G.tiles.length; i++) for (let j = i + 1; j < G.tiles.length; j++) assert.ok(!overlaps(G.tiles[i], G.tiles[j]), `${w}x${h}: плитки пересекаются`);
+    assert.ok(!overlaps(G.energy, G.rack), `${w}x${h}: энергия перекрывает стойку`);
+  }
+});
+
+test('пульт запуска, итоги, доска, лавка, настройки: области внутри безопасной зоны, кнопки ≥ 48 px', () => {
+  for (const { w, h, L } of layouts()) {
     const l = launchLayout(L);
-    assert.ok(l.start.h >= MIN_TOUCH && inside(l.start, L.area) && inside(l.cons, L.area), `${w}x${h}: запуск`);
-    for (const c of l.destCards) assert.ok(inside(c, L.area) && c.h >= MIN_TOUCH, `${w}x${h}: карточка цели`);
+    assert.ok(l.start.h >= MIN_TOUCH && inside(l.start, L.area) && inside(l.cons, L.area) && inside(l.panel, L.area), `${w}x${h}: запуск`);
+    for (const c of l.dest) assert.ok(inside(c, L.area) && c.h >= MIN_TOUCH && c.w >= MIN_TOUCH, `${w}x${h}: кнопка-планета`);
+    for (const c of l.consSlots) assert.ok(inside(c, L.area) && c.h >= MIN_TOUCH && c.w >= MIN_TOUCH, `${w}x${h}: гнездо расходника`);
+    assert.ok(!overlaps(l.start, l.cons) && !overlaps(l.start, l.destArea), `${w}x${h}: ПУСК перекрывает пульт`);
     const r = resultsLayout(L);
+    const chrome = chromeLayout(L, {});
     assert.ok(r.buttons.h >= MIN_TOUCH && inside(r.card, L.area), `${w}x${h}: итоги`);
+    assert.ok(r.card.y >= chrome.y + chrome.h, `${w}x${h}: бланк итогов не закрывает таблички`);
     const j = journalLayout(L);
-    assert.ok(j.tabs.h >= MIN_TOUCH && inside(j.card, L.area), `${w}x${h}: журнал`);
+    assert.ok(inside(j.board, L.area) && inside(j.shelf, L.area) && !overlaps(j.board, j.shelf), `${w}x${h}: доска`);
+    const sh = shopLayout(L);
+    assert.ok(inside(sh.shelf1, L.area) && inside(sh.shelf2, L.area) && inside(sh.counter, L.area), `${w}x${h}: лавка`);
+    assert.ok(!overlaps(sh.shelf1, sh.shelf2) && !overlaps(sh.shelf2, sh.counter), `${w}x${h}: полки пересекаются`);
     assert.ok(inside(settingsLayout(L).card, L.area), `${w}x${h}: настройки`);
   }
 });

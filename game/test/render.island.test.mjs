@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { ASSET_FILES, BUILDING_ANCHORS, BUILDING_KEYS, ISLAND } from '../src/render/manifest.js';
+import { ASSET_FILES, BUILDING_ANCHORS, BUILDING_KEYS, ENTRY_KEYS, ISLAND, ISLAND_ROADS, WORLD_ENTRIES } from '../src/render/manifest.js';
 import { pngSize, repoRoot } from './render-helpers.mjs';
 
 const envDir = path.join(repoRoot, 'art', 'gen', 'environment');
@@ -109,4 +109,65 @@ test('масштаб острова: октагон площадки соотв�
   const padWidthUnits = 256 * ISLAND.unitsPerPx;
   assert.ok(Math.abs(padWidthUnits - 170) < 3, `октагон ${padWidthUnits} ед.`);
   assert.ok(ISLAND.widthUnits > 1000 && ISLAND.widthUnits < 1500);
+});
+
+// --- объекты-входы и дороги -----------------------------------------------------------------------
+
+function entryFootprints() {
+  return ENTRY_KEYS.map((key) => {
+    const anchor = WORLD_ENTRIES[key].anchors[0];
+    return { tag: key, key, anchor, rect: footprintOf(anchor, WORLD_ENTRIES[key].footprint) };
+  });
+}
+
+test('объекты-входы: на суше, внутри острова, рядом с площадкой', () => {
+  const core = ISLAND.padCore;
+  for (const item of entryFootprints()) {
+    assert.ok(isLand(item.anchor[0], item.anchor[1] - 2), `${item.tag}: якорь в воде`);
+    assert.ok(item.rect.x0 >= 0 && item.rect.x1 <= ISLAND.width && item.rect.y0 >= 0 && item.rect.y1 <= ISLAND.height, `${item.tag}: за пределами острова`);
+    assert.ok(landFraction(item.rect) >= 0.9, `${item.tag}: след не на суше (${landFraction(item.rect).toFixed(2)})`);
+    assert.ok(Math.hypot(item.anchor[0] - core.center[0], item.anchor[1] - core.center[1]) < 260, `${item.tag}: далеко от площадки`);
+  }
+});
+
+test('объекты-входы: не перекрываются между собой, с покупками, площадкой и каналом пламени', () => {
+  const entries = entryFootprints();
+  const purchases = allFootprints();
+  const core = ISLAND.padCore;
+  const trench = { x0: core.trench[0], y0: core.trench[1], x1: core.trench[2], y1: core.trench[3] };
+  entries.forEach((a, i) => {
+    const nearestX = Math.min(Math.max(core.center[0], a.rect.x0), a.rect.x1);
+    const nearestY = Math.min(Math.max(core.center[1], a.rect.y0), a.rect.y1);
+    assert.ok(Math.hypot(nearestX - core.center[0], nearestY - core.center[1]) >= core.radius, `${a.tag} задевает ракету на столе`);
+    assert.ok(!overlaps(a.rect, trench), `${a.tag} задевает пламенный канал`);
+    for (const b of entries.slice(i + 1)) assert.ok(!overlaps(a.rect, b.rect), `${a.tag} пересекается с ${b.tag}`);
+    for (const b of purchases) assert.ok(!overlaps(a.rect, b.rect), `${a.tag} стоит на месте покупки ${b.tag}`);
+  });
+});
+
+test('объекты-входы: размеры читаются на карте, а следы пропорциональны спрайтам', () => {
+  for (const key of ENTRY_KEYS) {
+    const { size, footprint } = WORLD_ENTRIES[key];
+    assert.ok(size[0] >= 50 && size[1] >= 70 && size[1] <= 200, `${key}: размер ${size}`);
+    assert.ok(footprint[0] <= size[0] + 1 && footprint[0] >= size[0] * 0.55, `${key}: след ${footprint[0]} при ширине ${size[0]}`);
+  }
+});
+
+test('дороги островной жизни проложены по суше и не пересекают площадку', () => {
+  const core = ISLAND.padCore;
+  for (const road of ISLAND_ROADS) {
+    for (let i = 0; i + 1 < road.points.length; i++) {
+      const [x0, y0] = road.points[i];
+      const [x1, y1] = road.points[i + 1];
+      const steps = Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 6);
+      let wet = 0;
+      for (let k = 0; k <= steps; k++) {
+        const x = x0 + ((x1 - x0) * k) / steps;
+        const y = y0 + ((y1 - y0) * k) / steps;
+        if (!isLand(x, y)) wet++;
+        assert.ok(Math.hypot(x - core.center[0], y - core.center[1]) > core.radius, `${road.id}: дорога по столу`);
+      }
+      assert.ok(wet / (steps + 1) < 0.1, `${road.id}: участок ${i} в воде`);
+    }
+  }
 });

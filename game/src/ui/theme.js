@@ -1,72 +1,79 @@
-// Палитра интерфейса: тёмные панели, янтарный акцент, золото = монеты, циан = данные,
-// зелёный = мощность, красный = предупреждение. Все пары «текст/фон» держат контраст WCAG AA (≥ 4,5).
+// Палитра интерфейса — не больше 32 цветов, пиксельные рамки из трёх тонов со светом сверху-слева.
+// Цвета ресурсов: монеты — золото, данные — циан, мощность — зелёный, предупреждение — красный, акцент — янтарь.
 
-export const FONT_FAMILY = 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif';
-
-const BASE = {
-  bg: '#090e1a',
-  panel: '#131b2e',
-  panelHi: '#2a3a5c',
-  panelLo: '#0a1020',
-  edge: '#03060c',
-  inset: '#0c1324',
-  line: '#33456b',
-  text: '#f6f1e4',
-  textDim: '#b4bfd8',
-  textMute: '#8a97b5',
-  textDark: '#1a1206',
-  amber: '#ffb627',
-  amberDeep: '#a86300',
+export const PALETTE = Object.freeze({
+  ink: '#05070e',
+  navy0: '#0b0f1a',
+  navy1: '#141b2e',
+  navy2: '#222b3f',
+  steel0: '#3a465f',
+  steel1: '#56658a',
+  steel2: '#8a9bb8',
+  steel3: '#c4d0e4',
+  white: '#f6f1e4',
+  amber0: '#874c08',
+  amber1: '#e6a020',
+  amber2: '#ffd978',
   gold: '#ffd23f',
-  cyan: '#52d8ff',
-  green: '#62e38d',
-  red: '#ff6b5e',
-  white: '#ffffff',
-  shade: 'rgba(3,6,12,0.72)',
+  red0: '#7a1c1c',
+  red1: '#f86a5a',
+  red2: '#ff9a8a',
+  red3: '#c03a2b',
+  green0: '#1c6038',
+  green1: '#3aa860',
+  green2: '#9af0b4',
+  cyan0: '#185a70',
+  cyan1: '#52d8ff',
+  cyan2: '#b8f0ff',
+  paper0: '#b09a68',
+  paper1: '#e8d6a8',
+  paper2: '#fff4d8',
+  cork0: '#6e4a26',
+  cork1: '#a8743a',
+  cork2: '#d09a5a',
+});
+
+// режим для дальтоников: зелёно-красная пара и янтарь заменяются (ещё три цвета, всего 31)
+const CB = { blue: '#6cc3f2', orange: '#ff7a30', yellow: '#f0e442' };
+
+const P = PALETTE;
+
+/** Пиксельные рамки: hi — свет (сверху-слева), mid — основной тон, lo — тень (снизу-справа), edge — контур 1 пиксель. */
+const FRAMES = {
+  panel: { hi: 'steel1', mid: 'navy2', lo: 'ink', edge: 'ink', rivets: true },
+  raised: { hi: 'steel2', mid: 'steel1', lo: 'steel0', edge: 'ink', rivets: true },
+  inset: { hi: 'ink', mid: 'navy1', lo: 'steel0', edge: 'ink' },
+  screen: { hi: 'ink', mid: 'navy0', lo: 'navy2', edge: 'ink' },
+  btn: { hi: 'steel2', mid: 'steel1', lo: 'navy2', edge: 'ink', rivets: true },
+  btnHover: { hi: 'steel3', mid: 'steel1', lo: 'navy2', edge: 'ink', rivets: true },
+  btnPress: { hi: 'navy2', mid: 'steel0', lo: 'steel1', edge: 'ink' },
+  primary: { hi: 'amber2', mid: 'amber1', lo: 'amber0', edge: 'ink', rivets: true },
+  primaryHover: { hi: 'white', mid: 'amber1', lo: 'amber0', edge: 'ink', rivets: true },
+  primaryPress: { hi: 'amber0', mid: 'amber1', lo: 'amber2', edge: 'ink' },
+  danger: { hi: 'red2', mid: 'red3', lo: 'red0', edge: 'ink', rivets: true },
+  dangerHover: { hi: 'white', mid: 'red1', lo: 'red0', edge: 'ink', rivets: true },
+  dangerPress: { hi: 'red0', mid: 'red3', lo: 'red2', edge: 'ink' },
+  good: { hi: 'green2', mid: 'green1', lo: 'green0', edge: 'ink', rivets: true },
+  goodHover: { hi: 'white', mid: 'green1', lo: 'green0', edge: 'ink', rivets: true },
+  goodPress: { hi: 'green0', mid: 'green1', lo: 'green2', edge: 'ink' },
+  disabled: { hi: 'steel0', mid: 'navy2', lo: 'navy1', edge: 'ink' },
+  card: { hi: 'steel1', mid: 'steel0', lo: 'navy2', edge: 'ink' },
+  cardOn: { hi: 'amber2', mid: 'steel0', lo: 'amber0', edge: 'ink' },
+  warn: { hi: 'red1', mid: 'red0', lo: 'ink', edge: 'ink' },
+  paper: { hi: 'paper2', mid: 'paper1', lo: 'paper0', edge: 'cork0' },
+  cork: { hi: 'cork2', mid: 'cork1', lo: 'cork0', edge: 'ink' },
+  // «стекло» без полупрозрачности: тёмная шашечная сетка пикселей, сквозь которую виден фон
+  hud: { hi: 'steel1', mid: 'navy0', lo: 'ink', edge: 'ink', dither: true },
+  glass: { hi: 'steel1', mid: 'navy0', lo: 'ink', edge: 'ink', dither: true },
+  panelGlass: { hi: 'steel1', mid: 'navy1', lo: 'ink', edge: 'ink', dither: true },
 };
 
-// палитра для дальтоников (Окабе–Ито): сине-оранжевая пара вместо зелёно-красной
-const COLORBLIND = {
-  green: '#6cc3f2',
-  red: '#ff7a30',
-  amber: '#f0e442',
-  amberDeep: '#8a7d00',
-};
-
-// варианты 9-slice: заливка, светлый скос, тёмный скос
-const VARIANTS = {
-  panel: { fill: 'panel', hi: 'panelHi', lo: 'panelLo' },
-  inset: { fill: 'inset', hi: 'panelLo', lo: 'panelHi' },
-  raised: { fill: '#1b2744', hi: '#3a4f7b', lo: 'panelLo' },
-  btn: { fill: '#2b3d63', hi: '#5873ad', lo: '#16213b' },
-  btnHover: { fill: '#364c7a', hi: '#7390cc', lo: '#1b2845' },
-  btnPress: { fill: '#1d2a47', hi: '#16213b', lo: '#3a4f7b' },
-  primary: { fill: '#f0a512', hi: '#ffd776', lo: 'amberDeep' },
-  primaryHover: { fill: '#ffbb2e', hi: '#ffe49a', lo: 'amberDeep' },
-  primaryPress: { fill: '#c98108', hi: '#a86300', lo: '#ffd776' },
-  danger: { fill: '#b8322b', hi: '#ff8b7c', lo: '#6d1519' },
-  dangerHover: { fill: '#d4413a', hi: '#ffa294', lo: '#6d1519' },
-  dangerPress: { fill: '#8e2420', hi: '#6d1519', lo: '#ff8b7c' },
-  good: { fill: '#1f7a46', hi: '#5fd18a', lo: '#0e4125' },
-  goodHover: { fill: '#22804b', hi: '#7fe3a5', lo: '#0e4125' },
-  goodPress: { fill: '#175c35', hi: '#0e4125', lo: '#5fd18a' },
-  disabled: { fill: '#1a2238', hi: '#27324e', lo: '#0d1424' },
-  tab: { fill: '#18223a', hi: '#2a3a5c', lo: '#0a1020' },
-  tabOn: { fill: '#2b3d63', hi: '#7390cc', lo: '#16213b' },
-  card: { fill: '#17213a', hi: '#33456b', lo: '#080d19' },
-  cardOn: { fill: '#233256', hi: 'amber', lo: 'amberDeep' },
-  warn: { fill: '#3a1a1c', hi: 'red', lo: '#1c0a0c' },
-  panelGlass: { fill: 'rgba(19,27,46,0.76)', hi: 'panelHi', lo: 'panelLo' },
-  glass: { fill: 'rgba(8,13,26,0.30)', hi: 'rgba(190,210,245,0.38)', lo: 'rgba(0,0,0,0.5)' },
-  hud: { fill: 'rgba(8,13,26,0.62)', hi: 'rgba(120,150,210,0.45)', lo: 'rgba(0,0,0,0.5)' },
-};
-
-const textColorFor = {
-  btn: 'text', btnHover: 'text', btnPress: 'text',
-  primary: 'textDark', primaryHover: 'textDark', primaryPress: 'textDark',
-  danger: 'white', dangerHover: 'white', dangerPress: 'white',
-  good: 'white', goodHover: 'white', goodPress: 'white',
-  disabled: 'textMute',
+const LABEL = {
+  btn: 'white', btnHover: 'white', btnPress: 'steel3',
+  primary: 'ink', primaryHover: 'ink', primaryPress: 'ink',
+  danger: 'white', dangerHover: 'ink', dangerPress: 'white',
+  good: 'ink', goodHover: 'ink', goodPress: 'ink',
+  disabled: 'steel2',
 };
 
 const cache = new Map();
@@ -77,31 +84,73 @@ export function getTheme(settings = {}) {
   const key = cb ? 'cb' : 'std';
   let theme = cache.get(key);
   if (theme) return theme;
-  const c = { ...BASE, ...(cb ? COLORBLIND : null) };
-  const resolve = (v) => (typeof v === 'string' && c[v] ? c[v] : v);
-  const variants = {};
-  for (const [name, v] of Object.entries(VARIANTS)) {
-    const fill = resolve(v.fill);
-    const solid = fill.startsWith('#');
-    variants[name] = {
-      fill,
-      hi: resolve(v.hi),
-      lo: resolve(v.lo),
-      // контур — тёмный хроматический оттенок самой заливки, а не чёрный
-      edge: solid ? mix(fill, '#02040c', 0.84) : 'rgba(2,4,12,0.7)',
-      fillTop: solid ? mix(fill, '#fff0d0', 0.09) : fill,
-      fillBottom: solid ? mix(fill, '#050a1c', 0.22) : fill,
-      sheen: solid && /^(panel|raised|card|inset|warn|good|danger|primary|btn)/.test(name) && !/Press$/.test(name),
-    };
+  const pal = { ...P };
+  if (cb) {
+    pal.green1 = CB.blue;
+    pal.green2 = '#b6defa';
+    pal.green0 = '#1d5f8c';
+    pal.red1 = CB.orange;
+    pal.red2 = '#ffb48a';
+    pal.red0 = '#8a3a10';
+    pal.red3 = '#b04a10';
+    pal.amber1 = CB.yellow;
+    pal.amber2 = '#fff7a8';
+    pal.amber0 = '#5c5200';
+  }
+  const c = {
+    bg: pal.navy0,
+    panel: pal.navy2,
+    panelHi: pal.steel1,
+    panelLo: pal.ink,
+    card: pal.steel0,
+    edge: pal.ink,
+    inset: pal.navy1,
+    screen: pal.navy0,
+    line: pal.steel1,
+    text: pal.white,
+    textDim: pal.steel3,
+    textMute: pal.steel2,
+    textDark: pal.ink,
+    amber: pal.amber1,
+    amberLight: pal.amber2,
+    amberDeep: pal.amber0,
+    gold: pal.gold,
+    cyan: pal.cyan1,
+    cyanDark: pal.cyan0,
+    green: pal.green1,
+    greenLight: pal.green2,
+    greenDark: pal.green0,
+    red: pal.red1,
+    redLight: pal.red2,
+    redDark: pal.red0,
+    white: pal.white,
+    ink: pal.ink,
+    steel0: pal.steel0,
+    steel1: pal.steel1,
+    steel2: pal.steel2,
+    steel3: pal.steel3,
+    navy1: pal.navy1,
+    navy2: pal.navy2,
+    paper0: pal.paper0,
+    paper1: pal.paper1,
+    paper2: pal.paper2,
+    cork0: pal.cork0,
+    cork1: pal.cork1,
+    cork2: pal.cork2,
+    shade: pal.ink,
+  };
+  const frames = {};
+  for (const [name, f] of Object.entries(FRAMES)) {
+    frames[name] = { hi: pal[f.hi], mid: pal[f.mid], lo: pal[f.lo], edge: pal[f.edge], rivets: !!f.rivets, dither: !!f.dither };
   }
   theme = {
     key,
     colorblind: cb,
+    palette: pal,
     c,
-    variants,
+    variants: frames,
     /** Цвет подписи на кнопке данного варианта. */
-    labelColor: (variant) => c[textColorFor[variant] || 'text'],
-    /** good/bad с запасными символами для дальтоников. */
+    labelColor: (variant) => pal[LABEL[variant] || 'white'],
     good: c.green,
     bad: c.red,
     coin: c.gold,
@@ -150,4 +199,21 @@ export function withAlpha(hex, a) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
-export const THEME_SOURCE = { BASE, COLORBLIND, VARIANTS };
+/** Ближайший цвет палитры (для иконок: все тона сводятся к палитре интерфейса). */
+export function nearestPalette(hex, pal = PALETTE) {
+  const [r, g, b] = hexToRgb(hex);
+  let best = null;
+  let bestD = Infinity;
+  for (const v of Object.values(pal)) {
+    const [pr, pg, pb] = hexToRgb(v);
+    const d = (pr - r) ** 2 + (pg - g) ** 2 + (pb - b) ** 2;
+    if (d < bestD) {
+      bestD = d;
+      best = v;
+    }
+  }
+  return best;
+}
+
+export const THEME_SOURCE = { PALETTE, CB, FRAMES };
+export const FONT_FAMILY = 'monospace'; // запасной шрифт на случай сбоя пиксельного (не используется при нормальной работе)

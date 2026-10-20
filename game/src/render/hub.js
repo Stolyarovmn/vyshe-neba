@@ -4,9 +4,16 @@
 
 import { createMapView, drawIslandHd, drawSea } from './islandmap.js';
 import { ensureWorld } from './layout.js';
-import { BUILDING_ANCHORS, ISLAND, eraYear, spriteName } from './manifest.js';
-import { drawPlacedBuildings, islandToWorld } from './buildings.js';
-import { drawLaunchMount } from './launchpad.js';
+import {
+  BUILDING_ANCHORS, ENTRY_KEYS, ISLAND, WORLD_ENTRIES, eraYear, spriteName,
+} from './manifest.js';
+import { buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
+import { drawEntry, drawEntryHint, entrySize, entryWorld } from './entries.js';
+import { BUILD_DURATION, createHubFx, drawScaffold } from './hubfx.js';
+import {
+  dayOverlay, daylightAt, drawBirds, drawFoam, drawGlow, drawHeadlights, drawVehicles, lightsAt, shorePoints,
+} from './life.js';
+import { MOUNT_RADIUS, drawLaunchMount } from './launchpad.js';
 import { createRocketPose, drawRocket, stackHeight } from './rocket.js';
 import { drawAircraft, drawDrone } from './traffic.js';
 import { drawRain } from './sky.js';
@@ -17,8 +24,9 @@ const MIN_TOUCH_CSS = 48;
 const VIEW_RATE = 7;
 const MAX_ZOOM_WIDTH = 150; // самый крупный план: столько единиц по ширине экрана
 const DEFAULT_VIEW = {
-  portrait: { visibleWidth: 300, cx: 36, cy: -14 },
-  landscape: { visibleWidth: 760, cx: 250, cy: -14 },
+  // стартовый вид показывает площадку и все четыре объекта-входа (они стоят от -150 до +165 ед. по X, до -180 по Y)
+  portrait: { visibleWidth: 340, cx: 12, cy: -40 },
+  landscape: { visibleWidth: 780, cx: 230, cy: -50 },
 };
 const CAPSULE_CART = { x: -42, y: 34 };
 
@@ -63,7 +71,18 @@ export function createHub(painter, shared) {
     devH: 1,
     devPerCss: 1,
     sFit: 1,
+    hints: null,
+    daylight: null,
+    shore: null,
   };
+  const fx = createHubFx();
+  const overlay = { r: 0, g: 0, b: 0, a: 0 };
+  const vents = [
+    { x: -26, y: 20, rate: 5, drift: -1 },
+    { x: 27, y: 21, rate: 5, drift: 1 },
+    { x: 0, y: 60, rate: 3, drift: 0 },
+  ];
+  const mistVent = [{ x: 56, y: 22, rate: 8, drift: 2 }];
 
   /** Рамки хранятся по идентификатору key#n: у парных построек (маяки) их несколько, и ракета между ними остаётся доступной. */
   function rectFor(key, index) {
@@ -178,6 +197,10 @@ export function createHub(painter, shared) {
         const heightUnits = BUILDING_ANCHORS[target].size[1] * ISLAND.unitsPerPx;
         x = wx;
         y = wy - heightUnits * 0.4;
+      } else if (typeof target === 'string' && WORLD_ENTRIES[target]) {
+        const [wx, wy] = entryWorld(target);
+        x = wx;
+        y = wy - WORLD_ENTRIES[target].size[1] * ISLAND.unitsPerPx * 0.4;
       } else if (target && typeof target === 'object') {
         x = target.x;
         y = target.y;
@@ -206,6 +229,37 @@ export function createHub(painter, shared) {
         state.cx = state.tx;
         state.cy = state.ty;
       }
+    },
+
+    /**
+     * Анимация покупки здания key (~1,2 с): леса, пыль, искры, поднимающиеся блоки, вспышка по завершении.
+     * Вызывайте сразу после покупки; здание уже в профиле. При reduceMotion — короткая стройка без вспышек.
+     */
+    playBuild(key) {
+      if (BUILDING_ANCHORS[key]) fx.playBuild(key);
+    },
+
+    /** Праздник новой эпохи: фейерверк над островом и вспышка огней (при reduceMotion — только мягкое свечение ламп). */
+    playEra() {
+      fx.playEra();
+    },
+
+    /** Длительность анимации стройки, с. */
+    buildDuration: BUILD_DURATION,
+
+    /** Идёт ли сейчас анимация стройки или праздника (для UI: держать кадры, не запускать повторно). */
+    get animating() {
+      return fx.active;
+    },
+
+    /** Освещённость 0 (ночь) .. 1 (день) принудительно; null — вернуть автоматическую смену дня и ночи. */
+    setDaylight(value) {
+      state.daylight = value === null || value === undefined ? null : clamp(value, 0, 1);
+    },
+
+    /** Подсветка объектов-входов пульсирующим контуром: true/false или null — решает профиль (первый запуск). */
+    setHints(value) {
+      state.hints = value === null || value === undefined ? null : !!value;
     },
 
     setSelected(key) {
@@ -307,12 +361,27 @@ export function createHub(painter, shared) {
       for (const r of rects.values()) r.active = false;
       frameCounts.clear();
 
-      drawSea(ctx, mv, time, mood);
-      drawIslandHd(ctx, painter, mv);
-      drawCloudShadows(ctx, painter, mv, time, mood, state.zoom);
+      const reduce = !!(params.settings && params.settings.reduceMotion);
+      if (state.shore === null) state.shore = shorePoints(painter.assets.json('island_land'));
+      const daylight = params.daylight ?? state.daylight ?? daylightAt(time);
+      const night = lightsAt(daylight);
 
       const era = profile ? clamp(profile.era | 0, 0, 5) : 0;
       const parts = profile && profile.parts ? profile.parts : {};
+      const owned = profile && profile.buildings ? profile.buildings : {};
+      const ownedCount = Object.keys(owned).filter((key) => (owned[key] | 0) > 0).length;
+
+      // эффекты: стройка, праздник, пар
+      fx.update(dt, reduce, (key) => buildBoxes(painter, key, owned[key] | 0), mv);
+      fx.steam(dt, vents, reduce ? 0.4 : 1);
+      if (owned.deluge > 0) fx.steam(dt, mistVent, reduce ? 0.3 : 0.8);
+
+      drawSea(ctx, mv, time, mood);
+      drawIslandHd(ctx, painter, mv);
+      if (!reduce) drawFoam(ctx, mv, state.shore, time);
+      drawCloudShadows(ctx, painter, mv, time, mood, state.zoom);
+      drawVehicles(ctx, mv, time, vehicleCount(ownedCount));
+
       const rocketItem = {
         y: 0,
         draw() {
@@ -332,15 +401,57 @@ export function createHub(painter, shared) {
           addRect('rocket', mv.sx(-18), mv.sy(-height), mv.sx(18), mv.sy(4));
         },
       };
-      drawPlacedBuildings(ctx, painter, mv, profile, time, addRect, [rocketItem]);
+      const contracts = profile && profile.contracts && profile.contracts.active ? profile.contracts.active.length : 0;
+      const entryItems = ENTRY_KEYS.map((key) => {
+        const [wx, wy] = entryWorld(key);
+        return {
+          y: wy,
+          draw() {
+            drawEntry(ctx, painter, mv, key, wx, wy, time, { era, contracts, pulse: fx.eraPulse, sway: !reduce });
+            const [w, h] = entrySize(key, painter, era);
+            addRect(key, mv.sx(wx - w / 2), mv.sy(wy - h), mv.sx(wx + w / 2), mv.sy(wy));
+          },
+        };
+      });
+      drawPlacedBuildings(ctx, painter, mv, profile, time, addRect, [rocketItem, ...entryItems], {
+        build: (key) => fx.buildState(key, reduce),
+        scaffold: (c, box, build) => drawScaffold(c, mv, box, build.reveal, build.scaffold, time),
+      });
+      fx.draw(ctx, mv, 0);
       drawHubDrones(ctx, painter, mv, profile, time);
       drawHubPlanes(ctx, painter, mv, time, profile);
+      if (!reduce) drawBirds(ctx, mv, time);
       drawHubClouds(ctx, painter, mv, time, mood, state.zoom);
 
       if (mood.rain > 0.05) drawRain(ctx, mv, time, mood.rain, mood.wind);
       if (mood.storm > 0.3) {
         ctx.fillStyle = `rgba(20,28,40,${(0.2 * mood.storm).toFixed(2)})`;
         ctx.fillRect(0, 0, devW, devH);
+      }
+
+      // сумерки и ночь: затемнение, затем огни поверх (аддитивно)
+      dayOverlay(daylight, overlay);
+      if (overlay.a > 0.01) {
+        ctx.fillStyle = `rgba(${overlay.r},${overlay.g},${overlay.b},${overlay.a.toFixed(3)})`;
+        ctx.fillRect(0, 0, devW, devH);
+      }
+      const lightStrength = Math.max(night, fx.eraPulse * 0.9);
+      if (lightStrength > 0.03) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        drawNightLights(ctx, painter, mv, profile, time, lightStrength, era);
+        ctx.restore();
+        drawHeadlights(ctx, mv, time, vehicleCount(ownedCount), night);
+      }
+      fx.draw(ctx, mv, 1);
+
+      const hints = state.hints ?? !!(profile && profile.settings && profile.settings.tutorial && !profile.settings.tutorial.done);
+      if (hints) {
+        const d = state.devPerCss;
+        for (const key of ENTRY_KEYS) {
+          const r = rects.get(key);
+          if (r && r.active) drawEntryHint(ctx, { x0: r.x0 * d, y0: r.y0 * d, x1: r.x1 * d, y1: r.y1 * d }, time, mv.s);
+        }
       }
       if (state.selected) {
         for (const r of rects.values()) if (r.active && r.key === state.selected) drawSelection(ctx, mv, r, state.devPerCss, time);
@@ -349,6 +460,55 @@ export function createHub(painter, shared) {
     },
   };
   return hub;
+}
+
+/** Сколько машин ездит по дорогам: растёт вместе с базой. */
+export function vehicleCount(ownedCount) {
+  return ownedCount >= 6 ? 3 : ownedCount >= 2 ? 2 : 1;
+}
+
+/** Рамки здания key (ед. мира, y — низ) по его якорям: для стройки и эффектов. */
+function buildBoxes(painter, key, level) {
+  const spec = BUILDING_ANCHORS[key];
+  if (!spec || level <= 0) return null;
+  const [w, h] = buildingSize(painter, key, level);
+  return spec.anchors.map(([px, py]) => {
+    const [x, y] = islandToWorld(px, py);
+    return { x, y, w: w * 0.9, h };
+  });
+}
+
+const GLOW_WARM = '255,206,120';
+const GLOW_RED = '255,90,70';
+
+/** Ночные огни построек, стола, объектов-входов: ровные и мигающие; strength 0..1. */
+function drawNightLights(ctx, painter, mv, profile, time, strength, era) {
+  const owned = profile && profile.buildings ? profile.buildings : {};
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+    const on = (Math.floor(time * 1.5) + i) % 2 === 0;
+    drawGlow(ctx, mv, Math.cos(a) * MOUNT_RADIUS * 0.82, Math.sin(a) * MOUNT_RADIUS * 0.72, 11, GLOW_WARM, strength * (on ? 1 : 0.35));
+  }
+  for (const key of Object.keys(BUILDING_ANCHORS)) {
+    const level = owned[key] | 0;
+    if (level <= 0) continue;
+    const [w, h] = buildingSize(painter, key, level);
+    const blinking = key === 'beacons' || key === 'radar' || key === 'recovery';
+    const on = !blinking || Math.floor(time * 1.4 + hash2(key.length, level, 3)) % 2 === 0;
+    BUILDING_ANCHORS[key].anchors.forEach(([px, py], i) => {
+      const [x, y] = islandToWorld(px, py);
+      drawGlow(ctx, mv, x, y - h * (key === 'beacons' ? 0.78 : 0.42), Math.max(w, h) * (key === 'beacons' ? 0.4 : 0.55), blinking ? GLOW_RED : GLOW_WARM, strength * (on ? 0.9 : 0.3));
+      if (i === 0 && !blinking) drawGlow(ctx, mv, x + w * 0.25, y - h * 0.2, w * 0.35, GLOW_WARM, strength * 0.6);
+    });
+  }
+  const [wx, wy] = entryWorld('workshop');
+  drawGlow(ctx, mv, wx, wy - 50, 34, GLOW_WARM, strength * 0.75);
+  const [sx, sy] = entryWorld('shop');
+  drawGlow(ctx, mv, sx, sy - 32, 46, GLOW_WARM, strength * 0.9);
+  const [mx, my] = entryWorld('monument');
+  const k = ISLAND.unitsPerPx;
+  for (let i = 0; i <= era; i++) drawGlow(ctx, mv, mx + (-11.5 + i * 4.6) * k, my - 62 * k, 8, GLOW_WARM, strength * 0.9);
+  drawGlow(ctx, mv, mx, my - 122 * k, 12, GLOW_WARM, strength);
 }
 
 function drawCapsuleOnCart(ctx, painter, mv, era) {

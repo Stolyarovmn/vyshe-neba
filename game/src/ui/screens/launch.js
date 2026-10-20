@@ -1,12 +1,14 @@
-// Запуск: выбор цели (Атмосфера / Луна / Марс) с причинами недоступности, расходники, кнопка «Старт».
+// Пульт запуска: ряд ламп готовности, три крупные кнопки-планеты (картинка и замок), гнёзда расходников
+// и большая кнопка «ПУСК» под защитной планкой.
 
 import { t } from '../../i18n/index.js';
-import { screenFrame, launchLayout } from '../layout.js';
-import { drawHeader } from './common.js';
+import { launchLayout } from '../layout.js';
+import { drawChrome, lockRows, isFundsReason, partIcon } from './common.js';
 
 const DEST_ICON = { earth: 'earth', moon: 'moon', mars: 'mars' };
 const CONS = ['chute', 'repair', 'canister', 'magnet'];
 const CONS_ICON = { chute: 'chute', repair: 'repair', canister: 'canister', magnet: 'target' };
+const READY_PARTS = ['engine', 'tank', 'hull', 'capsule'];
 
 function state(app) {
   return ((app.ui ||= {}).launch ||= { dest: 'earth', cons: {} });
@@ -24,81 +26,74 @@ export default {
     const st = state(app);
     const c = kit.c;
     const p = app.profile;
-    const F = screenFrame(L, { header: true });
     const G = launchLayout(L);
-    drawHeader(app, kit, F.header, { back: true, title: t('launch.title') });
+    drawChrome(app, kit, { back: true });
     const dests = app.rules.availableDestinations(p);
     const base = app.rules.deriveBase(p);
     const free = { chute: base.effects.freeChute > 0, canister: base.effects.freeCanister > 0 };
+    const sel = dests.find((d) => d.id === st.dest);
 
-    // цели
+    // корпус пульта
+    kit.panel(G.panel, { variant: 'raised', pad: 0 });
+
+    // лампы готовности: ключевые модули установлены, цель открыта
+    const lampSize = Math.round(18 * L.ui);
+    const cells = READY_PARTS.length + 1;
+    const step = G.lamps.w / cells;
+    READY_PARTS.forEach((id, i) => {
+      const cx = G.lamps.x + step * (i + 0.5);
+      const ok = (p.parts[id] || 0) > 0;
+      kit.icon(partIcon(id), cx - lampSize * 0.9, G.lamps.y + G.lamps.h / 2, Math.round(lampSize * 1.15), ok ? c.text : c.textMute);
+      kit.lamp(cx + lampSize * 0.5, G.lamps.y + G.lamps.h / 2, lampSize, ok ? c.green : c.amber, ok, false);
+    });
+    {
+      const cx = G.lamps.x + step * (cells - 0.5);
+      const ok = !!sel?.ok;
+      kit.icon(DEST_ICON[st.dest] || 'earth', cx - lampSize * 0.9, G.lamps.y + G.lamps.h / 2, Math.round(lampSize * 1.15), ok ? c.text : c.textMute);
+      kit.lamp(cx + lampSize * 0.5, G.lamps.y + G.lamps.h / 2, lampSize, ok ? c.green : c.red, true, !ok);
+    }
+
+    // три планеты
     dests.forEach((d, i) => {
-      const r = G.destCards[i];
+      const r = G.dest[i];
       const on = st.dest === d.id;
-      const variant = on ? 'cardOn' : 'card';
-      const clicked = kit.button(`launch-dest-${d.id}`, r, { variant, locked: !d.ok });
+      const clicked = kit.button(`launch-dest-${d.id}`, r, {
+        variant: on ? 'cardOn' : 'card', locked: !d.ok, icon: DEST_ICON[d.id], stack: true, label: t(`dest.${d.id}`),
+        size: kit.fs(L.portrait ? 12 : 14), iconColor: d.id === 'mars' ? '#e8845a' : c.text, lamp: on ? c.green : false,
+      });
       if (clicked) st.dest = d.id;
       else if (kit.denied === `launch-dest-${d.id}`) kit.toast(t('launch.closed'), { kind: 'bad', icon: 'lock' });
-      const pad = L.pad;
-      const ic = Math.min(Math.round((L.portrait ? 40 : 52) * L.ui), Math.round(r.w * 0.26));
-      kit.icon(DEST_ICON[d.id], r.x + pad + ic / 2, r.y + pad + ic / 2, ic, d.id === 'mars' ? '#e8845a' : c.text, d.ok ? 1 : 0.55);
-      const tx = r.x + pad + ic + L.gap;
-      const tw = r.w - (tx - r.x) - pad;
-      kit.drawText(d.name, tx, r.y + pad + kit.fs(10), { size: kit.fs(17), color: d.ok ? (on ? c.amber : c.text) : c.textDim, maxWidth: tw });
-      const used = kit.paragraph(d.desc, L.portrait ? tx : r.x + pad, L.portrait ? r.y + pad + kit.fs(24) : r.y + pad + ic + L.gap, L.portrait ? tw : r.w - pad * 2, { size: kit.fs(12), color: c.textDim, maxLines: L.portrait ? 2 : 4, lineHeight: 1.2 });
-      let y = (L.portrait ? r.y + pad + kit.fs(24) : r.y + pad + ic + L.gap) + used + L.gap * 0.5;
-      if (d.ok) {
-        kit.icon('check', (L.portrait ? tx : r.x + pad) + kit.fs(7), y + kit.fs(8), kit.fs(14), c.green);
-        kit.drawText(t('launch.open'), (L.portrait ? tx : r.x + pad) + kit.fs(18), y + kit.fs(8), { size: kit.fs(12), color: c.green });
-      } else {
-        // причины недоступности: сколько поместится
-        const room = r.y + r.h - pad - y;
-        const lineH = kit.fs(14);
-        const fit = Math.max(1, Math.floor(room / lineH));
-        const shownCount = d.reasons.length <= fit ? d.reasons.length : Math.max(1, fit - 1);
-        const shown = d.reasons.slice(0, shownCount);
-        const x0 = L.portrait ? tx : r.x + pad;
-        const w0 = L.portrait ? tw : r.w - pad * 2;
-        for (const rs of shown) {
-          kit.icon('lock', x0 + kit.fs(6), y + lineH / 2, kit.fs(11), c.red);
-          kit.drawText(app.reasonText(rs), x0 + kit.fs(16), y + lineH / 2, { size: kit.fs(11), color: c.red, maxWidth: w0 - kit.fs(16) });
-          y += lineH;
-        }
-        if (d.reasons.length > shown.length && fit > 1) kit.drawText(t('launch.more', { n: d.reasons.length - shown.length }), x0 + kit.fs(16), y + lineH / 2, { size: kit.fs(11), color: c.textMute });
+      if (!d.ok) {
+        const why = d.reasons.filter((x) => !isFundsReason(x)).slice(0, 1);
+        if (why.length) lockRows(app, kit, r.x + L.gap * 0.5, r.y + r.h - Math.round(34 * L.ui), r.w - L.gap, why, { compact: true });
       }
     });
 
-    // расходники
-    const cr = G.cons;
-    const inner = kit.panel(cr, { title: t('launch.cons'), titleIcon: 'canister', variant: 'panel' });
-    const cols = L.portrait ? 4 : 2;
-    const rows = Math.ceil(CONS.length / cols);
-    const cell = { w: (inner.w - L.gap * (cols - 1)) / cols, h: Math.min(L.touch(62), (inner.h - L.gap * (rows - 1)) / rows) };
+    // гнёзда расходников
+    kit.nine('screen', G.cons.x, G.cons.y, G.cons.w, G.cons.h);
     CONS.forEach((id, i) => {
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const r = { x: inner.x + col * (cell.w + L.gap), y: inner.y + row * (cell.h + L.gap), w: cell.w, h: cell.h };
+      const r = G.consSlots[i];
       const have = p.inventory[id] || 0;
       const isFree = !!free[id];
       const usable = have > 0 || isFree;
       const on = usable && (isFree || st.cons[id]);
-      const clicked = kit.button(`cons-${id}`, r, { variant: on ? 'cardOn' : 'card', stack: true, icon: CONS_ICON[id], label: t(`cons.${id}`), size: Math.min(kit.fs(L.portrait ? 10 : 12), Math.round(r.w / 6.2)), disabled: false, iconColor: usable ? c.text : c.textMute, color: usable ? c.text : c.textMute });
-      kit.drawText(isFree ? t('cons.free') : `×${have}`, r.x + r.w - L.px * 3, r.y + L.px * 4, { size: kit.fs(11), color: isFree ? c.green : have ? c.amber : c.textMute, align: 'right', weight: 900 });
+      const pad = Math.round(L.gap * 0.5);
+      const slot = { x: r.x + pad, y: r.y + pad, w: r.w - pad * 2, h: r.h - pad * 2 };
+      const clicked = kit.button(`cons-${id}`, slot, { variant: on ? 'cardOn' : 'card', icon: CONS_ICON[id], iconSize: Math.round(slot.h * 0.56), iconColor: usable ? c.text : c.textMute, tip: t(`cons.${id}`), lamp: on ? c.green : false });
+      kit.drawText(isFree ? t('cons.free') : `×${have}`, slot.x + slot.w - kit.cell() * 3, slot.y + slot.h - kit.cell() * 5, { size: kit.fs(11), color: isFree ? c.green : have ? c.amberLight : c.textMute, align: 'right', shadow: true });
+      if (id === 'chute' && usable && st.dest !== 'earth') kit.icon('warn', slot.x + kit.cell() * 5, slot.y + slot.h - kit.cell() * 5, Math.round(14 * L.ui), c.amber);
       if (clicked) {
-        if (!usable) app.go('journal', { tab: 'shop' }, { push: true });
+        if (!usable) app.go('shop', {}, { push: true });
         else if (!isFree) st.cons[id] = !st.cons[id];
       }
     });
-    if (!L.portrait) {
-      const noteY = inner.y + rows * (cell.h + L.gap);
-      if (st.dest !== 'earth') kit.paragraph(t('launch.chuteMoon'), inner.x, noteY, inner.w, { size: kit.fs(11), color: c.textMute, maxLines: 3 });
-    } else if (st.dest !== 'earth') {
-      kit.drawText(t('launch.chuteMoon.short'), inner.x, cr.y + cr.h - L.px * 3, { size: kit.fs(10), color: c.textMute, maxWidth: inner.w, baseline: 'bottom' });
-    }
 
-    // старт
-    const sel = dests.find((d) => d.id === st.dest);
-    if (kit.button('launch-start', G.start, { label: t('launch.start'), icon: 'launch', variant: 'primary', size: kit.fs(20), disabled: !sel?.ok })) {
+    // ПУСК под защитной планкой
+    const cc = kit.cell();
+    kit.hazard(G.start);
+    for (const [x, y, w, h] of [[G.start.x, G.start.y, G.start.w, cc], [G.start.x, G.start.y + G.start.h - cc, G.start.w, cc], [G.start.x, G.start.y, cc, G.start.h], [G.start.x + G.start.w - cc, G.start.y, cc, G.start.h]]) kit.rect(x, y, w, h, c.ink);
+    const btn = { x: G.start.x + cc * 3, y: G.start.y + cc * 3, w: G.start.w - cc * 6, h: G.start.h - cc * 6 };
+    if (kit.button('launch-start', btn, { label: t('launch.start'), icon: 'launch', variant: 'danger', size: kit.fs(24), iconSize: Math.round(btn.h * 0.46), disabled: !sel?.ok, lamp: sel?.ok ? c.amberLight : false })) {
       const consumables = {};
       for (const id of CONS) consumables[id] = !!(st.cons[id] && (p.inventory[id] || 0) > 0);
       app.startLaunch({ destination: st.dest, consumables });

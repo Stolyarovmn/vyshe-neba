@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { backdropCell, coverCrop, createBackdrop } from '../src/render/backdrop.js';
-import { STATION_COLUMNS, createWorkshop, layoutStations } from '../src/render/workshop.js';
+import { MODULE_IDS, MODULE_STATIONS, STATION_COLUMNS, createWorkshop, defaultRocketRect, layoutStations, moduleBoxes } from '../src/render/workshop.js';
+import { ASSEMBLY_HEIGHT, ASSEMBLY_WIDTH, MODULE_VIEW } from '../src/render/rocket-view.js';
 import { createPainter } from '../src/render/painter.js';
 import { ASSET_FILES, BACKDROP_ATLAS, STATION_SIZES, eraYear } from '../src/render/manifest.js';
 import { fakeAssets, makeStubCanvas, pngSize, repoRoot, stubContext } from './render-helpers.mjs';
@@ -77,6 +78,83 @@ test('drawStations рисует все станции эпохи и возвра
   const items = workshop.drawStations(ctx, { era: 3, rect: { x: 0, y: 100, w: 390, h: 400 }, time: 2 });
   assert.equal(items.length, 5);
   assert.ok(ctx.calls.drawImage >= 5);
+});
+
+const within = (a, b) => a.x >= b.x - 1e-6 && a.y >= b.y - 1e-6 && a.x + a.w <= b.x + b.w + 1e-6 && a.y + a.h <= b.y + b.h + 1e-6;
+const sameBox = (a, b) => ['x', 'y', 'w', 'h'].every((k) => Math.abs(a[k] - b[k]) < 1e-9);
+
+test('хитбоксы модулей: девять модулей, станции у двигателя, корпуса и электроники, остальное — части ракеты', () => {
+  assert.deepEqual([...MODULE_IDS].sort(), Object.keys(MODULE_VIEW).sort());
+  assert.deepEqual(MODULE_STATIONS, { engine: 'engine_test_stand', hull: 'hull_diagnostics', avionics: 'telemetry_post' });
+  for (const rect of [{ x: 0, y: 0, w: 390, h: 500 }, { x: 40, y: 80, w: 844, h: 300 }, { x: 0, y: 0, w: 1280, h: 560 }]) {
+    for (const era of [0, 3, 5]) {
+      const boxes = moduleBoxes({ era, rect });
+      const stations = layoutStations(rect);
+      assert.deepEqual(Object.keys(boxes).sort(), [...MODULE_IDS].sort());
+      for (const id of MODULE_IDS) {
+        const box = boxes[id];
+        assert.ok(box.w > 0 && box.h > 0 && Number.isFinite(box.x + box.y), `${id}: пустой хитбокс`);
+        if (MODULE_STATIONS[id]) {
+          assert.equal(box.source, 'station', id);
+          assert.equal(box.station, MODULE_STATIONS[id]);
+          assert.ok(sameBox(box, stations.find((s) => s.id === MODULE_STATIONS[id])), `${id}: рамка станции`);
+        } else {
+          assert.equal(box.source, 'rocket', id);
+          assert.equal(box.station, null);
+        }
+        assert.ok(box.part && box.part.w > 0 && box.part.h > 0, `${id}: есть рамка узла на ракете`);
+      }
+    }
+  }
+});
+
+test('хитбоксы частей ракеты: лежат в рамке сборки, идут по высоте сверху вниз и совпадают с MODULE_VIEW', () => {
+  const rect = { x: 0, y: 0, w: 844, h: 360 };
+  const rocket = { x: 360, y: 20, w: (320 * ASSEMBLY_WIDTH) / ASSEMBLY_HEIGHT, h: 320 };
+  const boxes = moduleBoxes({ era: 2, rect, rocket });
+  for (const id of MODULE_IDS) {
+    const { part } = boxes[id];
+    const [t0, t1] = MODULE_VIEW[id].region;
+    assert.ok(Math.abs(part.y - (rocket.y + t0 * rocket.h)) < 1e-6 && Math.abs(part.y + part.h - (rocket.y + t1 * rocket.h)) < 1e-6, `${id}: диапазон по высоте`);
+    assert.ok(part.y >= rocket.y - 1e-6 && part.y + part.h <= rocket.y + rocket.h + 1e-6, `${id}: за пределами сборки по высоте`);
+    assert.ok(part.x < rocket.x + rocket.w && part.x + part.w > rocket.x, `${id}: не над ракетой`);
+  }
+  const top = (id) => boxes[id].part.y;
+  const bottom = (id) => boxes[id].part.y + boxes[id].part.h;
+  assert.ok(top('parachute') <= top('avionics'), 'парашют выше электроники');
+  assert.ok(top('avionics') >= top('capsule') - 1e-6 && bottom('avionics') <= bottom('capsule') + 1e-6, 'электроника внутри капсулы');
+  assert.ok(top('capsule') < top('tank') && top('tank') <= top('hull') + 1e-6 && top('hull') < top('engine') && top('engine') < top('booster'));
+  assert.ok(boxes.fins.part.w > boxes.hull.part.w && boxes.legs.part.w > boxes.hull.part.w, 'ноги и стабилизаторы шире корпуса');
+  const centre = rocket.x + rocket.w / 2;
+  for (const id of MODULE_IDS) assert.ok(Math.abs(boxes[id].part.x + boxes[id].part.w / 2 - centre) < 1e-6, `${id}: по центру сборки`);
+});
+
+test('хитбоксы без станций (портрет): все девять модулей — части ракеты', () => {
+  const rect = { x: 0, y: 0, w: 390, h: 420 };
+  const boxes = moduleBoxes({ era: 1, rect, stations: false });
+  for (const id of MODULE_IDS) {
+    assert.equal(boxes[id].source, 'rocket', id);
+    assert.ok(sameBox(boxes[id], boxes[id].part), id);
+  }
+  const guessed = defaultRocketRect(rect);
+  assert.ok(within(guessed, rect) && Math.abs(guessed.w / guessed.h - ASSEMBLY_WIDTH / ASSEMBLY_HEIGHT) < 1e-9);
+});
+
+test('drawStations возвращает массив станций с .modules (хитбокс каждого модуля), контракт массива не нарушен', () => {
+  const painter = createPainter(fakeAssets(), makeStubCanvas);
+  const workshop = createWorkshop(painter);
+  const ctx = stubContext(800, 600);
+  const rect = { x: 0, y: 100, w: 844, h: 300 };
+  const rocket = { x: 400, y: 110, w: 40, h: 280 };
+  const items = workshop.drawStations(ctx, { era: 4, rect, time: 1, rocket });
+  assert.ok(Array.isArray(items) && items.length === 5);
+  assert.ok(items.every((item) => item.id && item.side && Number.isFinite(item.w)));
+  assert.deepEqual(Object.keys(items.modules).sort(), [...MODULE_IDS].sort());
+  assert.equal(items.modules.engine.station, 'engine_test_stand');
+  assert.ok(sameBox(items.modules.engine, moduleBoxes({ era: 4, rect, rocket }).engine));
+  const plain = workshop.drawStations(ctx, { era: 4, rect, time: 1 });
+  assert.equal(Object.keys(plain.modules).length, 9, 'без params.rocket рамка сборки оценивается по rect');
+  assert.equal(workshop.moduleBoxes({ era: 4, rect, rocket }).capsule.source, 'rocket');
 });
 
 test('файлы фонов и станций существуют и совпадают по размеру с манифестом', () => {

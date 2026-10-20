@@ -48,6 +48,15 @@ PURCHASES = {
     'observation': ('perimeter_east', [(1380, 320)], (150, 175), (120, 34), 'Скальный холм справа с обзором стартовой площадки.'),
     'recovery': ('recovery_east', [(1610, 478)], (200, 112), (180, 34), 'Берег справа внизу, у дальней береговой логистики.'),
 }
+# Объекты-входы в мире: не покупаются, открывают экраны (хаб.hitTest возвращает эти ключи).
+# ключ: (зона, [якоря], размер спрайта (w, h) px, след на земле (w, d) px, название, причина)
+ENTRIES = {
+    'workshop': ('launch_core', [(330, 262)], (130, 157), (114, 28), 'Мастерская', 'Сервисный подъёмник эпохи к северу от площадки: отсюда собирают ракету.'),
+    'monument': ('launch_core', [(232, 276)], (50, 120), (44, 22), 'Памятник эпох', 'Обелиск на северо-западной косе: лампы по пройденным эпохам; спрайт не заходит на доску контрактов.'),
+    'board': ('launch_core', [(210, 352)], (78, 72), (60, 20), 'Доска контрактов', 'У западного края площадки, рядом со стартовой зоной, ниже памятника.'),
+    'shop': ('launch_core', [(578, 352)], (120, 98), (110, 30), 'Лавка', 'Прилавок у начала дороги, между площадкой и сервисным двором.'),
+}
+
 ASSET_FAMILIES = {
     'B01_weather_complex': {'purchase': 'weather', 'zone': 'command_north'},
     'B02_tracking_radar': {'purchase': 'radar', 'zone': 'command_north'},
@@ -100,7 +109,9 @@ def validate(land, cell):
     errors = []
     rects = []
     trench = PAD_CORE['trench_px']
-    for key, (zone, anchors, size, footprint, reason) in PURCHASES.items():
+    items = [(key, anchors, footprint) for key, (zone, anchors, size, footprint, reason) in PURCHASES.items()]
+    items += [(key, anchors, footprint) for key, (zone, anchors, size, footprint, name, reason) in ENTRIES.items()]
+    for key, anchors, footprint in items:
         for index, anchor in enumerate(anchors):
             rect = footprint_rect(anchor, footprint)
             tag = f'{key}[{index}]'
@@ -132,6 +143,18 @@ def build():
             'footprint_px': list(footprint),
             'reason': reason,
         }
+    entries = {}
+    for key, (zone, anchors, size, footprint, name, reason) in ENTRIES.items():
+        entries[key] = {
+            'name': name,
+            'zone': zone,
+            'anchors': [list(a) for a in anchors],
+            'anchors_uv': [[round(a[0] / ISLAND_SIZE[0], 5), round(a[1] / ISLAND_SIZE[1], 5)] for a in anchors],
+            'anchors_world': [[round((a[0] - LAUNCH_ORIGIN[0]) * UNITS_PER_PX, 2), round((a[1] - LAUNCH_ORIGIN[1]) * UNITS_PER_PX, 2)] for a in anchors],
+            'sprite_px': list(size),
+            'footprint_px': list(footprint),
+            'reason': reason,
+        }
     return {
         'version': 3,
         'world': {
@@ -151,6 +174,7 @@ def build():
             'sprite_scale': 'sprite_px — целевой видимый размер спрайта в пикселях острова (пропорционален footprint из art/placeables/PRODUCTION_MANIFEST.md, 1 LP ≈ 1.45 px).',
         },
         'purchases': purchases,
+        'entries': entries,
         'asset_families': ASSET_FAMILIES,
     }
 
@@ -163,7 +187,14 @@ def doc_text(layout):
         size = '×'.join(str(v) for v in purchase['sprite_px'])
         rows.append(f"| {NAMES[key]} | `{key}` | `{purchase['zone']}` | {anchors} | {world} | {size} | {purchase['reason']} |")
     table = '\n'.join(rows)
-    families = '\n'.join(f"| `{k}` | `{v['purchase']}` | `{v['zone']}` |" for k, v in layout['asset_families'].items())
+    entry_rows = []
+    for key, entry in layout['entries'].items():
+        anchors = '; '.join(f'({a[0]}, {a[1]})' for a in entry['anchors'])
+        world = '; '.join(f'({w[0]:.0f}, {w[1]:.0f})' for w in entry['anchors_world'])
+        size = '×'.join(str(v) for v in entry['sprite_px'])
+        entry_rows.append(f"| {entry['name']} | `{key}` | {anchors} | {world} | {size} | {entry['reason']} |")
+    entry_table = '\n'.join(entry_rows)
+    families ='\n'.join(f"| `{k}` | `{v['purchase']}` | `{v['zone']}` |" for k, v in layout['asset_families'].items())
     return f'''# Стартовый остров и размещение расширений базы
 
 Документ фиксирует геометрию стартового острова и канонические позиции покупок. Машиночитаемый источник — `art/placeables/BASE_ISLAND_LAYOUT.json` (version 3); при расхождении прав JSON. Файл и эта таблица генерируются скриптом `game/tools/island-layout.py` (таблица якорей лежит в нём же).
@@ -182,6 +213,14 @@ def doc_text(layout):
 | Покупка | Ключ | Зона | Якорь (px острова) | Мир (ед.) | Спрайт (px) | Причина позиции |
 | --- | --- | --- | --- | --- | --- | --- |
 {table}
+
+## Объекты-входы
+
+Не покупаются, открывают экраны; `hub.hitTest` возвращает их ключи. Лежат в JSON в разделе `entries` с теми же полями, что у покупок.
+
+| Объект | Ключ | Якорь (px острова) | Мир (ед.) | Спрайт (px) | Причина позиции |
+| --- | --- | --- | --- | --- | --- |
+{entry_table}
 
 «Спрайт» — целевой видимый размер в пикселях острова (пропорционален footprint из `art/placeables/PRODUCTION_MANIFEST.md`, 1 LP ≈ 1,45 px). След на земле (`footprint_px`) лежит в JSON.
 

@@ -7,7 +7,9 @@
 //   renderer.events(flightEvents);
 //   renderer.layout(w, h, dpr, safeInsets);
 //   renderer.backdrop.draw(ctx, { kind, era, rect, time, dim });
-//   renderer.workshop.drawStations(ctx, { era, rect, time });
+//   renderer.workshop.drawStations(ctx, { era, rect, time, rocket? }); // массив станций + .modules (хитбокс каждого модуля)
+//   renderer.workshop.moduleBoxes({ era, rect, rocket, stations? });   // те же хитбоксы без рисования
+//   renderer.hub.playBuild(key) / playEra() / setDaylight(v) / setHints(on) / hitTest(x, y) / screenPos(key)
 
 import * as manifest from './manifest.js';
 import { loadAssets } from './assets.js';

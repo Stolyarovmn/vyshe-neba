@@ -3,8 +3,9 @@
 // виджеты читают результат (clicked/hover/press) и рисуют себя. Всё в CSS-пикселях.
 
 import { createText } from './text.js';
+import { drawSegments, segmentWidth } from './font-pixel.js';
 import { createIcons, hasIcon } from './icons.js';
-import { getTheme, mix, withAlpha } from './theme.js';
+import { getTheme, mix } from './theme.js';
 import * as Scroll from './scroll.js';
 import { clamp, damp, easeOutCubic, fmtCompact, fmtStat, fmtInt } from './format.js';
 import { intersect } from './layout.js';
@@ -18,7 +19,6 @@ export function createKit({ sfx = () => {} } = {}) {
   const icons = createIcons();
   const anims = new Map();
   const scrolls = new Map();
-  const toasts = [];
 
   const S = {
     ctx: null,
@@ -68,6 +68,10 @@ export function createKit({ sfx = () => {} } = {}) {
     S.clickPos = null;
     S.emptyTap = null;
     S.dragDx = 0;
+    S.dragDy = 0;
+    S.pinch = null;
+    S.wheel = null;
+    S.dtap = null;
     S.denied = null;
     S.back = false;
     S.tipCandidate = null;
@@ -88,6 +92,7 @@ export function createKit({ sfx = () => {} } = {}) {
   }
 
   function end() {
+    drawSparks();
     drawToasts();
     drawTooltip();
     S.ctx = null;
@@ -143,7 +148,9 @@ export function createKit({ sfx = () => {} } = {}) {
         }
         if (!p.id) {
           S.dragDx += e.x - (p.lastX ?? p.x);
+          S.dragDy += e.y - (p.lastYd ?? p.y);
           p.lastX = e.x;
+          p.lastYd = e.y;
         }
         const dist = Math.hypot(e.x - p.x, e.y - p.y);
         if (!p.moved && dist > TAP_SLOP) {
@@ -195,6 +202,7 @@ export function createKit({ sfx = () => {} } = {}) {
       case 'wheel': {
         const sc = pick(e.x, e.y, (h) => h.scroll);
         if (sc) Scroll.wheel(scrollState(sc.id), e.dy);
+        else S.wheel = { dy: (S.wheel?.dy || 0) + e.dy, x: e.x, y: e.y };
         break;
       }
       case 'nav':
@@ -208,6 +216,12 @@ export function createKit({ sfx = () => {} } = {}) {
         break;
       case 'back':
         S.back = true;
+        break;
+      case 'pinch':
+        S.pinch = { factor: (S.pinch?.factor ?? 1) * (e.factor || 1), x: e.x, y: e.y };
+        break;
+      case 'dtap':
+        S.dtap = { x: e.x, y: e.y };
         break;
       default:
     }
@@ -293,7 +307,7 @@ export function createKit({ sfx = () => {} } = {}) {
   function anim(id) {
     let a = anims.get(id);
     if (!a) {
-      a = { hover: 0, press: 0, flash: 0, born: S.time };
+      a = { hover: 0, press: 0, flash: 0, shake: 0, born: S.time };
       anims.set(id, a);
       if (anims.size > 600) anims.delete(anims.keys().next().value);
     }
@@ -307,12 +321,14 @@ export function createKit({ sfx = () => {} } = {}) {
     a.hover = damp(a.hover, hovering ? 1 : 0, 16, S.dt);
     a.press = damp(a.press, pressing ? 1 : 0, 34, S.dt);
     a.flash = Math.max(0, a.flash - S.dt * 3);
+    a.shake = Math.max(0, a.shake - S.dt * 3.5);
     return a;
   }
 
   // ---------- примитивы ----------
 
   const px = () => S.L.px;
+  const cell = () => S.L.cell;
   const fs = (n) => Math.round(n * S.L.ui * (S.settings.textScale || 1));
 
   function rect(x, y, w, h, color) {
@@ -335,100 +351,144 @@ export function createKit({ sfx = () => {} } = {}) {
     return icons.draw(S.ctx, hasIcon(name) ? name : 'info', cx, cy, size, col, alpha);
   }
 
-  function chamferPath(ctx, x, y, w, h, c) {
-    ctx.beginPath();
-    ctx.moveTo(x + c, y);
-    ctx.lineTo(x + w - c, y);
-    ctx.lineTo(x + w, y + c);
-    ctx.lineTo(x + w, y + h - c);
-    ctx.lineTo(x + w - c, y + h);
-    ctx.lineTo(x + c, y + h);
-    ctx.lineTo(x, y + h - c);
-    ctx.lineTo(x, y + c);
-    ctx.closePath();
+  // шашечный узор «стекла»: тёмные пиксели через один, остальное — фон сцены
+  const dithers = new Map();
+  function ditherPattern(color, cc) {
+    const dpr = S.L.dpr;
+    const key = `${color}|${cc}|${dpr}`;
+    let p = dithers.get(key);
+    if (!p) {
+      const dev = Math.max(1, Math.round(cc * dpr));
+      const tile = document.createElement('canvas');
+      tile.width = tile.height = dev * 2;
+      const g = tile.getContext('2d');
+      g.fillStyle = color;
+      g.fillRect(0, 0, dev, dev);
+      g.fillRect(dev, dev, dev, dev);
+      p = S.ctx.createPattern(tile, 'repeat');
+      p.setTransform(new DOMMatrix().scale(1 / dpr));
+      dithers.set(key, p);
+    }
+    return p;
   }
 
   /**
-   * Панель «пиксель-HD»: тёмный хроматический контур в 1 ячейку, скошенные углы, вертикальный градиент заливки,
-   * скос — свет сверху-слева (тёплый), тень снизу-справа (холодная), на крупных панелях стеклянный блик.
-   * cellSize — подсказка масштаба скоса (мелкие чипы — меньше).
+   * Пиксельная рамка из трёх тонов: контур 1 пиксель, свет сверху-слева (hi), тень снизу-справа (lo),
+   * ступенчатые углы, заклёпки на крупных. Без скруглений, градиентов и сглаживания.
    */
-  function nine(variant, x, y, w, h, cellSize) {
+  function nine(variant, x, y, w, h) {
     const ctx = S.ctx;
-    const v = S.th.variants[variant] || S.th.variants.panel;
-    const cell = S.L.cell;
+    const f = S.th.variants[variant] || S.th.variants.panel;
     x = Math.round(x);
     y = Math.round(y);
     w = Math.round(w);
     h = Math.round(h);
-    if (w < 4 || h < 4) return;
-    const c = clamp(Math.round((cellSize || px()) * 1.4), 2, Math.max(2, Math.floor(Math.min(w, h) / 3)));
-    ctx.fillStyle = v.edge;
-    chamferPath(ctx, x, y, w, h, c);
-    ctx.fill();
-    const i = cell;
-    const iw = w - i * 2;
-    const ih = h - i * 2;
-    const ci = Math.max(1, c - i);
-    if (v.fillTop === v.fillBottom) ctx.fillStyle = v.fillTop;
-    else {
-      const g = ctx.createLinearGradient(0, y + i, 0, y + i + ih);
-      g.addColorStop(0, v.fillTop);
-      g.addColorStop(1, v.fillBottom);
-      ctx.fillStyle = g;
+    const cc = Math.max(1, Math.min(cell(), Math.floor(Math.min(w, h) / 8)));
+    if (w < cc * 4 || h < cc * 4) {
+      rect(x, y, w, h, f.edge);
+      return;
     }
-    chamferPath(ctx, x + i, y + i, iw, ih, ci);
-    ctx.fill();
-    // скос: свет сверху-слева, тень снизу-справа
-    ctx.fillStyle = v.hi;
-    ctx.fillRect(x + i + ci, y + i, iw - ci * 2, cell);
-    ctx.fillRect(x + i, y + i + ci, cell, ih - ci * 2);
-    ctx.fillStyle = v.lo;
-    ctx.fillRect(x + i + ci, y + h - i - cell, iw - ci * 2, cell);
-    ctx.fillRect(x + w - i - cell, y + i + ci, cell, ih - ci * 2);
-    // стеклянный блик в верхней части крупных непрозрачных панелей
-    if (v.sheen && ih >= 20) {
-      const sh = Math.round(ih * 0.42);
-      const g2 = ctx.createLinearGradient(0, y + i + cell, 0, y + i + cell + sh);
-      g2.addColorStop(0, 'rgba(255,238,205,0.10)');
-      g2.addColorStop(1, 'rgba(255,238,205,0)');
-      ctx.fillStyle = g2;
-      ctx.fillRect(x + i + cell * 2, y + i + cell, iw - cell * 4, sh);
+    // тело
+    if (f.dither) {
+      ctx.fillStyle = ditherPattern(f.mid, cc);
+      ctx.fillRect(x + cc, y + cc, w - cc * 2, h - cc * 2);
+    } else rect(x + cc, y + cc, w - cc * 2, h - cc * 2, f.mid);
+    // свет и тень
+    rect(x + cc, y + cc, w - cc * 2, cc, f.hi);
+    rect(x + cc, y + cc, cc, h - cc * 2, f.hi);
+    rect(x + cc, y + h - cc * 2, w - cc * 2, cc, f.lo);
+    rect(x + w - cc * 2, y + cc, cc, h - cc * 2, f.lo);
+    // контур со ступенчатыми углами
+    ctx.fillStyle = f.edge;
+    ctx.fillRect(x + cc * 2, y, w - cc * 4, cc);
+    ctx.fillRect(x + cc * 2, y + h - cc, w - cc * 4, cc);
+    ctx.fillRect(x, y + cc * 2, cc, h - cc * 4);
+    ctx.fillRect(x + w - cc, y + cc * 2, cc, h - cc * 4);
+    ctx.fillRect(x + cc, y + cc, cc, cc);
+    ctx.fillRect(x + w - cc * 2, y + cc, cc, cc);
+    ctx.fillRect(x + cc, y + h - cc * 2, cc, cc);
+    ctx.fillRect(x + w - cc * 2, y + h - cc * 2, cc, cc);
+    // заклёпки
+    if (f.rivets && w >= cc * 16 && h >= cc * 12) {
+      const o = cc * 3;
+      for (const [rx, ry] of [[x + o, y + o], [x + w - o - cc, y + o], [x + o, y + h - o - cc], [x + w - o - cc, y + h - o - cc]]) {
+        rect(rx, ry, cc, cc, f.hi);
+        rect(rx + cc, ry + cc, cc, cc, f.edge);
+      }
     }
   }
 
-  /** Панель с тенью и необязательным заголовком. Возвращает внутреннюю область. */
+  /** Панель с жёсткой тенью и необязательным заголовком. Возвращает внутреннюю область. */
   function panel(r, o = {}) {
     const { variant = 'panel', title, titleIcon, shadow = true, pad } = o;
-    const cell = px();
+    const cc = cell();
     if (!o.passthrough) hit(`panel@${Math.round(r.x)},${Math.round(r.y)}`, r, {});
-    if (shadow) rect(r.x + cell, r.y + cell * 1.5, r.w, r.h, 'rgba(0,0,0,0.38)');
+    if (shadow) {
+      S.ctx.globalAlpha = 0.5;
+      rect(r.x + cc * 2, r.y + cc * 2, r.w, r.h, S.th.c.ink);
+      S.ctx.globalAlpha = 1;
+    }
     nine(variant, r.x, r.y, r.w, r.h);
     const p = pad ?? S.L.pad;
     let inner = { x: r.x + p, y: r.y + p, w: r.w - p * 2, h: r.h - p * 2 };
     if (title) {
-      const th = Math.round(fs(26));
       const c = S.th.c;
-      rect(r.x + cell * 2, r.y + cell * 2, r.w - cell * 4, th, 'rgba(0,0,0,0.28)');
-      rect(r.x + cell * 2, r.y + cell * 2 + th, r.w - cell * 4, cell, S.th.c.amber);
+      const th = Math.max(cc * 9, Math.round(fs(24)));
+      nine('screen', r.x + cc * 2, r.y + cc * 2, r.w - cc * 4, th);
       let tx = r.x + p;
       if (titleIcon) {
-        icon(titleIcon, tx + fs(8), r.y + cell * 2 + th / 2, fs(16), c.amber);
-        tx += fs(24);
+        icon(titleIcon, tx + th * 0.4, r.y + cc * 2 + th / 2, Math.round(th * 0.8), c.amber);
+        tx += th * 0.9;
       }
-      drawText(title, tx, r.y + cell * 2 + th / 2, { size: fs(14), color: c.amber, maxWidth: r.w - (tx - r.x) - p });
-      inner = { x: inner.x, y: r.y + cell * 3 + th + p * 0.5, w: inner.w, h: r.y + r.h - p - (r.y + cell * 3 + th + p * 0.5) };
+      drawText(title, tx, r.y + cc * 2 + th / 2, { size: fs(14), color: c.amber, maxWidth: r.x + r.w - tx - p });
+      const top = r.y + cc * 4 + th + p * 0.5;
+      inner = { x: inner.x, y: top, w: inner.w, h: r.y + r.h - p - top };
     }
     return inner;
   }
 
+  /** Красный квадратик-значок с цифрой или «!» в углу кнопки. */
   function badge(cx, cy, label) {
     const c = S.th.c;
     const size = fs(11);
     const s = String(label);
-    const w = Math.max(size * 1.5, text.measure(s, size) + size * 0.8);
-    nine('danger', cx - w / 2, cy - size * 0.9, w, size * 1.8, Math.max(1, Math.round(px() / 2)));
-    drawText(s, cx, cy, { size, color: c.white, align: 'center', weight: 900 });
+    const cc = cell();
+    const w = Math.max(cc * 7, text.measure(s, size) + cc * 3);
+    const h = cc * 7;
+    nine('danger', cx - w / 2, cy - h / 2, w, h);
+    drawText(s, cx, cy, { size, color: c.white, align: 'center' });
+  }
+
+  /** Лампа-индикатор: пиксельная «лампочка» 5×5 клеток. on — горит, blink — мигает. */
+  function lamp(cx, cy, size, color, on = true, blink = false) {
+    const cc = Math.max(1, Math.round(size / 5));
+    const lit = on && (!blink || S.settings.reduceMotion || Math.floor(S.time * 4) % 2 === 0);
+    const c = S.th.c;
+    const x0 = Math.round(cx - cc * 2.5);
+    const y0 = Math.round(cy - cc * 2.5);
+    const rows = ['.###.', '#####', '#####', '#####', '.###.'];
+    const glass = lit ? color : c.navy2;
+    rows.forEach((row, ry) => {
+      for (let rx = 0; rx < 5; rx++) {
+        if (row[rx] !== '#') continue;
+        const edge = ry === 0 || ry === 4 || rx === 0 || rx === 4;
+        rect(x0 + rx * cc, y0 + ry * cc, cc, cc, edge ? c.ink : glass);
+      }
+    });
+    rect(x0 + cc, y0 + cc, cc, cc, lit ? c.white : c.steel0);
+  }
+
+  /** Угловая металлическая табличка с пиксельной иконкой и числом. */
+  function plate(x, y, w, h, iconName, value, color) {
+    const cc = cell();
+    nine('raised', x, y, w, h);
+    nine('screen', x + h - cc * 2, y + cc * 3, w - h - cc, h - cc * 6);
+    icon(iconName, x + h * 0.5 - cc, y + h / 2, Math.round(h * 0.7), color);
+    const size = Math.round(h * 0.42);
+    const room = w - h - cc * 5;
+    let str = typeof value === 'number' ? fmtInt(value) : String(value);
+    if (text.measure(str, size) > room && typeof value === 'number') str = fmtCompact(value);
+    drawText(str, x + w - cc * 4, y + h / 2, { size, color, align: 'right', maxWidth: room, shadow: true });
   }
 
   // ---------- кнопки ----------
@@ -441,105 +501,120 @@ export function createKit({ sfx = () => {} } = {}) {
     return v[base] ? base : 'btn';
   }
 
+  const sparks = [];
+  function spawnSparks(x, y, color) {
+    if (S.settings.reduceMotion) return;
+    for (let i = 0; i < 7; i++) {
+      const a = (Math.PI * 2 * i) / 7 + S.time;
+      sparks.push({ x, y, vx: Math.cos(a) * (60 + (i % 3) * 30), vy: Math.sin(a) * (60 + (i % 2) * 30) - 30, t: 0, color });
+    }
+    if (sparks.length > 80) sparks.splice(0, sparks.length - 80);
+  }
+
+  function drawSparks() {
+    if (!sparks.length) return;
+    const cc = cell();
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const p = sparks[i];
+      p.t += S.dt;
+      if (p.t > 0.45) {
+        sparks.splice(i, 1);
+        continue;
+      }
+      p.x += p.vx * S.dt;
+      p.y += p.vy * S.dt;
+      p.vy += 220 * S.dt;
+      rect(Math.round(p.x), Math.round(p.y), cc, cc, p.t < 0.25 ? p.color : S.th.c.steel2);
+    }
+  }
+
   /**
-   * Кнопка. Возвращает true в кадре клика.
-   * o: label, sub, icon, variant (btn|primary|danger|good|card|cardOn|tab|tabOn), disabled, locked, size, badge, tip,
-   *    iconColor, active, align
+   * Кнопка-«физический объект»: утапливается при нажатии, при отказе дрожит, при нажатии даёт искры.
+   * o: label, sub, icon, variant (btn|primary|danger|good|card|cardOn|raised), disabled, locked, size, badge, tip,
+   *    iconColor, align, lamp (цвет лампы-индикатора), stack
    */
   function button(id, r, o = {}) {
-    const { label, sub, icon: iconName, variant = 'btn', locked = false, active = false, badge: badgeText, tip } = o;
+    const { label, sub, icon: iconName, variant = 'btn', locked = false, badge: badgeText, tip } = o;
     const disabled = !!o.disabled;
     const c = S.th.c;
     hit(id, r, { focusable: true });
     const a = stepAnim(id);
     if (S.hover === id && !disabled) S.cursor = 'pointer';
     if (tip && S.hover === id) S.tipCandidate = { id, text: tip };
-    const cell = px();
-    const lip = S.L.cell * 2;
-    const off = Math.round(a.press * lip);
-    const body = { x: r.x, y: r.y + off, w: r.w, h: r.h - lip };
-    const name = variantName(active && variant === 'tab' ? 'tabOn' : variant, a, disabled || locked);
-    // нижняя «губа» кнопки
-    rect(body.x + cell, r.y + r.h - lip - 0, body.w - cell * 2, lip, 'rgba(0,0,0,0.5)');
-    if (variant === 'primary' && !disabled && !locked) {
-      S.ctx.shadowColor = `rgba(255,182,39,${(0.18 + 0.32 * a.hover).toFixed(2)})`;
-      S.ctx.shadowBlur = Math.round(10 * S.L.ui);
-    }
-    nine(name, body.x, body.y, body.w, body.h);
-    S.ctx.shadowBlur = 0;
-    S.ctx.shadowColor = 'transparent';
-    if (a.hover > 0.01 && !disabled && !S.th.variants[`${variant}Hover`]) {
-      S.ctx.globalAlpha = 0.12 * a.hover;
-      rect(body.x + cell * 2, body.y + cell * 2, body.w - cell * 4, body.h - cell * 4, '#fff');
-      S.ctx.globalAlpha = 1;
-    }
-    if (a.flash > 0) {
-      S.ctx.globalAlpha = a.flash * 0.5;
-      rect(body.x + cell * 2, body.y + cell * 2, body.w - cell * 4, body.h - cell * 4, '#fff');
-      S.ctx.globalAlpha = 1;
-    }
+    const cc = cell();
+    const lip = cc * 2;
     const dim = disabled || locked;
-    const labelColor = dim ? c.textMute : o.color || S.th.labelColor(variant === 'tab' ? (active ? 'btn' : 'btn') : variant);
+    const pressed = a.press > 0.5;
+    const shake = a.shake > 0 && !S.settings.reduceMotion ? Math.round(Math.sin(a.shake * 40) * cc * 2 * a.shake) : 0;
+    const body = { x: r.x + shake, y: r.y + (pressed ? lip : 0), w: r.w, h: r.h - lip };
+    // нижний «борт» кнопки: пока кнопка не утоплена, виден под ней
+    rect(r.x + cc + shake, r.y + r.h - lip, r.w - cc * 2, lip, c.ink);
+    const name = variantName(variant, a, dim);
+    nine(name, body.x, body.y, body.w, body.h);
+    const labelColor = dim ? c.textMute : o.color || S.th.labelColor(variant);
     const size = o.size || fs(15);
     const cx = body.x + body.w / 2;
     const cy = body.y + body.h / 2;
-    const iconSize = o.iconSize || Math.round(size * 1.35);
+    const iconSize = o.iconSize || Math.round(size * 1.5);
     const hasLabel = !!label;
-    const pad = cell * 3;
-    let contentW = 0;
-    const labelMax = body.w - pad * 2 - (iconName ? iconSize + size * 0.4 : 0) - (locked ? iconSize : 0);
-    let lblSize = size;
+    const pad = cc * 3;
+    const labelMax = o.stack ? body.w - pad : body.w - pad * 2 - (iconName ? iconSize + size * 0.4 : 0) - (locked ? iconSize : 0);
     let lbl = label;
+    let lblSize = size;
     if (hasLabel) {
-      const fit = text.fit(label, Math.max(10, labelMax), size);
-      lbl = fit.str;
-      lblSize = fit.size;
+      const f = text.fit(label, Math.max(10, labelMax), size);
+      lbl = f.str;
+      lblSize = f.size;
     }
     const labelW = hasLabel ? text.measure(lbl, lblSize) : 0;
-    contentW = labelW + (iconName ? iconSize + (hasLabel ? size * 0.4 : 0) : 0);
-    const startX = o.align === 'left' ? body.x + pad + cell : cx - contentW / 2;
+    const contentW = labelW + (iconName ? iconSize + (hasLabel ? size * 0.4 : 0) : 0);
+    const startX = o.align === 'left' ? body.x + pad + cc : cx - contentW / 2;
     const midY = sub ? cy - size * 0.42 : cy;
     let x = startX;
     if (o.stack && iconName) {
-      const is = Math.round(Math.min(body.h * 0.46, body.w * 0.5));
-      icon(iconName, cx, body.y + body.h * 0.4, is, dim ? c.textMute : o.iconColor || labelColor, dim ? 0.7 : 1);
-      if (hasLabel) drawText(lbl, cx, body.y + body.h * 0.82, { size: lblSize, color: labelColor, align: 'center', weight: 900, maxWidth: body.w - pad });
-    } else if (iconName) {
-      icon(iconName, x + iconSize / 2, midY, iconSize, dim ? c.textMute : o.iconColor || labelColor, dim ? 0.7 : 1);
-      x += iconSize + (hasLabel ? size * 0.4 : 0);
+      const is = Math.round(Math.min(body.h * 0.5, body.w * 0.55));
+      icon(iconName, cx, body.y + body.h * 0.4, is, dim ? c.textMute : o.iconColor || labelColor, dim ? 0.6 : 1);
+      if (hasLabel) drawText(lbl, cx, body.y + body.h * 0.82, { size: lblSize, color: labelColor, align: 'center', maxWidth: body.w - pad });
+    } else {
+      if (iconName) {
+        icon(iconName, x + iconSize / 2, midY, iconSize, dim ? c.textMute : o.iconColor || labelColor, dim ? 0.6 : 1);
+        x += iconSize + (hasLabel ? size * 0.4 : 0);
+      }
+      if (hasLabel) drawText(lbl, x, midY, { size: lblSize, color: labelColor });
     }
-    if (hasLabel && !(o.stack && iconName)) {
-      drawText(lbl, x, midY, { size: lblSize, color: labelColor, weight: 900 });
-    }
-    if (sub) drawText(sub, o.align === 'left' ? startX : cx, cy + size * 0.78, { size: Math.round(size * 0.74), color: dim ? c.textMute : mix(labelColor, variant === 'primary' ? '#7a4a00' : '#8a97b5', 0.25), align: o.align === 'left' ? 'left' : 'center', maxWidth: body.w - pad * 2, weight: 800 });
+    if (sub) drawText(sub, o.align === 'left' ? startX : cx, cy + size * 0.85, { size: Math.max(9, Math.round(size * 0.7)), color: dim ? c.textMute : labelColor, align: o.align === 'left' ? 'left' : 'center', maxWidth: body.w - pad * 2 });
     if (locked) icon('lock', body.x + body.w - iconSize * 0.75, body.y + iconSize * 0.75, Math.round(iconSize * 0.9), c.amber);
-    if (badgeText !== undefined && badgeText !== null && badgeText !== false) badge(body.x + body.w - cell * 2, body.y + cell * 2, badgeText);
+    if (o.lamp) lamp(body.x + body.w - cc * 5, body.y + cc * 5, cc * 5, o.lamp === true ? c.green : o.lamp, !dim);
+    if (badgeText !== undefined && badgeText !== null && badgeText !== false) badge(body.x + body.w - cc * 2, body.y + cc * 2, badgeText);
     if (S.focusVisible && S.focusId === id) focusRing(r);
     if (S.clicked === id) {
-      a.flash = 1;
       if (disabled || locked) {
         S.clicked = null;
         S.denied = id;
+        a.shake = 1;
         sfx('deny');
         return false;
       }
+      spawnSparks(S.clickPos?.x ?? cx, S.clickPos?.y ?? cy, variant === 'primary' ? c.amberLight : c.steel3);
       return true;
     }
     return false;
   }
 
-  function focusRing(r) {
-    const cell = px();
-    const ctx = S.ctx;
-    const pulse = S.settings.reduceMotion ? 1 : 0.8 + 0.2 * Math.sin(S.time * 8);
-    ctx.globalAlpha = pulse;
-    ctx.strokeStyle = S.th.c.edge;
-    ctx.lineWidth = cell * 3;
-    ctx.strokeRect(r.x - cell * 1.5, r.y - cell * 1.5, r.w + cell * 3, r.h + cell * 3);
-    ctx.strokeStyle = S.th.c.amber;
-    ctx.lineWidth = cell * 1.5;
-    ctx.strokeRect(r.x - cell * 1.25, r.y - cell * 1.25, r.w + cell * 2.5, r.h + cell * 2.5);
-    ctx.globalAlpha = 1;
+  /** Рамка выбора при управлении с клавиатуры/геймпада: мигающие пиксельные уголки-скобы. */
+  function focusRing(r, color) {
+    const cc = cell();
+    const pulse = S.settings.reduceMotion || Math.floor(S.time * 4) % 2 === 0;
+    const col = color || (pulse ? S.th.c.amberLight : S.th.c.amber);
+    const arm = cc * 4;
+    const x0 = Math.round(r.x - cc * 2);
+    const y0 = Math.round(r.y - cc * 2);
+    const x1 = Math.round(r.x + r.w + cc);
+    const y1 = Math.round(r.y + r.h + cc);
+    for (const [x, y, sx, sy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) {
+      rect(sx > 0 ? x : x - arm + cc, y, arm, cc, col);
+      rect(x, sy > 0 ? y : y - arm + cc, cc, arm, col);
+    }
   }
 
   /** Кнопка-иконка (подпись нужна для подсказки курсора и доступности). */
@@ -549,112 +624,103 @@ export function createKit({ sfx = () => {} } = {}) {
 
   // ---------- индикаторы ----------
 
-  function meter(r, o = {}) {
+  /**
+   * Сегментная светодиодная шкала. o: value 0..1, segments, color, warn (порог красного), vertical, ghost (метка).
+   * Возвращает внутреннюю область экрана шкалы.
+   */
+  function ledBar(r, o = {}) {
     const c = S.th.c;
+    const cc = cell();
     const v = clamp(o.value ?? 0, 0, 1);
-    const cell = S.L.cell;
+    const vertical = o.vertical ?? r.h > r.w * 1.5;
     const warn = o.warn !== undefined && v <= o.warn;
-    const pulse = warn && !S.settings.reduceMotion ? 0.65 + 0.35 * Math.sin(S.time * 9) : 1;
-    const color = warn ? c.red : o.color || c.green;
-    rect(r.x, r.y, r.w, r.h, c.edge);
-    rect(r.x + cell, r.y + cell, r.w - cell * 2, r.h - cell * 2, o.bg || c.inset);
-    const iw = r.w - cell * 4;
-    const ih = r.h - cell * 4;
-    const vertical = r.h > r.w * 1.5;
-    if (v > 0) {
-      S.ctx.globalAlpha = pulse;
-      if (vertical) {
-        const fh = Math.max(1, Math.round(ih * v));
-        rect(r.x + cell * 2, r.y + cell * 2 + ih - fh, iw, fh, color);
-        rect(r.x + cell * 2, r.y + cell * 2 + ih - fh, Math.max(1, Math.round(iw * 0.3)), fh, mix(color, '#ffffff', 0.4));
-      } else {
-        const fw = Math.max(1, Math.round(iw * v));
-        rect(r.x + cell * 2, r.y + cell * 2, fw, ih, color);
-        rect(r.x + cell * 2, r.y + cell * 2, fw, Math.max(1, Math.round(ih * 0.3)), mix(color, '#ffffff', 0.4));
-      }
-      S.ctx.globalAlpha = 1;
-    }
-    if (o.segments) {
-      for (let i = 1; i < o.segments; i++) {
-        if (vertical) rect(r.x + cell * 2, r.y + cell * 2 + Math.round((ih * i) / o.segments), iw, cell, 'rgba(0,0,0,0.45)');
-        else rect(r.x + cell * 2 + Math.round((iw * i) / o.segments), r.y + cell * 2, cell, ih, 'rgba(0,0,0,0.45)');
-      }
+    const blink = warn && !S.settings.reduceMotion && Math.floor(S.time * 4) % 2 === 0;
+    nine('screen', r.x, r.y, r.w, r.h);
+    const inner = { x: r.x + cc * 2, y: r.y + cc * 2, w: r.w - cc * 4, h: r.h - cc * 4 };
+    const len = vertical ? inner.h : inner.w;
+    const n = o.segments || clamp(Math.floor(len / (cc * 3)), 4, 24);
+    const gap = cc;
+    const seg = Math.max(cc, Math.floor((len - gap * (n - 1)) / n));
+    const lit = Math.round(v * n);
+    const onColor = warn ? c.red : o.color || c.green;
+    const hiColor = warn ? c.redLight : mix(onColor, '#ffffff', 0.35);
+    for (let i = 0; i < n; i++) {
+      const on = i < lit && !(blink && i >= lit - 1);
+      const pos = Math.round(i * (seg + gap));
+      const bx = vertical ? inner.x : inner.x + pos;
+      const by = vertical ? inner.y + inner.h - pos - seg : inner.y;
+      const bw = vertical ? inner.w : seg;
+      const bh = vertical ? seg : inner.h;
+      rect(bx, by, bw, bh, on ? onColor : c.navy2);
+      if (on) rect(bx, by, bw, Math.max(1, cc), hiColor);
     }
     if (o.ghost !== undefined) {
-      if (vertical) rect(r.x, r.y + r.h - cell * 2 - Math.round(ih * clamp(o.ghost, 0, 1)), r.w, cell, c.white);
-      else rect(r.x + cell * 2 + Math.round(iw * clamp(o.ghost, 0, 1)), r.y, cell, r.h, c.white);
+      const gpos = Math.round(clamp(o.ghost, 0, 1) * (len - cc));
+      if (vertical) rect(r.x, inner.y + inner.h - gpos - cc, r.w, cc, c.white);
+      else rect(inner.x + gpos, r.y, cc, r.h, c.white);
     }
-    return { x: r.x + cell * 2, y: r.y + cell * 2, w: iw, h: ih, warn };
+    return { ...inner, warn };
   }
 
-  /** Прогресс-полоса с подписью. */
+  const meter = ledBar;
+
+  /** Прогресс-шкала с подписью. */
   function progress(r, v, o = {}) {
     const c = S.th.c;
-    const m = meter(r, { value: v, color: o.color || c.amber, segments: o.segments });
-    if (o.label) drawText(o.label, r.x + r.w / 2, r.y + r.h / 2, { size: Math.min(fs(12), r.h - 4), color: c.white, align: 'center', shadow: 'rgba(0,0,0,0.8)', weight: 900 });
+    const m = ledBar(r, { value: v, color: o.color || c.amber, segments: o.segments });
+    if (o.label) drawText(o.label, r.x + r.w / 2, r.y + r.h / 2, { size: Math.min(fs(12), Math.max(9, r.h - 6)), color: c.white, align: 'center', shadow: true });
     return m;
   }
 
   /**
-   * Строка «было → станет» с двумя полосками. better: 'up' (по умолчанию) или 'down' (меньше лучше).
+   * Строка «было → станет»: подпись, значения и пиксельная полоска: серые блоки — было, цветные — прибавка.
    * o: label, before, after, fmt, max, unit, better
    */
   function statDelta(r, o) {
     const c = S.th.c;
+    const cc = cell();
     const { label, before, after, unit = '', better = 'up' } = o;
     const fmt = o.fmt || fmtStat;
     const delta = after - before;
     const good = delta === 0 ? null : better === 'up' ? delta > 0 : delta < 0;
     const accent = good === null ? c.textDim : good ? c.green : c.red;
-    const size = fs(13);
-    const half = r.h * 0.5;
-    drawText(label, r.x, r.y + half * 0.55, { size, color: c.textDim, maxWidth: r.w * 0.45 });
+    const size = fs(12);
+    const lineY = r.y + r.h * 0.3;
+    drawText(label, r.x, lineY, { size, color: c.textDim, maxWidth: r.w * 0.5 });
     const afterStr = `${fmt(after)}${unit}`;
-    const beforeStr = `${fmt(before)}${unit}`;
-    const arrowW = fs(18);
     let x = r.x + r.w;
-    drawText(afterStr, x, r.y + half * 0.55, { size: fs(14), color: accent, align: 'right', weight: 900 });
-    x -= text.measure(afterStr, fs(14)) + fs(4);
+    drawText(afterStr, x, lineY, { size: fs(13), color: accent, align: 'right' });
+    x -= text.measure(afterStr, fs(13)) + cc * 2;
     if (delta !== 0) {
-      icon('arrow', x - arrowW / 2, r.y + half * 0.55, fs(14), c.textMute);
-      x -= arrowW;
-      drawText(beforeStr, x, r.y + half * 0.55, { size, color: c.textMute, align: 'right' });
+      icon('arrow', x - fs(7), lineY, fs(14), c.textMute);
+      x -= fs(18);
+      drawText(`${fmt(before)}${unit}`, x, lineY, { size, color: c.textMute, align: 'right' });
     }
     const maxV = o.max ?? Math.max(before, after, 1e-9) * 1.15;
-    const barY = r.y + half * 1.15;
-    const barH = Math.max(Math.round(px() * 2.5), Math.round(r.h * 0.26));
-    const bar = { x: r.x, y: barY, w: r.w, h: barH };
-    const inner = meter(bar, { value: 0, color: accent });
-    const bv = clamp(before / maxV, 0, 1);
-    const av = clamp(after / maxV, 0, 1);
-    const lo = Math.min(bv, av);
-    const hi = Math.max(bv, av);
-    rect(inner.x, inner.y, Math.round(inner.w * lo), inner.h, mix(c.textDim, c.inset, 0.35));
-    if (hi > lo) {
-      rect(inner.x + Math.round(inner.w * lo), inner.y, Math.round(inner.w * (hi - lo)), inner.h, accent);
-      {
-        // штриховка отличает «станет» от «было» и без цвета
-        S.ctx.save();
-        S.ctx.beginPath();
-        S.ctx.rect(inner.x + Math.round(inner.w * lo), inner.y, Math.round(inner.w * (hi - lo)), inner.h);
-        S.ctx.clip();
-        S.ctx.fillStyle = 'rgba(0,0,0,0.22)';
-        for (let sx = inner.x; sx < inner.x + inner.w; sx += px() * 3) S.ctx.fillRect(sx, inner.y, px(), inner.h);
-        S.ctx.restore();
-      }
+    const barH = Math.max(cc * 3, Math.round(r.h * 0.26));
+    const by = r.y + r.h - barH - cc;
+    const n = clamp(Math.floor(r.w / (cc * 4)), 8, 28);
+    const bw = Math.floor((r.w - cc * (n - 1)) / n);
+    const lo = Math.round(clamp(Math.min(before, after) / maxV, 0, 1) * n);
+    const hi = Math.round(clamp(Math.max(before, after) / maxV, 0, 1) * n);
+    for (let i = 0; i < n; i++) {
+      const bx = r.x + Math.round(i * (bw + cc));
+      const col = i < lo ? c.steel2 : i < hi ? accent : c.navy2;
+      rect(bx, by, bw, barH, c.ink);
+      rect(bx, by + cc, Math.max(1, bw), Math.max(1, barH - cc * 2), col);
     }
     return good;
   }
 
-  /** Ползунок 0..1; возвращает новое значение. */
+  /** Рычажок-ползунок 0..1 в пазу; возвращает новое значение. */
   function slider(id, r, value, o = {}) {
     const c = S.th.c;
-    const cell = px();
+    const cc = cell();
     hit(id, r, { capture: true, focusable: true, slider: true });
     const a = stepAnim(id);
     let v = value;
-    const trackH = Math.max(cell * 3, Math.round(r.h * 0.3));
-    const track = { x: r.x + cell * 2, y: r.y + (r.h - trackH) / 2, w: r.w - cell * 4, h: trackH };
+    const trackH = Math.max(cc * 5, Math.round(r.h * 0.34));
+    const track = { x: r.x + cc * 2, y: r.y + (r.h - trackH) / 2, w: r.w - cc * 4, h: trackH };
     if (S.sliderDrag && S.sliderDrag.id === id) {
       v = clamp((S.sliderDrag.x - track.x) / track.w, 0, 1);
       if (o.step) v = Math.round(v / o.step) * o.step;
@@ -663,50 +729,30 @@ export function createKit({ sfx = () => {} } = {}) {
       v = clamp(Math.round((value + S.sliderNudge.delta) / (o.step || 0.05)) * (o.step || 0.05), 0, 1);
       S.sliderNudge = null;
     }
-    meter(track, { value: v, color: o.color || c.amber, bg: c.inset });
-    const kx = track.x + track.w * v;
-    const kw = Math.round(r.h * 0.5);
-    nine(a.press > 0.4 ? 'primaryPress' : a.hover > 0.4 ? 'primaryHover' : 'primary', kx - kw / 2, r.y + (r.h - r.h * 0.8) / 2, kw, r.h * 0.8, Math.max(1, Math.round(cell / 2)));
+    ledBar(track, { value: v, color: o.color || c.amber, segments: o.segments || 16 });
+    const kw = cc * 6;
+    const kx = Math.round(track.x + (track.w - kw) * v);
+    nine(a.press > 0.4 ? 'primaryPress' : 'primary', kx, r.y + cc, kw, r.h - cc * 3);
     if (S.focusVisible && S.focusId === id) focusRing(r);
     return v;
   }
 
-  /** Переключатель (вкл/выкл). Возвращает новое значение. */
+  /** Тумблер вкл/выкл. Возвращает новое значение. */
   function toggle(id, r, value, o = {}) {
     const c = S.th.c;
+    const cc = cell();
     const clicked = button(id, r, { variant: 'card', disabled: o.disabled });
-    const cell = px();
-    const sw = { x: r.x + r.w - cell * 3 - Math.round(r.h * 1.1), y: r.y + (r.h - cell * 6) / 2 - cell, w: Math.round(r.h * 1.1), h: cell * 6 };
-    const inner = meter(sw, { value: value ? 1 : 0, color: value ? c.green : c.textMute });
-    const kx = value ? sw.x + sw.w - cell * 5 : sw.x + cell * 2;
-    rect(kx, sw.y + cell, cell * 3, sw.h - cell * 2, c.white);
-    drawText(value ? t('common.on') : t('common.off'), sw.x - cell * 2, r.y + r.h / 2 - cell, { size: fs(12), color: value ? c.green : c.textMute, align: 'right' });
+    const sw = { x: r.x + r.w - cc * 3 - Math.round(r.h * 1.3), y: r.y + (r.h - cc * 10) / 2 - cc, w: Math.round(r.h * 1.3), h: cc * 10 };
+    nine('screen', sw.x, sw.y, sw.w, sw.h);
+    const kw = Math.round(sw.w * 0.45);
+    nine(value ? 'good' : 'btn', value ? sw.x + sw.w - kw - cc * 2 : sw.x + cc * 2, sw.y + cc * 2, kw, sw.h - cc * 4);
+    drawText(value ? t('common.on') : t('common.off'), sw.x - cc * 3, r.y + r.h / 2 - cc, { size: fs(12), color: value ? c.green : c.textMute, align: 'right' });
     return clicked ? !value : value;
-  }
-
-  // ---------- вкладки ----------
-
-  function tabs(id, r, items, active, o = {}) {
-    const cell = px();
-    const slots = [];
-    const w = (r.w - cell * (items.length - 1)) / items.length;
-    items.forEach((it, i) => slots.push({ x: Math.round(r.x + i * (w + cell)), y: r.y, w: Math.round(w), h: r.h }));
-    let next = active;
-    items.forEach((it, i) => {
-      const isOn = it.id === active;
-      const clicked = button(`${id}-${it.id}`, slots[i], { label: it.label, icon: it.icon, variant: isOn ? 'tabOn' : 'tab', size: o.size || fs(13), badge: it.badge, active: isOn, color: isOn ? S.th.c.text : S.th.c.textDim, iconColor: isOn ? S.th.c.amber : S.th.c.textDim });
-      if (isOn) rect(slots[i].x + cell * 2, slots[i].y + slots[i].h - cell * 2, slots[i].w - cell * 4, cell, S.th.c.amber);
-      if (clicked && !isOn) {
-        next = it.id;
-        sfx('tab');
-      }
-    });
-    return next;
   }
 
   // ---------- прокрутка ----------
 
-  function scrollArea(id, r, contentH, draw, o = {}) {
+  function scrollArea(id, r, contentH, draw) {
     const s = scrollState(id);
     const ch = contentH ?? s.contentH ?? r.h;
     Scroll.setRange(s, ch, r.h);
@@ -719,37 +765,21 @@ export function createKit({ sfx = () => {} } = {}) {
     if (typeof used === 'number') s.contentH = used;
     if (s.max > 0) {
       const c = S.th.c;
-      const cell = px();
-      const barH = Math.max(cell * 6, Math.round((r.h * r.h) / ch));
-      const t0 = s.max > 0 ? clamp(s.offset / s.max, 0, 1) : 0;
+      const cc = cell();
+      const barH = Math.max(cc * 6, Math.round((r.h * r.h) / ch));
+      const t0 = clamp(s.offset / s.max, 0, 1);
       const by = r.y + Math.round((r.h - barH) * t0);
-      const active = s.dragging || !s.settled;
-      S.ctx.globalAlpha = active ? 0.95 : 0.5;
-      rect(r.x + r.w - cell * 2, by, cell, barH, c.amber);
-      S.ctx.globalAlpha = 1;
-      if (s.offset > 2) fadeEdge(r, true);
-      if (s.offset < s.max - 2) fadeEdge(r, false);
+      rect(r.x + r.w - cc * 2, r.y, cc, r.h, c.ink);
+      rect(r.x + r.w - cc * 2, by, cc, barH, s.dragging || !s.settled ? c.amberLight : c.amber);
     }
     return s;
   }
-
-  function fadeEdge(r, topEdge) {
-    const ctx = S.ctx;
-    const h = Math.min(18, r.h * 0.12);
-    const g = ctx.createLinearGradient(0, topEdge ? r.y : r.y + r.h, 0, topEdge ? r.y + h : r.y + r.h - h);
-    g.addColorStop(0, o2(S.th.c.panel, 0.9));
-    g.addColorStop(1, o2(S.th.c.panel, 0));
-    ctx.fillStyle = g;
-    ctx.fillRect(r.x, topEdge ? r.y : r.y + r.h - h, r.w, h);
-  }
-
-  const o2 = (hex, a) => withAlpha(hex, a);
 
   /** Список с виртуализацией. draw(i, rect) вызывается только для видимых элементов. */
   function scrollList(id, r, o) {
     const { count, itemH, gap = 0 } = o;
     const contentH = Math.max(0, count * (itemH + gap) - gap);
-    const innerW = r.w - px() * 3;
+    const innerW = r.w - cell() * 5;
     return scrollArea(id, r, contentH, (top, offset) => {
       const first = Math.max(0, Math.floor(offset / (itemH + gap)));
       const last = Math.min(count - 1, Math.ceil((offset + r.h) / (itemH + gap)));
@@ -770,13 +800,13 @@ export function createKit({ sfx = () => {} } = {}) {
   function costWidth(cost, size = fs(14)) {
     let w = 0;
     const gap = size * 0.5;
-    if (cost.coins) w += size * 1.2 + text.measure(fmtCompact(cost.coins), size) + gap;
-    if (cost.data) w += size * 1.2 + text.measure(fmtCompact(cost.data), size) + gap;
+    if (cost.coins) w += size * 1.4 + text.measure(fmtCompact(cost.coins), size) + gap;
+    if (cost.data) w += size * 1.4 + text.measure(fmtCompact(cost.data), size) + gap;
     return Math.max(0, w - gap);
   }
 
   /**
-   * Цена: монеты (золото) и данные (циан); недостающее подсвечено красным и значком.
+   * Цена: монеты (золото) и данные (циан); недостающее подсвечено красным.
    * align: left | center | right относительно x. Возвращает ширину.
    */
   function costChip(x, y, cost, o = {}) {
@@ -788,34 +818,19 @@ export function createKit({ sfx = () => {} } = {}) {
     if (cost.coins) items.push({ icon: 'coin', val: cost.coins, color: c.gold, ok: o.have ? o.have.coins >= cost.coins : true });
     if (cost.data) items.push({ icon: 'data', val: cost.data, color: c.cyan, ok: o.have ? o.have.data >= cost.data : true });
     for (const it of items) {
-      icon(it.icon, cx + size * 0.6, y, size * 1.15, it.color);
-      cx += size * 1.2;
-      const str = fmtCompact(it.val);
-      const col = it.ok ? it.color : c.red;
-      const wd = drawText(str, cx, y, { size, color: col, weight: 900, shadow: 'rgba(0,0,0,0.6)' }).w;
-      cx += wd;
-      if (!it.ok) {
-        icon('warn', cx + size * 0.55, y, size * 0.9, c.red);
-        cx += size * 1.1;
-      }
-      cx += size * 0.5;
+      icon(it.icon, cx + size * 0.7, y, size * 1.3, it.color);
+      cx += size * 1.4;
+      const wd = drawText(fmtCompact(it.val), cx, y, { size, color: it.ok ? it.color : c.red, shadow: true }).w;
+      cx += wd + size * 0.5;
     }
     return total;
   }
 
-  /** Ресурс в капсуле: иконка и число. Возвращает ширину. */
-  function resourceChip(x, y, w, h, iconName, value, color, o = {}) {
-    const cell = px();
-    nine('inset', x, y, w, h, Math.max(1, Math.round(cell * 0.75)));
-    const size = Math.round(h * 0.46);
-    icon(iconName, x + h * 0.55, y + h / 2, Math.round(h * 0.6), color);
-    drawText(fmtInt(value), x + w - cell * 3, y + h / 2, { size, color, align: 'right', weight: 900, dynamic: o.dynamic, maxWidth: w - h * 0.9 });
-  }
-
-  // ---------- подсказки и уведомления ----------
+  // ---------- уведомления ----------
 
   const MAX_TOASTS = 2;
   const pending = [];
+  const toasts = [];
 
   /** Уведомление: одновременно видны не больше двух, остальные ждут своей очереди. */
   function toast(message, o = {}) {
@@ -826,8 +841,7 @@ export function createKit({ sfx = () => {} } = {}) {
 
   /**
    * Якорь стопки уведомлений. edge 'bottom': y — нижняя граница, стопка растёт вверх (до двух сразу);
-   * edge 'top': y — центр первого, видно по одному (экраны без дока: поверх шапки, правее кнопки «назад»).
-   * area — область по горизонтали (по умолчанию вся безопасная).
+   * edge 'top': y — центр первого, видно по одному. area — область по горизонтали.
    */
   function setToastAnchor(edge, y, area = null) {
     S.toastEdge = edge;
@@ -847,25 +861,24 @@ export function createKit({ sfx = () => {} } = {}) {
       toasts.push(next);
     }
     if (!toasts.length) return;
-    const size = fs(14);
-    const h = Math.round(size * 2.4);
+    const size = fs(13);
+    const cc = cell();
+    const h = Math.round(size * 2.6);
     const zone = S.toastArea || L.area;
     const anchor = S.toastY ?? L.area.y + L.area.h - L.gap * 1.5;
     toasts.forEach((tt, i) => {
       const age = S.time - tt.t0;
-      const inK = easeOutCubic(age / 0.2);
-      const outK = clamp((tt.ttl - age) / 0.25, 0, 1);
-      const w = Math.min(zone.w - L.gap * 2, text.measure(tt.message, size) + size * 3.4);
+      const slide = Math.round(clamp(1 - age / 0.18, 0, 1) * 4) * cc * 2;
+      const outK = clamp(1 - (tt.ttl - age) / 0.2, 0, 1);
+      const out = Math.round(outK * 3) * cc * 2;
+      const w = Math.min(zone.w - L.gap * 2, text.measure(tt.message, size) + size * 3.6);
       const x = zone.x + (zone.w - w) / 2;
-      const slide = (1 - inK) * 18 + (1 - outK) * 10;
-      const y = top ? anchor - h / 2 - slide : Math.min(anchor, L.area.y + L.area.h - L.gap) - h - i * (h + L.gap) + slide;
-      S.ctx.globalAlpha = Math.min(inK, outK);
-      const variant = tt.kind === 'bad' ? 'warn' : tt.kind === 'good' ? 'good' : 'raised';
-      nine(variant, x, y, w, h, Math.max(1, Math.round(px() * 0.75)));
+      const y = top ? anchor - h / 2 - slide - out : Math.min(anchor, L.area.y + L.area.h - L.gap) - h - i * (h + L.gap) + slide + out;
+      const variant = tt.kind === 'bad' ? 'danger' : tt.kind === 'good' ? 'good' : 'raised';
+      nine(variant, x, y, w, h);
       const ic = tt.icon || (tt.kind === 'bad' ? 'warn' : tt.kind === 'good' ? 'check' : 'info');
-      icon(ic, x + size * 1.2, y + h / 2, size * 1.2, tt.kind === 'bad' ? c.red : tt.kind === 'good' ? c.white : c.amber);
-      drawText(tt.message, x + size * 2.2, y + h / 2, { size, color: c.text, maxWidth: w - size * 3 });
-      S.ctx.globalAlpha = 1;
+      icon(ic, x + size * 1.4, y + h / 2, size * 1.6, tt.kind === 'info' ? c.amberLight : c.white);
+      drawText(tt.message, x + size * 2.6, y + h / 2, { size, color: tt.kind === 'good' ? c.ink : c.white, maxWidth: w - size * 3.2 });
     });
   }
 
@@ -877,62 +890,318 @@ export function createKit({ sfx = () => {} } = {}) {
     const size = fs(12);
     const maxW = Math.min(L.area.w * 0.5, 260 * L.ui);
     const lines = text.wrap(cand.text, maxW, size);
-    const w = Math.max(...lines.map((l) => text.measure(l, size))) + size * 1.4;
-    const h = lines.length * size * 1.3 + size * 1.0;
+    const w = Math.max(...lines.map((l) => text.measure(l, size))) + size * 1.6;
+    const h = lines.length * size * 1.5 + size;
     const x = clamp(S.pointer.x + 14, L.area.x + 4, L.area.x + L.area.w - w - 4);
     const y = clamp(S.pointer.y + 18, L.area.y + 4, L.area.y + L.area.h - h - 4);
-    nine('raised', x, y, w, h, Math.max(1, Math.round(px() * 0.6)));
-    lines.forEach((ln, i) => drawText(ln, x + size * 0.7, y + size * 0.5 + i * size * 1.3 + size * 0.65, { size, color: c.text }));
+    nine('screen', x, y, w, h);
+    lines.forEach((ln, i) => drawText(ln, x + size * 0.8, y + size * 0.5 + i * size * 1.5 + size * 0.6, { size, color: c.text }));
   }
 
-  // ---------- модальные карточки ----------
+  // ---------- выноска-щиток ----------
 
   /**
-   * Модальная карточка. Возвращает true, когда её закрыли.
-   * o: title, body, icon, button, extra(rectInner)
+   * Щиток, прикреплённый к объекту хвостиком. anchor — точка объекта (CSS px), size — желаемые {w, h}.
+   * o: variant, side ('auto'|'above'|'below'|'left'|'right'), bounds.
+   * Возвращает { rect, inner, side } — внутренняя область для содержимого. Щиток перехватывает нажатия.
+   */
+  function callout(id, anchor, size, o = {}) {
+    const L = S.L;
+    const cc = cell();
+    const m = L.gap;
+    const b = o.bounds || L.area;
+    const tail = cc * 5;
+    const w = Math.min(size.w, b.w - m * 2);
+    const h = Math.min(size.h, b.h - m * 2);
+    // объект-цель: щиток прикрепляется к середине ближайшей к нему стороны рамки объекта
+    const T = o.target || { x: anchor.x, y: anchor.y, w: 0, h: 0 };
+    const pt = {
+      above: { x: T.x + T.w / 2, y: T.y },
+      below: { x: T.x + T.w / 2, y: T.y + T.h },
+      left: { x: T.x, y: T.y + T.h / 2 },
+      right: { x: T.x + T.w, y: T.y + T.h / 2 },
+    };
+    const place = {
+      above: () => ({ x: pt.above.x - w / 2, y: pt.above.y - h - tail }),
+      below: () => ({ x: pt.below.x - w / 2, y: pt.below.y + tail }),
+      left: () => ({ x: pt.left.x - w - tail, y: pt.left.y - h / 2 }),
+      right: () => ({ x: pt.right.x + tail, y: pt.right.y - h / 2 }),
+    };
+    const fits = (p) => p.x >= b.x + m && p.y >= b.y + m && p.x + w <= b.x + b.w - m && p.y + h <= b.y + b.h - m;
+    const forced = o.side && o.side !== 'auto';
+    const order = forced ? [o.side] : L.portrait ? ['above', 'below', 'left', 'right'] : ['right', 'left', 'above', 'below'];
+    const cy0 = T.y + T.h / 2;
+    let side = order.find((s) => fits(place[s]())) || (forced ? o.side : cy0 > b.y + b.h / 2 ? 'above' : 'below');
+    const raw = place[side]();
+    const r = {
+      x: Math.round(clamp(raw.x, b.x + m, b.x + b.w - m - w)),
+      y: Math.round(clamp(raw.y, b.y + m, b.y + b.h - m - h)),
+      w: Math.round(w),
+      h: Math.round(h),
+    };
+    const tip = pt[side];
+    withLayer(60, () => {
+      hit(`callout-${id}`, r, {});
+      S.ctx.globalAlpha = 0.5;
+      rect(r.x + cc * 2, r.y + cc * 2, r.w, r.h, S.th.c.ink);
+      S.ctx.globalAlpha = 1;
+      nine(o.variant || 'panel', r.x, r.y, r.w, r.h);
+      const f = S.th.variants[o.variant || 'panel'];
+      const rows = 4;
+      const horizontal = side === 'above' || side === 'below';
+      const along = horizontal ? clamp(tip.x, r.x + cc * 6, r.x + r.w - cc * 6) : clamp(tip.y, r.y + cc * 6, r.y + r.h - cc * 6);
+      for (const [pass, col] of [[1, f.edge], [0, f.mid]]) {
+        for (let i = 0; i < rows; i++) {
+          const half = i * cc + (pass ? cc : 0);
+          const span = half * 2 + cc;
+          const k = rows - 1 - i; // ряд от основания (0) к острию (rows-1)
+          if (horizontal) {
+            const yy = side === 'above' ? r.y + r.h + k * cc : r.y - (k + 1) * cc;
+            rect(Math.round(along - half), yy, span, cc, col);
+          } else {
+            const xx = side === 'left' ? r.x + r.w + k * cc : r.x - (k + 1) * cc;
+            rect(xx, Math.round(along - half), cc, span, col);
+          }
+        }
+      }
+    });
+    const pad = L.pad;
+    return { rect: r, inner: { x: r.x + pad, y: r.y + pad, w: r.w - pad * 2, h: r.h - pad * 2 }, side };
+  }
+
+  // ---------- пиксельная окружность и штамп ----------
+
+  /** Кольцо из пикселей: центр, внешний радиус r и толщина th в CSS px; рисуется клетками cc. */
+  function ring(cx, cy, r, th, color) {
+    const cc = cell();
+    const R = Math.max(1, Math.round(r / cc));
+    const T = Math.max(1, Math.round(th / cc));
+    const ctx = S.ctx;
+    ctx.fillStyle = color;
+    for (let dy = -R; dy <= R; dy++) {
+      const outer = Math.floor(Math.sqrt(R * R - dy * dy) + 0.5);
+      const innerR = R - T;
+      const inner = Math.abs(dy) <= innerR ? Math.floor(Math.sqrt(innerR * innerR - dy * dy) + 0.5) : -1;
+      const y = Math.round(cy + dy * cc - cc / 2);
+      if (inner < 0) ctx.fillRect(Math.round(cx - outer * cc - cc / 2), y, (outer * 2 + 1) * cc, cc);
+      else {
+        ctx.fillRect(Math.round(cx - outer * cc - cc / 2), y, (outer - inner) * cc, cc);
+        ctx.fillRect(Math.round(cx + (inner + 1) * cc - cc / 2), y, (outer - inner) * cc, cc);
+      }
+    }
+  }
+
+  /** Штамп: двойная рамка и слово крупным пиксельным шрифтом (ПОСАДКА, АВАРИЯ). */
+  function stamp(label, cx, cy, color, size = fs(26)) {
+    const cc = cell();
+    const w = text.measure(label, size) + cc * 14;
+    const h = Math.round(7 * text.stepFor(size).css + cc * 12);
+    const x = Math.round(cx - w / 2);
+    const y = Math.round(cy - h / 2);
+    for (const [off, th] of [[0, cc * 2], [cc * 3, cc]]) {
+      rect(x + off, y + off, w - off * 2, th, color);
+      rect(x + off, y + h - off - th, w - off * 2, th, color);
+      rect(x + off, y + off, th, h - off * 2, color);
+      rect(x + w - off - th, y + off, th, h - off * 2, color);
+    }
+    drawText(label, cx, cy, { size, color, align: 'center' });
+    return { x, y, w, h };
+  }
+
+  // ---------- плакетка (справка и «Новое») ----------
+
+  /**
+   * Небольшая плакетка по центру (справка, «Новое»). Закрывается кнопкой, тапом вне плакетки или Esc.
+   * Возвращает true, когда её закрыли. o: title, body, icon, button, kicker, extra(rect), extraH
    */
   function modal(id, o) {
     const L = S.L;
     const c = S.th.c;
     const a = anim(`modal-${id}`);
     const age = S.time - a.born;
-    const k = easeOutCubic(age / 0.22);
+    const slide = Math.round(clamp(1 - age / 0.2, 0, 1) * 4) * cell() * 3;
     let closed = false;
     withLayer(100, () => {
-      const full = { x: 0, y: 0, w: L.w, h: L.h };
-      hit('barrier', full, {});
-      S.ctx.globalAlpha = 0.72 * k;
-      rect(0, 0, L.w, L.h, c.bg);
-      S.ctx.globalAlpha = 1;
-      const w = Math.min(L.area.w - L.gap * 4, Math.round(420 * L.ui));
-      const bodyH = text.blockHeight(o.body || '', w - L.pad * 4, fs(14), 1.3);
-      const h = Math.min(L.area.h - L.gap * 4, Math.round(fs(120) + bodyH + L.touch(56) + (o.extraH || 0)));
+      hit('barrier', { x: 0, y: 0, w: L.w, h: L.h }, {});
+      S.ctx.fillStyle = ditherPattern(c.ink, cell());
+      S.ctx.fillRect(0, 0, L.w, L.h);
+      const w = Math.min(L.area.w - L.gap * 4, Math.round(400 * L.ui));
+      const bodyH = text.blockHeight(o.body || '', w - L.pad * 4, fs(14), 1.4);
+      const h = Math.min(L.area.h - L.gap * 4, Math.round(fs(110) + bodyH + L.touch(56) + (o.extraH || 0)));
       const x = L.area.x + (L.area.w - w) / 2;
-      const y = L.area.y + (L.area.h - h) / 2 + (1 - k) * 30;
-      S.ctx.globalAlpha = k;
+      const y = L.area.y + (L.area.h - h) / 2 + slide;
       const inner = panel({ x, y, w, h }, { variant: 'raised' });
       let cy = inner.y + L.gap;
       if (o.icon) {
-        const ring = fs(52);
-        nine('inset', x + w / 2 - ring / 2, cy, ring, ring);
-        icon(o.icon, x + w / 2, cy + ring / 2, fs(32), c.amber);
-        cy += ring + L.gap * 1.5;
+        const ringS = fs(56);
+        nine('screen', x + w / 2 - ringS / 2, cy, ringS, ringS);
+        icon(o.icon, x + w / 2, cy + ringS / 2, fs(36), c.amber);
+        cy += ringS + L.gap * 1.2;
       }
       if (o.kicker) {
-        drawText(o.kicker, x + w / 2, cy, { size: fs(12), color: c.amber, align: 'center', baseline: 'top', weight: 900 });
-        cy += fs(16);
+        drawText(o.kicker, x + w / 2, cy + fs(6), { size: fs(12), color: c.amber, align: 'center' });
+        cy += fs(18);
       }
-      drawText(o.title, x + w / 2, cy, { size: fs(20), color: c.text, align: 'center', baseline: 'top', maxWidth: inner.w, shadow: 'rgba(0,0,0,0.6)' });
-      cy += fs(28);
-      const used = paragraph(o.body || '', inner.x, cy, inner.w, { size: fs(14), lineHeight: 1.3, align: 'center' });
+      drawText(o.title, x + w / 2, cy + fs(10), { size: fs(20), color: c.text, align: 'center', maxWidth: inner.w, shadow: true });
+      cy += fs(30);
+      const used = paragraph(o.body || '', inner.x, cy, inner.w, { size: fs(13), lineHeight: 1.4, align: 'center' });
       cy += used + L.gap;
       if (o.extra) cy += o.extra({ x: inner.x, y: cy, w: inner.w }) || 0;
       const bh = L.touch(52);
       if (button(`modal-${id}-ok`, { x: inner.x, y: y + h - L.pad - bh, w: inner.w, h: bh }, { label: o.button || t('common.ok'), variant: 'primary', size: fs(16) })) closed = true;
-      S.ctx.globalAlpha = 1;
     });
     if (S.back || S.clicked === 'barrier') closed = true;
     return closed;
+  }
+
+  // ---------- пиксельные линии, табло, стрелочный прибор, ирис ----------
+
+  /** Ступенчатая линия клетками (Брезенхем). dash — рисовать каждую вторую клетку пары. */
+  function line(x0, y0, x1, y1, color, o = {}) {
+    const cc = o.cell || cell();
+    const ctx = S.ctx;
+    ctx.fillStyle = color;
+    let ix = Math.round(x0 / cc);
+    let iy = Math.round(y0 / cc);
+    const jx = Math.round(x1 / cc);
+    const jy = Math.round(y1 / cc);
+    const dx = Math.abs(jx - ix);
+    const dy = -Math.abs(jy - iy);
+    const sx = ix < jx ? 1 : -1;
+    const sy = iy < jy ? 1 : -1;
+    let err = dx + dy;
+    for (let i = 0; i < 600; i++) {
+      if (!o.dash || i % 4 < 2) ctx.fillRect(ix * cc, iy * cc, cc, cc);
+      if (ix === jx && iy === jy) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) {
+        err += dy;
+        ix += sx;
+      }
+      if (e2 <= dx) {
+        err += dx;
+        iy += sy;
+      }
+    }
+  }
+
+  /** Жёлто-чёрная предупреждающая планка из клеток (рисуется один раз в offscreen и переиспользуется). */
+  const hazards = new Map();
+  function hazard(r, c1, c2) {
+    const cc = cell();
+    const a = c1 || S.th.c.amber;
+    const b = c2 || S.th.c.ink;
+    const dpr = S.L.dpr;
+    const w = Math.max(1, Math.round(r.w));
+    const h = Math.max(1, Math.round(r.h));
+    const key = `${w}x${h}|${a}|${b}|${cc}|${dpr}`;
+    let cv = hazards.get(key);
+    if (!cv) {
+      cv = document.createElement('canvas');
+      cv.width = Math.ceil(w * dpr);
+      cv.height = Math.ceil(h * dpr);
+      const g = cv.getContext('2d');
+      g.scale(dpr, dpr);
+      for (let y = 0; y < h; y += cc) {
+        for (let x = 0; x < w; x += cc) {
+          g.fillStyle = (Math.floor(x / cc) + Math.floor(y / cc)) % 6 < 3 ? a : b;
+          g.fillRect(x, y, cc, cc);
+        }
+      }
+      if (hazards.size > 12) hazards.delete(hazards.keys().next().value);
+      hazards.set(key, cv);
+    }
+    const ctx = S.ctx;
+    const smooth = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(cv, Math.round(r.x), Math.round(r.y), w, h);
+    ctx.imageSmoothingEnabled = smooth;
+  }
+
+  /**
+   * Табло из семи сегментов на приборном стекле: погасшие сегменты тускло видны. o: lit, ghost, digits (число знакомест), h.
+   * Возвращает область цифр.
+   */
+  function segDisplay(r, str, o = {}) {
+    const c = S.th.c;
+    const cc = cell();
+    nine('screen', r.x, r.y, r.w, r.h);
+    const h = Math.max(cc * 5, o.h || Math.round(r.h - cc * 8));
+    const s = String(str);
+    const digits = o.digits || s.length;
+    const ghostStr = '8'.repeat(digits);
+    const total = segmentWidth(ghostStr, h);
+    const rp = o.padRight ?? cc * 4;
+    const x = Math.round(r.x + r.w - rp - total);
+    const y = Math.round(r.y + (r.h - h) / 2);
+    drawSegments(S.ctx, ghostStr, x, y, h, o.ghost || c.navy2, null);
+    const w = segmentWidth(s, h);
+    drawSegments(S.ctx, s, Math.round(r.x + r.w - rp - w), y, h, o.lit || c.green, null);
+    return { x, y, w: total, h };
+  }
+
+  /** Крупное число пиксельными сегментами без рамки (счётчики на табличках). Возвращает ширину. */
+  function bigNumber(str, x, y, h, color, align = 'left') {
+    const w = segmentWidth(String(str), h);
+    drawSegments(S.ctx, String(str), Math.round(align === 'right' ? x - w : align === 'center' ? x - w / 2 : x), Math.round(y), h, color, null);
+    return w;
+  }
+
+  /**
+   * Стрелочный прибор: шкала из делений по дуге, цветные зоны и стрелка из клеток. r — область прибора,
+   * value 0..1, o: zones [{ to, color }], ticks.
+   */
+  function dial(r, value, o = {}) {
+    const c = S.th.c;
+    const cc = cell();
+    nine('screen', r.x, r.y, r.w, r.h);
+    const cx = r.x + r.w / 2;
+    const cy = r.y + r.h * 0.68;
+    const rad = Math.max(cc * 6, Math.min(r.w / 2 - cc * 4, r.h * 0.62 - cc * 2));
+    const a0 = Math.PI * 1.12;
+    const a1 = -Math.PI * 0.12;
+    const zones = o.zones || [{ to: 0.35, color: c.red }, { to: 1, color: c.green }];
+    const ticks = o.ticks || 10;
+    for (let i = 0; i <= ticks; i++) {
+      const k = i / ticks;
+      const a = a0 - k * (a0 - a1);
+      const color = (zones.find((z) => k <= z.to + 1e-6) || zones[zones.length - 1]).color;
+      const x = Math.round((cx + Math.cos(a) * rad) / cc) * cc;
+      const y = Math.round((cy - Math.sin(a) * rad) / cc) * cc;
+      rect(x, y, cc, cc, color);
+      if (i % 5 === 0) {
+        const x2 = Math.round((cx + Math.cos(a) * (rad - cc * 2)) / cc) * cc;
+        const y2 = Math.round((cy - Math.sin(a) * (rad - cc * 2)) / cc) * cc;
+        rect(x2, y2, cc, cc, color);
+      }
+    }
+    const k = clamp(value, 0, 1);
+    const a = a0 - k * (a0 - a1);
+    line(cx, cy, cx + Math.cos(a) * rad * 0.82, cy - Math.sin(a) * rad * 0.82, c.white, { cell: cc });
+    rect(Math.round(cx / cc) * cc - cc, Math.round(cy / cc) * cc - cc, cc * 2, cc * 2, c.steel2);
+    return { cx, cy, rad };
+  }
+
+  /** Ирис: закрывающийся/открывающийся круг из клеток. progress 0 — всё видно, 1 — закрыто. (cx, cy) — центр. */
+  function iris(progress, cx, cy) {
+    const L = S.L;
+    const ctx = S.ctx;
+    const step = cell() * 2;
+    const maxR = Math.hypot(Math.max(cx, L.w - cx), Math.max(cy, L.h - cy)) + step;
+    const rad = maxR * (1 - clamp(progress, 0, 1));
+    ctx.fillStyle = S.th.c.ink;
+    for (let y = 0; y < L.h; y += step) {
+      const dy = y + step / 2 - cy;
+      const half = rad > Math.abs(dy) ? Math.sqrt(rad * rad - dy * dy) : -1;
+      if (half < 0) {
+        ctx.fillRect(0, y, L.w, step);
+        continue;
+      }
+      const x0 = Math.floor((cx - half) / step) * step;
+      const x1 = Math.ceil((cx + half) / step) * step;
+      if (x0 > 0) ctx.fillRect(0, y, x0, step);
+      if (x1 < L.w) ctx.fillRect(x1, y, L.w - x1, step);
+    }
   }
 
   // ---------- вспомогательное ----------
@@ -955,17 +1224,27 @@ export function createKit({ sfx = () => {} } = {}) {
     button,
     iconButton,
     meter,
+    ledBar,
     progress,
     statDelta,
     slider,
     toggle,
-    tabs,
     scrollArea,
     scrollList,
     resetScroll,
     costChip,
     costWidth,
-    resourceChip,
+    plate,
+    lamp,
+    line,
+    hazard,
+    segDisplay,
+    bigNumber,
+    dial,
+    iris,
+    callout,
+    ring,
+    stamp,
     modal,
     toast,
     setToastAnchor,
@@ -982,6 +1261,9 @@ export function createKit({ sfx = () => {} } = {}) {
     isPressed,
     rectOf,
     fs,
+    cell,
+    spawnSparks,
+    ditherPattern,
     sfx,
     get L() { return S.L; },
     get th() { return S.th; },
@@ -989,10 +1271,15 @@ export function createKit({ sfx = () => {} } = {}) {
     get time() { return S.time; },
     get dt() { return S.dt; },
     get clicked() { return S.clicked; },
+    get clickPos() { return S.clickPos; },
     get back() { return S.back; },
     get denied() { return S.denied; },
     get emptyTap() { return S.emptyTap; },
     get dragDx() { return S.dragDx; },
+    get dragDy() { return S.dragDy; },
+    get pinch() { return S.pinch; },
+    get wheel() { return S.wheel; },
+    get dtap() { return S.dtap; },
     get cursor() { return S.cursor; },
     get hoverId() { return S.hover; },
     get hitCount() { return S.prevHits.length; },

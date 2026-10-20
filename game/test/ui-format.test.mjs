@@ -96,27 +96,37 @@ test('ellipsize обрезает по ширине и добавляет мно�
 
 const pairs = (c) => [
   ['text', 'panel'], ['textDim', 'panel'], ['textMute', 'panel'], ['gold', 'panel'], ['cyan', 'panel'], ['green', 'panel'], ['red', 'panel'], ['amber', 'panel'],
-  ['text', 'bg'], ['textDim', 'inset'], ['gold', 'inset'], ['cyan', 'inset'],
+  ['text', 'bg'], ['textDim', 'inset'], ['textMute', 'inset'], ['gold', 'inset'], ['cyan', 'inset'], ['red', 'inset'], ['green', 'inset'], ['amber', 'inset'],
+  ['textMute', 'screen'], ['red', 'screen'], ['white', 'card'], ['textDim', 'card'],
+  ['ink', 'paper1'], ['amberDeep', 'paper1'], ['redDark', 'paper1'], ['greenDark', 'paper1'], ['cyanDark', 'paper1'],
 ].map(([a, b]) => [a, b, contrast(c[a], c[b])]);
 
 for (const [label, settings] of [['обычная палитра', {}], ['палитра для дальтоников', { colorblind: true }]]) {
-  test(`контраст WCAG AA (≥ 4,5) текста и акцентов на панелях: ${label}`, () => {
+  test(`контраст WCAG AA (≥ 4,5) текста и акцентов на панелях, щитках, табло и бумаге: ${label}`, () => {
     const { c } = getTheme(settings);
     for (const [a, b, ratio] of pairs(c)) assert.ok(ratio >= 4.5, `${a} на ${b}: ${ratio.toFixed(2)}`);
   });
 }
 
-test('подписи кнопок читаются на своих заливках (≥ 4,5)', () => {
-  const th = getTheme({});
-  const checks = { btn: 'btn', primary: 'primary', danger: 'danger', good: 'good' };
-  for (const [variant, base] of Object.entries(checks)) {
-    const label = th.labelColor(variant);
-    for (const state of ['', 'Hover', 'Press']) {
-      const fill = th.variants[`${base}${state}`]?.fill;
-      if (!fill) continue;
-      assert.ok(contrast(label, fill) >= 4.5, `${variant}${state}: ${contrast(label, fill).toFixed(2)}`);
+test('подписи кнопок читаются на своих заливках (≥ 4,5), обе палитры', () => {
+  for (const settings of [{}, { colorblind: true }]) {
+    const th = getTheme(settings);
+    for (const base of ['btn', 'primary', 'danger', 'good']) {
+      for (const state of ['', 'Hover', 'Press']) {
+        const fill = th.variants[`${base}${state}`]?.mid;
+        if (!fill) continue;
+        const label = th.labelColor(`${base}${state}`);
+        assert.ok(contrast(label, fill) >= 4.5, `${base}${state}: ${contrast(label, fill).toFixed(2)}`);
+      }
     }
   }
+});
+
+test('палитра интерфейса: не больше 32 цветов, все цвета рамок взяты из неё', () => {
+  const th = getTheme({});
+  const colors = new Set(Object.values(th.palette));
+  assert.ok(colors.size <= 32, `цветов в палитре: ${colors.size}`);
+  for (const [name, v] of Object.entries(th.variants)) for (const k of ['hi', 'mid', 'lo', 'edge']) assert.ok(colors.has(v[k]), `${name}.${k} вне палитры`);
 });
 
 test('режим дальтоника заменяет зелёно-красную пару и различим по яркости', () => {
@@ -131,9 +141,9 @@ test('режим дальтоника заменяет зелёно-красну
 test('mix и все варианты 9-slice заданы полностью', () => {
   assert.equal(mix('#000000', '#ffffff', 0.5), '#808080');
   const th = getTheme({});
-  for (const name of Object.keys(THEME_SOURCE.VARIANTS)) {
+  for (const name of Object.keys(THEME_SOURCE.FRAMES)) {
     const v = th.variants[name];
-    assert.ok(v.fill && v.hi && v.lo && v.edge, name);
+    assert.ok(v.hi && v.mid && v.lo && v.edge, name);
   }
 });
 
@@ -167,7 +177,8 @@ test('все литеральные ключи t(...) в ui/ input/ main.js ес
 
 test('динамические семейства ключей покрыты в ru.js', () => {
   const families = [
-    ['dock', ['launch', 'rocket', 'base', 'journal', 'more']],
+    ['dock', ['launch', 'rocket', 'base', 'journal', 'shop', 'more']],
+    ['dest', ['earth', 'moon', 'mars']],
     ['cons', ['chute', 'repair', 'canister', 'magnet']],
     ['mode', ['arcade', 'pilot']],
     ['layout', ['right', 'left']],
@@ -178,7 +189,7 @@ test('динамические семейства ключей покрыты в
   const missing = [];
   for (const [prefix, ids] of families) for (const id of ids) if (!hasKey(`${prefix}.${id}`)) missing.push(`${prefix}.${id}`);
   for (const id of ['arcade', 'pilot']) if (!hasKey(`mode.${id}.desc`)) missing.push(`mode.${id}.desc`);
-  for (const id of ['launch', 'rocket', 'base', 'journal', 'more']) if (!hasKey(`dock.${id}.tip`)) missing.push(`dock.${id}.tip`);
+  for (const id of ['launch', 'rocket', 'base', 'journal', 'shop', 'more']) if (!hasKey(`dock.${id}.tip`)) missing.push(`dock.${id}.tip`);
   for (const list of Object.values(ZONES)) for (const z of list) if (!hasKey(`zone.${z.id}`)) missing.push(`zone.${z.id}`);
   for (const id of ['thrust', 'tilt']) for (const sfx of ['key', 'touch']) if (!hasKey(`tut.${id}.${sfx}`)) missing.push(`tut.${id}.${sfx}`);
   for (const id of ['fuel', 'descent', 'land']) if (!hasKey(`tut.${id}`)) missing.push(`tut.${id}`);

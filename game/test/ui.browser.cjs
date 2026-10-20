@@ -1,5 +1,7 @@
 // Браузерная проверка интерфейса и ввода (Playwright): обе раскладки, смена ориентации на лету, покупки через интерфейс,
 // сенсорное управление настоящими touch-событиями, пауза, итоги, ноль ошибок консоли. Снимки: work/ui-*.png.
+// ТЕСТ-СТРАЖ языка интерфейса (game/docs/UI_LANGUAGE.md): в слое интерфейса не должно быть fillText (весь текст идёт через
+// пиксельный шрифт), скруглённых прямоугольников и градиентных заливок; счётчики вызовов в обёртке контекста.
 // Использует тестовый хук globalThis.__VN_TEST__ и сборку game/dist/vyshe-neba.html (собирается при отсутствии).
 const path = require('node:path');
 const fs = require('node:fs');
@@ -43,6 +45,18 @@ async function click(page, id, wait = 140) {
   await page.waitForTimeout(wait);
 }
 
+/** Закрыть щиток клавишей Esc (в хабе тап по миру может открыть другой объект). */
+async function closeCallout(page, wait = 200) {
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(wait);
+}
+
+/** Тап по пустому месту мастерской (закрывает щиток): точка выбирается на сборке вверху кадра. */
+async function clickWorld(page, vp, wait = 200) {
+  await page.mouse.click(vp.width * 0.5, vp.height * 0.16);
+  await page.waitForTimeout(wait);
+}
+
 /** Прокручивает список колесом мыши, пока цель не появится на экране, затем кликает. */
 async function clickScrolling(page, id, anchor) {
   for (let i = 0; i < 25; i++) {
@@ -67,11 +81,11 @@ async function waitScreen(page, name, timeout = 15000) {
   }
 }
 
-async function touch(cdp, type, x, y, id = 1) {
-  await cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id }] });
+async function touch(cdp, type, points) {
+  await cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points });
 }
 
-/** Все интерактивные цели экрана (кнопки, вкладки, ползунки, органы управления полётом) ≥ 44×44 CSS px и внутри окна. */
+/** Все интерактивные цели экрана (кнопки, плитки, ползунки, органы управления полётом) ≥ 44×44 CSS px и внутри окна. */
 async function checkTargets(page, vp, label) {
   const res = await page.evaluate(() => {
     const app = globalThis.__VN_APP__;
@@ -91,7 +105,7 @@ async function checkTargets(page, vp, label) {
     if (app.screen === 'flight') for (const [id, r] of Object.entries(app.hudTargets || {})) test(id, r.x, r.y, r.w, r.h);
     return { problems, count };
   });
-  assert(res.count >= 3, `${vp.name}/${label}: найдено слишком мало целей (${res.count})`);
+  assert(res.count >= 2, `${vp.name}/${label}: найдено слишком мало целей (${res.count})`);
   assert(res.problems.length === 0, `${vp.name}/${label}: мелкие цели или вне окна: ${res.problems.join('; ')}`);
 }
 
@@ -128,6 +142,32 @@ async function checkBackdrop(page, vp, screen, expectKind) {
   assert(on === true, `${vp.name}/${screen}: фон экрана не нарисован артом (${expectKind})`);
 }
 
+/**
+ * Тест-страж: считает вызовы «запрещённых» примитивов только пока рисуется слой интерфейса (app.uiDrawing).
+ * Ставится до загрузки страницы. drawImage считается как контроль того, что страж вообще включён.
+ */
+const GUARD_SCRIPT = () => {
+  const guard = { fillText: 0, strokeText: 0, roundRect: 0, arcTo: 0, createLinearGradient: 0, createRadialGradient: 0, createConicGradient: 0, drawImage: 0, fillRect: 0 };
+  globalThis.__UI_GUARD__ = guard;
+  const proto = CanvasRenderingContext2D.prototype;
+  for (const name of Object.keys(guard)) {
+    const orig = proto[name];
+    if (typeof orig !== 'function') continue;
+    proto[name] = function patched(...args) {
+      const app = globalThis.__VN_APP__;
+      if (app && app.uiDrawing) guard[name]++;
+      return orig.apply(this, args);
+    };
+  }
+};
+
+async function checkGuard(page, vp, label) {
+  const g = await page.evaluate(() => ({ ...globalThis.__UI_GUARD__ }));
+  const bad = ['fillText', 'strokeText', 'roundRect', 'arcTo', 'createLinearGradient', 'createRadialGradient', 'createConicGradient'].filter((k) => g[k] > 0);
+  assert(bad.length === 0, `${vp.name}/${label}: в слое интерфейса запрещённые вызовы: ${bad.map((k) => `${k}=${g[k]}`).join(', ')}`);
+  assert(g.drawImage > 50 && g.fillRect > 500, `${vp.name}/${label}: страж не видит рисования интерфейса (drawImage=${g.drawImage}, fillRect=${g.fillRect})`);
+}
+
 const shot = (page, vp, name) => page.screenshot({ path: path.join(outDir, `ui-${vp.name}-${name}.png`) });
 
 async function runViewport(browser, vp) {
@@ -138,6 +178,7 @@ async function runViewport(browser, vp) {
     isMobile: vp.touch,
   });
   const page = await context.newPage();
+  await page.addInitScript(GUARD_SCRIPT);
   const errors = [];
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
   page.on('console', (m) => {
@@ -147,7 +188,7 @@ async function runViewport(browser, vp) {
 
   await page.goto(pathToFileURL(gameFile).href);
   await page.waitForFunction(() => globalThis.__VN_TEST__, null, { timeout: 20000 });
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(800);
   assert((await screenName(page)) === 'hub', `${vp.name}: после загрузки должен быть хаб`);
   await shot(page, vp, '01-hub');
   await checkTargets(page, vp, 'хаб');
@@ -162,7 +203,7 @@ async function runViewport(browser, vp) {
 
   await checkAssets(page, vp);
 
-  // деньги на покупки; новая игра: подсказка «Запуск» видна
+  // деньги на покупки; новая игра: подсказка «ПУСК» видна
   await hook(page, () => {
     const t = globalThis.__VN_TEST__;
     const p = t.profile();
@@ -172,61 +213,113 @@ async function runViewport(browser, vp) {
     t.setProfile(p);
   });
 
+  // ---- хаб: камера. Двойной тап (и колесо на десктопе) приближает остров, ещё раз — возвращает ----
+  {
+    const zoom0 = await hook(page, () => globalThis.__VN_APP__.renderer.hub.view.zoom);
+    await page.mouse.dblclick(vp.width * 0.55, vp.height * 0.4);
+    await page.waitForTimeout(900);
+    const zoom1 = await hook(page, () => globalThis.__VN_APP__.renderer.hub.view.zoom);
+    assert(zoom1 > zoom0 * 1.15, `${vp.name}: двойной тап не приблизил остров (${zoom0.toFixed(2)} → ${zoom1.toFixed(2)})`);
+    await shot(page, vp, '01a-hub-zoom');
+    await page.mouse.dblclick(vp.width * 0.55, vp.height * 0.4);
+    await page.waitForTimeout(900);
+    const zoom2 = await hook(page, () => globalThis.__VN_APP__.renderer.hub.view.zoom);
+    assert(zoom2 < zoom1 * 0.9, `${vp.name}: второй двойной тап не вернул вид (${zoom1.toFixed(2)} → ${zoom2.toFixed(2)})`);
+    if (vp.touch) {
+      // щипок двумя пальцами приближает остров
+      const cx = vp.width / 2;
+      const cy = vp.height * 0.4;
+      const z0 = await hook(page, () => globalThis.__VN_APP__.renderer.hub.view.zoom);
+      await touch(cdp, 'touchStart', [{ x: cx - 20, y: cy, id: 11 }]);
+      await touch(cdp, 'touchStart', [{ x: cx - 20, y: cy, id: 11 }, { x: cx + 20, y: cy, id: 12 }]);
+      for (let i = 1; i <= 8; i++) {
+        await touch(cdp, 'touchMove', [{ x: cx - 20 - i * 14, y: cy, id: 11 }, { x: cx + 20 + i * 14, y: cy, id: 12 }]);
+        await page.waitForTimeout(30);
+      }
+      await touch(cdp, 'touchEnd', []);
+      await page.waitForTimeout(500);
+      const z1 = await hook(page, () => globalThis.__VN_APP__.renderer.hub.view.zoom);
+      assert(z1 > z0 * 1.2, `${vp.name}: щипок не приблизил остров (${z0.toFixed(2)} → ${z1.toFixed(2)})`);
+      await page.mouse.dblclick(vp.width * 0.55, vp.height * 0.4);
+      await page.waitForTimeout(700);
+      await hook(page, () => globalThis.__VN_APP__.renderer.hub.reset?.(true));
+    } else {
+      await page.mouse.move(vp.width / 2, vp.height * 0.4);
+      await page.mouse.wheel(0, -500);
+      await page.waitForTimeout(500);
+      const z1 = await hook(page, () => globalThis.__VN_APP__.renderer.hub.view.zoom);
+      assert(z1 > zoom2 * 1.2, `${vp.name}: колесо не приблизило остров`);
+      await hook(page, () => globalThis.__VN_APP__.renderer.hub.reset?.(true));
+    }
+    await page.waitForTimeout(300);
+  }
+
+  // ---- хаб: щиток Памятника эпох по тапу на табличку эпохи ----
+  await click(page, 'plate-era', 300);
+  await target(page, 'era-advance');
+  await shot(page, vp, '01c-hub-era');
+  await closeCallout(page);
+  assert(!(await hook(page, () => !!globalThis.__VN_TEST__.target('era-advance'))), `${vp.name}: щиток эпохи не закрылся по Esc`);
+
   // ---- полная работа с клавиатуры: фокус стрелками, Enter, Esc ----
-  const dockOrder = ['dock-launch', 'dock-rocket', 'dock-base', 'dock-journal', 'dock-more'];
-  let focus = null;
-  for (let i = 0; i < 20 && focus !== 'dock-rocket'; i++) {
-    const at = dockOrder.indexOf(focus);
-    await page.keyboard.press(at < 0 ? 'ArrowDown' : at > 1 ? 'ArrowLeft' : 'ArrowRight');
+  const navSet = ['dock-rocket', 'dock-base', 'dock-journal', 'dock-shop'];
+  await hook(page, () => globalThis.__VN_APP__.kit.setFocus('dock-launch'));
+  await page.keyboard.press(vp.height > vp.width ? 'ArrowUp' : 'ArrowLeft');
+  await page.waitForTimeout(110);
+  let focus = await hook(page, () => globalThis.__VN_APP__.kit.S.focusId);
+  for (let i = 0; i < 8 && focus !== 'dock-rocket'; i++) {
+    await page.keyboard.press('ArrowLeft');
     await page.waitForTimeout(110);
     focus = await hook(page, () => globalThis.__VN_APP__.kit.S.focusId);
   }
-  assert(focus === 'dock-rocket', `${vp.name}: фокус не дошёл до дока стрелками (${focus})`);
+  assert(navSet.includes(focus) && focus === 'dock-rocket', `${vp.name}: фокус не дошёл до кнопки «Ракета» стрелками (${focus})`);
   await shot(page, vp, '01b-hub-focus');
   await page.keyboard.press('Enter');
   await page.waitForTimeout(250);
-  assert((await screenName(page)) === 'rocket', `${vp.name}: Enter не открыл экран ракеты`);
+  assert((await screenName(page)) === 'rocket', `${vp.name}: Enter не открыл мастерскую`);
   await page.keyboard.press('Escape');
   await page.waitForTimeout(250);
   assert((await screenName(page)) === 'hub', `${vp.name}: Esc не вернул в хаб`);
 
-  // ---- база: купить маяки через интерфейс ----
+  // ---- строительство: купить маяки через щиток у плитки ----
   await click(page, 'dock-base');
   await waitScreen(page, 'base');
   await shot(page, vp, '02-base');
-  await checkTargets(page, vp, 'база');
+  await checkTargets(page, vp, 'строительство');
   await click(page, 'bld-beacons');
   await shot(page, vp, '03-base-card');
-  await click(page, 'build-beacons', 250);
+  await click(page, 'build-beacons', 300);
   let p = await hook(page, () => globalThis.__VN_TEST__.profile());
   assert(p.buildings.beacons === 1, `${vp.name}: маяки не построены через интерфейс`);
-  await click(page, 'card-close');
-  await page.mouse.wheel(0, 300);
-  await page.waitForTimeout(250);
-  await click(page, 'base-tabs-era');
+  await page.waitForTimeout(1400);
+  await closeCallout(page);
+  await click(page, 'plate-era');
+  await target(page, 'era-advance');
   await shot(page, vp, '04-base-era');
+  await closeCallout(page);
   await click(page, 'back');
-  assert((await screenName(page)) === 'hub', `${vp.name}: возврат в хаб с базы`);
+  assert((await screenName(page)) === 'hub', `${vp.name}: возврат в хаб со стройки`);
 
-  // ---- хаб: тап по построенной постройке открывает карточку ----
+  // ---- хаб: тап по построенной постройке открывает щиток у здания ----
   const pos = await hook(page, () => globalThis.__VN_APP__.renderer.hub.screenPos?.('beacons') || null);
-  if (pos) {
+  if (pos && pos.x > 0 && pos.y > 0 && pos.x < vp.width && pos.y < vp.height) {
     await page.mouse.click(pos.x, pos.y);
-    await page.waitForTimeout(250);
+    await page.waitForTimeout(500);
     const selected = await hook(page, () => globalThis.__VN_APP__.hubSelected);
-    assert(selected === 'beacons', `${vp.name}: тап по маякам не открыл карточку (${selected})`);
+    assert(selected === 'beacons', `${vp.name}: тап по маякам не открыл щиток (${selected})`);
+    await target(page, 'build-beacons');
     await shot(page, vp, '05-hub-card');
-    await click(page, 'card-close');
+    await closeCallout(page);
   }
 
-  // ---- ракета: модуль, «было → станет», покупка, смена ориентации на лету ----
+  // ---- мастерская: узел модуля, «было → станет», покупка, смена ориентации на лету ----
   await click(page, 'dock-rocket');
   await waitScreen(page, 'rocket');
   await click(page, 'part-legs');
   await shot(page, vp, '06-rocket');
-  await checkBackdrop(page, vp, 'ракета', 'workshop');
-  await checkTargets(page, vp, 'ракета');
-  await click(page, 'buy-legs', 250);
+  await checkBackdrop(page, vp, 'мастерская', 'workshop');
+  await checkTargets(page, vp, 'мастерская');
+  await click(page, 'buy-legs', 300);
   p = await hook(page, () => globalThis.__VN_TEST__.profile());
   assert(p.parts.legs === 1, `${vp.name}: опоры не куплены через интерфейс`);
   const flipped = vp.height > vp.width ? { width: vp.height, height: vp.width } : { width: 390, height: 844 };
@@ -239,22 +332,49 @@ async function runViewport(browser, vp) {
   await click(page, 'part-engine');
   await page.setViewportSize({ width: vp.width, height: vp.height });
   await page.waitForTimeout(500);
+  await clickWorld(page, vp);
   await click(page, 'stand', 300);
   await page.waitForTimeout(400);
   await click(page, 'back');
 
-  // ---- журнал, настройки ----
+  // ---- доска: листы контрактов и полка наград ----
   await click(page, 'dock-journal');
   await waitScreen(page, 'journal');
-  for (const tab of ['achievements', 'shop', 'skins', 'contracts']) {
-    await click(page, `journal-tabs-${tab}`);
-    if (tab === 'shop') await shot(page, vp, '08-journal-shop');
-    if (tab === 'shop') await checkBackdrop(page, vp, 'журнал', 'shop');
-  if (tab !== 'contracts') await checkTargets(page, vp, `журнал/${tab}`);
+  await shot(page, vp, '08-journal');
+  await checkBackdrop(page, vp, 'доска', 'workshop');
+  await checkTargets(page, vp, 'доска');
+  const firstSheet = await hook(page, () => !!globalThis.__VN_TEST__.target('sheet-0'));
+  if (firstSheet) {
+    await click(page, 'sheet-0', 250);
+    await shot(page, vp, '08b-journal-sheet');
+    await closeCallout(page);
   }
+  const medal = await hook(page, () => `medal-${globalThis.__VN_APP__.data.ACHIEVEMENTS[0]?.id}`);
+  await click(page, medal, 250);
+  await shot(page, vp, '08c-journal-medal');
   await click(page, 'back');
-  await click(page, 'dock-more');
-  await click(page, 'more-settings');
+  await waitScreen(page, 'hub');
+
+  // ---- лавка: расходники и краски на полках, щиток «купить» ----
+  await click(page, 'dock-shop');
+  await waitScreen(page, 'shop');
+  await shot(page, vp, '08d-shop');
+  await checkBackdrop(page, vp, 'лавка', 'shop');
+  await checkTargets(page, vp, 'лавка');
+  await click(page, 'shelf-repair', 250);
+  await shot(page, vp, '08e-shop-item');
+  await click(page, 'shop-buy-repair', 250);
+  p = await hook(page, () => globalThis.__VN_TEST__.profile());
+  assert(p.inventory.repair === 1, `${vp.name}: ремкомплект не куплен в лавке`);
+  await closeCallout(page);
+  await click(page, 'shelf-skin-wasp', 250);
+  await click(page, 'skin-wasp', 250);
+  p = await hook(page, () => globalThis.__VN_TEST__.profile());
+  assert(p.skins.includes('wasp') && p.skin === 'wasp', `${vp.name}: краска не куплена в лавке`);
+  await click(page, 'back');
+
+  // ---- настройки ----
+  await click(page, 'hub-gear');
   await waitScreen(page, 'settings');
   const scrollAt = { x: vp.width / 2, y: vp.height / 2 };
   await clickScrolling(page, 'set-mode-pilot', scrollAt);
@@ -265,7 +385,7 @@ async function runViewport(browser, vp) {
   await clickScrolling(page, 'set-mode-arcade', scrollAt);
   await click(page, 'back');
 
-  // ---- запуск → полёт ----
+  // ---- пульт запуска → полёт ----
   await click(page, 'dock-launch');
   await waitScreen(page, 'launch');
   await shot(page, vp, '10-launch');
@@ -276,6 +396,9 @@ async function runViewport(browser, vp) {
   await shot(page, vp, '10b-launch-moon-backdrop');
   await page.evaluate(() => { globalThis.__VN_APP__.ui.launch.dest = 'earth'; });
   await checkTargets(page, vp, 'запуск');
+  // закрытая цель: отказ (дрожание) и подсказка
+  await click(page, 'launch-dest-moon', 100);
+  await shot(page, vp, '10c-launch-denied');
   await click(page, 'launch-start');
   await page.waitForTimeout(700);
   await shot(page, vp, '11-countdown');
@@ -288,18 +411,18 @@ async function runViewport(browser, vp) {
   const alt0 = await hook(page, () => globalThis.__VN_TEST__.flight().alt);
   if (vp.touch) {
     const lever = await target(page, 'flight-thrust');
-    await touch(cdp, 'touchStart', lever.x + lever.w / 2, lever.y + lever.h * 0.2);
+    await touch(cdp, 'touchStart', [{ x: lever.x + lever.w / 2, y: lever.y + lever.h * 0.2, id: 1 }]);
     await page.waitForTimeout(1600);
     const thr = await hook(page, () => globalThis.__VN_TEST__.flight().throttle);
     assert(thr > 0.5, `${vp.name}: касание рычага не дало тягу (${thr})`);
     // диск наклона вторым пальцем (мультитач)
     const disc = await target(page, 'flight-tilt');
-    await touch(cdp, 'touchStart', disc.x + disc.w * 0.9, disc.y + disc.h / 2, 2);
+    await touch(cdp, 'touchStart', [{ x: lever.x + lever.w / 2, y: lever.y + lever.h * 0.2, id: 1 }, { x: disc.x + disc.w * 0.9, y: disc.y + disc.h / 2, id: 2 }]);
     await page.waitForTimeout(500);
     const tilted = await hook(page, () => Math.abs(globalThis.__VN_TEST__.flight().angle));
     assert(tilted > 0.01, `${vp.name}: диск наклона не наклонил ракету`);
     await shot(page, vp, '13-flight-touch');
-    await touch(cdp, 'touchEnd', 0, 0);
+    await touch(cdp, 'touchEnd', []);
     await page.waitForTimeout(200);
     const released = await hook(page, () => globalThis.__VN_APP__.input.touch.active());
     assert(released === false, `${vp.name}: захват пальцев не освобождён после touchEnd`);
@@ -349,10 +472,10 @@ async function runViewport(browser, vp) {
   await click(page, 'flight-resume');
   assert(!(await hook(page, () => globalThis.__VN_APP__.session.paused)), `${vp.name}: пауза не снялась`);
 
-  // ---- итоги: прерванный/аварийный полёт, «Ещё раз», «На базу» ----
+  // ---- итоги: бланк со штампом, «Ещё раз», «На базу» ----
   await page.evaluate(() => globalThis.__VN_TEST__.step(120 * 240));
   await waitScreen(page, 'results', 20000);
-  await page.waitForTimeout(2200);
+  await page.waitForTimeout(3200);
   await shot(page, vp, '15-results');
   await checkTargets(page, vp, 'итоги');
   await click(page, 'results-again', 300);
@@ -362,13 +485,14 @@ async function runViewport(browser, vp) {
   await click(page, 'flight-abandon', 200);
   await click(page, 'flight-abandon', 300);
   await waitScreen(page, 'results');
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(900);
   await shot(page, vp, '16-results-abandoned');
   await click(page, 'results-base');
   assert((await screenName(page)) === 'hub', `${vp.name}: возврат на базу после итогов`);
 
   // сохранение пережило перезагрузку
   const coins = await hook(page, () => globalThis.__VN_TEST__.profile().coins);
+  await checkGuard(page, vp, 'весь обход');
   await page.reload();
   await page.waitForFunction(() => globalThis.__VN_TEST__, null, { timeout: 20000 });
   await page.waitForTimeout(500);

@@ -1,7 +1,26 @@
 // Станции мастерской вокруг схемы ракеты: рисуются по бокам прямоугольника, центр остаётся свободным.
 // Как и backdrop.js, работают в текущем преобразовании ctx (CSS-пиксели интерфейса).
 
-import { STATION_SIZES, eraYear } from './manifest.js';
+import { STATION_SIZES, eraYear, spriteName, spriteSize } from './manifest.js';
+import { ASSEMBLY_HEIGHT, ASSEMBLY_WIDTH, MODULE_VIEW, assemblyParts } from './rocket-view.js';
+
+/** Девять модулей ракеты в порядке сборки снизу вверх. */
+export const MODULE_IDS = ['engine', 'tank', 'hull', 'booster', 'capsule', 'legs', 'fins', 'parachute', 'avionics'];
+
+/** Модули, за которые отвечает станция мастерской (рамка станции — основной хитбокс); остальные — части самой ракеты. */
+export const MODULE_STATIONS = {
+  engine: 'engine_test_stand',
+  hull: 'hull_diagnostics',
+  avionics: 'telemetry_post',
+};
+
+/** Какая ступень сборки несёт модуль: от неё берутся ширина и положение рамки. */
+const MODULE_OWNER = {
+  parachute: 'capsule', avionics: 'capsule', capsule: 'capsule',
+  tank: 'core', hull: 'core', engine: 'core', fins: 'core', legs: 'core',
+  booster: 'booster',
+};
+const SPREAD = { fins: 0.2, legs: 0.2 }; // лапы и стабилизаторы выступают за корпус: доля ширины ступени с каждой стороны
 
 /** Колонки станций, снизу вверх. Имена спрайтов: bld_factory/bld_control переиспользуют арт построек. */
 export const STATION_COLUMNS = {
@@ -47,13 +66,68 @@ export function layoutStations(rect) {
   return out;
 }
 
+/**
+ * Рамка сборки по умолчанию в rect (когда UI не передал свою): по центру, пропорции ASSEMBLY_WIDTH:ASSEMBLY_HEIGHT.
+ * Приблизительна — для точных рамок передавайте params.rocket (та же рамка, что идёт в drawAssembly).
+ */
+export function defaultRocketRect(rect) {
+  const h = Math.min(rect.h * 0.8, rect.w * 1.2, 400);
+  const w = (h * ASSEMBLY_WIDTH) / ASSEMBLY_HEIGHT;
+  return { x: rect.x + (rect.w - w) / 2, y: rect.y + rect.h * 0.05, w, h };
+}
+
+/** Рамки ступеней сборки в координатах rocket (как drawAssembly): { booster, core, capsule } -> { x, y, w, h }. */
+function stageRects(rocket, era) {
+  const scale = rocket.h / ASSEMBLY_HEIGHT;
+  const cx = rocket.x + rocket.w / 2;
+  const out = {};
+  for (const part of assemblyParts({})) {
+    const size = spriteSize(spriteName(part.base, era));
+    const h = part.h * scale;
+    const w = size ? (h * size[0]) / size[1] : h * 0.5;
+    out[part.base] = { x: cx - w / 2, y: rocket.y + rocket.h - part.bottom * scale - h, w, h };
+  }
+  return out;
+}
+
+/**
+ * Хитбоксы девяти модулей для выносок и нажатий. params: { era, rect (рамка схемы), rocket (рамка сборки, CSS px),
+ * stations (станции нарисованы? по умолчанию true) }. Возвращает { engine: { x, y, w, h, source, station, part }, ... }:
+ * source 'station' — рамка станции мастерской (engine -> engine_test_stand, hull -> hull_diagnostics,
+ * avionics -> telemetry_post), иначе 'rocket' — часть самой ракеты (по спрайтам капсулы, бака/корпуса, ног,
+ * стабилизаторов, парашюта). part — всегда рамка узла на самой ракете, station — id станции или null.
+ */
+export function moduleBoxes(params) {
+  const { era = 0, rect } = params;
+  const rocket = params.rocket || defaultRocketRect(rect);
+  const stages = stageRects(rocket, era);
+  const stations = params.stations === false ? [] : layoutStations(rect);
+  const out = {};
+  for (const id of MODULE_IDS) {
+    const owner = stages[MODULE_OWNER[id]];
+    const [t0, t1] = MODULE_VIEW[id].region;
+    const spread = owner.w * (SPREAD[id] || 0);
+    const y0 = rocket.y + t0 * rocket.h;
+    const y1 = rocket.y + t1 * rocket.h;
+    const part = { x: owner.x - spread, y: y0, w: owner.w + spread * 2, h: Math.max(1, y1 - y0) };
+    const stationId = MODULE_STATIONS[id] || null;
+    const station = stationId ? stations.find((item) => item.id === stationId) : null;
+    out[id] = station
+      ? { x: station.x, y: station.y, w: station.w, h: station.h, source: 'station', station: stationId, part }
+      : { ...part, source: 'rocket', station: stationId, part };
+  }
+  return out;
+}
+
 export function createWorkshop(painter) {
   return {
     layoutStations,
+    moduleBoxes,
 
     /**
-     * params: { era, rect:{x,y,w,h}, time }. Рисует станции эпохи и возвращает их рамки
-     * ([{ id, x, y, w, h, side }]) — например, для подсказок и нажатий.
+     * params: { era, rect:{x,y,w,h}, time, rocket?:{x,y,w,h}, stations?:boolean }. Рисует станции эпохи и возвращает их
+     * рамки ([{ id, x, y, w, h, side }]) — например, для подсказок и нажатий. У массива есть свойство modules:
+     * хитбокс каждого из девяти модулей (см. moduleBoxes); rocket — рамка сборки для точных рамок частей ракеты.
      */
     drawStations(ctx, params) {
       const { era = 0, rect, time = 0 } = params;
@@ -76,6 +150,7 @@ export function createWorkshop(painter) {
         drawIndicator(ctx, item, time);
       }
       ctx.restore();
+      items.modules = moduleBoxes({ era, rect, rocket: params.rocket, stations: params.stations });
       return items;
     },
   };

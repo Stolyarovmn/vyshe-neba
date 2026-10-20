@@ -61,11 +61,23 @@ export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts 
   const [width, height] = buildingSize(painter, key, lv);
   drawShadow(ctx, view, wx, wy, BUILDING_ANCHORS[key], width);
   const name = buildingSpriteName(key, lv);
-  if (painter.has(name)) {
-    return painter.sprite(ctx, view, name, wx, wy, { h: height, flipX: !!opts.mirror, smooth: true });
+  const building = opts.reveal !== undefined && opts.reveal < 1;
+  if (building) {
+    // стройка: здание «вырастает» снизу вверх — видна только нижняя часть спрайта
+    ctx.save();
+    ctx.beginPath();
+    const top = view.sy(wy - height * clamp(opts.reveal, 0, 1));
+    ctx.rect(view.sx(wx - width), top, view.sx(wx + width) - view.sx(wx - width), view.sy(wy) + 8 - top);
+    ctx.clip();
   }
-  drawProcedural(ctx, view, key, lv, wx, wy, time, width);
-  return false;
+  let drawn = false;
+  if (painter.has(name)) {
+    drawn = painter.sprite(ctx, view, name, wx, wy, { h: height, flipX: !!opts.mirror, smooth: true });
+  } else {
+    drawProcedural(ctx, view, key, lv, wx, wy, time, width);
+  }
+  if (building) ctx.restore();
+  return drawn;
 }
 
 function drawShadow(ctx, view, wx, wy, layout, width) {
@@ -414,7 +426,7 @@ export function buildingDrawOrder(profile) {
  * рамка каждой постройки в пикселях устройства (для тапов). extras — [{ y, draw() }]: объекты, которые нужно
  * вставить в нужную глубину (например, ракета на площадке).
  */
-export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, extras) {
+export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, extras, hooks) {
   const items = buildingDrawOrder(profile);
   const queue = extras && extras.length ? [...items, ...extras].sort((a, b) => a.y - b.y) : items;
   for (const item of queue) {
@@ -424,10 +436,12 @@ export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, e
     }
     const [w, h] = buildingSize(painter, item.key, item.level);
     if (item.x + w < view.left || item.x - w > view.right || item.y - h > view.bottom || item.y < view.top) continue;
-    drawBuilding(ctx, painter, view, item.key, item.level, item.x, item.y, time, { mirror: item.mirror });
-    if (isProceduralBuilding(item.key) && !painter.has(buildingSpriteName(item.key, item.level))) {
+    const build = hooks && hooks.build ? hooks.build(item.key) : null;
+    drawBuilding(ctx, painter, view, item.key, item.level, item.x, item.y, time, { mirror: item.mirror, reveal: build ? build.reveal : undefined });
+    if (isProceduralBuilding(item.key) && !painter.has(buildingSpriteName(item.key, item.level)) && (!build || build.reveal >= 1)) {
       drawBuildingBadge(ctx, view, item.key, item.x, item.y - h, time);
     }
+    if (build && hooks.scaffold) hooks.scaffold(ctx, { x: item.x, y: item.y, w: w * 0.9, h }, build);
     if (onRect) onRect(item.key, view.sx(item.x - w / 2), view.sy(item.y - h), view.sx(item.x + w / 2), view.sy(item.y));
   }
 }

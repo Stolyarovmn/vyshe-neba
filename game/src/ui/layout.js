@@ -38,8 +38,8 @@ export function computeLayout(w, h, dpr = 1, safe = NO_SAFE) {
     portrait,
     ui,
     px: Math.max(2, R(ui * 2)),
-    // ячейка «пиксель-HD» для контуров и скосов: 1 CSS px (2 физических на телефоне), на больших окнах — 2
-    cell: Math.max(1, R(ui / 1.5)),
+    // клетка пиксельной графики интерфейса: 2 CSS px на телефоне, 3 на среднем окне, 4 на большом
+    cell: ui < 1.5 ? 2 : ui < 2.3 ? 3 : 4,
     safe: s,
     area,
     gap: R(8 * ui),
@@ -65,24 +65,55 @@ function defaultAnchor(L) {
   return L.portrait ? { x: L.w / 2, y: L.h * 0.68 } : { x: L.w * 0.33, y: L.h * 0.62 };
 }
 
-// --- общая рамка экрана ---
+// --- общая рамка экрана: угловые таблички ---
 
 export function headerHeight(L) {
   return Math.max(MIN_TOUCH, R(44 * L.ui));
 }
 
-export function dockHeight(L) {
-  return Math.max(64, R(62 * L.ui));
+/**
+ * Угловые элементы: слева «назад» / табличка эпохи / шестерёнка, справа таблички данных и монет.
+ * o: back, era, gear. Возвращает прямоугольники и строку row, занятую всеми ими. Табличка сжимается на узких экранах.
+ */
+export function chromeLayout(L, o = {}) {
+  const a = L.area;
+  const g = L.gap;
+  const h = headerHeight(L);
+  const y = a.y + g;
+  const left0 = a.x + g;
+  const right0 = right(a) - g;
+  const want = { back: o.back ? h : 0, era: o.era ? R(96 * L.ui) : 0, gear: o.gear ? h : 0, coins: R(112 * L.ui), data: R(92 * L.ui) };
+  const min = { era: R(72 * L.ui), coins: R(76 * L.ui), data: R(64 * L.ui) };
+  const keys = Object.keys(want).filter((k) => want[k]);
+  let over = keys.reduce((s, k) => s + want[k], 0) + g * (keys.length - 1) - (right0 - left0);
+  for (const k of ['coins', 'era', 'data']) {
+    if (over <= 0 || !want[k]) continue;
+    const cut = Math.min(over, want[k] - min[k]);
+    want[k] -= cut;
+    over -= cut;
+  }
+  const out = { y, h, row: rect(left0, y, right0 - left0, h) };
+  let x = left0;
+  for (const k of ['back', 'era', 'gear']) {
+    if (!want[k]) continue;
+    out[k] = rect(x, y, want[k], h);
+    x += want[k] + g;
+  }
+  out.data = rect(right0 - want.data, y, want.data, h);
+  out.coins = rect(out.data.x - g - want.coins, y, want.coins, h);
+  out.left = x - g; // правая граница левой группы
+  return out;
 }
 
-/** Шапка (ресурсы, «назад»), тело и (опционально) док. */
-export function screenFrame(L, { header = true, dock = false } = {}) {
+/** Шапка (угловые таблички) и тело; док — нижняя панель хаба. */
+export function screenFrame(L, { header = true, dock = false, back = true, era = false, gear = false } = {}) {
   const a = L.area;
   const hh = header ? headerHeight(L) : 0;
-  const headerR = rect(a.x + L.gap, a.y + L.gap, a.w - L.gap * 2, hh);
+  const headerR = header ? chromeLayout(L, { back, era, gear }).row : rect(a.x + L.gap, a.y + L.gap, a.w - L.gap * 2, 0);
   const top = header ? bottom(headerR) + L.gap : a.y + L.gap;
   const dockR = dock ? dockLayout(L).bar : null;
   const bottomEdge = dockR ? dockR.y - L.gap : bottom(a) - L.gap;
+  void hh;
   return {
     header: headerR,
     body: rect(a.x + L.gap, top, a.w - L.gap * 2, Math.max(0, bottomEdge - top)),
@@ -118,33 +149,70 @@ export function column(r, count, gap = 0) {
   return Array.from({ length: count }, (_, i) => rect(r.x, r.y + i * (h + gap), r.w, h));
 }
 
-// --- хаб ---
+// --- хаб: нижняя панель с большой кнопкой «ПУСК» ---
 
-export const DOCK_ITEMS = ['launch', 'rocket', 'base', 'journal', 'more'];
+export const DOCK_ITEMS = ['launch', 'rocket', 'base', 'journal', 'shop'];
+const NAV_ITEMS = ['rocket', 'base', 'journal', 'shop'];
 
+export function dockHeight(L) {
+  return Math.max(64, R(68 * L.ui));
+}
+
+/**
+ * Нижняя панель хаба: кнопка «ПУСК» по центру под защитной планкой (launch — вся планка, launchBtn — сама кнопка),
+ * четыре кнопки-иконки: Мастерская, База, Доска, Лавка. В широком окне они в одном ряду с ПУСКом, в узком — над ним.
+ */
 export function dockLayout(L) {
   const a = L.area;
-  const h = dockHeight(L);
-  const w = L.portrait ? a.w - L.gap * 2 : clamp(R(a.w * 0.6), Math.min(a.w - L.gap * 2, R(420 * L.ui)), R(760 * L.ui));
-  const bar = rect(a.x + (a.w - w) / 2, bottom(a) - L.gap - h, w, h);
-  const innerPad = L.px * 2;
-  const slots = row(inset(bar, innerPad, innerPad), DOCK_ITEMS.length, L.px);
-  return { bar, items: Object.fromEntries(DOCK_ITEMS.map((k, i) => [k, slots[i]])) };
-}
-
-/** Боковая/нижняя карточка (постройка, модуль): снизу над доком в портрете, справа в ландшафте. */
-export function sheetRect(L, { dock = true } = {}) {
-  const a = L.area;
-  const frame = screenFrame(L, { header: true, dock });
-  if (L.portrait) {
-    const h = Math.min(R(frame.body.h * 0.62), R(380 * L.ui));
-    return rect(frame.body.x, bottom(frame.body) - h, frame.body.w, h);
+  const g = L.gap;
+  const nav = Math.max(MIN_TOUCH + 4, R(60 * L.ui));
+  const lh = dockHeight(L);
+  const cc = L.cell;
+  const lwMax = R(300 * L.ui);
+  const wide = a.w - g * 2 >= nav * 4 + g * 4 + R(240 * L.ui);
+  const lw = wide ? Math.min(lwMax, R((a.w - g * 2) - nav * 4 - g * 4) , R(a.w * 0.34)) : Math.min(lwMax, a.w - g * 2);
+  const launch = rect(a.x + (a.w - lw) / 2, bottom(a) - g - lh, lw, lh);
+  const items = { launch };
+  const btn = Math.max(MIN_TOUCH, lh - cc * 4);
+  const guard = rect(launch.x + cc * 2, launch.y + cc * 2, launch.w - cc * 4, launch.h - cc * 4);
+  let bar;
+  if (wide) {
+    const y = launch.y + (launch.h - nav) / 2;
+    items.rocket = rect(launch.x - g * 2 - nav * 2 - g, y, nav, nav);
+    items.base = rect(launch.x - g - nav, y, nav, nav);
+    items.journal = rect(right(launch) + g, y, nav, nav);
+    items.shop = rect(right(launch) + g * 2 + nav, y, nav, nav);
+    bar = rect(items.rocket.x, launch.y, items.shop.x + nav - items.rocket.x, launch.h);
+  } else {
+    const total = nav * 4 + g * 3;
+    const y = launch.y - g * 1.5 - nav;
+    const x0 = a.x + (a.w - total) / 2;
+    NAV_ITEMS.forEach((k, i) => {
+      items[k] = rect(x0 + i * (nav + g), y, nav, nav);
+    });
+    bar = rect(Math.min(launch.x, x0), y, Math.max(launch.w, total), bottom(launch) - y);
   }
-  const w = clamp(R(a.w * 0.34), R(300 * L.ui), R(460 * L.ui));
-  return rect(right(frame.body) - w, frame.body.y, w, frame.body.h);
+  return { bar, items, launch, guard, button: guard, nav, btn };
 }
 
-// --- ракета ---
+/** Область сцены между угловыми табличками и нижней панелью: сюда ставятся выноски. */
+export function sceneArea(L, { dock = false, header = true, ...opts } = {}) {
+  const f = screenFrame(L, { header, dock, ...opts });
+  return f.body;
+}
+
+/** Выноска: область, где щиток может стоять (под табличками, над панелью). */
+export function sheetRect(L, { dock = true } = {}) {
+  const b = sceneArea(L, { dock, back: false, era: true, gear: true });
+  if (L.portrait) {
+    const h = Math.min(R(b.h * 0.62), R(380 * L.ui));
+    return rect(b.x, bottom(b) - h, b.w, h);
+  }
+  const w = clamp(R(L.area.w * 0.34), R(300 * L.ui), R(460 * L.ui));
+  return rect(right(b) - w, b.y, w, b.h);
+}
+
+// --- ракета: мастерская ---
 
 /** Девять горячих точек вдоль сборки. t — положение по высоте (0 — верх), берётся из render/rocket-view.js; side — сторона подписи. */
 const SPOT_SIDE = { parachute: 1, capsule: -1, avionics: 1, tank: -1, hull: 1, booster: 1, engine: -1, legs: 1, fins: -1 };
@@ -155,9 +223,7 @@ export const ROCKET_SPOTS = Object.entries(SPOT_SIDE)
 export function rocketLayout(L) {
   const { body } = screenFrame(L, { header: true });
   const spot = MIN_TOUCH + (L.portrait || L.h < 420 ? 0 : R(4 * L.ui));
-  const needH = 5 * spot + 4 * R(L.gap * 0.4) + L.gap * 3;
-  const ratio = L.portrait ? clamp(needH / Math.max(1, body.h), 0.5, 0.62) : 0.56;
-  const { a: schematic, b: panel } = splitBody(L, body, ratio);
+  const schematic = rect(body.x, body.y, body.w, body.h);
   const standH = L.touch(46);
   const stripH = standH + L.gap * 2;
   const flameRoom = R(Math.min(schematic.h, schematic.w * 1.05) * 0.1);
@@ -176,7 +242,7 @@ export function rocketLayout(L) {
   const bySide = { '-1': [], 1: [] };
   for (const s of ROCKET_SPOTS) bySide[s.side].push(s);
   for (const list of Object.values(bySide)) {
-    // в тесной раскладке лишние точки уходят во второй столбец дальше от ракеты (без подписей)
+    // в тесной раскладке лишние точки уходят во второй столбец дальше от ракеты
     for (let start = 0, col = 0; start < list.length; start += perCol, col++) {
       const chunk = list.slice(start, start + perCol);
       if (col > 0) compact = true;
@@ -196,7 +262,6 @@ export function rocketLayout(L) {
   const standW = Math.max(MIN_TOUCH, Math.min(L.touch(112), centerGap));
   return {
     schematic,
-    panel,
     spot,
     rocket: rect(cx - rocketW / 2, top, rocketW, rocketH),
     spots,
@@ -205,35 +270,55 @@ export function rocketLayout(L) {
   };
 }
 
-// --- база ---
+// --- строительство: остров и стойка зданий ---
+
+export const BUILD_COUNT = 14;
 
 export function baseLayout(L) {
-  const { body } = screenFrame(L, { header: true });
-  const energyH = L.touch(56);
-  const energy = rect(body.x, body.y, body.w, energyH);
-  const rest = rect(body.x, body.y + energyH + L.gap, body.w, Math.max(0, body.h - energyH - L.gap));
-  const tabsH = L.touch(44);
-  if (L.portrait) {
-    // список и карточка постройки делят одну область: выбранная карточка заменяет список
-    const tabs = rect(rest.x, rest.y, rest.w, tabsH);
-    const list = rect(rest.x, rest.y + tabsH + L.gap, rest.w, rest.h - tabsH - L.gap);
-    return { energy, tabs, list, detail: list, wide: false };
+  const { body } = screenFrame(L, { header: true, era: true });
+  const tile = Math.max(MIN_TOUCH + 4, R(58 * L.ui));
+  const gap = R(L.gap * 0.6);
+  const padR = R(L.pad * 0.7);
+  const cols = Math.min(BUILD_COUNT, Math.max(1, Math.floor((body.w - padR * 2 + gap) / (tile + gap))));
+  const rows = Math.ceil(BUILD_COUNT / cols);
+  const rackH = rows * tile + (rows - 1) * gap + padR * 2;
+  const rack = rect(body.x, bottom(body) - rackH, body.w, rackH);
+  // последняя неполная строка центрируется
+  const tiles = [];
+  for (let i = 0; i < BUILD_COUNT; i++) {
+    const rIdx = Math.floor(i / cols);
+    const inRow = rIdx === rows - 1 ? BUILD_COUNT - rIdx * cols : cols;
+    const rowW = inRow * tile + (inRow - 1) * gap;
+    const x0 = rack.x + (rack.w - rowW) / 2;
+    tiles.push(rect(x0 + (i - rIdx * cols) * (tile + gap), rack.y + padR + rIdx * (tile + gap), tile, tile));
   }
-  // ландшафт: слева вкладки и список, справа постоянная карточка выбранной постройки
-  const leftW = R((rest.w - L.gap) * 0.46);
-  const tabs = rect(rest.x, rest.y, leftW, tabsH);
-  const list = rect(rest.x, rest.y + tabsH + L.gap, leftW, rest.h - tabsH - L.gap);
-  const detail = rect(rest.x + leftW + L.gap, rest.y, rest.w - leftW - L.gap, rest.h);
-  return { energy, tabs, list, detail, wide: true, full: rect(rest.x, rest.y + tabsH + L.gap, rest.w, rest.h - tabsH - L.gap) };
+  const energy = rect(body.x, body.y, R(124 * L.ui), R(64 * L.ui));
+  return { rack, tiles, energy, body, cols, rows, tile };
 }
 
-// --- журнал / настройки ---
+// --- доска и лавка ---
 
 export function journalLayout(L) {
   const { body } = screenFrame(L, { header: true });
-  const card = centerCard(L, body, 720, 2000);
-  const tabsH = L.touch(44);
-  return { card, tabs: rect(card.x, card.y, card.w, tabsH), list: rect(card.x, card.y + tabsH + L.gap, card.w, card.h - tabsH - L.gap) };
+  if (L.portrait) {
+    const hb = R(body.h * 0.56);
+    return { board: rect(body.x, body.y, body.w, hb), shelf: rect(body.x, body.y + hb + L.gap, body.w, body.h - hb - L.gap), body };
+  }
+  const wb = R((body.w - L.gap) * 0.6);
+  return { board: rect(body.x, body.y, wb, body.h), shelf: rect(body.x + wb + L.gap, body.y, body.w - wb - L.gap, body.h), body };
+}
+
+export function shopLayout(L) {
+  const { body } = screenFrame(L, { header: true });
+  const counterH = Math.max(MIN_TOUCH, R(46 * L.ui));
+  const shelvesH = body.h - counterH - L.gap;
+  const half = R((shelvesH - L.gap) / 2);
+  return {
+    body,
+    shelf1: rect(body.x, body.y, body.w, half),
+    shelf2: rect(body.x, body.y + half + L.gap, body.w, shelvesH - half - L.gap),
+    counter: rect(body.x, bottom(body) - counterH, body.w, counterH),
+  };
 }
 
 export function settingsLayout(L) {
@@ -241,32 +326,45 @@ export function settingsLayout(L) {
   return { card: centerCard(L, body, 640, 2000) };
 }
 
-// --- запуск ---
+// --- запуск: пульт ---
 
 export function launchLayout(L) {
   const { body } = screenFrame(L, { header: true });
-  const startH = L.touch(64);
-  const consH = L.touch(112);
+  const panel = centerCard(L, body, 760, L.portrait ? 640 : 2000);
+  const p = R(L.pad * 0.9);
+  const inner = rect(panel.x + p, panel.y + p, panel.w - p * 2, panel.h - p * 2);
+  const startH = Math.max(72, R(76 * L.ui));
+  const lampsH = R(26 * L.ui);
+  const consH = Math.max(MIN_TOUCH + 12, R(70 * L.ui));
   if (L.portrait) {
-    const start = rect(body.x, bottom(body) - startH, body.w, startH);
-    const cons = rect(body.x, start.y - L.gap - consH, body.w, consH);
-    const dest = rect(body.x, body.y, body.w, cons.y - L.gap - body.y);
-    return { dest, cons, start, destCards: column(dest, 3, L.gap) };
+    const start = rect(inner.x, bottom(inner) - startH, inner.w, startH);
+    const cons = rect(inner.x, start.y - L.gap - consH, inner.w, consH);
+    const lamps = rect(inner.x, inner.y, inner.w, lampsH);
+    const destArea = rect(inner.x, bottom(lamps) + L.gap, inner.w, Math.max(0, cons.y - L.gap - bottom(lamps) - L.gap));
+    return { panel, inner, lamps, destArea, dest: destRow(L, destArea), cons, consSlots: row(cons, 4, L.gap), start };
   }
-  const colW = R(body.w * 0.64);
-  const dest = rect(body.x, body.y, colW, body.h);
-  const rightCol = rect(body.x + colW + L.gap, body.y, body.w - colW - L.gap, body.h);
-  const start = rect(rightCol.x, bottom(rightCol) - startH, rightCol.w, startH);
-  const cons = rect(rightCol.x, body.y, rightCol.w, start.y - L.gap - body.y);
-  return { dest, cons, start, destCards: row(dest, 3, L.gap) };
+  const rightW = clamp(R(inner.w * 0.3), R(180 * L.ui), R(280 * L.ui));
+  const leftW = inner.w - rightW - L.gap;
+  const lamps = rect(inner.x, inner.y, leftW, lampsH);
+  const cons = rect(inner.x, bottom(inner) - consH, leftW, consH);
+  const destArea = rect(inner.x, bottom(lamps) + L.gap, leftW, Math.max(0, cons.y - L.gap - bottom(lamps) - L.gap));
+  const start = rect(inner.x + leftW + L.gap, inner.y + R(inner.h / 2 - startH * 0.9), rightW, startH * 1.8);
+  return { panel, inner, lamps, destArea, dest: destRow(L, destArea), cons, consSlots: row(cons, 4, L.gap), start };
 }
 
-// --- итоги ---
+/** Три кнопки-планеты: ограничены по высоте и стоят по центру области. */
+function destRow(L, area) {
+  const h = Math.min(area.h, R(220 * L.ui));
+  return row(rect(area.x, area.y + (area.h - h) / 2, area.w, h), 3, L.gap);
+}
+
+// --- итоги: бланк ---
 
 export function resultsLayout(L) {
   const a = L.area;
-  const card = centerCard(L, rect(a.x + L.gap, a.y + L.gap, a.w - L.gap * 2, a.h - L.gap * 2), 600, 780);
-  const btnH = L.touch(56);
+  const top = a.y + L.gap * 2 + headerHeight(L);
+  const card = centerCard(L, rect(a.x + L.gap, top, a.w - L.gap * 2, bottom(a) - L.gap - top), 600, 780);
+  const btnH = L.portrait || L.h >= 460 ? L.touch(56) : MIN_TOUCH;
   const buttons = rect(card.x + L.pad, bottom(card) - L.pad - btnH, card.w - L.pad * 2, btnH);
   return { card, buttons, content: rect(card.x + L.pad, card.y + L.pad, card.w - L.pad * 2, buttons.y - L.gap - card.y - L.pad) };
 }
@@ -281,6 +379,8 @@ export function hudLayout(L, opts = {}) {
   const a = L.area;
   const g = L.gap;
   const u = L.ui;
+  // приборы на маленьких экранах чуть ужимаются (до 0,88), кнопки управления — нет
+  const iu = clamp(Math.min(L.w, L.h) / 420, 0.88, 1.55);
   const btn = R(Math.max(52, 54 * u));
   const pause = rect(right(a) - g - L.touch(48), a.y + g, L.touch(48), L.touch(48));
   const discR = R(Math.max(52, 62 * u));
@@ -297,8 +397,8 @@ export function hudLayout(L, opts = {}) {
 
   const gridRight = lever.x - g;
   if (L.portrait) {
-    const rowH = R(30 * u);
-    const barH = R(16 * u);
+    const rowH = R(36 * iu);
+    const barH = R(16 * iu);
     const left = a.x + g;
     const span = pause.x - g - left;
     instruments.alt = rect(left, a.y + g, R(span * 0.4), rowH);
@@ -309,9 +409,9 @@ export function hudLayout(L, opts = {}) {
     instruments.fuel = rect(left, barsY, barW, barH);
     instruments.hull = rect(left + barW + g, barsY, span - barW - g, barH);
     const topBlock = bottom(instruments.hull);
-    hint = rect(a.x + R(a.w * 0.12), topBlock + g * 2, R(a.w * 0.76), R(34 * u));
+    hint = rect(a.x + R(a.w * 0.12), topBlock + g * 2, R(a.w * 0.76), R(34 * iu));
     // радар под подсказкой справа: длинная подсказка его не перекрывает
-    radar = { cx: right(a) - g - R(34 * u), cy: hint.y + hint.h + g + R(34 * u), r: R(34 * u) };
+    radar = { cx: right(a) - g - R(34 * iu), cy: hint.y + hint.h + g + R(34 * iu), r: R(34 * iu) };
     // кнопки: два столбца между диском и рычагом
     const colX = [disc.cx + discR + g, 0];
     const free = gridRight - colX[0];
@@ -324,21 +424,21 @@ export function hudLayout(L, opts = {}) {
     buttons.repair = rect(colX[1], rowY[1], bw, bw);
     buttons.transfer = rect(colX[0], rowY[0] - g - bw, bw * 2 + g, bw);
     const controlsTop = Math.min(lever.y, disc.cy - discR, buttons.transfer.y);
-    strip = rect(a.x + g, hint.y + hint.h + g, R(12 * u), Math.max(0, controlsTop - g - (hint.y + hint.h + g)));
+    strip = rect(a.x + g, hint.y + hint.h + g, R(16 * iu), Math.max(0, controlsTop - g - (hint.y + hint.h + g)));
   } else {
-    const rowH = R(32 * u);
+    const rowH = R(40 * iu);
     const left = a.x + g;
-    instruments.alt = rect(left, a.y + g, R(120 * u), rowH);
-    instruments.vspeed = rect(left, bottom(instruments.alt) + g * 0.5, R(120 * u), R(22 * u));
-    instruments.coins = rect(pause.x - g - R(104 * u), a.y + g, R(104 * u), rowH);
-    const barW = R(14 * u);
+    instruments.alt = rect(left, a.y + g, R(140 * iu), rowH);
+    instruments.vspeed = rect(left, bottom(instruments.alt) + g * 0.5, R(140 * iu), R(34 * iu));
+    instruments.coins = rect(pause.x - g - R(104 * iu), a.y + g, R(104 * iu), rowH);
+    const barW = R(18 * iu);
     const barsTop = bottom(instruments.vspeed) + g * 2;
-    const barsH = Math.max(R(60 * u), disc.cy - discR - g * 2 - barsTop);
+    const barsH = Math.max(R(60 * iu), disc.cy - discR - g * 2 - barsTop);
     instruments.fuel = rect(left, barsTop, barW, barsH);
     instruments.hull = rect(left + barW + g * 2, barsTop, barW, barsH);
-    hint = rect(a.x + R(a.w * 0.3), a.y + g, R(a.w * 0.4), R(34 * u));
-    radar = { cx: right(a) - g - R(12 * u) - g - R(34 * u), cy: bottom(pause) + g + R(34 * u), r: R(34 * u) };
-    strip = rect(right(a) - g - R(12 * u), bottom(pause) + g, R(12 * u), Math.max(0, lever.y - g - bottom(pause) - g));
+    hint = rect(a.x + R(a.w * 0.3), a.y + g, R(a.w * 0.4), R(34 * iu));
+    radar = { cx: right(a) - g - R(16 * iu) - g - R(34 * iu), cy: bottom(pause) + g + R(34 * iu), r: R(34 * iu) };
+    strip = rect(right(a) - g - R(16 * iu), bottom(pause) + g, R(16 * iu), Math.max(0, lever.y - g - bottom(pause) - g));
     const bw = Math.min(btn, R((gridRight - (disc.cx + discR + g * 2) - g * 2) / 3));
     const startX = gridRight - bw * 3 - g * 2;
     const rowY = [bottom(a) - g - bw * 2 - g, bottom(a) - g - bw];

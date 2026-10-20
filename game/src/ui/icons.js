@@ -4,7 +4,7 @@
 //     рисуются сразу в разрешении устройства и кэшируются (не растягиваются из мелких картинок).
 // Вызов один: draw(ctx, имя, cx, cy, размер, цвет, alpha). Имя 'bld:<ключ>:<уровень>' — спрайт постройки по эпохе.
 
-import { mix } from './theme.js';
+import { mix, nearestPalette, PALETTE } from './theme.js';
 import { spriteName, buildingSpriteName } from '../render/manifest.js';
 
 export const ICON_GRID = 32;
@@ -136,7 +136,39 @@ const BUILDING_FALLBACK = {
 export const ICON_NAMES = Object.keys(ICONS);
 export const hasIcon = (name) => name in ICONS || name.startsWith('bld:');
 
-const FIXED = { gold: '#f4b92a', cyan: '#52d8ff', red: '#ff6b5e', amber: '#ffb627', green: '#62e38d', w: '#ffffff', k: '#0b1124' };
+const FIXED = { gold: '#ffd23f', cyan: '#52d8ff', red: '#f0584a', amber: '#e6a020', green: '#3aa860', w: '#f6f1e4', k: '#0b0f1a' };
+
+const PIX = 24; // сетка пиксельной иконки; вокруг неё поле в 1 пиксель под контур
+const PAD = 1;
+
+function pointInPoly(pts, x, y) {
+  let inside = false;
+  for (let i = 0, j = pts.length - 2; i < pts.length; j = i, i += 2) {
+    const xi = pts[i];
+    const yi = pts[i + 1];
+    const xj = pts[j];
+    const yj = pts[j + 1];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+function distToSegment(px, py, ax, ay, bx, by) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const len2 = dx * dx + dy * dy;
+  const t = len2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2)) : 0;
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+}
+
+function covers(shape, x, y) {
+  if (shape.k === 'c') return (x - shape.x) ** 2 + (y - shape.y) ** 2 <= shape.r * shape.r;
+  if (shape.k === 'p') return pointInPoly(shape.pts, x, y);
+  for (let i = 0; i + 3 < shape.pts.length; i += 2) {
+    if (distToSegment(x, y, shape.pts[i], shape.pts[i + 1], shape.pts[i + 2], shape.pts[i + 3]) <= shape.w / 2) return true;
+  }
+  return false;
+}
 
 export function createIcons() {
   let dpr = 1;
@@ -151,79 +183,79 @@ export function createIcons() {
     return FIXED[tone] || base;
   }
 
-  function polyPath(g, pts) {
-    g.beginPath();
-    g.moveTo(pts[0], pts[1]);
-    for (let i = 2; i < pts.length; i += 2) g.lineTo(pts[i], pts[i + 1]);
-    g.closePath();
-  }
-
-  function bounds(shape) {
-    if (shape.k === 'c') return [shape.x - shape.r, shape.y - shape.r, shape.x + shape.r, shape.y + shape.r];
-    let x0 = Infinity;
-    let y0 = Infinity;
-    let x1 = -Infinity;
-    let y1 = -Infinity;
-    for (let i = 0; i < shape.pts.length; i += 2) {
-      x0 = Math.min(x0, shape.pts[i]);
-      x1 = Math.max(x1, shape.pts[i]);
-      y0 = Math.min(y0, shape.pts[i + 1]);
-      y1 = Math.max(y1, shape.pts[i + 1]);
+  /**
+   * Пиксельная растеризация векторного описания без сглаживания: каждый пиксель сетки принадлежит одной фигуре;
+   * свет сверху-слева, тень снизу-справа и тёмный контур — как в пиксельной графике. Все цвета сводятся к палитре.
+   */
+  function pixels(name, color) {
+    const key = `${name}|${color}`;
+    let bm = cache.get(`px:${key}`);
+    if (bm) return bm;
+    const shapes = ICONS[name] || ICONS.info;
+    const N = PIX + PAD * 2;
+    const idx = new Int16Array(N * N).fill(-1);
+    for (let py = 0; py < N; py++) {
+      for (let px = 0; px < N; px++) {
+        const x = ((px - PAD + 0.5) * ICON_GRID) / PIX;
+        const y = ((py - PAD + 0.5) * ICON_GRID) / PIX;
+        for (let si = 0; si < shapes.length; si++) if (covers(shapes[si], x, y)) idx[py * N + px] = si;
+      }
     }
-    return [x0, y0, x1, y1];
+    const tones = shapes.map((sh) => {
+      const base = nearestPalette(toneColor(sh.tone, color));
+      return { base, light: nearestPalette(mix(base, '#fff4d6', 0.5)), dark: nearestPalette(mix(base, '#0b0f1a', 0.5)) };
+    });
+    const at = (x, y) => (x < 0 || y < 0 || x >= N || y >= N ? -1 : idx[y * N + x]);
+    const out = new Array(N * N).fill(null);
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const si = idx[y * N + x];
+        if (si < 0) {
+          let near = false;
+          for (let dy = -1; dy <= 1 && !near; dy++) for (let dx = -1; dx <= 1; dx++) if ((dx || dy) && at(x + dx, y + dy) >= 0) near = true;
+          if (near) out[y * N + x] = PALETTE.ink;
+          continue;
+        }
+        const tn = tones[si];
+        if (shapes[si].flat) {
+          out[y * N + x] = tn.base;
+          continue;
+        }
+        const up = at(x, y - 1);
+        const left = at(x - 1, y);
+        const down = at(x, y + 1);
+        const right = at(x + 1, y);
+        const tl = up === -1 || left === -1;
+        const br = down === -1 || right === -1 || down > si || right > si;
+        out[y * N + x] = br && !tl ? tn.dark : tl && !br ? tn.light : tn.base;
+      }
+    }
+    bm = { N, out };
+    cache.set(`px:${key}`, bm);
+    return bm;
   }
 
-  function vector(name, color, sizeDev) {
-    const key = `${name}|${color}|${sizeDev}`;
+  function vector(name, color, k) {
+    const key = `${name}|${color}|${k}`;
     let canvas = cache.get(key);
     if (canvas) return canvas;
+    const { N, out } = pixels(name, color);
     canvas = document.createElement('canvas');
-    canvas.width = canvas.height = sizeDev;
+    canvas.width = canvas.height = N * k;
     const g = canvas.getContext('2d');
-    const s = sizeDev / ICON_GRID;
-    g.scale(s, s);
-    g.lineJoin = 'round';
-    g.lineCap = 'round';
-    const outline = mix(color, '#040816', 0.8);
-    for (const shape of ICONS[name] || ICONS.info) {
-      const tone = toneColor(shape.tone, color);
-      if (shape.k === 'l') {
-        g.beginPath();
-        g.moveTo(shape.pts[0], shape.pts[1]);
-        for (let i = 2; i < shape.pts.length; i += 2) g.lineTo(shape.pts[i], shape.pts[i + 1]);
-        g.strokeStyle = outline;
-        g.lineWidth = shape.w + 2.4;
-        g.stroke();
-        g.strokeStyle = tone;
-        g.lineWidth = shape.w;
-        g.stroke();
-        continue;
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const col = out[y * N + x];
+        if (!col) continue;
+        g.fillStyle = col;
+        g.fillRect(x * k, y * k, k, k);
       }
-      if (shape.k === 'c') {
-        g.beginPath();
-        g.arc(shape.x, shape.y, shape.r, 0, Math.PI * 2);
-      } else polyPath(g, shape.pts);
-      if (!(shape.flat && shape.tone === 'k')) {
-        g.strokeStyle = outline;
-        g.lineWidth = 2.2;
-        g.stroke();
-      }
-      if (shape.flat) g.fillStyle = tone;
-      else {
-        const [x0, y0, x1, y1] = bounds(shape);
-        const grad = g.createLinearGradient(x0, y0, x1, y1);
-        grad.addColorStop(0, mix(tone, '#fff3d4', 0.42));
-        grad.addColorStop(0.55, tone);
-        grad.addColorStop(1, mix(tone, '#101a44', 0.4));
-        g.fillStyle = grad;
-      }
-      g.fill();
     }
     cache.set(key, canvas);
     return canvas;
   }
 
-  function spriteFor(name, level) {
+  function spriteFor(name) {
     if (!painter) return null;
     let sprite = null;
     if (name.startsWith('bld:')) {
@@ -231,7 +263,6 @@ export function createIcons() {
       sprite = buildingSpriteName(key, Math.max(1, Number(lv) || era + 1));
     } else if (SPRITE_FLAT[name]) sprite = SPRITE_FLAT[name];
     else if (SPRITE_OF[name]) sprite = spriteName(SPRITE_OF[name], era);
-    void level;
     const asset = sprite && painter.assets.get(sprite);
     return asset || null;
   }
@@ -245,7 +276,7 @@ export function createIcons() {
 
   /**
    * Иконка по центру (cx, cy), размер size — сторона квадрата в CSS-пикселях.
-   * Спрайт (если есть) вписывается по большей стороне и не красится; вектор красится цветом color.
+   * Спрайт арта (если есть) вписывается по большей стороне и не красится; пиксельная иконка красится цветом color.
    */
   function draw(ctx, name, cx, cy, size, color = '#fff', alpha = 1) {
     const prev = ctx.globalAlpha;
@@ -260,10 +291,14 @@ export function createIcons() {
       ctx.drawImage(src, Math.round((cx - wDev / dpr / 2) * dpr) / dpr, Math.round((cy - hDev / dpr / 2) * dpr) / dpr, wDev / dpr, hDev / dpr);
     } else {
       const vname = name.startsWith('bld:') ? BUILDING_FALLBACK[name.split(':')[1]] || 'building' : name;
-      const sizeDev = Math.max(8, Math.round(size * dpr));
-      const bm = vector(vname in ICONS ? vname : 'info', color, sizeDev);
-      actual = sizeDev / dpr;
+      const N = PIX + PAD * 2;
+      const k = Math.max(1, Math.round((size * dpr) / PIX));
+      const bm = vector(vname in ICONS ? vname : 'info', color, k);
+      actual = (N * k) / dpr;
+      const prevSmooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
       ctx.drawImage(bm, Math.round((cx - actual / 2) * dpr) / dpr, Math.round((cy - actual / 2) * dpr) / dpr, actual, actual);
+      ctx.imageSmoothingEnabled = prevSmooth;
     }
     if (alpha !== 1) ctx.globalAlpha = prev;
     return actual;

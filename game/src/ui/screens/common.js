@@ -1,8 +1,11 @@
-// Общие части экранов: шапка с ресурсами, фон-чертёж, карточки построек, индикаторы уровней, подсказка «что дальше».
+// Общие части сцен: угловые таблички, запасной фон, щитки-выноски модулей и построек, щиток эпохи, индикатор энергии.
+// Всё рисуется пиксельным набором кита: рамки, лампы, сегментные полоски; текста мало.
 
 import { t } from '../../i18n/index.js';
-import { fmtInt } from '../format.js';
-import { right } from '../layout.js';
+import { clamp, fmtCompact, fmtInt } from '../format.js';
+import { chromeLayout } from '../layout.js';
+
+const MIN_ROW = 44; // нижняя граница высоты нажимаемых строк и кнопок щитка
 
 export const BUILDING_KEYS = ['beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel', 'logistics', 'factory', 'weather', 'control', 'radar', 'energy', 'observation', 'recovery'];
 export const PART_KEYS = ['engine', 'tank', 'hull', 'booster', 'capsule', 'legs', 'fins', 'parachute', 'avionics'];
@@ -24,10 +27,10 @@ export const statLabel = (key) => {
   return s === k ? key : s;
 };
 
-/** Название эпохи: «1978». */
+/** Год эпохи. */
 export const ERA_YEARS = [1978, 1986, 1998, 2015, 2035, 2060];
 
-// Названия и описания берутся из data/ (там же единицы измерения); i18n — запасной вариант.
+// Названия берутся из data/ (там же единицы измерения); короткие подписи и i18n — запасной вариант.
 const fromKey = (key, fallback) => {
   const s = t(key);
   return s === key ? fallback : s;
@@ -36,9 +39,21 @@ export const partName = (app, id) => app.data.PARTS?.[id]?.name || fromKey(`part
 export const partShort = (app, id) => fromKey(`part.short.${id}`, partName(app, id));
 export const partDesc = (app, id) => app.data.PARTS?.[id]?.desc || fromKey(`part.${id}.desc`, '');
 export const buildingName = (app, key) => app.data.BUILDINGS?.[key]?.name || fromKey(`building.${key}.name`, key);
+export const buildingShort = (app, key) => fromKey(`building.short.${key}`, buildingName(app, key));
 export const buildingDesc = (app, key) => app.data.BUILDINGS?.[key]?.desc || fromKey(`building.${key}.desc`, '');
 export const eraName = (app, id) => app.data.ERAS?.[id]?.name || fromKey(`era.${id}.name`, '');
 export const eraDesc = (app, id) => app.data.ERAS?.[id]?.desc || fromKey(`era.${id}.desc`, '');
+
+/** Первое предложение без точки: описания для экранов — одна короткая строка. */
+export const oneLine = (str) => String(str || '').split(/(?<=[.!?])\s/)[0].replace(/[.]$/, '');
+
+/** Короткая подпись показателя: словарь stat.* или первые два слова названия. */
+export function statShort(info) {
+  const k = `stat.${info.key}`;
+  const s = t(k);
+  if (s !== k) return s;
+  return String(info.label || info.key).split(/\s+/).slice(0, 2).join(' ');
+}
 
 /** Форматирование показателя по описанию { unit, digits }: доли — в процентах, «×» — множитель. */
 export function fmtInfo(info, v) {
@@ -55,256 +70,327 @@ export function deltaRows(infos, before, after) {
     const a = before?.[info.key] ?? 0;
     const b = after?.[info.key] ?? 0;
     if (typeof a !== 'number' || typeof b !== 'number') continue;
-    const unitLabel = info.unit && info.unit !== '%' && info.unit !== '×' ? `${info.label}, ${info.unit}` : info.label;
-    rows.push({ key: info.key, label: unitLabel, before: a, after: b, better: info.dir < 0 ? 'down' : 'up', fmt: (v) => fmtInfo(info, v), changed: a !== b });
+    rows.push({ key: info.key, label: statShort(info), before: a, after: b, better: info.dir < 0 ? 'down' : 'up', fmt: (v) => fmtInfo(info, v), changed: a !== b });
   }
   return rows;
 }
 
-// ---------- фон-чертёж ----------
+export const isFundsReason = (r) => r.kind === 'coins' || r.kind === 'data';
 
-let bpCache = null;
+// ---------- запасной фон (если арт недоступен) ----------
 
-export function drawBlueprint(ctx, L, time, era = 0) {
-  const key = `${L.w}x${L.h}@${L.dpr}`;
-  if (!bpCache || bpCache.key !== key) {
-    const c = document.createElement('canvas');
-    c.width = Math.ceil(L.w * L.dpr);
-    c.height = Math.ceil(L.h * L.dpr);
-    const g = c.getContext('2d');
+let bgCache = null;
+
+/** Фон-запаска без сетки: тёмная ступенчатая заливка шашками двух тонов и несколько звёзд. */
+export function drawFallbackBackground(ctx, L, kit) {
+  const key = `${L.w}x${L.h}@${L.dpr}|${L.cell}`;
+  if (!bgCache || bgCache.key !== key) {
+    const cv = document.createElement('canvas');
+    cv.width = Math.ceil(L.w * L.dpr);
+    cv.height = Math.ceil(L.h * L.dpr);
+    const g = cv.getContext('2d');
     g.scale(L.dpr, L.dpr);
-    const grad = g.createLinearGradient(0, 0, 0, L.h);
-    grad.addColorStop(0, '#0c1630');
-    grad.addColorStop(0.6, '#0a1226');
-    grad.addColorStop(1, '#070c1a');
-    g.fillStyle = grad;
+    const c = kit.c;
+    g.fillStyle = c.navy1;
     g.fillRect(0, 0, L.w, L.h);
-    const step = Math.round(24 * L.ui);
-    g.strokeStyle = 'rgba(82,216,255,0.07)';
-    g.lineWidth = 1;
-    g.beginPath();
-    for (let x = 0; x < L.w; x += step) {
-      g.moveTo(x + 0.5, 0);
-      g.lineTo(x + 0.5, L.h);
+    const band = Math.round(L.h / 5);
+    const cc = L.cell * 2;
+    for (let b = 1; b <= 3; b++) {
+      g.fillStyle = b % 2 ? c.bg : c.navy1;
+      for (let y = b * band; y < (b + 1) * band; y += cc) for (let x = ((y / cc) % 2) * cc; x < L.w; x += cc * 2) g.fillRect(x, y, cc, cc);
     }
-    for (let y = 0; y < L.h; y += step) {
-      g.moveTo(0, y + 0.5);
-      g.lineTo(L.w, y + 0.5);
-    }
-    g.stroke();
-    g.strokeStyle = 'rgba(82,216,255,0.13)';
-    g.beginPath();
-    for (let x = 0; x < L.w; x += step * 4) {
-      g.moveTo(x + 0.5, 0);
-      g.lineTo(x + 0.5, L.h);
-    }
-    for (let y = 0; y < L.h; y += step * 4) {
-      g.moveTo(0, y + 0.5);
-      g.lineTo(L.w, y + 0.5);
-    }
-    g.stroke();
-    // звёздная пыль
+    g.fillStyle = c.bg;
+    g.fillRect(0, band * 4, L.w, L.h - band * 4);
     let seed = 7;
     const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-    g.fillStyle = 'rgba(255,255,255,0.35)';
-    for (let i = 0; i < 70; i++) g.fillRect(Math.floor(rnd() * L.w), Math.floor(rnd() * L.h), 2, 2);
-    bpCache = { key, canvas: c };
+    g.fillStyle = c.steel3;
+    for (let i = 0; i < 60; i++) g.fillRect(Math.floor((rnd() * L.w) / L.cell) * L.cell, Math.floor((rnd() * L.h) / L.cell) * L.cell, L.cell, L.cell);
+    bgCache = { key, canvas: cv };
   }
-  ctx.drawImage(bpCache.canvas, 0, 0, L.w, L.h);
-  // медленная «развёртка»
-  const y = ((time * 40) % (L.h + 80)) - 40;
-  const g2 = ctx.createLinearGradient(0, y - 30, 0, y + 30);
-  g2.addColorStop(0, 'rgba(82,216,255,0)');
-  g2.addColorStop(0.5, 'rgba(82,216,255,0.05)');
-  g2.addColorStop(1, 'rgba(82,216,255,0)');
-  ctx.fillStyle = g2;
-  ctx.fillRect(0, y - 30, L.w, 60);
+  ctx.drawImage(bgCache.canvas, 0, 0, L.w, L.h);
 }
 
-// ---------- шапка ----------
+// ---------- угловые таблички ----------
 
 /**
- * Шапка: слева «назад» (или эпоха в хабе), справа монеты и данные.
- * o: title, back (bool), era (bool — показать чип эпохи вместо «назад»)
+ * Угловые элементы сцены: «назад» / табличка эпохи / шестерёнка слева, таблички данных и монет справа.
+ * o: back, era, gear, coins, data (значения для анимации; по умолчанию из профиля).
+ * Возвращает { G, era, gear } — раскладка и нажатия кнопок эпохи/шестерёнки.
  */
-export function drawHeader(app, kit, hdr, o = {}) {
+export function drawChrome(app, kit, o = {}) {
   const L = kit.L;
   const c = kit.c;
   const p = app.profile;
-  const h = hdr.h;
-  let x = hdr.x;
-  const chipH = Math.min(h, Math.round(40 * L.ui));
-  const chipY = hdr.y + (h - chipH) / 2;
-  if (o.back) {
-    if (kit.iconButton('back', { x, y: hdr.y, w: h, h }, { icon: 'back', label: t('common.back'), variant: 'btn' })) app.back();
-    x += h + L.gap;
-  } else if (o.era) {
-    const w = Math.round(104 * L.ui);
-    if (kit.button('era-chip', { x, y: hdr.y, w, h }, { icon: 'era', label: String(ERA_YEARS[p.era] ?? ''), variant: 'btn', size: kit.fs(16), sub: t('hub.era') })) app.go('base', { tab: 'era' }, { push: true });
-    x += w + L.gap;
+  const G = chromeLayout(L, o);
+  const out = { G, era: false, gear: false };
+  if (o.back && G.back && kit.iconButton('back', G.back, { icon: 'back', label: t('common.back'), variant: 'btn' })) app.back();
+  if (o.era && G.era) {
+    const cc = kit.cell();
+    if (kit.button('plate-era', G.era, { variant: o.eraOpen ? 'cardOn' : 'raised', icon: 'era', label: String(ERA_YEARS[p.era] ?? ''), size: Math.round(G.era.h * 0.4), iconSize: Math.round(G.era.h * 0.58), lamp: false })) out.era = true;
+    void cc;
   }
-  const dataW = Math.round(88 * L.ui);
-  const coinW = Math.round(104 * L.ui);
-  let rx = right(hdr);
-  kit.resourceChip(rx - dataW, chipY, dataW, chipH, 'data', p.data, kit.c.cyan);
-  rx -= dataW + L.gap;
-  kit.resourceChip(rx - coinW, chipY, coinW, chipH, 'coin', p.coins, kit.c.gold);
-  rx -= coinW + L.gap;
-  if (o.title) {
-    const avail = rx - x;
-    if (avail > 60) kit.drawText(o.title, x + L.gap, hdr.y + h / 2, { size: kit.fs(18), color: c.text, maxWidth: avail - L.gap, shadow: 'rgba(0,0,0,0.6)' });
-  }
+  if (o.gear && G.gear && kit.iconButton('hub-gear', G.gear, { icon: 'gear', label: t('more.settings'), variant: 'btn' })) out.gear = true;
+  kit.plate(G.coins.x, G.coins.y, G.coins.w, G.coins.h, 'coin', o.coins ?? p.coins, c.gold);
+  kit.plate(G.data.x, G.data.y, G.data.w, G.data.h, 'data', o.data ?? p.data, c.cyan);
+  app.plateRects = { coins: G.coins, data: G.data };
+  return out;
 }
 
-// ---------- индикаторы ----------
+// ---------- индикаторы уровней ----------
 
-/** Ряд ячеек уровня: заполнено — куплено, пунктир — доступно по эпохе, тёмное — закрыто эпохой. */
-export function levelPips(kit, r, level, max, cap) {
+/** Ряд сегментов уровня: янтарные — куплено, серые — доступно по эпохе, тёмные — закрыто эпохой. */
+export function levelSegs(kit, r, level, max, cap) {
   const c = kit.c;
-  const gap = Math.max(1, Math.round(kit.L.px / 2));
-  const w = (r.w - gap * (max - 1)) / max;
+  const cc = kit.cell();
+  const gap = Math.max(cc, Math.round(r.w / max / 8));
+  const w = Math.max(cc * 2, Math.floor((r.w - gap * (max - 1)) / max));
+  const total = w * max + gap * (max - 1);
+  const x0 = Math.round(r.x + (r.w - total) / 2);
   for (let i = 0; i < max; i++) {
-    const x = Math.round(r.x + i * (w + gap));
-    const ww = Math.max(2, Math.round(w));
+    const x = x0 + i * (w + gap);
     const filled = i < level;
     const reachable = cap === undefined || i < cap;
-    kit.rect(x, r.y, ww, r.h, c.edge);
-    kit.rect(x + 1, r.y + 1, ww - 2, r.h - 2, filled ? c.amber : reachable ? '#2b3b5e' : '#121a2c');
-    if (filled) kit.rect(x + 1, r.y + 1, ww - 2, Math.max(1, Math.round(r.h * 0.3)), '#ffe9a8');
+    kit.rect(x, r.y, w, r.h, c.ink);
+    kit.rect(x + cc, r.y + cc, Math.max(1, w - cc * 2), Math.max(1, r.h - cc * 2), filled ? c.amber : reachable ? c.steel0 : c.navy2);
+    if (filled) kit.rect(x + cc, r.y + cc, Math.max(1, w - cc * 2), cc, c.amberLight);
   }
 }
 
-/** Строка причин блокировки. Возвращает высоту. */
-export function drawReasons(app, kit, x, y, w, reasons, o = {}) {
-  const c = kit.c;
+// ---------- причины блокировки ----------
+
+/**
+ * Строки причин блокировки: замок, значок нужной постройки/модуля и два слова. Деньги здесь не показываются
+ * (их недостаток красит цену). Возвращает высоту. o.goto(buildingKey) делает строку постройки кнопкой.
+ */
+export function lockRows(app, kit, x, y, w, reasons, o = {}) {
   const L = kit.L;
-  const size = kit.fs(13);
+  const c = kit.c;
+  const size = kit.fs(12);
   let cy = y;
   for (const r of reasons) {
-    const txt = app.reasonText(r);
-    if (!txt) continue;
-    const isBuilding = r.kind === 'building' && r.building;
-    const rowH = isBuilding && o.goto ? L.touch(48) : Math.max(size * 1.4, 0);
-    const iconName = r.kind === 'coins' ? 'coin' : r.kind === 'data' ? 'data' : r.kind === 'era' ? 'era' : isBuilding ? 'building' : 'lock';
-    const color = r.kind === 'coins' ? c.gold : r.kind === 'data' ? c.cyan : c.red;
-    kit.icon(iconName, x + size * 0.7, cy + rowH / 2, size * 1.2, color);
-    const btnW = isBuilding && o.goto ? Math.round(112 * L.ui) : 0;
-    const textW = w - size * 1.8 - btnW - (btnW ? L.gap : 0);
-    const used = kit.text.blockHeight(txt, textW, size, 1.2);
-    kit.paragraph(txt, x + size * 1.6, cy + (rowH - used) / 2, textW, { size, color: c.text, lineHeight: 1.2, maxLines: 3 });
-    if (isBuilding && o.goto) {
-      const b = { x: x + w - btnW, y: cy + (rowH - L.touch(44)) / 2, w: btnW, h: L.touch(44) };
-      if (kit.button(`goto-${r.building}`, b, { label: t('rocket.goto'), variant: 'btn', size: kit.fs(12), icon: 'arrow' })) o.goto(r.building);
+    if (isFundsReason(r)) continue;
+    const tappable = !!(o.goto && r.kind === 'building' && r.building);
+    const rowH = tappable ? L.touch(44) : Math.round(28 * L.ui);
+    const mid = cy + rowH / 2;
+    const row = { x, y: cy, w, h: rowH };
+    if (tappable && kit.button(`goto-${r.building}`, row, { variant: 'inset' })) o.goto(r.building);
+    if (!o.compact) kit.icon('lock', x + size * 1.0, mid, Math.round(size * 1.4), c.amber);
+    let ix = o.compact ? x + size * 0.6 : x + size * 2.2;
+    let label;
+    if (r.kind === 'building') {
+      kit.icon(buildingIcon(r.building, 1), ix + size * 0.9, mid, Math.round(size * 2), c.text);
+      label = `${buildingShort(app, r.building)} ${t('lvl.short', { n: r.level })}`;
+    } else if (r.kind === 'part') {
+      kit.icon(partIcon(r.part), ix + size * 0.9, mid, Math.round(size * 2), c.text);
+      label = `${partShort(app, r.part)} ${t('lvl.short', { n: r.level })}`;
+    } else if (r.kind === 'era') {
+      kit.icon('era', ix + size * 0.9, mid, Math.round(size * 1.8), c.text);
+      label = String(ERA_YEARS[r.era] ?? '');
+    } else {
+      label = app.reasonText(r).split(/\s+/).slice(0, 2).join(' ');
+      ix -= size * 1.5;
     }
-    cy += Math.max(rowH, used) + L.gap * 0.5;
+    ix += size * 2.3;
+    kit.drawText(label, ix, mid, { size, color: c.red, maxWidth: x + w - ix - size * 0.4 });
+    cy += rowH + Math.round(L.gap * 0.3);
   }
   return cy - y;
 }
 
-export const isFundsReason = (r) => r.kind === 'coins' || r.kind === 'data';
+// ---------- щиток модуля и постройки ----------
 
-// ---------- карточка постройки ----------
+/** Масштаб размеров щитка: если щиток не помещается в bounds, его строки ужимаются (но не меньше 0,62). */
+function fitScale(L, bounds, calcH) {
+  const avail = (bounds?.h ?? L.area.h) - L.gap * 2;
+  let u = L.ui;
+  for (let i = 0; i < 3; i++) {
+    const h = calcH(u);
+    if (h <= avail) break;
+    u = Math.max(L.ui * 0.62, u * Math.max(0.7, avail / h));
+  }
+  return u;
+}
 
 /**
- * Карточка постройки (хаб и экран базы). Возвращает true, если нажали «закрыть».
- * Содержимое прокручивается, если не помещается.
+ * Универсальный щиток-выноска: название, сегменты уровня, до трёх строк «было → станет», причины блокировки,
+ * цена и кнопка. Прикреплён хвостиком к spec.target (рамка объекта) либо spec.anchor.
+ * spec: id, target, anchor, bounds, side, name, iconName, iconAlpha, level, max, cap, rows, locks, goto,
+ *       next (есть ли следующий уровень), cost { coins, data }, canBuy, buyLabel, buyId, onBuy, line, extra(rect) -> height.
  */
-export function drawBuildingCard(app, kit, r, key, o = {}) {
+export function infoCallout(app, kit, spec) {
   const L = kit.L;
   const c = kit.c;
   const p = app.profile;
-  const st = app.rules.getBuildingState(p, key);
-  const pb = app.rules.powerBalance ? app.rules.powerBalance(p) : null;
-  const inner = kit.panel(r, { title: buildingName(app, key), titleIcon: buildingIcon(key), variant: 'panel' });
-  let closed = false;
-  if (o.close) {
-    const bs = L.touch(40);
-    if (kit.iconButton('card-close', { x: right(r) - bs - L.px * 2, y: r.y + L.px * 2, w: bs, h: bs }, { icon: 'close', label: t('common.close'), variant: 'btn' })) closed = true;
-  }
-  const footerH = L.touch(56) + L.gap;
-  const bodyRect = { x: inner.x, y: inner.y, w: inner.w, h: inner.h - footerH };
-  const funds = st.locked.filter(isFundsReason);
-  const blocking = st.locked.filter((x) => !isFundsReason(x));
-  const nextLevel = st.level + 1;
-  const size = kit.fs(13);
+  const rows = (spec.rows || []).slice(0, 3);
+  const locks = (spec.locks || []).filter((r) => !isFundsReason(r)).slice(0, 2);
+  const dims = (uu) => {
+    const touch = (n) => Math.max(MIN_ROW, Math.round(n * uu));
+    return {
+      titleH: Math.round(34 * uu),
+      segH: Math.round(18 * uu),
+      rowH: Math.round(36 * uu),
+      lockH: (spec.goto ? touch(44) : Math.round(28 * uu)) + Math.round(L.gap * 0.3),
+      lineH: spec.line ? Math.round(24 * uu) : 0,
+      footH: spec.next === false || spec.noBuy ? Math.round(32 * uu) : touch(52),
+    };
+  };
+  const calcH = (uu) => {
+    const d = dims(uu);
+    return L.pad * 2 + d.titleH + (spec.max ? d.segH : 0) + d.lineH + rows.length * (d.rowH + Math.round(L.gap * 0.3)) + locks.length * d.lockH + (spec.extraH || 0) + d.footH + L.gap;
+  };
+  const u = fitScale(L, spec.bounds, calcH);
+  const w = Math.min(Math.round(310 * L.ui), 420, L.area.w - L.gap * 2);
+  const { titleH, segH, rowH, lockH, lineH, footH } = dims(u);
+  const h = calcH(u);
+  const co = kit.callout(spec.id, spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds: spec.bounds, side: spec.side, variant: 'panel' });
+  const r = co.inner;
+  let y = r.y;
+  // содержимое щитка лежит выше слоя самого щитка, иначе щиток перехватывает нажатия кнопок
+  kit.withLayer(61, () => {
 
-  kit.scrollArea(`card-scroll-${key}`, bodyRect, undefined, (top) => {
-    let y = top;
-    const sprite = Math.round(Math.min(72 * L.ui, bodyRect.w * 0.3));
-    kit.icon(buildingIcon(key, st.level || 1), bodyRect.x + sprite / 2, y + sprite / 2, sprite, c.text, st.level ? 1 : 0.55);
-    const hx = bodyRect.x + sprite + L.gap;
-    kit.drawText(t('card.level', { n: st.level, max: st.max }), hx, y + sprite * 0.3, { size: kit.fs(14), color: c.amber });
-    levelPips(kit, { x: hx, y: y + sprite * 0.55, w: bodyRect.w - L.px * 3 - sprite - L.gap, h: Math.round(L.ui * 8) }, st.level, st.max, st.cap);
-    y += sprite + L.gap;
-    y += kit.paragraph(buildingDesc(app, key), bodyRect.x, y, bodyRect.w - L.px * 3, { size, color: c.textDim, lineHeight: 1.25 }) + L.gap;
-    const infos = app.data.BUILDINGS?.[key]?.effectInfo || [];
-    const effRows = st.next ? deltaRows(infos, st.effects, st.next.effects) : [];
-    if (effRows.length) {
-      kit.drawText(t('card.effects'), bodyRect.x, y + size * 0.6, { size: kit.fs(12), color: c.textMute });
-      y += size * 1.4;
-      const rowH = Math.round(40 * L.ui);
-      for (const row of effRows) {
-        kit.statDelta({ x: bodyRect.x, y, w: bodyRect.w - L.px * 3, h: rowH }, row);
-        y += rowH + L.gap * 0.5;
-      }
+  // название и уровень
+  const icoS = Math.round(30 * u);
+  kit.icon(spec.iconName, r.x + icoS / 2, y + titleH / 2, icoS, c.text, spec.iconAlpha ?? 1);
+  const lvl = spec.tag ?? (spec.max ? `${spec.level}/${spec.max}` : '');
+  const lvlW = lvl ? kit.text.measure(lvl, kit.fs(14)) + L.gap : 0;
+  kit.drawText(spec.name, r.x + icoS + L.gap, y + titleH / 2, { size: kit.fs(14), color: c.text, maxWidth: r.w - icoS - L.gap - lvlW, shadow: true });
+  if (lvl) kit.drawText(lvl, r.x + r.w, y + titleH / 2, { size: kit.fs(14), color: c.amber, align: 'right' });
+  y += titleH;
+  if (spec.max) {
+    levelSegs(kit, { x: r.x, y: y + Math.round(2 * u), w: r.w, h: Math.round(10 * u) }, spec.level, spec.max, spec.cap);
+    y += segH;
+  }
+  if (spec.line) {
+    kit.drawText(spec.line, r.x, y + lineH / 2 - Math.round(2 * u), { size: kit.fs(11), color: c.textDim, maxWidth: r.w });
+    y += lineH;
+  }
+  for (const row of rows) {
+    kit.statDelta({ x: r.x, y, w: r.w, h: rowH }, row);
+    y += rowH + Math.round(L.gap * 0.3);
+  }
+  if (locks.length) y += lockRows(app, kit, r.x, y, r.w, locks, { goto: spec.goto });
+  if (spec.extra) y += spec.extra({ x: r.x, y, w: r.w }) || 0;
+
+  // подвал: цена и кнопка / «макс»
+  const fy = r.y + r.h - footH;
+  if (spec.noBuy) {
+    if (spec.cost) kit.costChip(r.x, fy + footH / 2, spec.cost, { size: kit.fs(13) });
+    if (spec.doneText) {
+      kit.lamp(r.x + r.w - Math.round(10 * u), fy + footH / 2, Math.round(15 * u), c.green, true);
+      kit.drawText(spec.doneText, r.x + r.w - Math.round(26 * u), fy + footH / 2, { size: kit.fs(13), color: c.green, align: 'right' });
     }
-    if (st.next && st.next.power) {
-      kit.icon('bolt', bodyRect.x + size * 0.7, y + size * 0.7, size * 1.2, c.green);
-      kit.drawText(st.next.power.supply ? t('card.powerSupply', { supply: st.next.power.supply }) : t('card.power', { n: st.next.power.use }), bodyRect.x + size * 1.7, y + size * 0.7, { size, color: c.green, maxWidth: bodyRect.w - size * 2 });
-      y += size * 1.8;
-    }
-    if (pb && pb.ratio < 1 && st.level > 0) {
-      y += kit.paragraph(t('card.lowPower', { pct: Math.round((1 - pb.ratio) * 100) }), bodyRect.x, y, bodyRect.w - L.px * 3, { size, color: c.red }) + L.gap;
-    }
-    if (st.next) {
-      if (blocking.length) y += drawReasons(app, kit, bodyRect.x, y, bodyRect.w - L.px * 3, blocking, { goto: o.goto });
-    } else {
-      kit.drawText(t('card.maxed'), bodyRect.x, y + size * 0.7, { size: kit.fs(14), color: c.green });
-      y += size * 1.8;
-    }
-    if (o.onShow && st.level > 0) {
-      y += L.gap * 0.5;
-      if (kit.button(`show-${key}`, { x: bodyRect.x, y, w: bodyRect.w - L.px * 3, h: L.touch(48) }, { label: t('card.show'), icon: 'target', variant: 'btn', size: kit.fs(14) })) o.onShow(key);
-      y += L.touch(48) + L.gap;
-    }
-    return y - top + L.gap;
+  } else if (spec.next === false) {
+    kit.lamp(r.x + Math.round(10 * u), fy + footH / 2, Math.round(15 * u), c.green, true);
+    kit.drawText(spec.doneText || t('card.maxed'), r.x + Math.round(26 * u), fy + footH / 2, { size: kit.fs(14), color: c.green });
+  } else {
+    const btnW = Math.round(r.w * 0.52);
+    if (spec.cost) kit.costChip(r.x, fy + footH / 2, spec.cost, { have: { coins: p.coins, data: p.data }, size: kit.fs(13) });
+    const funds = (spec.locks || []).some(isFundsReason);
+    const sub = !spec.canBuy && !funds ? undefined : undefined;
+    void sub;
+    if (kit.button(spec.buyId, { x: r.x + r.w - btnW, y: fy, w: btnW, h: footH }, { label: spec.buyLabel, variant: 'primary', disabled: !spec.canBuy, size: kit.fs(15), icon: 'plus', lamp: spec.canBuy ? kit.c.green : false })) spec.onBuy?.();
+  }
   });
-
-  // подвал: цена и кнопка
-  const fy = inner.y + inner.h - footerH + L.gap;
-  const have = { coins: p.coins, data: p.data };
-  const btnW = Math.round(inner.w * 0.5);
-  if (st.next) {
-    kit.costChip(inner.x, fy + L.touch(56) / 2, { coins: st.next.cost, data: st.next.data }, { have });
-    const label = st.level === 0 ? t('card.build') : t('card.upgrade');
-    const canBuy = st.locked.length === 0;
-    const sub = !canBuy ? app.reasonText(st.locked.find((x) => !isFundsReason(x)) || st.locked[0]) : undefined;
-    if (kit.button(`build-${key}`, { x: inner.x + inner.w - btnW, y: fy, w: btnW, h: L.touch(56) }, { label, variant: 'primary', disabled: !canBuy, sub: funds.length && !blocking.length ? t('card.needFunds') : sub && blocking.length ? t('card.locked') : undefined, size: kit.fs(16), icon: 'plus' })) {
-      const res = app.buyBuilding(key);
-      if (!res.ok) kit.toast(t('card.cannot'), { kind: 'bad' });
-      else kit.toast(t('card.built', { name: buildingName(app, key) }), { kind: 'good', icon: buildingIcon(key) });
-    }
-  }
-  return closed;
+  return co;
 }
 
-// ---------- что дальше ----------
+// ---------- щиток эпохи (Памятник эпох) ----------
 
-/** Одна рекомендация для хаба: { text, icon, action }. */
-export function suggestNext(app) {
+/** Приводит условия перехода от rules к виду [{ ok, text, have, need, kind }]. */
+export function eraConditions(es) {
+  if (!es) return [];
+  if (Array.isArray(es.conditions)) return es.conditions;
+  const out = [];
+  for (const [kind, v] of Object.entries(es)) {
+    if (v && typeof v === 'object' && 'ok' in v) out.push({ kind, ...v });
+  }
+  return out;
+}
+
+/**
+ * Памятник эпох: колонка ламп по эпохам, условия перехода лампами с числами и кнопка «Новая эпоха».
+ * Закрывается тапом по миру. Возвращает true, если нажали кнопку (эпоха сменилась).
+ */
+export function eraCallout(app, kit, spec) {
+  const L = kit.L;
+  const c = kit.c;
   const p = app.profile;
-  if (p.stats.flights === 0) return { text: t('hub.goal.first'), icon: 'launch', action: () => app.go('launch', {}, { push: true }) };
-  for (const id of PART_KEYS) {
-    const st = app.rules.getPartState(p, id);
-    if (st.next && !st.locked.length) return { text: t('hub.goal.part', { name: partName(app, id) }), icon: partIcon(id), action: () => app.go('rocket', { select: id }, { push: true }) };
+  const es = app.rules.getEraState(p);
+  const conds = eraConditions(es);
+  const calcH = (uu) => L.pad * 2 + Math.round(36 * uu) + Math.round(38 * uu) + (es.final ? 0 : conds.length * Math.round(28 * uu)) + (es.final ? Math.round(32 * uu) : Math.max(MIN_ROW, Math.round(52 * uu))) + L.gap * 1.5;
+  const u = fitScale(L, spec.bounds, calcH);
+  const w = Math.min(Math.round(310 * L.ui), 420, L.area.w - L.gap * 2);
+  const titleH = Math.round(36 * u);
+  const lampsH = Math.round(38 * u);
+  const condH = Math.round(28 * u);
+  const footH = es.final ? Math.round(32 * u) : Math.max(MIN_ROW, Math.round(52 * u));
+  const h = calcH(u);
+  const co = kit.callout(spec.id || 'era', spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds: spec.bounds, side: spec.side, variant: 'panel' });
+  const r = co.inner;
+  let y = r.y;
+  let advanced = false;
+  kit.withLayer(61, () => {
+  kit.icon('era', r.x + Math.round(15 * u), y + titleH / 2, Math.round(30 * u), c.amber);
+  kit.drawText(String(ERA_YEARS[p.era]), r.x + Math.round(36 * u), y + titleH / 2, { size: kit.fs(21), color: c.amberLight, shadow: true });
+  const yw = kit.text.measure(String(ERA_YEARS[p.era]), kit.fs(21));
+  kit.drawText(eraName(app, p.era), r.x + Math.round(46 * u) + yw, y + titleH / 2, { size: kit.fs(12), color: c.textDim, maxWidth: r.w - Math.round(46 * u) - yw });
+  y += titleH;
+  // лампы эпох
+  const step = r.w / 6;
+  for (let i = 0; i < 6; i++) {
+    const cx = r.x + step * (i + 0.5);
+    const done = i < p.era;
+    const now = i === p.era;
+    kit.lamp(cx, y + Math.round(10 * u), Math.round(17 * u), done ? c.green : now ? c.amber : c.navy2, done || now, now);
+    kit.drawText(String(ERA_YEARS[i]), cx, y + Math.round(30 * u), { size: Math.max(7, kit.fs(8)), color: now ? c.amberLight : done ? c.text : c.textMute, align: 'center' });
   }
-  for (const key of BUILDING_KEYS) {
-    const st = app.rules.getBuildingState(p, key);
-    if (st.next && !st.locked.length) return { text: t('hub.goal.building', { name: buildingName(app, key) }), icon: buildingIcon(key), action: () => app.go('base', { select: key }, { push: true }) };
+  y += lampsH;
+  if (!es.final) {
+    for (const cd of conds) {
+      const mid = y + condH / 2;
+      kit.lamp(r.x + Math.round(8 * u), mid, Math.round(13 * u), cd.ok ? c.green : c.red, true);
+      const iconName = cd.kind === 'coins' ? 'coin' : cd.kind === 'data' ? 'data' : cd.kind === 'buildings' ? 'building' : 'target';
+      kit.icon(iconName, r.x + Math.round(30 * u), mid, Math.round(20 * u), cd.ok ? c.text : c.textDim);
+      const tx = r.x + Math.round(46 * u);
+      let str;
+      if (cd.kind === 'coins' || cd.kind === 'data') str = `${fmtCompact(cd.have)} / ${fmtCompact(cd.need)}`;
+      else if (cd.kind === 'buildings') str = t('era.cond.buildings', { have: cd.have, need: cd.need, level: cd.level });
+      else str = cd.text || cd.kind;
+      kit.drawText(str, tx, mid, { size: kit.fs(12), color: cd.ok ? c.text : c.textDim, maxWidth: r.x + r.w - tx });
+      y += condH;
+    }
   }
-  const era = app.rules.getEraState(p);
-  if (era.ok) return { text: t('hub.goal.era'), icon: 'era', action: () => app.go('base', { tab: 'era' }, { push: true }) };
-  return { text: t('hub.goal.fly'), icon: 'launch', action: () => app.go('launch', {}, { push: true }) };
+  const fy = r.y + r.h - footH;
+  if (es.final) {
+    kit.lamp(r.x + Math.round(10 * u), fy + footH / 2, Math.round(15 * u), c.green, true);
+    kit.drawText(t('card.maxed'), r.x + Math.round(26 * u), fy + footH / 2, { size: kit.fs(14), color: c.green });
+  } else if (kit.button('era-advance', { x: r.x, y: fy, w: r.w, h: footH }, { label: t('era.advance'), variant: 'primary', disabled: !es.ok, icon: 'era', size: kit.fs(15), lamp: es.ok ? c.green : false })) {
+    const res = app.advanceEra();
+    if (res.ok) {
+      advanced = true;
+      kit.toast(t('era.done', { year: ERA_YEARS[res.profile.era] }), { kind: 'good', icon: 'era' });
+    }
+  }
+  });
+  return advanced;
+}
+
+// ---------- аналоговый индикатор энергии ----------
+
+/** Табличка со стрелочным индикатором баланса мощности: красная зона — энергии не хватает. */
+export function drawEnergyPlate(app, kit, r) {
+  const c = kit.c;
+  const cc = kit.cell();
+  const pb = app.rules.powerBalance(app.profile);
+  const low = pb.ratio < 1;
+  kit.nine('raised', r.x, r.y, r.w, r.h);
+  kit.hit('base-energy', r, {});
+  const dial = { x: r.x + cc * 3, y: r.y + cc * 3, w: Math.round(r.w * 0.58), h: r.h - cc * 6 };
+  kit.dial(dial, clamp(pb.ratio, 0, 1), { zones: [{ to: 0.55, color: c.red }, { to: 0.8, color: c.amber }, { to: 1, color: c.green }] });
+  const tx = dial.x + dial.w + cc * 2;
+  kit.icon('bolt', tx + (r.x + r.w - tx - cc * 2) / 2, r.y + r.h * 0.32, Math.round(r.h * 0.36), low ? c.red : c.green);
+  kit.drawText(`${Math.round(pb.demand)}/${Math.round(pb.supply)}`, tx + (r.x + r.w - tx - cc * 2) / 2, r.y + r.h * 0.74, { size: Math.max(8, kit.fs(9)), color: low ? c.red : c.textDim, align: 'center', maxWidth: r.x + r.w - tx - cc * 2 });
+  kit.lamp(r.x + r.w - cc * 5, r.y + cc * 5, cc * 4, low ? c.red : c.green, true, low);
 }
 
 export const coinsText = (n) => fmtInt(n);
