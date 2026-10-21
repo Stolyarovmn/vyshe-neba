@@ -59,11 +59,12 @@ jobs:
         run: node game/tools/economy-bot.mjs
 
       - name: Upload build and screenshots
+        continue-on-error: true
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: next-game-${{ github.sha }}
-          retention-days: 7
+          retention-days: 3
           if-no-files-found: warn
           path: |
             game/dist/vyshe-neba.html
