@@ -6,6 +6,8 @@ import { t } from '../../i18n/index.js';
 import { clamp, fmtAlt, fmtInt, fmtSpeed } from '../format.js';
 import { centerCard } from '../layout.js';
 import { tutorialHint, drawTutorialPointer } from './onboarding.js';
+import { mix } from '../theme.js';
+import * as inst from '../skin/instruments.js';
 
 const DANGER_WARNS = ['brake', 'tilt', 'drift', 'hazard', 'chute-air', 'overheat', 'hull'];
 const WARN_KEYS = { brake: 'hint.brake', tilt: 'hint.tilt', drift: 'hint.drift', hazard: 'hint.hazard', 'chute-air': 'hint.chuteAir', overheat: 'hint.overheat', hull: 'hint.hull' };
@@ -90,37 +92,25 @@ function drawInstruments(app, kit, L, s, f, hud) {
   const c = kit.c;
   const I = hud.instruments;
   const u = L.ui;
-  const cc = kit.cell();
 
-  // высота: сегментное табло, лампа тревоги слева
+  // высота: прибор эпохи (барабанный счётчик, светодиодное табло, плоский индикатор…), лампа тревоги слева
   const alt = fmtAlt(f.alt);
-  const altStr = alt.value.replace(/[\s ]/g, '');
   const unit = t(alt.unit === 'km' ? 'unit.km' : 'unit.m');
-  const unitW = kit.text.measure(unit, kit.fs(10)) + cc * 3;
-  const lampW = Math.round(I.alt.h * 0.55);
-  kit.segDisplay({ x: I.alt.x + lampW, y: I.alt.y, w: I.alt.w - lampW, h: I.alt.h }, altStr, { lit: c.green, digits: 4, h: Math.round(I.alt.h * 0.56), padRight: unitW + cc * 2 });
-  kit.nine('screen', I.alt.x, I.alt.y, lampW + cc * 2, I.alt.h);
   const alarm = app.time < s.alarmUntil || DANGER_WARNS.some((k) => s.warn[k] !== undefined && app.time - s.warn[k] < 1.2);
-  kit.lamp(I.alt.x + lampW / 2 + cc, I.alt.y + I.alt.h / 2, Math.round(I.alt.h * 0.34), alarm ? c.red : c.green, true, alarm);
-  kit.drawText(unit, I.alt.x + I.alt.w - cc * 3, I.alt.y + I.alt.h - cc * 5, { size: kit.fs(10), color: c.amber, align: 'right' });
+  inst.altitude(kit, I.alt, f, { alt, unit, alarm, meters: Math.max(0, f.alt) * 10 });
 
-  // вертикальная скорость: лента-светодиодная шкала от нуля, белая риска — допуск посадки
+  // вертикальная скорость: число и лента или стрелка; красная зона — быстрее допуска посадки
   const climb = f.climb ?? -f.vy;
   const falling = f.vy > 0 && f.liftedOff;
   const tol = f.landing?.vTol ?? 0;
   const danger = falling && f.alt < 400 && tol > 0 && f.vy > tol;
   const vcol = danger ? c.red : falling ? c.amber : c.green;
-  kit.nine('screen', I.vspeed.x, I.vspeed.y, I.vspeed.w, I.vspeed.h);
-  const topRow = I.vspeed.y + I.vspeed.h * 0.34;
-  kit.icon(climb >= 0 ? 'up' : 'down', I.vspeed.x + cc * 8, topRow, Math.round(I.vspeed.h * 0.4), vcol);
-  kit.drawText(fmtSpeed(climb), I.vspeed.x + I.vspeed.w - cc * 3, topRow, { size: Math.max(9, Math.round(I.vspeed.h * 0.4)), color: vcol, align: 'right', maxWidth: I.vspeed.w - cc * 16 });
-  const ribbon = { x: I.vspeed.x + cc * 3, y: I.vspeed.y + I.vspeed.h * 0.62, w: I.vspeed.w - cc * 6, h: I.vspeed.h * 0.28 };
-  drawRibbon(kit, ribbon, climb, tol > 0 ? tol : 25, vcol);
+  inst.vspeed(kit, I.vspeed, { climb, tol, vcol, numStr: fmtSpeed(climb) });
 
   // монеты: табличка с числом
   kit.plate(I.coins.x, I.coins.y, I.coins.w, I.coins.h, 'coin', f.coins, c.gold);
 
-  // топливо активной ступени и прочность: светодиодные шкалы; лампа вместо значка, когда ниже порога
+  // топливо активной ступени и прочность; ниже порога значок заменяется мигающей красной лампой
   const fuel01 = f.maxFuel > 0 ? f.fuel / f.maxFuel : 0;
   const hull01 = f.maxHp > 0 ? f.hp / f.maxHp : 0;
   const st = f.stages?.length > 1 ? `${f.stageIndex + 1}/${f.stages.length}` : '';
@@ -128,14 +118,14 @@ function drawInstruments(app, kit, L, s, f, hud) {
     const vertical = r.h > r.w;
     const low = v <= lowAt;
     if (vertical) {
-      kit.ledBar(r, { value: v, color, warn: lowAt, vertical: true, segments: 8 });
+      inst.gauge(kit, r, v, color, lowAt);
       const iy = r.y - Math.round(13 * u);
       if (low) kit.lamp(r.x + r.w / 2, iy, Math.round(16 * u), c.red, true, true);
       else kit.icon(iconName, r.x + r.w / 2, iy, Math.round(18 * u), color);
       if (caption) kit.drawText(caption, r.x, r.y + r.h + Math.round(10 * u), { size: kit.fs(10), color: c.textDim });
     } else {
       const shift = Math.round(r.h * 1.5);
-      kit.ledBar({ x: r.x + shift, y: r.y, w: r.w - shift, h: r.h }, { value: v, color, warn: lowAt, segments: 10 });
+      inst.gauge(kit, { x: r.x + shift, y: r.y, w: r.w - shift, h: r.h }, v, color, lowAt);
       if (low) kit.lamp(r.x + shift / 2, r.y + r.h / 2, Math.round(r.h * 0.9), c.red, true, true);
       else kit.icon(iconName, r.x + shift / 2, r.y + r.h / 2, Math.round(r.h * 1.1), color);
     }
@@ -211,6 +201,19 @@ function drawStrip(app, kit, L, f, hud, radar) {
 // ---------- радар ----------
 
 function drawRadar(app, kit, L, f, hud) {
+  const R = hud.radar;
+  const cc = kit.cell();
+  if (['analog', 'led', 'digital'].includes(kit.S.skin.instr)) {
+    // радар эпох ЭЛТ — круглая развёртка на квадратном экране с корпусом
+    const box = { x: Math.round(R.cx - R.r - cc), y: Math.round(R.cy - R.r - cc), w: Math.round(R.r * 2 + cc * 2), h: Math.round(R.r * 2 + cc * 2) };
+    kit.nine('raised', box.x - cc * 2, box.y - cc * 2, box.w + cc * 4, box.h + cc * 4);
+    kit.screen('hud-radar', box, () => drawRadarFace(app, kit, L, f, hud));
+    return;
+  }
+  drawRadarFace(app, kit, L, f, hud);
+}
+
+function drawRadarFace(app, kit, L, f, hud) {
   const c = kit.c;
   const cc = kit.cell();
   const R = hud.radar;
@@ -301,6 +304,12 @@ function pickHint(app, s, f, tut) {
     if (front) out.push({ pri: 0.9, key: `fc:${fc.kind}`, text: t(`hint.forecast.${fc.kind}`, { n: soon }), icon: 'wind', kind: 'tip' });
     else if (windSoon) out.push({ pri: 0.8, key: `fcw:${fc.windDir}`, text: t(fc.windDir > 0 ? 'hint.forecast.wind.right' : 'hint.forecast.wind.left', { n: Math.ceil(fc.windIn) }), icon: fc.windDir > 0 ? 'arrow' : 'back', kind: 'tip' });
   }
+  // упор ограничителя наклона: раз за полёт подсказываем, что углом управляют маневровые (стабилизаторы)
+  const lim = tiltLimit(f);
+  if (lim !== null && f.liftedOff) {
+    if (s.tiltHintAt === undefined && Math.abs(f.angle) >= lim * 0.95) s.tiltHintAt = now;
+    if (s.tiltHintAt !== undefined && now - s.tiltHintAt < 2.4) out.push({ pri: 2.5, key: 'tiltlimit', text: t('hint.tiltLimit'), icon: 'fins', kind: 'tip' });
+  }
   const impact = f.predict?.impact;
   if (impact && f.vy > 5) out.push({ pri: 1, key: 'impact', text: t('hint.impact', { t: Math.max(0.1, impact.t).toFixed(1).replace('.', ','), v: fmtSpeed(impact.v), tol: fmtSpeed(f.landing?.vTol ?? 0) }), icon: impact.onPad ? 'check' : 'target', kind: impact.onPad ? 'good' : 'tip' });
   out.sort((a, b) => b.pri - a.pri);
@@ -330,6 +339,18 @@ function drawHint(app, kit, L, s, f, hud, tut) {
   const x = r.x + (r.w - tw) / 2;
   const variant = h.kind === 'bad' ? 'danger' : h.kind === 'good' ? 'good' : 'hud';
   const blink = h.kind === 'bad' && !app.settings.reduceMotion && Math.floor(app.time * 5) % 2 === 0;
+  if (['analog', 'led', 'digital'].includes(kit.S.skin.instr)) {
+    // эпохи ЭЛТ: подсказка — строка на экране; тревога мигает инверсией (светлый фон, тёмный текст)
+    const box = { x, y: r.y, w: tw, h: r.h };
+    kit.nine('raised', box.x - kit.cell() * 2, box.y - kit.cell() * 2, box.w + kit.cell() * 4, box.h + kit.cell() * 4);
+    kit.screen('hud-hint', box, () => {
+      if (h.kind === 'bad' && blink) kit.rect(box.x, box.y, box.w, box.h, c.red);
+      const fg = h.kind === 'bad' && blink ? c.ink : c.text;
+      kit.icon(h.icon, x + size * 1.1, r.y + r.h / 2, size * 1.25, h.kind === 'bad' && blink ? c.ink : h.kind === 'bad' ? c.red : c.amber);
+      kit.drawText(h.text, x + size * 2.1, r.y + r.h / 2, { size, color: fg, maxWidth: tw - size * 2.6 });
+    });
+    return;
+  }
   kit.nine(blink ? 'warn' : variant, x, r.y, tw, r.h);
   kit.icon(h.icon, x + size * 1.1, r.y + r.h / 2, size * 1.25, h.kind === 'bad' ? c.white : h.kind === 'good' ? c.ink : c.amber);
   kit.drawText(h.text, x + size * 2.1, r.y + r.h / 2, { size, color: h.kind === 'good' ? c.ink : c.text, maxWidth: tw - size * 2.6 });
@@ -393,7 +414,16 @@ function drawControls(app, kit, L, s, f, hud, touch) {
     hudButton(app, kit, L, 'transfer', B.transfer, { icon: 'transfer', variant: blink ? 'good' : 'primary', label: t('hud.transfer'), wide: true });
   }
 
-  if (!touch) return;
+  const lim = tiltLimit(f);
+  if (!touch) {
+    // без сенсорных органов управления на месте диска — указатель крена: стрелка и зона допустимого отклонения
+    const G = { cx: hud.disc.cx, cy: hud.disc.cy, r: Math.round(hud.disc.r * 0.8) };
+    kit.ring(G.cx, G.cy, G.r, G.r, c.ink);
+    kit.ring(G.cx, G.cy, G.r - cc * 2, G.r - cc * 2, c.steel1);
+    kit.ring(G.cx, G.cy, G.r - cc * 5, G.r - cc * 5, c.navy1);
+    drawAttitude(app, kit, G, f, lim);
+    return;
+  }
 
   // диск наклона: штурвал с шкалой и шариковой рукояткой
   const D = hud.disc;
@@ -404,14 +434,8 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   kit.ring(D.cx, D.cy, D.r, D.r, c.ink);
   kit.ring(D.cx, D.cy, D.r - cc * 2, D.r - cc * 2, finger ? c.steel0 : c.steel1);
   kit.ring(D.cx, D.cy, D.r - cc * 5, D.r - cc * 5, c.navy1);
-  // деления по дуге сверху
-  for (let i = -4; i <= 4; i++) {
-    const a = -Math.PI / 2 + (i * Math.PI) / 9;
-    const len = i % 2 === 0 ? cc * 3 : cc * 2;
-    const x0 = D.cx + Math.cos(a) * (D.r - cc * 6);
-    const y0 = D.cy + Math.sin(a) * (D.r - cc * 6);
-    kit.line(x0, y0, D.cx + Math.cos(a) * (D.r - cc * 6 - len), D.cy + Math.sin(a) * (D.r - cc * 6 - len), i === 0 ? c.amberLight : c.steel2);
-  }
+  // дуга ограничителя и стрелка крена по верхней дуге диска
+  drawAttitude(app, kit, D, f, lim);
   kit.icon('back', D.cx - D.r * 0.66, D.cy + D.r * 0.15, Math.round(D.r * 0.3), c.textDim);
   kit.icon('arrow', D.cx + D.r * 0.66, D.cy + D.r * 0.15, Math.round(D.r * 0.3), c.textDim);
   const knobX = D.cx + (finger ? clamp((finger.x - D.cx) / (D.r * 0.78), -1, 1) : 0) * D.r * 0.78;
@@ -439,6 +463,55 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   // подпись на самой рукоятке: «держи» в аркаде, процент в режиме «Пилот»
   kit.drawText(mode === 'arcade' ? t('hud.hold') : `${Math.round(lv.value * 100)}`, V.x + V.w / 2, ty + thumbH * 0.72, { size: kit.fs(9), color: c.ink, align: 'center', maxWidth: V.w - cc * 8 });
   kit.drawText(t('hud.thrust'), V.x + V.w / 2, V.y - kit.fs(8), { size: kit.fs(9), color: c.textMute, align: 'center' });
+}
+
+// ---------- крен и ограничитель наклона ----------
+
+// предел наклона стабилизаторов в радианах; от этого значения и выше ракета вращается свободно (как TILT_FREE в sim/rocket.js)
+const TILT_FREE = 3;
+const tiltLimit = (f) => {
+  const m = f.cfg?.fins?.maxTilt;
+  return typeof m === 'number' && m < TILT_FREE ? m : null;
+};
+
+/**
+ * Указатель крена на круглом приборе D: деления через 10° от вертикали, зона допустимого отклонения — дуга из клеток
+ * цвета янтаря с красными упорами; белая стрелка — текущий крен ракеты. У упора прибор мягко подсвечивается.
+ */
+function drawAttitude(app, kit, D, f, lim) {
+  const c = kit.c;
+  const cc = kit.cell();
+  const rIn = D.r - cc * 6;
+  const ang = f.angle || 0;
+  const hot = lim !== null && Math.abs(ang) >= lim * 0.93;
+  for (let i = -9; i <= 9; i++) {
+    const a = (i * Math.PI) / 18;
+    const th = -Math.PI / 2 + a;
+    const inside = lim === null || Math.abs(a) <= lim + 0.01;
+    const len = i % 3 === 0 ? cc * 3 : cc * 2;
+    const color = i === 0 ? c.amberLight : lim === null ? c.steel2 : inside ? c.amber : c.steel0;
+    kit.line(D.cx + Math.cos(th) * rIn, D.cy + Math.sin(th) * rIn, D.cx + Math.cos(th) * (rIn - len), D.cy + Math.sin(th) * (rIn - len), color);
+  }
+  if (lim !== null && lim < Math.PI / 2) {
+    // сама дуга допустимого отклонения и упоры на её концах
+    const step = (cc * 2) / rIn;
+    for (let a = -lim; a <= lim + 1e-6; a += step) {
+      const th = -Math.PI / 2 + a;
+      kit.rect(Math.round((D.cx + Math.cos(th) * (rIn + cc * 2)) / cc) * cc, Math.round((D.cy + Math.sin(th) * (rIn + cc * 2)) / cc) * cc, cc, cc, c.amber);
+    }
+    const blink = hot && !app.settings.reduceMotion ? Math.floor(app.time * 5) % 2 === 0 : hot;
+    for (const side of [-1, 1]) {
+      const th = -Math.PI / 2 + side * lim;
+      kit.line(D.cx + Math.cos(th) * (rIn + cc * 4), D.cy + Math.sin(th) * (rIn + cc * 4), D.cx + Math.cos(th) * (rIn - cc * 4), D.cy + Math.sin(th) * (rIn - cc * 4), blink ? c.redLight : c.red);
+    }
+    if (hot) {
+      // мягкая подсветка кольца, пока ракета стоит в упоре
+      const k = app.settings.reduceMotion ? 0.5 : 0.5 + 0.5 * Math.sin(app.time * 6);
+      kit.ring(D.cx, D.cy, D.r - cc * 2, cc * 2, mix(c.steel1, c.amber, 0.35 + 0.4 * k));
+    }
+  }
+  const th = -Math.PI / 2 + clamp(ang, -Math.PI / 2, Math.PI / 2);
+  kit.line(D.cx + Math.cos(th) * (rIn + cc * 3), D.cy + Math.sin(th) * (rIn + cc * 3), D.cx + Math.cos(th) * (rIn - cc * 6), D.cy + Math.sin(th) * (rIn - cc * 6), c.white);
 }
 
 // ---------- клавиатурная подсказка ----------

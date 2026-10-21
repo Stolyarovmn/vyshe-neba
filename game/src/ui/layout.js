@@ -241,7 +241,7 @@ export const ROCKET_SPOTS = Object.entries(SPOT_SIDE)
 
 export function rocketLayout(L) {
   const { body } = screenFrame(L, { header: true });
-  const spot = MIN_TOUCH + (L.portrait || L.h < 420 ? 0 : R(4 * L.ui));
+  const spot = L.portrait || L.h < 420 ? MIN_TOUCH : R(MIN_TOUCH * Math.min(L.ui, 1.45));
   const schematic = rect(body.x, body.y, body.w, body.h);
   const standH = L.touch(46);
   const stripH = standH + L.gap * 2;

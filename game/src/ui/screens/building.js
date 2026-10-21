@@ -54,15 +54,8 @@ export function drawBuildingCallout(app, kit, key, o = {}) {
     canBuy: st.next && st.locked.length === 0,
     buyLabel: st.level === 0 ? t('card.build') : t('card.upgrade'),
     buyId: `build-${key}`,
-    extraH: hasPower ? (uu) => Math.round(26 * uu) : 0,
-    extra: hasPower
-      ? (r, uu) => {
-        const good = !!power.supply;
-        kit.icon('bolt', r.x + Math.round(10 * uu), r.y + Math.round(13 * uu), Math.round(18 * uu), good ? c.green : c.amber);
-        kit.drawText(good ? `+${power.supply}` : `−${power.use}`, r.x + Math.round(26 * uu), r.y + Math.round(13 * uu), { size: kit.fs(13), color: good ? c.green : c.amber });
-        return Math.round(26 * uu);
-      }
-      : undefined,
+    // мощность — рядом с ценой в подвале: отдельная строка стоила бы лишней высоты в тесном окне
+    power: hasPower ? { text: power.supply ? `+${power.supply}` : `-${power.use}`, color: power.supply ? c.green : c.amber } : null,
     onBuy: () => {
       const res = app.buyBuilding(key);
       if (!res.ok) {

@@ -6,6 +6,12 @@ import { t } from '../../i18n/index.js';
 const STEPS = [
   { id: 'thrust', icon: 'boost', target: 'thrust', when: (f) => f.phase === 'pad', done: (f) => f.liftedOff },
   { id: 'tilt', icon: 'back', target: 'tilt', when: (f) => f.liftedOff && f.alt > 20, done: (f, ctx) => ctx.tiltSeen || f.alt > 220 },
+  // упёрся в предел наклона: объясняем, что угол растёт с прокачкой стабилизаторов (маневровых)
+  {
+    id: 'fins', icon: 'fins', target: null,
+    when: (f, ctx) => ctx.limitHit && f.liftedOff,
+    done: (f, ctx) => ctx.noLimit || f.alt > 300 || (ctx.finsAt !== undefined && f.time - ctx.finsAt > 4),
+  },
   { id: 'fuel', icon: 'fuel', target: null, when: (f) => f.alt > 200 || f.fuel01 < 0.8, done: (f) => f.vy > 0 || f.alt > 600 },
   { id: 'descent', icon: 'down', target: 'thrust', when: (f) => f.vy > 3 && f.alt < 700, done: (f) => f.alt < 130 },
   { id: 'land', icon: 'target', target: 'tilt', when: (f) => f.vy > 0 && f.alt < 160, done: (f) => f.ended },
@@ -20,11 +26,15 @@ export function tutorialHint(app, s) {
   const f = s.flight;
   const ctx = (s.tutorial ||= { tiltSeen: false });
   if (Math.abs(s.lastInput?.tilt || 0) > 0.3) ctx.tiltSeen = true;
+  const lim = f.cfg?.fins?.maxTilt;
+  ctx.noLimit = !(typeof lim === 'number' && lim < 3);
+  if (!ctx.noLimit && Math.abs(f.angle) >= lim * 0.85) ctx.limitHit = true;
   let step = tut.step;
   while (step < STEPS.length && STEPS[step].done(f, ctx)) step++;
   if (step !== tut.step) app.setSetting('tutorial', { done: false, step });
   const cur = STEPS[step];
-  if (!cur || !cur.when(f)) return null;
+  if (!cur || !cur.when(f, ctx)) return null;
+  if (cur.id === 'fins' && ctx.finsAt === undefined) ctx.finsAt = f.time;
   const touch = app.touchUi;
   const key = `tut.${cur.id}${touch ? '.touch' : '.key'}`;
   const text = t(key);

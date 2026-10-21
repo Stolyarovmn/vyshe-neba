@@ -15,15 +15,15 @@ const outDir = path.join(root, 'work');
 fs.mkdirSync(outDir, { recursive: true });
 
 const VIEWPORTS = [
-  { name: 'portrait', width: 390, height: 844, touch: true },
+  { name: 'portrait', width: 390, height: 844, touch: true, eraTour: true },
   { name: 'landscape', width: 1280, height: 720, touch: false },
-  { name: 'phone-landscape', width: 844, height: 390, touch: true },
+  { name: 'phone-landscape', width: 844, height: 390, touch: true, eraTour: true },
 ];
 
 // минимальные размеры окна: только страж текста и отступов
 const AUDIT_VIEWPORTS = [
   { name: 'min-portrait', width: 320, height: 568 },
-  { name: 'min-landscape', width: 568, height: 320 },
+  { name: 'min-landscape', width: 568, height: 320, eraTour: true },
 ];
 
 function launch() {
@@ -665,8 +665,38 @@ async function runViewport(browser, vp) {
   const saved = await hook(page, () => globalThis.__VN_TEST__.profile());
   assert(saved.coins === coins && saved.buildings.beacons === 1 && saved.parts.legs === 1, `${vp.name}: прогресс не сохранился`);
 
+  // смена эпохи: анимация переоснащения пульта не дольше 1,5 с, оформление меняется посреди анимации
+  {
+    await go(page, 'launch');
+    await page.waitForTimeout(300);
+    await hook(page, () => {
+      const t = globalThis.__VN_TEST__;
+      const p = t.profile();
+      p.era = 1;
+      t.setProfile(p);
+      globalThis.__VN_APP__.startRefit(0, 1);
+    });
+    await page.waitForTimeout(150);
+    const early = await hook(page, () => ({ active: !!globalThis.__VN_APP__.refit, skin: globalThis.__VN_APP__.skinEra }));
+    assert(early.active && early.skin === 0, `${vp.name}: переоснащение не началось (${JSON.stringify(early)})`);
+    await shot(page, vp, '17-refit-start');
+    await page.waitForTimeout(500);
+    await shot(page, vp, '17b-refit-shutters');
+    const t0 = Date.now();
+    await page.waitForFunction(() => !globalThis.__VN_APP__.refit, null, { timeout: 3000 });
+    const rest = Date.now() - t0;
+    const done = await hook(page, () => globalThis.__VN_APP__.skinEra);
+    assert(done === 1 && rest < 1100, `${vp.name}: переоснащение должно уложиться в 1,5 с и сменить оформление (осталось ${rest} мс, эпоха ${done})`);
+    await go(page, 'hub');
+  }
+
+  // снимки интерфейса каждой эпохи: HUD, пульт запуска, щиток модуля (work/ui-era-*.png)
+  await eraShots(page, vp);
+  await hook(page, () => { const t = globalThis.__VN_TEST__; const p = t.profile(); p.era = 0; t.setProfile(p); });
+
   // страж текста и отступов на всех экранах
   const issues = await tourScreens(page, vp);
+  if (vp.eraTour) for (let era = 1; era <= 5; era++) issues.push(...(await tourEra(page, vp, era)));
   assert(issues.length === 0, `${vp.name}: текст не помещается (${issues.length}):
 ${formatIssues(issues)}`);
   await checkGuard(page, vp, 'обход экранов');
@@ -675,6 +705,128 @@ ${formatIssues(issues)}`);
   assert(errors.length === 0 && hookErrors.length === 0, `${vp.name}: ошибки: ${[...errors, ...hookErrors].join(' | ')}`);
   await context.close();
   console.log(`OK ${vp.name} ${vp.width}x${vp.height}`);
+}
+
+
+
+/** Сокращённый обход для проверки текста в оформлении эпохи era: главные экраны и щитки, полёт и итоги. */
+async function tourEra(page, vp, era) {
+  const found = [];
+  const audit = async (label, wait) => {
+    found.push(...(await auditState(page, vp, `E${era}/${label}`, wait)));
+  };
+  await page.evaluate((e) => {
+    const t = globalThis.__VN_TEST__;
+    const p = t.profile();
+    p.era = e;
+    p.coins = 123456;
+    p.data = 654;
+    for (const k of Object.keys(p.buildings)) p.buildings[k] = Math.max(p.buildings[k], 1);
+    for (const k of Object.keys(p.parts)) p.parts[k] = Math.max(p.parts[k], 1);
+    p.inventory = { chute: 2, repair: 3, canister: 1, magnet: 9 };
+    t.setProfile(p);
+    globalThis.__VN_APP__.history.length = 0;
+    globalThis.__VN_APP__.prefs.touchControls = 'on';
+  }, era);
+  await go(page, 'hub');
+  await page.waitForTimeout(350);
+  await audit('хаб');
+  await setUi(page, () => { globalThis.__VN_APP__.ui.hub.era = true; });
+  await audit('хаб/эпоха', 200);
+  await setUi(page, () => { globalThis.__VN_APP__.ui.hub.era = false; });
+  await go(page, 'base');
+  await setUi(page, () => { globalThis.__VN_APP__.ui.base.sel = 'gantry'; });
+  await audit('стройка/башня', 300);
+  await go(page, 'rocket');
+  for (const id of ['engine', 'fins']) {
+    await setUi(page, (k) => { globalThis.__VN_APP__.ui.rocket.selected = k; }, id);
+    await audit(`мастерская/${id}`, 220);
+  }
+  await go(page, 'journal');
+  await setUi(page, () => { globalThis.__VN_APP__.ui.journal.sel = 'sheet:0'; });
+  await audit('доска/лист', 250);
+  await go(page, 'shop');
+  await setUi(page, () => { globalThis.__VN_APP__.ui.shop.sel = 'item:chute'; });
+  await audit('лавка/парашют', 250);
+  await go(page, 'launch');
+  await page.waitForTimeout(300);
+  await audit('пульт', 300);
+  await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: { chute: true, repair: true } }));
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+  await page.waitForTimeout(500);
+  await audit('полёт', 400);
+  await page.evaluate(() => globalThis.__VN_APP__.pause());
+  await audit('пауза', 250);
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.resume(); a.abandon(); });
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
+  await page.waitForTimeout(3200);
+  await audit('итоги', 300);
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); a.prefs.touchControls = 'auto'; });
+  return found;
+}
+
+/** Снимки интерфейса каждой эпохи: HUD в полёте, пульт запуска и щиток модуля (work/ui-era-*.png). */
+async function eraShots(page, vp) {
+  for (let era = 0; era <= 5; era++) {
+    await page.evaluate((e) => {
+      const t = globalThis.__VN_TEST__;
+      const p = t.profile();
+      p.era = e;
+      p.coins = 12450;
+      p.data = 380;
+      for (const k of Object.keys(p.buildings)) p.buildings[k] = Math.max(p.buildings[k], 2);
+      for (const k of Object.keys(p.parts)) p.parts[k] = Math.max(p.parts[k], 2);
+      p.inventory = { chute: 2, repair: 3, canister: 1, magnet: 1 };
+      t.setProfile(p);
+      globalThis.__VN_APP__.history.length = 0;
+      globalThis.__VN_APP__.prefs.touchControls = 'on';
+    }, era);
+    await go(page, 'hub');
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: path.join(outDir, `ui-era-${era}-hub-${vp.name}.png`) });
+    await go(page, 'rocket');
+    await page.waitForTimeout(300);
+    await setUi(page, () => { globalThis.__VN_APP__.ui.rocket.selected = 'fins'; });
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: path.join(outDir, `ui-era-${era}-callout-${vp.name}.png`) });
+    await go(page, 'launch');
+    await page.waitForTimeout(700);
+    await page.screenshot({ path: path.join(outDir, `ui-era-${era}-launch-${vp.name}.png`) });
+    await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: { chute: true, repair: true } }));
+    await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+    await page.waitForTimeout(500);
+    await page.keyboard.down('KeyW');
+    await page.waitForTimeout(1300);
+    await page.keyboard.down('KeyD');
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: path.join(outDir, `ui-era-${era}-hud-${vp.name}.png`) });
+    await page.keyboard.up('KeyD');
+    await page.keyboard.up('KeyW');
+    await page.evaluate(() => { globalThis.__VN_APP__.abandon(); });
+    await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
+    if (era === 0 || era === 5) {
+      await page.waitForTimeout(2600);
+      await page.screenshot({ path: path.join(outDir, `ui-era-${era}-results-${vp.name}.png`) });
+    }
+    await page.evaluate(() => { globalThis.__VN_APP__.results = null; globalThis.__VN_APP__.go('hub'); });
+  }
+  await page.evaluate(() => { globalThis.__VN_APP__.prefs.touchControls = 'auto'; });
+}
+
+/** Только снимки эпох (UI_ERA_ONLY=1), без остального обхода: для отладки внешнего вида. */
+async function runEraViewport(browser, vp) {
+  const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: vp.touch ? 2 : 1, hasTouch: !!vp.touch, isMobile: !!vp.touch });
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+  page.on('console', (m) => { if (m.type() === 'error') errors.push(`console: ${m.text()}`); });
+  await page.goto(pathToFileURL(gameFile).href);
+  await page.waitForFunction(() => globalThis.__VN_TEST__, null, { timeout: 20000 });
+  await page.waitForTimeout(800);
+  await eraShots(page, vp);
+  assert(errors.length === 0, `${vp.name}: ошибки: ${errors.join(' | ')}`);
+  await context.close();
+  console.log(`OK эпохи ${vp.name}`);
 }
 
 /** Только страж текста на минимальных размерах окна (320×568 и 568×320). */
@@ -691,6 +843,7 @@ async function runAuditViewport(browser, vp, collect = null) {
   await page.waitForFunction(() => globalThis.__VN_TEST__, null, { timeout: 20000 });
   await page.waitForTimeout(800);
   const issues = await tourScreens(page, vp);
+  if (vp.eraTour) for (let era = 1; era <= 5; era++) issues.push(...(await tourEra(page, vp, era)));
   await shot(page, vp, '01-hub');
   if (collect) collect.push(...issues);
   else assert(issues.length === 0, `${vp.name}: текст не помещается (${issues.length}):
@@ -710,6 +863,10 @@ ${formatIssues(issues)}`);
   }
   const browser = await launch();
   try {
+    if (process.env.UI_ERA_ONLY) {
+      for (const vp of VIEWPORTS) if (process.env.UI_ERA_ONLY === '1' || process.env.UI_ERA_ONLY.split(',').includes(vp.name)) await runEraViewport(browser, vp);
+      return;
+    }
     if (process.env.UI_AUDIT_ONLY) {
       // отладка стража текста: все размеры окна, замечания собираются и печатаются целиком
       const all = [];

@@ -202,6 +202,9 @@ export function lockRows(app, kit, x, y, w, reasons, o = {}) {
 
 // ---------- щиток модуля и постройки ----------
 
+// поля щитка уменьшаются вместе с масштабом: в тесном окне каждая строка на счету
+const padOfL = (L, uu) => (uu < L.ui * 0.95 ? Math.round(L.pad * 0.6) : L.pad);
+
 /**
  * Масштаб размеров щитка: если щиток не помещается в bounds, его строки ужимаются (но не меньше 0,62).
  * Если не помещается и так, щиток получает всю безопасную область окна: он важнее фона. Возвращает { u, bounds }.
@@ -239,6 +242,7 @@ export function infoCallout(app, kit, spec) {
   const L = kit.L;
   const c = kit.c;
   const p = app.profile;
+  const padOf = (uu) => padOfL(L, uu);
   const rows = (spec.rows || []).slice(0, 3);
   const locks = (spec.locks || []).filter((r) => !isFundsReason(r)).slice(0, 2);
   const dims = (uu) => {
@@ -257,66 +261,85 @@ export function infoCallout(app, kit, spec) {
   const calcH = (uu) => {
     const d = dims(uu);
     const extra = typeof spec.extraH === 'function' ? spec.extraH(uu) : spec.extraH || 0;
-    return L.pad * 2 + d.titleH + (spec.max ? d.segH : 0) + d.lineH + rows.length * (d.rowH + Math.round(L.gap * 0.3)) + locks.length * d.lockH + extra + d.footH + L.gap;
+    return padOf(uu) * 2 + d.titleH + (spec.max ? d.segH : 0) + d.lineH + rows.length * (d.rowH + Math.round(L.gap * 0.3)) + locks.length * d.lockH + extra + d.footH + L.gap;
   };
   const { u, bounds } = fitScale(L, spec.bounds, calcH);
   const w = Math.min(Math.round(310 * L.ui), 420, L.area.w - L.gap * 2);
   const { titleH, segH, rowH, lockH, lineH, footH } = dims(u);
   const h = calcH(u);
-  const co = kit.callout(spec.id, spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds, side: spec.side, variant: 'panel' });
+  const co = kit.callout(spec.id, spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds, side: spec.side, variant: 'panel', pad: padOf(u) });
   const r = co.inner;
   let y = r.y;
   // содержимое щитка лежит выше слоя самого щитка, иначе щиток перехватывает нажатия кнопок
   kit.withLayer(61, () => {
+    const cc = kit.cell();
+    const fy = r.y + r.h - footH;
+    const hasButton = !spec.noBuy && spec.next !== false;
+    const fr = co.rect;
+    // экран эпохи (ЭЛТ, плоский дисплей…): название, шкала уровня, «было → станет», причины блокировки;
+    // под ним на корпусе — табло цены и кнопка. Без кнопки экран занимает весь щиток.
+    const scrBottom = hasButton ? fy - Math.round(L.gap * 0.4) : fr.y + fr.h - cc * 2;
+    const scr = { x: fr.x + cc * 2, y: fr.y + cc * 2, w: fr.w - cc * 4, h: scrBottom - (fr.y + cc * 2) };
+    kit.screen(`callout-${spec.id}`, scr, () => {
+      let y = r.y;
+      const icoS = Math.round(30 * u);
+      kit.icon(spec.iconName, r.x + icoS / 2, y + titleH / 2, icoS, c.text, spec.iconAlpha ?? 1);
+      const lvl = spec.tag ?? (spec.max ? `${spec.level}/${spec.max}` : '');
+      const lvlW = lvl ? kit.text.measure(lvl, kit.fs(14)) + L.gap : 0;
+      kit.drawText(spec.name, r.x + icoS + L.gap, y + titleH / 2, { size: kit.fs(14), color: c.text, maxWidth: r.w - icoS - L.gap - lvlW, shadow: true });
+      if (lvl) kit.drawText(lvl, r.x + r.w, y + titleH / 2, { size: kit.fs(14), color: c.amber, align: 'right' });
+      y += titleH;
+      if (spec.max) {
+        levelSegs(kit, { x: r.x, y: y + Math.round(2 * u), w: r.w, h: Math.round(10 * u) }, spec.level, spec.max, spec.cap);
+        y += segH;
+      }
+      if (spec.line) {
+        kit.drawText(spec.line, r.x, y + lineH / 2 - Math.round(2 * u), { size: kit.fs(11), color: c.textDim, maxWidth: r.w });
+        y += lineH;
+      }
+      for (const row of rows) {
+        kit.statDelta({ x: r.x, y, w: r.w, h: rowH }, row);
+        y += rowH + Math.round(L.gap * 0.3);
+      }
+      if (locks.length) y += lockRows(app, kit, r.x, y, r.w, locks, { goto: spec.goto });
+      if (spec.extra) y += spec.extra({ x: r.x, y, w: r.w }, u) || 0;
+      // состояние без кнопки: «макс» / награда / «есть» — на самом экране внизу
+      if (!hasButton) {
+        const sy = r.y + r.h - footH + footH / 2;
+        if (spec.noBuy) {
+          if (spec.cost) kit.costChip(r.x, sy, spec.cost, { size: kit.fs(13) });
+          if (spec.doneText) {
+            kit.lamp(r.x + r.w - Math.round(10 * u), sy, Math.round(15 * u), c.green, true);
+            kit.drawText(spec.doneText, r.x + r.w - Math.round(26 * u), sy, { size: kit.fs(13), color: c.green, align: 'right' });
+          }
+        } else {
+          kit.lamp(r.x + Math.round(10 * u), sy, Math.round(15 * u), c.green, true);
+          kit.drawText(spec.doneText || t('card.maxed'), r.x + Math.round(26 * u), sy, { size: kit.fs(14), color: c.green });
+        }
+      }
+    }, { opaque: true });
 
-  // название и уровень
-  const icoS = Math.round(30 * u);
-  kit.icon(spec.iconName, r.x + icoS / 2, y + titleH / 2, icoS, c.text, spec.iconAlpha ?? 1);
-  const lvl = spec.tag ?? (spec.max ? `${spec.level}/${spec.max}` : '');
-  const lvlW = lvl ? kit.text.measure(lvl, kit.fs(14)) + L.gap : 0;
-  kit.drawText(spec.name, r.x + icoS + L.gap, y + titleH / 2, { size: kit.fs(14), color: c.text, maxWidth: r.w - icoS - L.gap - lvlW, shadow: true });
-  if (lvl) kit.drawText(lvl, r.x + r.w, y + titleH / 2, { size: kit.fs(14), color: c.amber, align: 'right' });
-  y += titleH;
-  if (spec.max) {
-    levelSegs(kit, { x: r.x, y: y + Math.round(2 * u), w: r.w, h: Math.round(10 * u) }, spec.level, spec.max, spec.cap);
-    y += segH;
-  }
-  if (spec.line) {
-    kit.drawText(spec.line, r.x, y + lineH / 2 - Math.round(2 * u), { size: kit.fs(11), color: c.textDim, maxWidth: r.w });
-    y += lineH;
-  }
-  for (const row of rows) {
-    kit.statDelta({ x: r.x, y, w: r.w, h: rowH }, row);
-    y += rowH + Math.round(L.gap * 0.3);
-  }
-  if (locks.length) y += lockRows(app, kit, r.x, y, r.w, locks, { goto: spec.goto });
-  if (spec.extra) y += spec.extra({ x: r.x, y, w: r.w }, u) || 0;
-
-  // подвал: цена и кнопка / «макс»
-  const fy = r.y + r.h - footH;
-  if (spec.noBuy) {
-    if (spec.cost) kit.costChip(r.x, fy + footH / 2, spec.cost, { size: kit.fs(13) });
-    if (spec.doneText) {
-      kit.lamp(r.x + r.w - Math.round(10 * u), fy + footH / 2, Math.round(15 * u), c.green, true);
-      kit.drawText(spec.doneText, r.x + r.w - Math.round(26 * u), fy + footH / 2, { size: kit.fs(13), color: c.green, align: 'right' });
+    if (hasButton) {
+      // подвал: табло цены (на экране эпохи) и кнопка; кнопка берёт сколько нужно подписи, не хватает места — значок убирается
+      const bsize = kit.fs(15);
+      const costW = spec.cost ? kit.costWidth(spec.cost, kit.fs(13)) : 0;
+      const powSize = kit.fs(13);
+      const powW = spec.power ? Math.round(powSize * 1.4) + kit.text.measure(spec.power.text, powSize) + L.gap : 0;
+      const availBtn = r.w - costW - powW - L.gap * 2 - cc * 4;
+      const want = kit.text.measure(spec.buyLabel, bsize) + Math.round(bsize * 1.9) + cc * 8;
+      const withIcon = want <= availBtn;
+      const btnW = Math.round(Math.max(Math.min(r.w * 0.52, availBtn), Math.min(want, availBtn)));
+      const price = { x: r.x, y: fy + cc, w: Math.max(cc * 12, r.w - btnW - L.gap), h: footH - cc * 2 };
+      kit.screen(`price-${spec.id}`, price, () => {
+        if (spec.cost) kit.costChip(price.x + cc * 3, fy + footH / 2, spec.cost, { have: { coins: p.coins, data: p.data }, size: kit.fs(13) });
+        if (spec.power) {
+          const px = price.x + cc * 3 + costW + L.gap;
+          kit.icon('bolt', px + powSize * 0.6, fy + footH / 2, Math.round(powSize * 1.4), spec.power.color);
+          kit.drawText(spec.power.text, px + Math.round(powSize * 1.4), fy + footH / 2, { size: powSize, color: spec.power.color });
+        }
+      }, { opaque: true });
+      if (kit.button(spec.buyId, { x: r.x + r.w - btnW, y: fy, w: btnW, h: footH }, { label: spec.buyLabel, variant: 'primary', disabled: !spec.canBuy, size: bsize, icon: withIcon ? 'plus' : undefined, lamp: spec.canBuy ? kit.c.green : false })) spec.onBuy?.();
     }
-  } else if (spec.next === false) {
-    kit.lamp(r.x + Math.round(10 * u), fy + footH / 2, Math.round(15 * u), c.green, true);
-    kit.drawText(spec.doneText || t('card.maxed'), r.x + Math.round(26 * u), fy + footH / 2, { size: kit.fs(14), color: c.green });
-  } else {
-    // кнопка берёт столько, сколько нужно подписи со значком; не хватает места — значок убирается
-    const bsize = kit.fs(15);
-    const costW = spec.cost ? kit.costWidth(spec.cost, kit.fs(13)) : 0;
-    const availBtn = r.w - costW - L.gap;
-    const want = kit.text.measure(spec.buyLabel, bsize) + Math.round(bsize * 1.9) + kit.cell() * 8;
-    const withIcon = want <= availBtn;
-    const btnW = Math.round(Math.max(Math.min(r.w * 0.52, availBtn), Math.min(want, availBtn)));
-    if (spec.cost) kit.costChip(r.x, fy + footH / 2, spec.cost, { have: { coins: p.coins, data: p.data }, size: kit.fs(13) });
-    const funds = (spec.locks || []).some(isFundsReason);
-    const sub = !spec.canBuy && !funds ? undefined : undefined;
-    void sub;
-    if (kit.button(spec.buyId, { x: r.x + r.w - btnW, y: fy, w: btnW, h: footH }, { label: spec.buyLabel, variant: 'primary', disabled: !spec.canBuy, size: bsize, icon: withIcon ? 'plus' : undefined, lamp: spec.canBuy ? kit.c.green : false })) spec.onBuy?.();
-  }
   });
   return co;
 }
@@ -344,7 +367,8 @@ export function eraCallout(app, kit, spec) {
   const p = app.profile;
   const es = app.rules.getEraState(p);
   const conds = eraConditions(es);
-  const calcH = (uu) => L.pad * 2 + Math.round(36 * uu) + Math.round(38 * uu) + (es.final ? 0 : conds.length * Math.round(28 * uu)) + (es.final ? Math.round(32 * uu) : Math.max(MIN_ROW, Math.round(52 * uu))) + L.gap * 1.5;
+  const padOf = (uu) => padOfL(L, uu);
+  const calcH = (uu) => padOf(uu) * 2 + Math.round(36 * uu) + Math.round(38 * uu) + (es.final ? 0 : conds.length * Math.round(28 * uu)) + (es.final ? Math.round(32 * uu) : Math.max(MIN_ROW, Math.round(52 * uu))) + L.gap * 1.5;
   const { u, bounds } = fitScale(L, spec.bounds, calcH);
   const w = Math.min(Math.round(310 * L.ui), 420, L.area.w - L.gap * 2);
   const titleH = Math.round(36 * u);
@@ -352,52 +376,61 @@ export function eraCallout(app, kit, spec) {
   const condH = Math.round(28 * u);
   const footH = es.final ? Math.round(32 * u) : Math.max(MIN_ROW, Math.round(52 * u));
   const h = calcH(u);
-  const co = kit.callout(spec.id || 'era', spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds, side: spec.side, variant: 'panel' });
+  const co = kit.callout(spec.id || 'era', spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds, side: spec.side, variant: 'panel', pad: padOf(u) });
   const r = co.inner;
   let y = r.y;
   let advanced = false;
   kit.withLayer(61, () => {
-  kit.icon('era', r.x + Math.round(15 * u), y + titleH / 2, Math.round(30 * u), c.amber);
-  kit.drawText(String(ERA_YEARS[p.era]), r.x + Math.round(36 * u), y + titleH / 2, { size: kit.fs(21), color: c.amberLight, shadow: true });
-  const yw = kit.text.measure(String(ERA_YEARS[p.era]), kit.fs(21));
-  kit.drawText(eraName(app, p.era), r.x + Math.round(46 * u) + yw, y + titleH / 2, { size: kit.fs(12), color: c.textDim, maxWidth: r.w - Math.round(46 * u) - yw });
-  y += titleH;
-  // лампы эпох
-  const step = r.w / 6;
-  for (let i = 0; i < 6; i++) {
-    const cx = r.x + step * (i + 0.5);
-    const done = i < p.era;
-    const now = i === p.era;
-    kit.lamp(cx, y + Math.round(10 * u), Math.round(17 * u), done ? c.green : now ? c.amber : c.navy2, done || now, now);
-    kit.drawText(String(ERA_YEARS[i]), cx, y + Math.round(30 * u), { size: Math.max(7, kit.fs(8)), color: now ? c.amberLight : done ? c.text : c.textMute, align: 'center' });
-  }
-  y += lampsH;
-  if (!es.final) {
-    for (const cd of conds) {
-      const mid = y + condH / 2;
-      kit.lamp(r.x + Math.round(8 * u), mid, Math.round(13 * u), cd.ok ? c.green : c.red, true);
-      const iconName = cd.kind === 'coins' ? 'coin' : cd.kind === 'data' ? 'data' : cd.kind === 'buildings' ? 'building' : 'target';
-      kit.icon(iconName, r.x + Math.round(30 * u), mid, Math.round(20 * u), cd.ok ? c.text : c.textDim);
-      const tx = r.x + Math.round(46 * u);
-      let str;
-      if (cd.kind === 'coins' || cd.kind === 'data') str = `${fmtCompact(cd.have)} / ${fmtCompact(cd.need)}`;
-      else if (cd.kind === 'buildings') str = t('era.cond.buildings', { have: cd.have, need: cd.need, level: cd.level });
-      else str = cd.text || cd.kind;
-      kit.drawText(str, tx, mid, { size: kit.fs(12), color: cd.ok ? c.text : c.textDim, maxWidth: r.x + r.w - tx });
-      y += condH;
+    const cc = kit.cell();
+    const fr = co.rect;
+    const fy = r.y + r.h - footH;
+    // экран эпохи: год, лампы эпох и условия перехода; кнопка «Новая эпоха» — на корпусе под ним
+    const scrBottom = es.final ? fr.y + fr.h - cc * 2 : fy - Math.round(L.gap * 0.4);
+    const scr = { x: fr.x + cc * 2, y: fr.y + cc * 2, w: fr.w - cc * 4, h: scrBottom - (fr.y + cc * 2) };
+    kit.screen(`callout-${spec.id || 'era'}`, scr, () => {
+      let y = r.y;
+      kit.icon('era', r.x + Math.round(15 * u), y + titleH / 2, Math.round(30 * u), c.amber);
+      kit.drawText(String(ERA_YEARS[p.era]), r.x + Math.round(36 * u), y + titleH / 2, { size: kit.fs(21), color: c.amberLight, shadow: true });
+      const yw = kit.text.measure(String(ERA_YEARS[p.era]), kit.fs(21));
+      kit.drawText(eraName(app, p.era), r.x + Math.round(46 * u) + yw, y + titleH / 2, { size: kit.fs(12), color: c.textDim, maxWidth: r.w - Math.round(46 * u) - yw });
+      y += titleH;
+      // лампы эпох
+      const step = r.w / 6;
+      for (let i = 0; i < 6; i++) {
+        const cx = r.x + step * (i + 0.5);
+        const done = i < p.era;
+        const now = i === p.era;
+        kit.lamp(cx, y + Math.round(10 * u), Math.round(17 * u), done ? c.green : now ? c.amber : c.navy2, done || now, now);
+        kit.drawText(String(ERA_YEARS[i]), cx, y + Math.round(30 * u), { size: Math.max(7, kit.fs(8)), color: now ? c.amberLight : done ? c.text : c.textMute, align: 'center' });
+      }
+      y += lampsH;
+      if (!es.final) {
+        for (const cd of conds) {
+          const mid = y + condH / 2;
+          kit.lamp(r.x + Math.round(8 * u), mid, Math.round(13 * u), cd.ok ? c.green : c.red, true);
+          const iconName = cd.kind === 'coins' ? 'coin' : cd.kind === 'data' ? 'data' : cd.kind === 'buildings' ? 'building' : 'target';
+          kit.icon(iconName, r.x + Math.round(30 * u), mid, Math.round(20 * u), cd.ok ? c.text : c.textDim);
+          const tx = r.x + Math.round(46 * u);
+          let str;
+          if (cd.kind === 'coins' || cd.kind === 'data') str = `${fmtCompact(cd.have)} / ${fmtCompact(cd.need)}`;
+          else if (cd.kind === 'buildings') str = t('era.cond.buildings', { have: cd.have, need: cd.need, level: cd.level });
+          else str = cd.text || cd.kind;
+          kit.drawText(str, tx, mid, { size: kit.fs(12), color: cd.ok ? c.text : c.textDim, maxWidth: r.x + r.w - tx });
+          y += condH;
+        }
+      }
+      if (es.final) {
+        kit.lamp(r.x + Math.round(10 * u), fy + footH / 2, Math.round(15 * u), c.green, true);
+        kit.drawText(t('card.maxed'), r.x + Math.round(26 * u), fy + footH / 2, { size: kit.fs(14), color: c.green });
+      }
+    }, { opaque: true });
+    if (!es.final && kit.button('era-advance', { x: r.x, y: fy, w: r.w, h: footH }, { label: t('era.advance'), variant: 'primary', disabled: !es.ok, icon: 'era', size: kit.fs(15), lamp: es.ok ? c.green : false })) {
+      const res = app.advanceEra();
+      if (res.ok) {
+        advanced = true;
+        kit.toast(t('era.done', { year: ERA_YEARS[res.profile.era] }), { kind: 'good', icon: 'era' });
+      }
     }
-  }
-  const fy = r.y + r.h - footH;
-  if (es.final) {
-    kit.lamp(r.x + Math.round(10 * u), fy + footH / 2, Math.round(15 * u), c.green, true);
-    kit.drawText(t('card.maxed'), r.x + Math.round(26 * u), fy + footH / 2, { size: kit.fs(14), color: c.green });
-  } else if (kit.button('era-advance', { x: r.x, y: fy, w: r.w, h: footH }, { label: t('era.advance'), variant: 'primary', disabled: !es.ok, icon: 'era', size: kit.fs(15), lamp: es.ok ? c.green : false })) {
-    const res = app.advanceEra();
-    if (res.ok) {
-      advanced = true;
-      kit.toast(t('era.done', { year: ERA_YEARS[res.profile.era] }), { kind: 'good', icon: 'era' });
-    }
-  }
   });
   return advanced;
 }

@@ -1,5 +1,8 @@
 // Палитра интерфейса — не больше 32 цветов, пиксельные рамки из трёх тонов со светом сверху-слева.
+// Эпоха базы подменяет часть цветов и рамок (skin/era-skins.js), число цветов палитры остаётся прежним: 32.
 // Цвета ресурсов: монеты — золото, данные — циан, мощность — зелёный, предупреждение — красный, акцент — янтарь.
+
+import { skinFor } from './skin/era-skins.js';
 
 export const PALETTE = Object.freeze({
   ink: '#05070e',
@@ -31,6 +34,10 @@ export const PALETTE = Object.freeze({
   cork0: '#6e4a26',
   cork1: '#a8743a',
   cork2: '#d09a5a',
+  // три тона материала корпуса (бакелит, слоновая кость, алюминий, карбон…): задаются эпохой
+  mat0: '#6d7884',
+  mat1: '#a3adb8',
+  mat2: '#d0d7de',
 });
 
 // режим для дальтоников: зелёно-красная пара и янтарь заменяются (ещё три цвета, всего 31)
@@ -78,13 +85,14 @@ const LABEL = {
 
 const cache = new Map();
 
-/** Тема по настройкам профиля. Объекты кэшируются, повторный вызов бесплатен. */
-export function getTheme(settings = {}) {
+/** Тема по настройкам профиля и эпохе базы (0–5). Объекты кэшируются, повторный вызов бесплатен. */
+export function getTheme(settings = {}, era = 0) {
   const cb = !!settings.colorblind;
-  const key = cb ? 'cb' : 'std';
+  const skin = skinFor(era);
+  const key = `${cb ? 'cb' : 'std'}:${skin.id}`;
   let theme = cache.get(key);
   if (theme) return theme;
-  const pal = { ...P };
+  const pal = { ...P, ...skin.palette };
   if (cb) {
     pal.green1 = CB.blue;
     pal.green2 = '#b6defa';
@@ -129,6 +137,7 @@ export function getTheme(settings = {}) {
     steel1: pal.steel1,
     steel2: pal.steel2,
     steel3: pal.steel3,
+    navy0: pal.navy0,
     navy1: pal.navy1,
     navy2: pal.navy2,
     paper0: pal.paper0,
@@ -137,20 +146,28 @@ export function getTheme(settings = {}) {
     cork0: pal.cork0,
     cork1: pal.cork1,
     cork2: pal.cork2,
+    mat0: pal.mat0,
+    mat1: pal.mat1,
+    mat2: pal.mat2,
     shade: pal.ink,
+    phosphor: skin.crt.tint,
   };
   const frames = {};
-  for (const [name, f] of Object.entries(FRAMES)) {
-    frames[name] = { hi: pal[f.hi], mid: pal[f.mid], lo: pal[f.lo], edge: pal[f.edge], rivets: !!f.rivets, dither: !!f.dither };
+  for (const [name, base] of Object.entries(FRAMES)) {
+    const f = { ...base, ...(skin.frames[name] || {}) };
+    frames[name] = { hi: pal[f.hi], mid: pal[f.mid], lo: pal[f.lo], edge: pal[f.edge], rivets: f.rivets === undefined ? false : f.rivets === true ? 'screw' : f.rivets === 'none' ? false : f.rivets, tex: f.tex || null, dither: !!f.dither };
   }
+  const labels = { ...LABEL, ...skin.labels };
   theme = {
     key,
+    era: skin.id,
+    skin,
     colorblind: cb,
     palette: pal,
     c,
     variants: frames,
     /** Цвет подписи на кнопке данного варианта. */
-    labelColor: (variant) => pal[LABEL[variant] || 'white'],
+    labelColor: (variant) => pal[labels[variant] || 'white'],
     good: c.green,
     bad: c.red,
     coin: c.gold,
@@ -216,4 +233,5 @@ export function nearestPalette(hex, pal = PALETTE) {
 }
 
 export const THEME_SOURCE = { PALETTE, CB, FRAMES };
+export { skinFor };
 export const FONT_FAMILY = 'monospace'; // запасной шрифт на случай сбоя пиксельного (не используется при нормальной работе)

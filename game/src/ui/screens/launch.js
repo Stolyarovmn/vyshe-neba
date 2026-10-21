@@ -4,6 +4,7 @@
 import { t } from '../../i18n/index.js';
 import { launchLayout } from '../layout.js';
 import { drawChrome, lockRows, isFundsReason, partIcon } from './common.js';
+import { mix } from '../theme.js';
 
 const DEST_ICON = { earth: 'earth', moon: 'moon', mars: 'mars' };
 const CONS = ['chute', 'repair', 'canister', 'magnet'];
@@ -53,28 +54,63 @@ export default {
       kit.lamp(cx + lampSize * 0.5, G.lamps.y + G.lamps.h / 2, lampSize, ok ? c.green : c.red, true, !ok);
     }
 
-    // три планеты: картинка, название и (для закрытой цели) замок с нужным условием — каждое на своём месте кнопки
-    dests.forEach((d, i) => {
-      const r = G.dest[i];
-      const on = st.dest === d.id;
+    // выбор цели: экран эпохи (ЭЛТ, плоский дисплей, голограмма) с тремя карточками-планетами; нажатия — поверх экрана
+    {
       const cc = kit.cell();
-      const clicked = kit.button(`launch-dest-${d.id}`, r, { variant: on ? 'cardOn' : 'card', locked: !d.ok, lamp: on ? c.green : false });
-      if (clicked) st.dest = d.id;
-      else if (kit.denied === `launch-dest-${d.id}`) kit.toast(t('launch.closed'), { kind: 'bad', icon: 'lock' });
-      const nameSize = kit.fs(L.portrait ? 12 : 14);
-      const glyphH = 7 * kit.text.stepFor(nameSize).css;
-      const chipH = d.ok ? 0 : Math.round(28 * L.ui);
-      // нижний край тела кнопки выше её «борта» на два пикселя клетки; под названием — поле
-      const nameY = r.y + r.h - cc * 2 - cc * 4 - chipH - glyphH / 2;
-      const room = nameY - glyphH / 2 - cc * 3 - (r.y + cc * 4);
-      const pic = Math.max(cc * 8, Math.min(Math.round(r.w * 0.62), Math.round(room)));
-      kit.icon(DEST_ICON[d.id], r.x + r.w / 2, r.y + cc * 4 + room / 2, pic, d.id === 'mars' ? '#e8845a' : c.text, d.ok ? 1 : 0.6);
-      kit.drawText(t(`dest.${d.id}`), r.x + r.w / 2, nameY, { size: nameSize, color: d.ok ? (on ? c.amberLight : c.text) : c.textMute, align: 'center', maxWidth: r.w - cc * 8, box: { x: r.x, y: r.y, w: r.w, h: r.h - cc * 2 } });
-      if (!d.ok) {
-        const why = d.reasons.filter((x) => !isFundsReason(x)).slice(0, 1);
-        if (why.length) lockRows(app, kit, r.x + cc * 2, r.y + r.h - cc * 5 - chipH, r.w - cc * 4, why, { compact: true });
-      }
-    });
+      const first = G.dest[0];
+      const last = G.dest[G.dest.length - 1];
+      const scr = { x: first.x - cc * 3, y: first.y - cc * 3, w: last.x + last.w - first.x + cc * 6, h: first.h + cc * 6 };
+      kit.nine('inset', scr.x - cc * 2, scr.y - cc * 2, scr.w + cc * 4, scr.h + cc * 4);
+      kit.screen('launch-dests', scr, () => {
+        dests.forEach((d, i) => {
+          const r0 = G.dest[i];
+          const id = `launch-dest-${d.id}`;
+          const a = kit.stepAnim(id);
+          const shake = a.shake > 0 && !app.settings.reduceMotion ? Math.round(Math.sin(a.shake * 40) * cc * 2 * a.shake) : 0;
+          const r = { x: r0.x + shake, y: r0.y + (a.press > 0.5 ? cc : 0), w: r0.w, h: r0.h };
+          const on = st.dest === d.id;
+          kit.rect(r.x, r.y, r.w, r.h, c.ink);
+          // на ЭЛТ выбранная карточка — только скобки: яркая заливка превратилась бы в сплошной блок люминофора
+          const crtKind = kit.S.skin.crt.kind;
+          kit.rect(r.x + cc, r.y + cc, r.w - cc * 2, r.h - cc * 2, on && !['green', 'amber', 'color'].includes(crtKind) ? mix(c.navy2, c.amber, 0.12) : c.navy1);
+          if (on) {
+            const arm = cc * 5;
+            for (const [bx, by, sx, sy] of [[r.x, r.y, 1, 1], [r.x + r.w, r.y, -1, 1], [r.x, r.y + r.h, 1, -1], [r.x + r.w, r.y + r.h, -1, -1]]) {
+              kit.rect(sx > 0 ? bx : bx - arm, sy > 0 ? by : by - cc, arm, cc, c.amberLight);
+              kit.rect(sx > 0 ? bx : bx - cc, sy > 0 ? by : by - arm, cc, arm, c.amberLight);
+            }
+          }
+          const nameSize = kit.fs(L.portrait ? 12 : 14);
+          const glyphH = 7 * kit.text.stepFor(nameSize).css;
+          const chipH = d.ok ? 0 : Math.round(28 * L.ui);
+          const nameY = r.y + r.h - cc * 4 - chipH - glyphH / 2;
+          const room = nameY - glyphH / 2 - cc * 3 - (r.y + cc * 4);
+          const pic = Math.max(cc * 8, Math.min(Math.round(r.w * 0.62), Math.round(room)));
+          kit.icon(DEST_ICON[d.id], r.x + r.w / 2, r.y + cc * 4 + room / 2, pic, d.id === 'mars' ? '#e8845a' : c.text, d.ok ? 1 : 0.6);
+          kit.drawText(t(`dest.${d.id}`), r.x + r.w / 2, nameY, { size: nameSize, color: d.ok ? (on ? c.amberLight : c.text) : c.textMute, align: 'center', maxWidth: r.w - cc * 8, box: { x: r.x, y: r.y, w: r.w, h: r.h } });
+          if (!d.ok) {
+            kit.icon('lock', r.x + r.w - cc * 7, r.y + cc * 7, Math.round(16 * L.ui), c.amber);
+            const why = d.reasons.filter((x) => !isFundsReason(x)).slice(0, 1);
+            if (why.length) lockRows(app, kit, r.x + cc * 2, r.y + r.h - cc * 3 - chipH, r.w - cc * 4, why, { compact: true });
+          }
+        });
+      });
+      dests.forEach((d, i) => {
+        const id = `launch-dest-${d.id}`;
+        const r = G.dest[i];
+        kit.hit(id, r, { focusable: true });
+        if (kit.S.focusVisible && kit.S.focusId === id) kit.focusRing(r);
+        if (kit.S.hover === id) kit.S.cursor = 'pointer';
+        if (kit.clicked === id) {
+          if (d.ok) st.dest = d.id;
+          else {
+            kit.anim(id).shake = 1;
+            kit.sfx('deny');
+            kit.toast(t('launch.closed'), { kind: 'bad', icon: 'lock' });
+          }
+        }
+      });
+    }
 
     // гнёзда расходников
     kit.nine('screen', G.cons.x, G.cons.y, G.cons.w, G.cons.h);

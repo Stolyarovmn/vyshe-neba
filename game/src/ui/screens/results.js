@@ -4,6 +4,7 @@
 import { t } from '../../i18n/index.js';
 import { resultsLayout } from '../layout.js';
 import { clamp, easeOutCubic, fmtAlt, fmtClock, fmtCompact, fmtInt, fmtSpeed } from '../format.js';
+import * as inst from '../skin/instruments.js';
 import { drawChrome, partShort, buildingShort, partIcon, buildingIcon } from './common.js';
 
 const FLY_COINS = 7;
@@ -168,7 +169,9 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
     const k = easeOutCubic(clamp((elapsed - 0.35 - i * 0.18) / 0.5, 0, 1));
     const r = stack ? { x, y: y + i * (sh + L.gap * 0.6), w, h: sh } : { x: x + i * ((w - L.gap * 2) / 3 + L.gap), y, w: (w - L.gap * 2) / 3, h: sh };
     const shown = i === 2 ? fmtClock(result.time * k) : countStr(val, k);
-    kit.segDisplay({ x: r.x + sh * 0.9, y: r.y, w: r.w - sh * 0.9, h: r.h }, shown, { lit: c.green, digits: Math.max(3, val.length), h: Math.round(sh * 0.5) });
+    // справа остаётся место под единицу измерения, чтобы она не налезала на цифры
+    const unitW = unit ? kit.text.measure(unit, Math.max(8, kit.fs(9))) + cc * 5 : 0;
+    inst.readout(kit, { x: r.x + sh * 0.9, y: r.y, w: r.w - sh * 0.9 - unitW, h: r.h }, shown, { lit: c.green, digits: Math.max(3, val.length), h: Math.round(sh * 0.5) });
     kit.nine('raised', r.x, r.y, sh * 0.9, r.h);
     kit.icon(icon, r.x + sh * 0.45, r.y + r.h / 2, Math.round(sh * 0.5), c.cyan);
     if (unit) kit.drawText(unit, r.x + r.w - cc * 3, r.y + r.h - cc * 4, { size: Math.max(8, kit.fs(9)), color: c.steel2, align: 'right' });
@@ -258,10 +261,10 @@ function drawRewardsColumn(app, kit, L, col, top, res, st, elapsed, dt) {
   const showD = dataDelta * totalK;
   kit.nine('raised', rc.x, rc.y, rc.w, rc.h);
   kit.icon('coin', rc.x + th * 0.5, rc.y + th / 2, Math.round(th * 0.6), c.gold);
-  kit.bigNumber(`${coinsDelta < 0 ? '-' : ''}${Math.round(showC)}`, rc.x + rc.w - cc * 4, rc.y + (th - Math.round(th * 0.5)) / 2, Math.round(th * 0.5), coinsDelta >= 0 ? c.gold : c.red, 'right');
+  inst.bigDigits(kit, `${coinsDelta < 0 ? '-' : ''}${Math.round(showC)}`, rc.x + rc.w - cc * 4, rc.y + (th - Math.round(th * 0.5)) / 2, Math.round(th * 0.5), coinsDelta >= 0 ? c.gold : c.red, 'right');
   kit.nine('raised', rd.x, rd.y, rd.w, rd.h);
   kit.icon('data', rd.x + th * 0.5, rd.y + th / 2, Math.round(th * 0.6), c.cyan);
-  kit.bigNumber(String(Math.round(showD)), rd.x + rd.w - cc * 4, rd.y + (th - Math.round(th * 0.5)) / 2, Math.round(th * 0.5), c.cyan, 'right');
+  inst.bigDigits(kit, String(Math.round(showD)), rd.x + rd.w - cc * 4, rd.y + (th - Math.round(th * 0.5)) / 2, Math.round(th * 0.5), c.cyan, 'right');
   y += th + L.gap;
 
   // монеты летят в табличку, когда набрались

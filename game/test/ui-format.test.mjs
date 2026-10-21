@@ -102,31 +102,38 @@ const pairs = (c) => [
 ].map(([a, b]) => [a, b, contrast(c[a], c[b])]);
 
 for (const [label, settings] of [['обычная палитра', {}], ['палитра для дальтоников', { colorblind: true }]]) {
-  test(`контраст WCAG AA (≥ 4,5) текста и акцентов на панелях, щитках, табло и бумаге: ${label}`, () => {
-    const { c } = getTheme(settings);
-    for (const [a, b, ratio] of pairs(c)) assert.ok(ratio >= 4.5, `${a} на ${b}: ${ratio.toFixed(2)}`);
-  });
+  for (let era = 0; era < 6; era++) {
+    test(`контраст WCAG AA (≥ 4,5) текста и акцентов на панелях, щитках, табло и бумаге: ${label}, эпоха ${era}`, () => {
+      const { c } = getTheme(settings, era);
+      for (const [a, b, ratio] of pairs(c)) assert.ok(ratio >= 4.5, `${a} на ${b}: ${ratio.toFixed(2)}`);
+    });
+  }
 }
 
-test('подписи кнопок читаются на своих заливках (≥ 4,5), обе палитры', () => {
+test('подписи кнопок читаются на своих заливках (≥ 4,5), обе палитры и все эпохи', () => {
   for (const settings of [{}, { colorblind: true }]) {
-    const th = getTheme(settings);
-    for (const base of ['btn', 'primary', 'danger', 'good']) {
-      for (const state of ['', 'Hover', 'Press']) {
-        const fill = th.variants[`${base}${state}`]?.mid;
-        if (!fill) continue;
-        const label = th.labelColor(`${base}${state}`);
-        assert.ok(contrast(label, fill) >= 4.5, `${base}${state}: ${contrast(label, fill).toFixed(2)}`);
+    for (let era = 0; era < 6; era++) {
+      const th = getTheme(settings, era);
+      for (const base of ['btn', 'primary', 'danger', 'good']) {
+        for (const state of ['', 'Hover', 'Press']) {
+          const fill = th.variants[`${base}${state}`]?.mid;
+          if (!fill) continue;
+          const label = th.labelColor(`${base}${state}`);
+          assert.ok(contrast(label, fill) >= 4.5, `эпоха ${era}, ${base}${state}: ${contrast(label, fill).toFixed(2)}`);
+        }
       }
     }
   }
 });
 
-test('палитра интерфейса: не больше 32 цветов, все цвета рамок взяты из неё', () => {
-  const th = getTheme({});
-  const colors = new Set(Object.values(th.palette));
-  assert.ok(colors.size <= 32, `цветов в палитре: ${colors.size}`);
-  for (const [name, v] of Object.entries(th.variants)) for (const k of ['hi', 'mid', 'lo', 'edge']) assert.ok(colors.has(v[k]), `${name}.${k} вне палитры`);
+test('палитра интерфейса: не больше 32 цветов в каждой эпохе, все цвета рамок взяты из неё', () => {
+  for (let era = 0; era < 6; era++) {
+    const th = getTheme({}, era);
+    const colors = new Set(Object.values(th.palette));
+    assert.ok(Object.keys(th.palette).length <= 32, `эпоха ${era}: ключей палитры ${Object.keys(th.palette).length}`);
+    assert.ok(colors.size <= 32, `эпоха ${era}: цветов в палитре: ${colors.size}`);
+    for (const [name, v] of Object.entries(th.variants)) for (const k of ['hi', 'mid', 'lo', 'edge']) assert.ok(colors.has(v[k]), `эпоха ${era}: ${name}.${k} вне палитры`);
+  }
 });
 
 test('режим дальтоника заменяет зелёно-красную пару и различим по яркости', () => {
@@ -205,4 +212,30 @@ test('t(): подстановка параметров, неизвестный �
   assert.equal(t('hud.pause', { x: 1 }), ru['hud.pause']);
   assert.equal(typeof plural, 'function');
   for (const [k, v] of Object.entries(ru)) assert.ok(typeof v === 'string' && v.length > 0, k);
+});
+
+// ---- модули и показатели «Ракеты» ----
+
+import { fmtInfo, deltaRows, PART_KEYS, statShort } from '../src/ui/screens/common.js';
+import { PARTS } from '../src/data/index.js';
+import { getPartState } from '../src/rules/index.js';
+import { fresh } from '../src/state/index.js';
+
+test('в мастерской восемь модулей без парашюта, все они есть в данных', () => {
+  assert.equal(PART_KEYS.length, 8);
+  assert.ok(!PART_KEYS.includes('parachute'));
+  for (const id of PART_KEYS) assert.ok(PARTS[id], id);
+});
+
+test('угол наклона стабилизаторов показывается в градусах: «11° → 17°»', () => {
+  const info = PARTS.fins.statInfo.find((i) => i.key === 'maxTilt');
+  assert.ok(info, 'нет показателя maxTilt у стабилизаторов');
+  assert.equal(fmtInfo(info, 0.2), '11°');
+  assert.equal(fmtInfo(info, 0.3), '17°');
+  const ps = getPartState(fresh(), 'fins');
+  const rows = deltaRows(PARTS.fins.statInfo, ps.current, ps.next.stats);
+  const row = rows.find((r) => r.key === 'maxTilt');
+  assert.ok(row && row.changed, 'угол должен расти с уровнем');
+  assert.equal(statShort(info), 'Угол наклона');
+  assert.match(`${row.fmt(row.before)} → ${row.fmt(row.after)}`, /^\d+° → \d+°$/);
 });

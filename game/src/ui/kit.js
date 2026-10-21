@@ -3,6 +3,7 @@
 // виджеты читают результат (clicked/hover/press) и рисуют себя. Всё в CSS-пикселях.
 
 import { createText } from './text.js';
+import { createCrt } from './skin/crt.js';
 import { drawSegments, segmentWidth } from './font-pixel.js';
 import { createIcons, hasIcon } from './icons.js';
 import { getTheme, mix } from './theme.js';
@@ -14,8 +15,18 @@ import { t } from '../i18n/index.js';
 const TAP_SLOP = 9;
 
 
-export function createKit({ sfx = () => {} } = {}) {
+export function createKit({ sfx = () => {}, exempt = null } = {}) {
   const text = createText();
+  const crt = createCrt();
+  // выполнить fn вне теста-стража: так помечаются части ЭЛТ, где разрешены градиенты и скругления (skin/crt.js)
+  const exemptRun = (fn) => {
+    const token = exempt ? exempt(true) : undefined;
+    try {
+      fn();
+    } finally {
+      if (exempt) exempt(false, token);
+    }
+  };
   const icons = createIcons();
   const anims = new Map();
   const scrolls = new Map();
@@ -120,7 +131,9 @@ export function createKit({ sfx = () => {} } = {}) {
     text.setAudit(frameAudit);
     text.setClip(null);
     S.settings = frame.settings || {};
-    S.th = getTheme(S.settings);
+    S.era = frame.era ?? 0;
+    S.th = getTheme(S.settings, S.era);
+    S.skin = S.th.skin;
     S.time = frame.time;
     S.dt = Math.min(0.1, frame.dt || 0);
     S.frame++;
@@ -465,9 +478,12 @@ export function createKit({ sfx = () => {} } = {}) {
       rect(x, y, w, h, f.edge);
       return;
     }
-    // тело
+    // тело: сплошное, «стекло» шашечным узором или материал эпохи (шлифованный металл, карбон)
     if (f.dither) {
       ctx.fillStyle = ditherPattern(f.mid, cc);
+      ctx.fillRect(x + cc, y + cc, w - cc * 2, h - cc * 2);
+    } else if (f.tex === 'brushed' || f.tex === 'carbon') {
+      ctx.fillStyle = texPattern(f.tex, f, cc);
       ctx.fillRect(x + cc, y + cc, w - cc * 2, h - cc * 2);
     } else rect(x + cc, y + cc, w - cc * 2, h - cc * 2, f.mid);
     // свет и тень
@@ -485,14 +501,72 @@ export function createKit({ sfx = () => {} } = {}) {
     ctx.fillRect(x + w - cc * 2, y + cc, cc, cc);
     ctx.fillRect(x + cc, y + h - cc * 2, cc, cc);
     ctx.fillRect(x + w - cc * 2, y + h - cc * 2, cc, cc);
+    // потёртости: светлые и тёмные царапины, расставленные по рамке детерминированно
+    if (f.tex === 'wear' && w >= cc * 20 && h >= cc * 14) {
+      let seed = ((x * 73856093) ^ (y * 19349663) ^ (w * 83492791) ^ (h * 2654435761)) >>> 0 || 1;
+      const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const n = clamp(Math.floor((w * h) / (cc * cc * 260)), 2, 22);
+      for (let i = 0; i < n; i++) {
+        const sx = x + cc * 3 + Math.floor((rnd() * (w - cc * 8)) / cc) * cc;
+        const sy = y + cc * 3 + Math.floor((rnd() * (h - cc * 8)) / cc) * cc;
+        const len = 1 + Math.floor(rnd() * 3);
+        rect(sx, sy, cc * len, cc, rnd() < 0.55 ? f.hi : f.lo);
+      }
+    }
     // заклёпки
     if (f.rivets && w >= cc * 16 && h >= cc * 12) {
       const o = cc * 3;
-      for (const [rx, ry] of [[x + o, y + o], [x + w - o - cc, y + o], [x + o, y + h - o - cc], [x + w - o - cc, y + h - o - cc]]) {
-        rect(rx, ry, cc, cc, f.hi);
-        rect(rx + cc, ry + cc, cc, cc, f.edge);
+      const pal = S.th.c;
+      for (const [rx, ry] of [[x + o, y + o], [x + w - o - cc * 2, y + o], [x + o, y + h - o - cc * 2], [x + w - o - cc * 2, y + h - o - cc * 2]]) {
+        if (f.rivets === 'brass') {
+          rect(rx, ry, cc, cc, pal.amberLight);
+          rect(rx + cc, ry, cc, cc, pal.amber);
+          rect(rx, ry + cc, cc, cc, pal.amber);
+          rect(rx + cc, ry + cc, cc, cc, pal.amberDeep);
+        } else if (f.rivets === 'screw') {
+          rect(rx, ry, cc, cc, pal.steel3);
+          rect(rx + cc, ry, cc, cc, pal.steel2);
+          rect(rx, ry + cc, cc, cc, pal.steel2);
+          rect(rx + cc, ry + cc, cc, cc, f.edge);
+        } else {
+          rect(rx, ry, cc, cc, f.hi);
+          rect(rx + cc, ry + cc, cc, cc, f.edge);
+        }
       }
     }
+  }
+
+  // узор материала: шлифованный металл (горизонтальные штрихи) и карбоновое плетение
+  const texCache = new Map();
+  function texPattern(kind, f, cc) {
+    const dpr = S.L.dpr;
+    const key = `${kind}|${f.mid}|${f.hi}|${f.lo}|${cc}|${dpr}`;
+    let p = texCache.get(key);
+    if (p) return p;
+    const dev = Math.max(1, Math.round(cc * dpr));
+    const tw = kind === 'brushed' ? 6 : 2;
+    const th = 2;
+    const tile = document.createElement('canvas');
+    tile.width = tw * dev;
+    tile.height = th * dev;
+    const g = tile.getContext('2d');
+    const cellAt = (cx, cy, color) => {
+      g.fillStyle = color;
+      g.fillRect(cx * dev, cy * dev, dev, dev);
+    };
+    for (let cy = 0; cy < th; cy++) for (let cx = 0; cx < tw; cx++) cellAt(cx, cy, f.mid);
+    if (kind === 'brushed') {
+      for (const cx of [1, 2, 3]) cellAt(cx, 1, mix(f.mid, f.hi, 0.22));
+      cellAt(5, 0, mix(f.mid, f.lo, 0.18));
+    } else {
+      const dark = mix(f.mid, '#000000', 0.4);
+      cellAt(1, 0, dark);
+      cellAt(0, 1, dark);
+    }
+    p = S.ctx.createPattern(tile, 'repeat');
+    p.setTransform(new DOMMatrix().scale(1 / dpr));
+    texCache.set(key, p);
+    return p;
   }
 
   /** Панель с жёсткой тенью и необязательным заголовком. Возвращает внутреннюю область. */
@@ -536,13 +610,72 @@ export function createKit({ sfx = () => {} } = {}) {
     drawText(s, cx, cy, { size, color: c.white, align: 'center' });
   }
 
+  /** Выполнить fn с оформлением другой эпохи (для переоснащения пульта: старые и новые панели рисуются рядом). */
+  function withEra(era, fn) {
+    const prev = { era: S.era, th: S.th, skin: S.skin };
+    S.era = era;
+    S.th = getTheme(S.settings, era);
+    S.skin = S.th.skin;
+    try {
+      fn();
+    } finally {
+      S.era = prev.era;
+      S.th = prev.th;
+      S.skin = prev.skin;
+    }
+  }
+
+  /** Круглое «свечение» вокруг горящей лампы: шашечный узор цвета лампы, без полупрозрачных градиентов. */
+  function ditherHalo(cx, cy, r, color) {
+    const cc = Math.max(1, Math.round(cell() / 2));
+    const ctx = S.ctx;
+    ctx.fillStyle = ditherPattern(color, cc);
+    const prev = ctx.globalAlpha;
+    ctx.globalAlpha = prev * 0.55;
+    for (let dy = -r; dy <= r; dy += cc) {
+      const half = Math.floor(Math.sqrt(Math.max(0, r * r - dy * dy)) / cc) * cc;
+      if (half > 0) ctx.fillRect(Math.round(cx - half), Math.round(cy + dy), half * 2, cc);
+    }
+    ctx.globalAlpha = prev;
+  }
+
   /** Лампа-индикатор: пиксельная «лампочка» 5×5 клеток. on — горит, blink — мигает. */
   function lamp(cx, cy, size, color, on = true, blink = false) {
     const cc = Math.max(1, Math.round(size / 5));
     const lit = on && (!blink || S.settings.reduceMotion || Math.floor(S.time * 4) % 2 === 0);
     const c = S.th.c;
+    const style = S.skin.lamp;
+    if (style !== 'bulb') {
+      // подсветка по эпохе: светодиод, полоска, тонкая линия, плоская точка
+      const glass = lit ? color : c.navy2;
+      const hi = lit ? c.white : c.steel0;
+      if (style === 'led') {
+        const x0 = Math.round(cx - cc * 1.5);
+        const y0 = Math.round(cy - cc * 1.5);
+        rect(x0 - cc, y0 - cc, cc * 5, cc * 5, c.ink);
+        rect(x0, y0, cc * 3, cc * 3, glass);
+        rect(x0, y0, cc, cc, hi);
+      } else if (style === 'bar') {
+        const x0 = Math.round(cx - cc * 3);
+        const y0 = Math.round(cy - cc);
+        rect(x0 - cc, y0 - cc, cc * 8, cc * 4, c.ink);
+        rect(x0, y0, cc * 6, cc * 2, glass);
+        if (lit) rect(x0, y0, cc * 6, cc, mix(color, '#ffffff', 0.5));
+      } else if (style === 'line') {
+        rect(Math.round(cx - cc * 3), Math.round(cy), cc * 6, cc, lit ? color : c.steel0);
+      } else {
+        const x0 = Math.round(cx - cc);
+        const y0 = Math.round(cy - cc);
+        if (lit) {
+          ditherHalo(cx, cy, cc * 3, color);
+          rect(x0, y0, cc * 2, cc * 2, mix(color, '#ffffff', 0.35));
+        } else rect(x0, y0, cc * 2, cc * 2, c.steel0);
+      }
+      return;
+    }
     const x0 = Math.round(cx - cc * 2.5);
     const y0 = Math.round(cy - cc * 2.5);
+    if (lit) ditherHalo(cx, cy, cc * 4, color);
     const rows = ['.###.', '#####', '#####', '#####', '.###.'];
     const glass = lit ? color : c.navy2;
     rows.forEach((row, ry) => {
@@ -555,19 +688,81 @@ export function createKit({ sfx = () => {} } = {}) {
     rect(x0 + cc, y0 + cc, cc, cc, lit ? c.white : c.steel0);
   }
 
+  /**
+   * Экран эпохи: ЭЛТ (E0 зелёный, E1 янтарный, E2 цветной), плоский дисплей (E3), проекция (E4), голограмма (E5).
+   * draw(rect) рисует содержимое обычными примитивами кита в координатах окна; для ЭЛТ оно идёт в offscreen,
+   * затем искривляется, окрашивается люминофором, получает развёртку, виньетку и послесвечение (skin/crt.js).
+   */
+  function screen(id, r, draw, o = {}) {
+    const sk = S.skin.crt;
+    const c = S.th.c;
+    const cc = cell();
+    const rr = { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.w), h: Math.round(r.h) };
+    if (rr.w < cc * 4 || rr.h < cc * 4) return;
+    if (sk.kind === 'green' || sk.kind === 'amber' || sk.kind === 'color') {
+      let begun = null;
+      exemptRun(() => {
+        begun = crt.begin(id, rr.w, rr.h, S.L.dpr, sk, cc);
+      });
+      const { g, entry } = begun;
+      const prev = S.ctx;
+      S.ctx = g;
+      g.save();
+      g.translate(-rr.x, -rr.y);
+      try {
+        draw(rr);
+      } finally {
+        g.restore();
+        S.ctx = prev;
+      }
+      exemptRun(() => crt.compose(prev, entry, rr, sk, { time: S.time, reduceMotion: S.settings.reduceMotion, cc }));
+      return;
+    }
+    if (sk.kind === 'flat') {
+      rect(rr.x, rr.y, rr.w, rr.h, c.ink);
+      rect(rr.x + cc, rr.y + cc, rr.w - cc * 2, rr.h - cc * 2, c.navy0);
+    } else {
+      // проекция и голограмма: стекло шашечным узором (фон сцены просвечивает), у щитков со своим текстом — сплошное;
+      // по углам светящиеся скобки
+      if (o.opaque) rect(rr.x, rr.y, rr.w, rr.h, c.navy0);
+      else {
+        S.ctx.fillStyle = ditherPattern(c.navy0, cc);
+        S.ctx.fillRect(rr.x, rr.y, rr.w, rr.h);
+      }
+      const arm = cc * 4;
+      const col = sk.kind === 'holo' ? c.cyan : c.cyan;
+      for (const [x, y, sx, sy] of [[rr.x, rr.y, 1, 1], [rr.x + rr.w, rr.y, -1, 1], [rr.x, rr.y + rr.h, 1, -1], [rr.x + rr.w, rr.y + rr.h, -1, -1]]) {
+        rect(sx > 0 ? x : x - arm, sy > 0 ? y : y - cc, arm, cc, col);
+        rect(sx > 0 ? x : x - cc, sy > 0 ? y : y - arm, cc, arm, col);
+      }
+      if (sk.kind === 'holo' && !S.settings.reduceMotion) {
+        const yy = rr.y + Math.floor(((S.time * 0.35) % 1) * (rr.h / cc)) * cc;
+        rect(rr.x + cc, yy, rr.w - cc * 2, cc, mix(c.cyan, c.navy0, 0.82));
+      }
+    }
+    draw(rr);
+  }
+
   /** Угловая металлическая табличка с пиксельной иконкой и числом. */
   function plate(x, y, w, h, iconName, value, color) {
     const cc = cell();
     nine('raised', x, y, w, h);
     const iw = Math.round(h * 0.82); // ширина области значка
-    const screen = { x: x + iw - cc * 2, y: y + cc * 3, w: w - iw - cc, h: h - cc * 6 };
-    nine('screen', screen.x, screen.y, screen.w, screen.h);
+    const scr = { x: x + iw - cc * 2, y: y + cc * 3, w: w - iw - cc, h: h - cc * 6 };
     icon(iconName, x + iw * 0.5 - cc, y + h / 2, Math.round(h * 0.62), color);
     const size = Math.round(h * 0.34);
-    const room = screen.w - cc * 5;
+    const room = scr.w - cc * 5;
     let str = typeof value === 'number' ? fmtInt(value) : String(value);
-    if (text.measure(str, size) > room && typeof value === 'number') str = fmtTiny(value);
-    drawText(str, screen.x + screen.w - cc * 3, y + h / 2, { size, color, align: 'right', maxWidth: room, shadow: true, box: screen });
+    // число целиком, пока оно помещается не мельче ×2; иначе — самая короткая запись (12К, 1,5М)
+    let fitted = text.fit(str, room, size);
+    if (typeof value === 'number' && (fitted.str !== str || text.scaleFor(fitted.size) < 2)) {
+      str = fmtTiny(value);
+      fitted = text.fit(str, room, size);
+    }
+    // число — на экране эпохи (ЭЛТ, светодиодное табло, плоский дисплей)
+    screen(`plate-${iconName}`, scr, () => {
+      drawText(str, scr.x + scr.w - cc * 3, y + h / 2, { size: fitted.size, color, align: 'right', maxWidth: room, shadow: true, box: scr });
+    });
   }
 
   // ---------- кнопки ----------
@@ -1055,7 +1250,7 @@ export function createKit({ sfx = () => {} } = {}) {
         }
       }
     });
-    const pad = L.pad;
+    const pad = o.pad ?? L.pad;
     return { rect: r, inner: { x: r.x + pad, y: r.y + pad, w: r.w - pad * 2, h: r.h - pad * 2 }, side };
   }
 
@@ -1306,6 +1501,8 @@ export function createKit({ sfx = () => {} } = {}) {
     text,
     icons,
     audit,
+    screen,
+    withEra,
     begin,
     end,
     hit,

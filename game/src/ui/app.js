@@ -42,7 +42,19 @@ const NEW_MECHANICS = ['gantry', 'weather', 'control', 'radar', 'observation', '
 export function createApp({ canvas, mods, store, prefs, savePrefs, input, renderer, audio, profile }) {
   const ctx = canvas.getContext('2d', { alpha: false });
   const sfx = createSfx(() => app.audio);
-  const kit = createKit({ sfx });
+  const kit = createKit({
+    sfx,
+    // части ЭЛТ (кривизна, градиенты) не входят в тест-страж: на время их вывода флаг слоя интерфейса снимается
+    exempt: (enter, prev) => {
+      if (enter) {
+        const was = app.uiDrawing;
+        app.uiDrawing = false;
+        return was;
+      }
+      app.uiDrawing = prev;
+      return undefined;
+    },
+  });
 
   const app = {
     canvas,
@@ -65,6 +77,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     params: {},
     history: [],
     iris: null,
+    refit: null,
+    skinEra: profile.era,
     shakeT: 0,
     uiDrawing: false,
     session: null,
@@ -269,13 +283,14 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
   };
 
   app.advanceEra = () => {
+    const before = app.profile;
     const res = app.rules.advanceEra(app.profile);
     if (!res.ok) {
       sfx('deny');
       return res;
     }
     app.commit(res.profile);
-    sfx('era');
+    startRefit(before.era, res.profile.era);
     app.haptic([20, 40, 30]);
     try {
       renderer.hub.playEra?.();
@@ -694,8 +709,9 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     }
 
     const events = input.drain(dt);
+    if (!app.refit) app.skinEra = app.profile.era;
     kit.S.auditScreen = app.screen;
-    kit.begin(ctx, { L, settings: app.settings, time: app.time, dt, events });
+    kit.begin(ctx, { L, settings: app.settings, time: app.time, dt, events, era: app.skinEra ?? app.profile.era });
     try {
       const t0 = performance.now();
       drawBackground(app.screen);
@@ -719,6 +735,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       console.error('[app] draw:', err);
     }
     app.uiDrawing = true;
+    drawRefit(dt);
     drawIris(dt);
     kit.end();
     app.uiDrawing = false;
@@ -739,6 +756,81 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       }
     }
   };
+
+  // ---------- переоснащение пульта при смене эпохи ----------
+
+  const REFIT_TIME = 1.4;
+
+  function startRefit(from, to) {
+    if (app.settings.reduceMotion || from === to || !app.layout) {
+      app.skinEra = to;
+      sfx('era');
+      return;
+    }
+    app.refit = { t: 0, from, to, clicks: 0 };
+    app.skinEra = from;
+  }
+
+  /**
+   * Анимация ≤ 1,5 с: лампы гаснут, створки панелей старой эпохи смыкаются (щелчок реле), под ними меняется оформление,
+   * створки новой эпохи раздвигаются, лампы загораются по очереди (щелчки и звук эпохи).
+   */
+  function drawRefit(dt) {
+    const rf = app.refit;
+    if (!rf) return;
+    rf.t += dt;
+    const L = app.layout;
+    const k = rf.t / REFIT_TIME;
+    const cc = L.cell;
+    // щелчки реле и звук эпохи
+    const marks = [0.04, 0.3, 0.62, 0.8];
+    while (rf.clicks < marks.length && k >= marks[rf.clicks]) {
+      sfx(rf.clicks === 3 ? 'era' : rf.clicks === 1 ? 'build-complete' : 'press');
+      rf.clicks++;
+    }
+    if (k >= 1) {
+      app.refit = null;
+      app.skinEra = rf.to;
+      return;
+    }
+    // фазы: 0–0.25 лампы гаснут, 0.25–0.5 створки смыкаются, 0.5 смена оформления, 0.5–0.75 створки расходятся, 0.75–1 лампы зажигаются
+    if (k >= 0.5 && app.skinEra !== rf.to) app.skinEra = rf.to;
+    const era = k < 0.5 ? rf.from : rf.to;
+    const close = k < 0.25 ? 0 : k < 0.5 ? (k - 0.25) / 0.25 : k < 0.75 ? 1 - (k - 0.5) / 0.25 : 0;
+    const dark = k < 0.25 ? k / 0.25 : k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25;
+    app.uiDrawing = true;
+    kit.withLayer(300, () => {
+      kit.hit('refit-barrier', { x: 0, y: 0, w: L.w, h: L.h }, {});
+      // затемнение: шашечный узор тёмных пикселей, плотность растёт ступенями
+      const steps = Math.round(dark * 3);
+      if (steps > 0) {
+        ctx.fillStyle = kit.ditherPattern(kit.c.ink, cc);
+        for (let i = 0; i < steps; i++) ctx.fillRect(0, 0, L.w, L.h);
+      }
+      if (close > 0) {
+        kit.withEra(era, () => {
+          const half = Math.ceil(L.w / 2);
+          const off = Math.round((1 - close) * half / (cc * 2)) * cc * 2;
+          for (const side of [0, 1]) {
+            const x = side === 0 ? -off : half - 0 + off;
+            kit.nine('raised', x - (side === 0 ? 0 : 0), 0, half, L.h);
+            // болты створки и разделительный шов
+            for (let y = L.h * 0.12; y < L.h; y += L.h * 0.19) {
+              const bx = side === 0 ? x + half - cc * 8 : x + cc * 8;
+              kit.rect(Math.round(bx), Math.round(y), cc * 2, cc * 2, kit.c.steel3);
+              kit.rect(Math.round(bx) + cc, Math.round(y) + cc, cc, cc, kit.c.ink);
+            }
+          }
+          // ряд ламп на шве загорается по очереди новой подсветкой
+          const lampsOn = k < 0.5 ? 0 : Math.min(5, Math.floor(((k - 0.5) / 0.5) * 7));
+          for (let i = 0; i < 5; i++) kit.lamp(L.w / 2, L.h * (0.3 + i * 0.1), cc * 8, kit.c.amber, i < lampsOn || (k > 0.75 && i < 5));
+        });
+      }
+    });
+    app.uiDrawing = false;
+  }
+
+  app.startRefit = startRefit;
 
   /** Раскрытие сцены кругом из клеток от места нажатия за ≈ 220 мс. */
   function drawIris(dt) {
