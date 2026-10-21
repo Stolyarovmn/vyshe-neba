@@ -2,7 +2,10 @@
 (function(root){
 'use strict';
 const TOP=6400,BOTTOM=-132,WIDTH=1600,LEFT=-800;
-const ISLAND_WORLD_LEFT=-330,ISLAND_WORLD_TOP=510,ISLAND_WORLD_WIDTH=1650,OCEAN_SURFACE_Y=150;
+const ISLAND_SOURCE_WIDTH=1916,ISLAND_SOURCE_HEIGHT=821,ISLAND_PAD_X=388,ISLAND_PAD_Y=375;
+const ISLAND_WORLD_WIDTH=1650,ISLAND_WORLD_SCALE=ISLAND_WORLD_WIDTH/ISLAND_SOURCE_WIDTH;
+/* The measured HD launch-pad center is the Earth world origin. */
+const ISLAND_WORLD_LEFT=-ISLAND_PAD_X*ISLAND_WORLD_SCALE,ISLAND_WORLD_TOP=ISLAND_PAD_Y*ISLAND_WORLD_SCALE,OCEAN_SURFACE_Y=150;
 const hash=(x,y)=>{let n=Math.imul(x^73471,y^19283);n=Math.imul(n^(n>>>16),2246822519);return ((n^(n>>>13))>>>0)/4294967296;};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 let atlas=null,islandImage=null,islandReady=null;
@@ -80,7 +83,7 @@ function draw(ctx,cam,r,p,art){
    }
   }
   drawOcean(ctx,cam,r,project,z);
-  const island=islandAsset(),islandHeight=ISLAND_WORLD_WIDTH*(island.naturalHeight||821)/(island.naturalWidth||1916);
+  const island=islandAsset(),islandHeight=ISLAND_WORLD_WIDTH*(island.naturalHeight||ISLAND_SOURCE_HEIGHT)/(island.naturalWidth||ISLAND_SOURCE_WIDTH);
   if(island.complete&&island.naturalWidth&&right>ISLAND_WORLD_LEFT&&left<ISLAND_WORLD_LEFT+ISLAND_WORLD_WIDTH){
    const q=project(ISLAND_WORLD_LEFT,ISLAND_WORLD_TOP);
    ctx.drawImage(island,q.x,q.y,ISLAND_WORLD_WIDTH*z,islandHeight*z);
@@ -102,5 +105,5 @@ function draw(ctx,cam,r,p,art){
  }
  ctx.restore();
 }
-root.WorldArt={draw,color,preload,qa(){return{island:{left:ISLAND_WORLD_LEFT,top:ISLAND_WORLD_TOP,width:ISLAND_WORLD_WIDTH},oceanSurfaceY:OCEAN_SURFACE_Y,clearWater:waterPalette({}),stormWater:waterPalette({effectiveCloud:1,effectiveRain:1,effectiveStorm:1})};}};
+root.WorldArt={draw,color,preload,qa(){return{island:{left:ISLAND_WORLD_LEFT,top:ISLAND_WORLD_TOP,width:ISLAND_WORLD_WIDTH,scale:ISLAND_WORLD_SCALE,source:[ISLAND_SOURCE_WIDTH,ISLAND_SOURCE_HEIGHT],padPx:[ISLAND_PAD_X,ISLAND_PAD_Y],padWorld:[ISLAND_WORLD_LEFT+ISLAND_PAD_X*ISLAND_WORLD_SCALE,ISLAND_WORLD_TOP-ISLAND_PAD_Y*ISLAND_WORLD_SCALE]},oceanSurfaceY:OCEAN_SURFACE_Y,clearWater:waterPalette({}),stormWater:waterPalette({effectiveCloud:1,effectiveRain:1,effectiveStorm:1})};}};
 })(typeof window!=='undefined'?window:globalThis);
