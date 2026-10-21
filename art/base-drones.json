@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "classification": "Noninteractive replacement for the original 2060 background drones; no new gameplay",
+  "source": "base_drone_static_v2_sheet",
+  "sliceCommand": "python3 tools/ref2game/slice.py art/gen/base_drone_static_v2_sheet.png base_drone_0,base_drone_1 --order x",
+  "notes": "Fan-well centres visually measured in prepared source pixels, uncertainty +/-4 source px. Fan radii and decorative trajectories are authored code geometry. Transparent RGB haze is not visible when correctly alpha composited.",
+  "parts": [
+    {"name":"base_drone_0","sourceSHA256":"2a80be22d7d62a89a35990cc154d4ed294f9af41dfa58963de8f02f7f137df1b","size":[606,354],"fans":[[301,25,45],[68,115,40],[530,143,40]]},
+    {"name":"base_drone_1","sourceSHA256":"8473786b3463d531ccabac22e5dc55392043a66b7accb5b98069c2d736481524","size":[738,365],"fans":[[396,28,46],[134,56,37],[656,57,37],[81,130,39],[658,154,39]]}
+  ],
+  "placements": [[296,236,26,0],[385,232,30,1],[475,176,22,0],[544,159,20,1]]
+}

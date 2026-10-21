@@ -1,0 +1,10 @@
+{
+  "asset": "w06_hull_diagnostics",
+  "source": "procedural pixel-art authoring on the canonical 1 LP grid",
+  "reason": "multiple built-in image generation attempts returned the already-existing flight simulator instead of W06 and were rejected rather than mislabeled",
+  "canvas_lp": [184,220],
+  "era_layout": {"cols":3,"rows":2,"reading_order":["E0","E1","E2","E3","E4","E5"]},
+  "palette_policy": "design-bible material ramps, <=32 indexed colors per exported PNG, no dithering",
+  "fx_policy": "no baked beam/glow/dynamic screen data",
+  "geometry_provenance": "rail, anchor and scanner-head pivots are measured from the authored runtime pixels and stored in manifest.json"
+}

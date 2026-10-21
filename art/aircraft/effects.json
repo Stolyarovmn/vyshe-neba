@@ -1,0 +1,1865 @@
+{
+  "version": 2,
+  "coordinateSpace": "normalized full prepared image",
+  "source": "art/aircraft/anchor-candidates-r2.json",
+  "profiles": {
+    "low_primary_1978": {
+      "engineType": "piston",
+      "sourceSize": [
+        247,
+        177
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            225,
+            85,
+            40
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            43,
+            104,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.91093117,
+          0.48022599,
+          0.2259887
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.17408907,
+          0.58757062,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_1986": {
+      "engineType": "piston",
+      "sourceSize": [
+        236,
+        178
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            219,
+            95,
+            40
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            56,
+            126,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.9279661,
+          0.53370787,
+          0.2247191
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.23728814,
+          0.70786517,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_1998": {
+      "engineType": "piston",
+      "sourceSize": [
+        247,
+        187
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            231,
+            95,
+            42
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            55,
+            123,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.93522267,
+          0.50802139,
+          0.22459893
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.22267206,
+          0.65775401,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_2015": {
+      "engineType": "piston",
+      "sourceSize": [
+        226,
+        177
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            210,
+            103,
+            40
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            57,
+            131,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.92920354,
+          0.5819209,
+          0.2259887
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.25221239,
+          0.74011299,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_2035": {
+      "engineType": "piston",
+      "sourceSize": [
+        248,
+        177
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            234,
+            104,
+            40
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            83,
+            139,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.94354839,
+          0.58757062,
+          0.2259887
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.33467742,
+          0.78531073,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_primary_2060": {
+      "engineType": "piston",
+      "sourceSize": [
+        245,
+        155
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            230,
+            111,
+            35
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            83,
+            139,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.93877551,
+          0.71612903,
+          0.22580645
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.33877551,
+          0.89677419,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_1978": {
+      "engineType": "piston",
+      "sourceSize": [
+        262,
+        189
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            239,
+            96,
+            45
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            36,
+            136,
+            "red"
+          ],
+          [
+            251,
+            34,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": " Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.91221374,
+          0.50793651,
+          0.23809524
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.13740458,
+          0.71957672,
+          "red"
+        ],
+        [
+          0.95801527,
+          0.17989418,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_1986": {
+      "engineType": "piston",
+      "sourceSize": [
+        232,
+        189
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            212,
+            96,
+            45
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            39,
+            132,
+            "red"
+          ],
+          [
+            225,
+            35,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": " Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.9137931,
+          0.50793651,
+          0.23809524
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.16810345,
+          0.6984127,
+          "red"
+        ],
+        [
+          0.96982759,
+          0.18518519,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_1998": {
+      "engineType": "piston",
+      "sourceSize": [
+        247,
+        189
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            224,
+            84,
+            43
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            32,
+            15,
+            "red"
+          ],
+          [
+            237,
+            18,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": " Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.90688259,
+          0.44444444,
+          0.22751323
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.12955466,
+          0.07936508,
+          "red"
+        ],
+        [
+          0.95951417,
+          0.0952381,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_2015": {
+      "engineType": "piston",
+      "sourceSize": [
+        256,
+        190
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            240,
+            100,
+            44
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            53,
+            47,
+            "red"
+          ],
+          [
+            247,
+            42,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": " Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.9375,
+          0.52631579,
+          0.23157895
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.20703125,
+          0.24736842,
+          "red"
+        ],
+        [
+          0.96484375,
+          0.22105263,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_2035": {
+      "engineType": "piston",
+      "sourceSize": [
+        272,
+        211
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            256,
+            145,
+            44
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            78,
+            192,
+            "red"
+          ],
+          [
+            229,
+            36,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": " Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px. Candidate snapped to nearest alpha>=128 material within8px for physical attachment.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.94117647,
+          0.68720379,
+          0.20853081
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.28676471,
+          0.90995261,
+          "red"
+        ],
+        [
+          0.84191176,
+          0.17061611,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "low_multiwing_2060": {
+      "engineType": "piston",
+      "sourceSize": [
+        261,
+        199
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            130,
+            40,
+            28
+          ],
+          [
+            243,
+            61,
+            28
+          ],
+          [
+            149,
+            151,
+            28
+          ],
+          [
+            245,
+            143,
+            30
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            44,
+            149,
+            "red"
+          ],
+          [
+            209,
+            67,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "All4 distinct distributed spinner centers measured. Top-front motor is farther from camera; validate draw order so its propeller does not overpaint nearer struts/body. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px. Candidate snapped to nearest alpha>=128 material within8px for physical attachment.",
+      "uncertaintyPx": 3,
+      "propellers": [
+        [
+          0.49808429,
+          0.20100503,
+          0.14070352
+        ],
+        [
+          0.93103448,
+          0.30653266,
+          0.14070352
+        ],
+        [
+          0.57088123,
+          0.75879397,
+          0.14070352
+        ],
+        [
+          0.93869732,
+          0.71859296,
+          0.15075377
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.16858238,
+          0.74874372,
+          "red"
+        ],
+        [
+          0.80076628,
+          0.33668342,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_passenger_1978": {
+      "engineType": "piston",
+      "sourceSize": [
+        740,
+        327
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            389,
+            285,
+            70
+          ],
+          [
+            550,
+            285,
+            70
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            162,
+            253,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. ",
+      "uncertaintyPx": 5,
+      "propellers": [
+        [
+          0.52567568,
+          0.87155963,
+          0.21406728
+        ],
+        [
+          0.74324324,
+          0.87155963,
+          0.21406728
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.21891892,
+          0.77370031,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_passenger_1986": {
+      "engineType": "civilJet",
+      "sourceSize": [
+        251,
+        147
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            90,
+            133
+          ],
+          [
+            135,
+            123
+          ]
+        ],
+        "fans": [
+          [
+            115,
+            132
+          ],
+          [
+            158,
+            123
+          ]
+        ],
+        "navLights": [
+          [
+            24,
+            136,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. ",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.35856574,
+          0.9047619
+        ],
+        [
+          0.53784861,
+          0.83673469
+        ]
+      ],
+      "fans": [
+        [
+          0.45816733,
+          0.89795918
+        ],
+        [
+          0.62948207,
+          0.83673469
+        ]
+      ],
+      "navLights": [
+        [
+          0.09561753,
+          0.92517007,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_passenger_1998": {
+      "engineType": "civilJet",
+      "sourceSize": [
+        255,
+        160
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            95,
+            142
+          ],
+          [
+            41,
+            59
+          ]
+        ],
+        "fans": [
+          [
+            136,
+            143
+          ],
+          [
+            83,
+            59
+          ]
+        ],
+        "navLights": [
+          [
+            12,
+            150,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. ",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.37254902,
+          0.8875
+        ],
+        [
+          0.16078431,
+          0.36875
+        ]
+      ],
+      "fans": [
+        [
+          0.53333333,
+          0.89375
+        ],
+        [
+          0.3254902,
+          0.36875
+        ]
+      ],
+      "navLights": [
+        [
+          0.04705882,
+          0.9375,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_passenger_2015": {
+      "engineType": "civilJet",
+      "sourceSize": [
+        261,
+        133
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            110,
+            116
+          ]
+        ],
+        "fans": [
+          [
+            153,
+            116
+          ]
+        ],
+        "navLights": [
+          [
+            33,
+            121,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. ",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.42145594,
+          0.87218045
+        ]
+      ],
+      "fans": [
+        [
+          0.5862069,
+          0.87218045
+        ]
+      ],
+      "navLights": [
+        [
+          0.12643678,
+          0.90977444,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_passenger_2035": {
+      "engineType": "civilJet",
+      "sourceSize": [
+        249,
+        167
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            119,
+            141
+          ]
+        ],
+        "fans": [
+          [
+            163,
+            141
+          ]
+        ],
+        "navLights": [
+          [
+            33,
+            158,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. ",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.47791165,
+          0.84431138
+        ]
+      ],
+      "fans": [
+        [
+          0.65461847,
+          0.84431138
+        ]
+      ],
+      "navLights": [
+        [
+          0.13253012,
+          0.94610778,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_passenger_2060": {
+      "engineType": "civilJet",
+      "sourceSize": [
+        259,
+        135
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            38,
+            125,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. Blended-wing2060 has no clearly exposed engine/fan, omit rather than draw generic civilJet fan on body.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.14671815,
+          0.92592593,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_cargo_1978": {
+      "engineType": "piston",
+      "sourceSize": [
+        741,
+        363
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            491,
+            243,
+            70
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            280,
+            243,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. Only upper high-wing nacelle has exposed spinner. Closed lower silver capsule/pod has no visible propeller hub: omit any propeller there; no new mechanism requested.",
+      "uncertaintyPx": 5,
+      "propellers": [
+        [
+          0.66261808,
+          0.66942149,
+          0.19283747
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.37786775,
+          0.66942149,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_cargo_1986": {
+      "engineType": "piston",
+      "sourceSize": [
+        650,
+        333
+      ],
+      "sourcePixels": {
+        "propellers": [
+          [
+            440,
+            200,
+            72
+          ],
+          [
+            369,
+            263,
+            72
+          ]
+        ],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            103,
+            314,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. ",
+      "uncertaintyPx": 5,
+      "propellers": [
+        [
+          0.67692308,
+          0.6006006,
+          0.21621622
+        ],
+        [
+          0.56769231,
+          0.78978979,
+          0.21621622
+        ]
+      ],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.15846154,
+          0.94294294,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_cargo_1998": {
+      "engineType": "civilJet",
+      "sourceSize": [
+        274,
+        169
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            83,
+            151
+          ],
+          [
+            135,
+            140
+          ]
+        ],
+        "fans": [
+          [
+            123,
+            152
+          ],
+          [
+            171,
+            141
+          ]
+        ],
+        "navLights": [
+          [
+            41,
+            152,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. ",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.30291971,
+          0.89349112
+        ],
+        [
+          0.49270073,
+          0.82840237
+        ]
+      ],
+      "fans": [
+        [
+          0.44890511,
+          0.89940828
+        ],
+        [
+          0.62408759,
+          0.83431953
+        ]
+      ],
+      "navLights": [
+        [
+          0.14963504,
+          0.89940828,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_cargo_2015": {
+      "engineType": "civilJet",
+      "sourceSize": [
+        264,
+        142
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            121,
+            127
+          ]
+        ],
+        "fans": [
+          [
+            162,
+            127
+          ]
+        ],
+        "navLights": [
+          [
+            22,
+            134,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. ",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.45833333,
+          0.8943662
+        ]
+      ],
+      "fans": [
+        [
+          0.61363636,
+          0.8943662
+        ]
+      ],
+      "navLights": [
+        [
+          0.08333333,
+          0.94366197,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_cargo_2035": {
+      "engineType": "civilJet",
+      "sourceSize": [
+        312,
+        157
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            136,
+            137
+          ],
+          [
+            177,
+            111
+          ]
+        ],
+        "fans": [
+          [
+            171,
+            139
+          ],
+          [
+            211,
+            114
+          ]
+        ],
+        "navLights": [
+          [
+            74,
+            148,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification.  Candidate snapped to nearest alpha>=128 material within8px for physical attachment.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.43589744,
+          0.87261146
+        ],
+        [
+          0.56730769,
+          0.70700637
+        ]
+      ],
+      "fans": [
+        [
+          0.54807692,
+          0.88535032
+        ],
+        [
+          0.67628205,
+          0.72611465
+        ]
+      ],
+      "navLights": [
+        [
+          0.23717949,
+          0.94267516,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "medium_cargo_2060": {
+      "engineType": "civilJet",
+      "sourceSize": [
+        252,
+        138
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            9,
+            133,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Visual native image landmark measurements; visible mounts only, opposite wing hidden/ambiguous so no speculative second light. Prop radii authored as rig geometry because blades are absent. Fan centers lie on front nacelle opening; exhaust points are rear housing boundaries and need behind-body occlusion verification. Blended-wing2060 has no clearly exposed fan/outlet at generic metadata position. No fan or exhaust assigned.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.03571429,
+          0.96376812,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_fighter_1978": {
+      "engineType": "earlyJet",
+      "sourceSize": [
+        233,
+        141
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            24,
+            66
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            45,
+            136,
+            "red"
+          ],
+          [
+            145,
+            46,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": " Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.10300429,
+          0.46808511
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.19313305,
+          0.96453901,
+          "red"
+        ],
+        [
+          0.6223176,
+          0.32624113,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_fighter_1986": {
+      "engineType": "fighterJet",
+      "sourceSize": [
+        250,
+        141
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            20,
+            76
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            53,
+            135,
+            "red"
+          ],
+          [
+            158,
+            46,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": " Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.08,
+          0.53900709
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.212,
+          0.95744681,
+          "red"
+        ],
+        [
+          0.632,
+          0.32624113,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_fighter_1998": {
+      "engineType": "fighterJet",
+      "sourceSize": [
+        224,
+        166
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            25,
+            89
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            12,
+            157,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.11160714,
+          0.53614458
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.05357143,
+          0.94578313,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_fighter_2015": {
+      "engineType": "modernAfterburner",
+      "sourceSize": [
+        253,
+        146
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            12,
+            76
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            34,
+            137,
+            "red"
+          ],
+          [
+            142,
+            53,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": " Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.04743083,
+          0.52054795
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.13438735,
+          0.93835616,
+          "red"
+        ],
+        [
+          0.56126482,
+          0.3630137,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_fighter_2035": {
+      "engineType": "modernAfterburner",
+      "sourceSize": [
+        253,
+        143
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            14,
+            72
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            43,
+            136,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.05533597,
+          0.5034965
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.16996047,
+          0.95104895,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_fighter_2060": {
+      "engineType": "modernAfterburner",
+      "sourceSize": [
+        279,
+        181
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            45,
+            92
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            15,
+            177,
+            "red"
+          ],
+          [
+            32,
+            9,
+            "green"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": " Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.16129032,
+          0.50828729
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.05376344,
+          0.97790055,
+          "red"
+        ],
+        [
+          0.11469534,
+          0.04972376,
+          "green"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_experimental_1978": {
+      "engineType": "rocketWarm",
+      "sourceSize": [
+        238,
+        130
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            11,
+            72
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            20,
+            125,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.04621849,
+          0.55384615
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.08403361,
+          0.96153846,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_experimental_1986": {
+      "engineType": "rocketWarm",
+      "sourceSize": [
+        228,
+        115
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            11,
+            58
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            16,
+            105,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.04824561,
+          0.50434783
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.07017544,
+          0.91304348,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_experimental_1998": {
+      "engineType": "modernAfterburner",
+      "sourceSize": [
+        256,
+        135
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [],
+        "fans": [],
+        "navLights": [
+          [
+            45,
+            130,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. No clearly exposed dark rear nozzle on this source silhouette. Engine exit withheld; inspect/regenerate rear outlet before enabling exhaust. Do not emit from generic x=.05,y=.5. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [],
+      "fans": [],
+      "navLights": [
+        [
+          0.17578125,
+          0.96296296,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_experimental_2015": {
+      "engineType": "modernAfterburner",
+      "sourceSize": [
+        268,
+        114
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            11,
+            61
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            18,
+            109,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.04104478,
+          0.53508772
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.06716418,
+          0.95614035,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    },
+    "high_experimental_2035": {
+      "engineType": "modernAfterburner",
+      "sourceSize": [
+        262,
+        113
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            22,
+            61
+          ]
+        ],
+        "fans": [],
+        "navLights": [],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Blended body wing contour does not expose a clear main-wing tip in this view; navigation-light mounts withheld. Vertical-tail tips are not substituted for wings. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.08396947,
+          0.53982301
+        ]
+      ],
+      "fans": [],
+      "navLights": [],
+      "contrailPoints": []
+    },
+    "high_experimental_2060": {
+      "engineType": "plasmaBlue",
+      "sourceSize": [
+        276,
+        93
+      ],
+      "sourcePixels": {
+        "propellers": [],
+        "engines": [
+          [
+            12,
+            48
+          ]
+        ],
+        "fans": [],
+        "navLights": [
+          [
+            26,
+            90,
+            "red"
+          ]
+        ],
+        "contrailPoints": []
+      },
+      "measurementNotes": "Opposite main wing-tip mount not clearly visible: omit hidden light rather than invent mirrored point. Available points are visible candidates, not proof of actual aviation port/starboard handedness. Prop radii are authored rig candidates, not measured blades (body-only source); color assignment is proposed rig convention. Landmark +-3px; nav mount +-5px.",
+      "uncertaintyPx": 3,
+      "propellers": [],
+      "engines": [
+        [
+          0.04347826,
+          0.51612903
+        ]
+      ],
+      "fans": [],
+      "navLights": [
+        [
+          0.0942029,
+          0.96774194,
+          "red"
+        ]
+      ],
+      "contrailPoints": []
+    }
+  },
+  "sprites": {
+    "low_primary_1978": "low_primary_1978",
+    "low_primary_1986": "low_primary_1986",
+    "low_primary_1998": "low_primary_1998",
+    "low_primary_2015": "low_primary_2015",
+    "low_primary_2035": "low_primary_2035",
+    "low_primary_2060": "low_primary_2060",
+    "low_multiwing_1978": "low_multiwing_1978",
+    "low_multiwing_1986": "low_multiwing_1986",
+    "low_multiwing_1998": "low_multiwing_1998",
+    "low_multiwing_2015": "low_multiwing_2015",
+    "low_multiwing_2035": "low_multiwing_2035",
+    "low_multiwing_2060": "low_multiwing_2060",
+    "medium_passenger_1978": "medium_passenger_1978",
+    "medium_passenger_1986": "medium_passenger_1986",
+    "medium_passenger_1998": "medium_passenger_1998",
+    "medium_passenger_2015": "medium_passenger_2015",
+    "medium_passenger_2035": "medium_passenger_2035",
+    "medium_passenger_2060": "medium_passenger_2060",
+    "medium_cargo_1978": "medium_cargo_1978",
+    "medium_cargo_1986": "medium_cargo_1986",
+    "medium_cargo_1998": "medium_cargo_1998",
+    "medium_cargo_2015": "medium_cargo_2015",
+    "medium_cargo_2035": "medium_cargo_2035",
+    "medium_cargo_2060": "medium_cargo_2060",
+    "high_fighter_1978": "high_fighter_1978",
+    "high_fighter_1986": "high_fighter_1986",
+    "high_fighter_1998": "high_fighter_1998",
+    "high_fighter_2015": "high_fighter_2015",
+    "high_fighter_2035": "high_fighter_2035",
+    "high_fighter_2060": "high_fighter_2060",
+    "high_experimental_1978": "high_experimental_1978",
+    "high_experimental_1986": "high_experimental_1986",
+    "high_experimental_1998": "high_experimental_1998",
+    "high_experimental_2015": "high_experimental_2015",
+    "high_experimental_2035": "high_experimental_2035",
+    "high_experimental_2060": "high_experimental_2060"
+  }
+}

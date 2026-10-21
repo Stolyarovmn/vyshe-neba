@@ -1,0 +1,17 @@
+name: W04 asset candidate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'art/raw/placeables/workshop/flight_simulator/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    uses: ./.github/workflows/asset-candidate.yml
+    with:
+      asset: W04

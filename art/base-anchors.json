@@ -1,0 +1,374 @@
+{
+  "version": 1,
+  "source": "art/gen/base_static_sheet.png",
+  "sourceSHA256": "2c3fae4d551fc898aad23527b037d2706a0360184bdd225d31c928a85742f6e5",
+  "comparisonSource": "outputs/rocket/dist/assets/base-eras.png",
+  "comparisonSHA256": "556ca6c212fdcfc18a4841f545fadc917671c76028ffd0c16b6b65a6a18076c2",
+  "size": [
+    1774,
+    887
+  ],
+  "grid": {
+    "columns": 3,
+    "rows": 2,
+    "cellSize": [
+      591.3333333333334,
+      443.5
+    ],
+    "runtimeSourceInset": 2,
+    "runtimeCellDestinationSize": [
+      1280,
+      800
+    ]
+  },
+  "coordinateSystem": "x/y in native source pixels local to the nominal era cell, origin top-left; manual visual measurement uncertainty includes <=1px integer-crop rounding",
+  "worldMapping": {
+    "x": "-650 + (x-2)*1280/(1774/3-4)",
+    "y": "600 - (y-2)*800/(887/2-4)"
+  },
+  "usage": "Observed hardware centres are measured; authored points are proposed emitters attached to observed fixtures/mast tips, not claims that an original lamp lens exists there. Emit subtle code light, never add physical poles. Check assembled scene before shipping.",
+  "eras": [
+    {
+      "year": 1978,
+      "cell": [
+        0,
+        0
+      ],
+      "sourceCellOrigin": [
+        0.0,
+        0.0
+      ],
+      "lamps": [
+        {
+          "id": "lamp-0",
+          "x": 197,
+          "y": 220,
+          "uncertaintyPixels": 2,
+          "evidence": "observed_hanging_lamp_housing",
+          "emitterAuthored": false,
+          "suggestedColor": "#ffd6a0"
+        },
+        {
+          "id": "lamp-1",
+          "x": 439,
+          "y": 245,
+          "uncertaintyPixels": 2,
+          "evidence": "observed_curved_pole_lamp_housing",
+          "emitterAuthored": false,
+          "suggestedColor": "#ffd6a0"
+        }
+      ],
+      "beacons": [
+        {
+          "id": "beacon-0",
+          "x": 166,
+          "y": 91,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        }
+      ]
+    },
+    {
+      "year": 1986,
+      "cell": [
+        1,
+        0
+      ],
+      "sourceCellOrigin": [
+        591.3333333333334,
+        0.0
+      ],
+      "lamps": [
+        {
+          "id": "lamp-0",
+          "x": 197,
+          "y": 220,
+          "uncertaintyPixels": 2,
+          "evidence": "observed_hanging_lamp_housing",
+          "emitterAuthored": false,
+          "suggestedColor": "#ffd6a0"
+        },
+        {
+          "id": "lamp-1",
+          "x": 439,
+          "y": 245,
+          "uncertaintyPixels": 2,
+          "evidence": "observed_curved_pole_lamp_housing",
+          "emitterAuthored": false,
+          "suggestedColor": "#ffd6a0"
+        }
+      ],
+      "beacons": [
+        {
+          "id": "beacon-0",
+          "x": 149,
+          "y": 119,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-1",
+          "x": 166,
+          "y": 91,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-2",
+          "x": 179,
+          "y": 130,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        }
+      ]
+    },
+    {
+      "year": 1998,
+      "cell": [
+        2,
+        0
+      ],
+      "sourceCellOrigin": [
+        1182.6666666666667,
+        0.0
+      ],
+      "lamps": [
+        {
+          "id": "lamp-0",
+          "x": 141,
+          "y": 188,
+          "uncertaintyPixels": 3,
+          "evidence": "authored_on_observed_tower_service_fixture",
+          "emitterAuthored": true,
+          "suggestedColor": "#ffd6a0"
+        },
+        {
+          "id": "lamp-1",
+          "x": 445,
+          "y": 211,
+          "uncertaintyPixels": 3,
+          "evidence": "authored_on_observed_service_pole_cap",
+          "emitterAuthored": true,
+          "suggestedColor": "#ffd6a0"
+        }
+      ],
+      "beacons": [
+        {
+          "id": "beacon-0",
+          "x": 165,
+          "y": 76,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-1",
+          "x": 188,
+          "y": 84,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-2",
+          "x": 201,
+          "y": 50,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        }
+      ]
+    },
+    {
+      "year": 2015,
+      "cell": [
+        0,
+        1
+      ],
+      "sourceCellOrigin": [
+        0.0,
+        443.5
+      ],
+      "lamps": [
+        {
+          "id": "lamp-0",
+          "x": 123,
+          "y": 292,
+          "uncertaintyPixels": 3,
+          "evidence": "observed_wall_fixture",
+          "emitterAuthored": false,
+          "suggestedColor": "#ffd6a0"
+        },
+        {
+          "id": "lamp-1",
+          "x": 418,
+          "y": 258,
+          "uncertaintyPixels": 3,
+          "evidence": "observed_curved_service_lamp_housing",
+          "emitterAuthored": false,
+          "suggestedColor": "#ffd6a0"
+        }
+      ],
+      "beacons": [
+        {
+          "id": "beacon-0",
+          "x": 192,
+          "y": 23,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-1",
+          "x": 224,
+          "y": 38,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-2",
+          "x": 167,
+          "y": 69,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        }
+      ]
+    },
+    {
+      "year": 2035,
+      "cell": [
+        1,
+        1
+      ],
+      "sourceCellOrigin": [
+        591.3333333333334,
+        443.5
+      ],
+      "lamps": [
+        {
+          "id": "lamp-0",
+          "x": 150,
+          "y": 284,
+          "uncertaintyPixels": 3,
+          "evidence": "authored_on_observed_wall_service_fixture",
+          "emitterAuthored": true,
+          "suggestedColor": "#ffd6a0"
+        },
+        {
+          "id": "lamp-1",
+          "x": 440,
+          "y": 212,
+          "uncertaintyPixels": 4,
+          "evidence": "authored_on_observed_service_column_cap",
+          "emitterAuthored": true,
+          "suggestedColor": "#ffd6a0"
+        }
+      ],
+      "beacons": [
+        {
+          "id": "beacon-0",
+          "x": 191,
+          "y": 19,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-1",
+          "x": 212,
+          "y": 8,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-2",
+          "x": 168,
+          "y": 53,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        }
+      ]
+    },
+    {
+      "year": 2060,
+      "cell": [
+        2,
+        1
+      ],
+      "sourceCellOrigin": [
+        1182.6666666666667,
+        443.5
+      ],
+      "lamps": [
+        {
+          "id": "lamp-0",
+          "x": 151,
+          "y": 283,
+          "uncertaintyPixels": 3,
+          "evidence": "authored_on_observed_wall_service_fixture",
+          "emitterAuthored": true,
+          "suggestedColor": "#ffd6a0"
+        },
+        {
+          "id": "lamp-1",
+          "x": 440,
+          "y": 214,
+          "uncertaintyPixels": 4,
+          "evidence": "authored_on_observed_service_column_cap",
+          "emitterAuthored": true,
+          "suggestedColor": "#ffd6a0"
+        }
+      ],
+      "beacons": [
+        {
+          "id": "beacon-0",
+          "x": 190,
+          "y": 19,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-1",
+          "x": 211,
+          "y": 8,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        },
+        {
+          "id": "beacon-2",
+          "x": 168,
+          "y": 53,
+          "uncertaintyPixels": 2,
+          "evidence": "authored_on_observed_mast_tip; hardware endpoint is visible, beacon lens is not independently established",
+          "emitterAuthored": true,
+          "suggestedColor": "#ff6858"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "vyshe-neba-production",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Выше неба: производство (документы, тесты, pipeline арта, скрипты подготовки)",
+  "scripts": {
+    "test:unit": "node --test \"game/test/**/*.test.mjs\"",
+    "economy": "node game/tools/economy-bot.mjs",
+    "probe:landing": "node game/tools/probe-landing.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "playwright": "1.62.1"
+  }
+}

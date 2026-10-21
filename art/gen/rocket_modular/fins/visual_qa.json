@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "asset_id": "R_FINS",
+  "asset": "rocket_fins",
+  "overall_status": "approved",
+  "reviewer": "self-review/ref2game",
+  "review_basis": "Visual self-review of the six-era fins lineage contact sheet plus exact candidate automatic QA. The approval below is bound to the exact post-pipeline candidate PNG SHA-256 values from candidate-manifest.json.",
+  "checks": {
+    "isolated_component": "pass",
+    "transparent_runtime_sprite": "pass",
+    "readable_silhouette": "pass",
+    "consistent_projection": "pass",
+    "upper_left_lighting": "pass",
+    "era_progression": "pass",
+    "no_text_logos_ui_baked_fx": "pass",
+    "separate_from_capsule_body_engine": "pass"
+  },
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "fe2ccb3b966af772a3abaaceb945d521547a581e6b2e9b6f272f740b8298d84b",
+      "note": "Simple red stabilizer pair with readable early-era construction."
+    },
+    "e1_1986": {
+      "status": "approved",
+      "sha256": "56efe253f150838c7396b230c0dc915f01afbd5ca1fd35574c08daf7cb5917ed",
+      "note": "Broader reinforced fins form a clear incremental upgrade from E0."
+    },
+    "e2_1998": {
+      "status": "approved",
+      "sha256": "3cc13bd6a84488219fd5299d9e3016911e7220061aaa88aa0488ed46186b2280",
+      "note": "More structured paneling and supports while retaining the family silhouette."
+    },
+    "e3_2015": {
+      "status": "approved",
+      "sha256": "aab12ca653d2513fcd7f4b96932fe0d28d228021e4814b51182dd2f56581341a",
+      "note": "Sharper modern geometry remains readable and physically plausible."
+    },
+    "e4_2035": {
+      "status": "approved",
+      "sha256": "ed5bea57c5bd41b40287867a86dde572e4f4147d950a586afb4d59aca0bfda81",
+      "note": "Future-era fin structure advances silhouette and material language coherently."
+    },
+    "e5_2060": {
+      "status": "approved",
+      "sha256": "bfe2888d2388366b5825a828e55182c2a5184eedf6bc846bf5e22ce04260a8ca",
+      "note": "Compact advanced stabilizers remain distinct from body and capsule geometry."
+    }
+  }
+}

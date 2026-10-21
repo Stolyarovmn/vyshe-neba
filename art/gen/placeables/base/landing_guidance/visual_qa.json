@@ -1,0 +1,30 @@
+{
+  "asset_id": "B03",
+  "asset": "landing_guidance",
+  "stage": "gameplay_size_visual_geometry",
+  "result": "fail_regenerate",
+  "canvas": [46, 82],
+  "registration_target": [23, 78],
+  "prompt_contract": {
+    "target_visible_width_lp": [38, 42],
+    "target_visible_height_lp": [70, 76],
+    "shape": "tall narrow landing beacon; base -> mast/yoke -> aiming head -> lamp"
+  },
+  "processed_candidate": {
+    "e0_1978": {"visible_bbox": [5, 36, 41, 78], "visible_bbox_size": [36, 42]},
+    "e1_1986": {"visible_bbox": [4, 40, 43, 78], "visible_bbox_size": [39, 38]},
+    "e2_1998": {"visible_bbox": [2, 40, 43, 78], "visible_bbox_size": [41, 38]},
+    "e3_2015": {"visible_bbox": [3, 41, 43, 78], "visible_bbox_size": [40, 37]},
+    "e4_2035": {"visible_bbox": [4, 39, 43, 78], "visible_bbox_size": [39, 39]},
+    "e5_2060": {"visible_bbox": [8, 43, 39, 78], "visible_bbox_size": [31, 35]}
+  },
+  "automatic_qa": "pass",
+  "visual_findings": [
+    "All six candidates are far too short for the authored 46x82 LP portrait footprint: visible height is only 35-42 LP versus the 70-76 LP production target.",
+    "Width is already near the 38-42 LP target in E1-E4, so scaling the processed family up cannot fix height without overflowing horizontally; the defect is source geometry, not normalization.",
+    "The lineage reads as a squat horizontal camera/tracker on a wide stance rather than the required tall landing beacon hierarchy.",
+    "E5 collapses further to 31x35 LP and loses the intended tall mast/yoke silhouette."
+  ],
+  "decision": "Reject this processed lineage for runtime. Keep art/gen files only as QA evidence. Regenerate E0 with the current prompt silhouette contract, archive the approved original, then evolve E1-E5 sequentially from the approved predecessor before re-running Pixel Snapper/Aseprite.",
+  "runtime_published": false
+}

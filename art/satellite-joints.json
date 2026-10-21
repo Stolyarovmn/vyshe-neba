@@ -1,0 +1,492 @@
+{
+  "version": 1,
+  "coordinateConvention": "Source PNG pixel coordinates [x,y], origin top left; normalize independently by bodySize/panelSize before using prepared assets. Side order: left, right. Same panel art mirrored for left.",
+  "method": "Visual pixel-grid inspection of physical artwork plus prepared alpha measurements. Existing body art does not expose unambiguous paired solar-array hinges. bodyJoints null explicitly means not observed. authoredAttachmentCandidates are proposed rig design, not inferred hidden hardware.",
+  "nativeScale": {
+    "bodyWidth": 38,
+    "panelWidth": 46,
+    "unit": "logical game px; independent of camera zoom"
+  },
+  "eras": {
+    "1978": {
+      "bodySize": [
+        222,
+        258
+      ],
+      "panelSize": [
+        164,
+        92
+      ],
+      "bodyJoints": null,
+      "panelRoot": [
+        11,
+        43
+      ],
+      "uncertaintyPx": {
+        "observedBodyJoints": null,
+        "panelRoot": 3,
+        "authoredCandidatePosition": 4
+      },
+      "authoredAttachmentCandidates": {
+        "bodyJoints": [
+          [
+            48,
+            146
+          ],
+          [
+            169,
+            147
+          ]
+        ],
+        "reviewedSidewallPoints": [
+          [
+            40,
+            146
+          ],
+          [
+            176,
+            147
+          ]
+        ],
+        "classification": "authored rig placement, not measured physical hinges",
+        "verdict": "feasible_for_overlap_rig",
+        "requiresNativeRuntimeReview": true,
+        "measurements": [
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.369
+          },
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.198
+          }
+        ],
+        "panelRootNearestOpaqueMaterialGamePx": 0.0,
+        "maximumConnectorToBodyMaterialGapGamePx": 0.0
+      },
+      "notes": "No exposed paired solar hinges. Proposed connector roots overlap visible sidewall; keep original appendages as existing static hardware, not mislabeled solar pivots.",
+      "sources": {
+        "body": {
+          "path": "art/gen/satellite_1978.png",
+          "sha256": "4574762d64d2b981ed156de4708ba1455ee14aa43fe56c12e991b6e0533b7402"
+        },
+        "panel": {
+          "path": "art/gen/panel_1978.png",
+          "sha256": "d397bd67e1f445c029e3f3928c74a672545c17c4547b676e2f44aa26289b5ac8"
+        }
+      },
+      "preparedSizes": {
+        "body": [
+          222,
+          258
+        ],
+        "panel": [
+          164,
+          92
+        ]
+      }
+    },
+    "1986": {
+      "bodySize": [
+        203,
+        273
+      ],
+      "panelSize": [
+        214,
+        108
+      ],
+      "bodyJoints": null,
+      "panelRoot": [
+        11,
+        64
+      ],
+      "uncertaintyPx": {
+        "observedBodyJoints": null,
+        "panelRoot": 3,
+        "authoredCandidatePosition": 4
+      },
+      "authoredAttachmentCandidates": {
+        "bodyJoints": [
+          [
+            35,
+            152
+          ],
+          [
+            132,
+            152
+          ]
+        ],
+        "reviewedSidewallPoints": [
+          [
+            28,
+            152
+          ],
+          [
+            140,
+            152
+          ]
+        ],
+        "classification": "authored rig placement, not measured physical hinges",
+        "verdict": "feasible_for_overlap_rig",
+        "requiresNativeRuntimeReview": true,
+        "measurements": [
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.31
+          },
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.498
+          }
+        ],
+        "panelRootNearestOpaqueMaterialGamePx": 0.0,
+        "maximumConnectorToBodyMaterialGapGamePx": 0.0
+      },
+      "notes": "No exposed paired solar hinges. Proposed connector roots overlap visible sidewall; keep original appendages as existing static hardware, not mislabeled solar pivots.",
+      "sources": {
+        "body": {
+          "path": "art/gen/satellite_1986.png",
+          "sha256": "74b08e578da495d6ce1383ed62ea4c12dde6bc23ca8d3faee83224d6dee18a91"
+        },
+        "panel": {
+          "path": "art/gen/panel_1986.png",
+          "sha256": "c4e038f5e3a18b2cafd40e2aa1eae0c7f51454af8b053179d8d539d226bca466"
+        }
+      },
+      "preparedSizes": {
+        "body": [
+          203,
+          273
+        ],
+        "panel": [
+          214,
+          108
+        ]
+      }
+    },
+    "1998": {
+      "bodySize": [
+        214,
+        270
+      ],
+      "panelSize": [
+        242,
+        131
+      ],
+      "bodyJoints": null,
+      "panelRoot": [
+        12,
+        79
+      ],
+      "uncertaintyPx": {
+        "observedBodyJoints": null,
+        "panelRoot": 3,
+        "authoredCandidatePosition": 4
+      },
+      "authoredAttachmentCandidates": {
+        "bodyJoints": [
+          [
+            28,
+            171
+          ],
+          [
+            167,
+            146
+          ]
+        ],
+        "reviewedSidewallPoints": [
+          [
+            21,
+            171
+          ],
+          [
+            175,
+            146
+          ]
+        ],
+        "classification": "authored rig placement, not measured physical hinges",
+        "verdict": "feasible_for_overlap_rig",
+        "requiresNativeRuntimeReview": true,
+        "measurements": [
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.243
+          },
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.421
+          }
+        ],
+        "panelRootNearestOpaqueMaterialGamePx": 0.0095,
+        "maximumConnectorToBodyMaterialGapGamePx": 0.0095
+      },
+      "notes": "No exposed paired solar hinges. Proposed connector roots overlap visible sidewall; keep original appendages as existing static hardware, not mislabeled solar pivots.",
+      "sources": {
+        "body": {
+          "path": "art/gen/satellite_1998.png",
+          "sha256": "ce62102e9e16e76b3b69abfe52d8636564fb1c0d8e52e6c590c2c5f98bf4796d"
+        },
+        "panel": {
+          "path": "art/gen/panel_1998.png",
+          "sha256": "19053f4d0c51d5345700b206456b896a02a0f5cbe7d5a5c4cd1e073fedcd6fa4"
+        }
+      },
+      "preparedSizes": {
+        "body": [
+          214,
+          270
+        ],
+        "panel": [
+          241,
+          131
+        ]
+      }
+    },
+    "2015": {
+      "bodySize": [
+        166,
+        215
+      ],
+      "panelSize": [
+        282,
+        132
+      ],
+      "bodyJoints": null,
+      "panelRoot": [
+        11,
+        78
+      ],
+      "uncertaintyPx": {
+        "observedBodyJoints": null,
+        "panelRoot": 3,
+        "authoredCandidatePosition": 4
+      },
+      "authoredAttachmentCandidates": {
+        "bodyJoints": [
+          [
+            14,
+            118
+          ],
+          [
+            150,
+            118
+          ]
+        ],
+        "reviewedSidewallPoints": [
+          [
+            7,
+            118
+          ],
+          [
+            158,
+            118
+          ]
+        ],
+        "classification": "authored rig placement, not measured physical hinges",
+        "verdict": "feasible_for_overlap_rig",
+        "requiresNativeRuntimeReview": true,
+        "measurements": [
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.602
+          },
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.831
+          }
+        ],
+        "panelRootNearestOpaqueMaterialGamePx": 0.0,
+        "maximumConnectorToBodyMaterialGapGamePx": 0.0
+      },
+      "notes": "Cube has no unambiguous protruding side hinge. Candidates deliberately author attachment points inside visible sidewall; they are not existing corner bolts or hidden mounts.",
+      "sources": {
+        "body": {
+          "path": "art/gen/satellite_2015.png",
+          "sha256": "bab930293dd1963e1b8fe2105365c118b25200a8e0ade7ef101d76ee17bdc9aa"
+        },
+        "panel": {
+          "path": "art/gen/panel_2015.png",
+          "sha256": "988278ab9a9e30ff7812a88acfc8404874486333e976494118a5697e97d5e2dd"
+        }
+      },
+      "preparedSizes": {
+        "body": [
+          166,
+          215
+        ],
+        "panel": [
+          282,
+          132
+        ]
+      }
+    },
+    "2035": {
+      "bodySize": [
+        250,
+        303
+      ],
+      "panelSize": [
+        282,
+        162
+      ],
+      "bodyJoints": null,
+      "panelRoot": [
+        12,
+        97
+      ],
+      "uncertaintyPx": {
+        "observedBodyJoints": null,
+        "panelRoot": 3,
+        "authoredCandidatePosition": 4
+      },
+      "authoredAttachmentCandidates": {
+        "bodyJoints": [
+          [
+            66,
+            172
+          ],
+          [
+            188,
+            141
+          ]
+        ],
+        "reviewedSidewallPoints": [
+          [
+            58,
+            172
+          ],
+          [
+            196,
+            141
+          ]
+        ],
+        "classification": "authored rig placement, not measured physical hinges",
+        "verdict": "feasible_for_overlap_rig",
+        "requiresNativeRuntimeReview": true,
+        "measurements": [
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.216
+          },
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.216
+          }
+        ],
+        "panelRootNearestOpaqueMaterialGamePx": 0.0654,
+        "maximumConnectorToBodyMaterialGapGamePx": 0.0654
+      },
+      "notes": "No exposed paired solar hinges. Proposed connector roots overlap visible sidewall; keep original appendages as existing static hardware, not mislabeled solar pivots.",
+      "sources": {
+        "body": {
+          "path": "art/gen/satellite_2035.png",
+          "sha256": "382f13e58e116ba145ea61366b024e44edabd7b01b3ae63af96bdad6e24db182"
+        },
+        "panel": {
+          "path": "art/gen/panel_2035.png",
+          "sha256": "0f71a40af2095b9db2335ac85dfebddd5c52662bada63009862e4e5e63c1e821"
+        }
+      },
+      "preparedSizes": {
+        "body": [
+          250,
+          303
+        ],
+        "panel": [
+          282,
+          161
+        ]
+      }
+    },
+    "2060": {
+      "bodySize": [
+        251,
+        265
+      ],
+      "panelSize": [
+        240,
+        169
+      ],
+      "bodyJoints": null,
+      "panelRoot": [
+        12,
+        95
+      ],
+      "uncertaintyPx": {
+        "observedBodyJoints": null,
+        "panelRoot": 3,
+        "authoredCandidatePosition": 4
+      },
+      "authoredAttachmentCandidates": {
+        "bodyJoints": [
+          [
+            62,
+            132
+          ],
+          [
+            201,
+            142
+          ]
+        ],
+        "reviewedSidewallPoints": [
+          [
+            54,
+            132
+          ],
+          [
+            209,
+            142
+          ]
+        ],
+        "classification": "authored rig placement, not measured physical hinges",
+        "verdict": "feasible_for_overlap_rig",
+        "requiresNativeRuntimeReview": true,
+        "measurements": [
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.211
+          },
+          {
+            "candidateAlpha": 255,
+            "nearestBodyMaterialGapGamePx": 0.0,
+            "authoredInsetFromReviewedSidewallGamePx": 1.211
+          }
+        ],
+        "panelRootNearestOpaqueMaterialGamePx": 0.0,
+        "maximumConnectorToBodyMaterialGapGamePx": 0.0
+      },
+      "notes": "No exposed paired solar hinges. Proposed connector roots overlap visible sidewall; keep original appendages as existing static hardware, not mislabeled solar pivots.",
+      "sources": {
+        "body": {
+          "path": "art/gen/satellite_2060.png",
+          "sha256": "6eaf5e65871e829658bd7e75bc52242c2a4204c51889206e3634490dcc1df137"
+        },
+        "panel": {
+          "path": "art/gen/panel_2060.png",
+          "sha256": "c3be2895c6fac99aadf9e43e6cd924dcc05a90839b3dbef035e05b257b606246"
+        }
+      },
+      "preparedSizes": {
+        "body": [
+          251,
+          265
+        ],
+        "panel": [
+          240,
+          169
+        ]
+      }
+    }
+  }
+}

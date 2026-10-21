@@ -1,0 +1,21 @@
+{
+  "asset_id": "W04",
+  "asset": "flight_simulator",
+  "era": "E1",
+  "year": 1986,
+  "source_gen_id": "6f1957c4-82ea-4ef1-ad11-c638bbe3a1e5",
+  "source_size": [1300, 1209],
+  "source_sha256": "a9efff983b42c2c3e3c0f167b0e30cd2e7661ec7281675e46b6e549d5926e08f",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "14ciwrBfmEhXD7bKH68EJ7aRhJxi8wtlQ",
+    "drive_url": "https://drive.google.com/file/d/14ciwrBfmEhXD7bKH68EJ7aRhJxi8wtlQ/view?usp=drivesdk"
+  },
+  "transport_png": "e1_1986_presnap.png",
+  "transport_size": [172, 160],
+  "transport_sha256": "c1f7a2bb3dd65e8b21bd898ce84cb6d7676966ba41e011f3ffd803d34705cc30",
+  "transport_derivation": "HQ-derived 344x320 transport resized nearest-neighbor to 172x160; existing 32-RGB palette preserved; alpha threshold >=128 mapped to opaque; indexed PNG; no dithering",
+  "target_canvas": [172, 160],
+  "registration_target": [86, 156],
+  "required_pipeline": ["ref2game", "SpriteFusion Pixel Snapper", "Aseprite"]
+}

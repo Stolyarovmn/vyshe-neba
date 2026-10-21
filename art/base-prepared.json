@@ -1,0 +1,17 @@
+{
+  "w": 1774,
+  "h": 887,
+  "crop": [
+    0,
+    0,
+    1774,
+    887
+  ],
+  "scale": 1.0,
+  "source": "art/gen/base_static_sheet.png",
+  "sourceSHA256": "2c3fae4d551fc898aad23527b037d2706a0360184bdd225d31c928a85742f6e5",
+  "grid": [
+    3,
+    2
+  ]
+}

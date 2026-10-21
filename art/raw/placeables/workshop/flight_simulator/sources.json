@@ -1,0 +1,140 @@
+{
+  "asset_id": "W04",
+  "asset": "flight_simulator",
+  "native_source_size": [1300, 1209],
+  "target_canvas": [172, 160],
+  "registration_target": [86, 156],
+  "prompt_file": "art/prompts/w04_flight_simulator.md",
+  "style_bible": "art/style_bible.txt",
+  "production_manifest": "art/placeables/PRODUCTION_MANIFEST.md",
+  "production_pipeline": "art/docs/ASSET_PRODUCTION_PIPELINE.md",
+  "required_skill": "ref2game",
+  "source_archive": {
+    "provider": "google_drive",
+    "folder_id": "1cUhp5jgedXm58YlrGlf0SfdzX_ZDivg2",
+    "folder_url": "https://drive.google.com/drive/folders/1cUhp5jgedXm58YlrGlf0SfdzX_ZDivg2"
+  },
+  "pixel_snapper": {
+    "repository": "Hugo-Dz/spritefusion-pixel-snapper",
+    "revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+    "package_version": "1.0.0",
+    "colors": 32,
+    "pixel_size": 8
+  },
+  "aseprite": {
+    "repository": "aseprite/aseprite",
+    "version": "1.3.18.6",
+    "dithering": "none",
+    "color_mode": "indexed"
+  },
+  "eras": [
+    {
+      "era": "E0", "year": 1978,
+      "source_gen_id": "ae46f076-6bbc-47ee-a0c9-49bdf476f1af",
+      "source_sha256": "7e773738a0a91c92642be3fdd7653d174b3fe868f6fc3e4927cea0f3ff006458",
+      "drive_file_id": "1NYBfC7ZeuMiIXGlx6HuhSnYZUjxihTQb",
+      "drive_url": "https://drive.google.com/file/d/1NYBfC7ZeuMiIXGlx6HuhSnYZUjxihTQb/view?usp=drivesdk"
+    },
+    {
+      "era": "E1", "year": 1986,
+      "source_gen_id": "6f1957c4-82ea-4ef1-ad11-c638bbe3a1e5",
+      "source_sha256": "a9efff983b42c2c3e3c0f167b0e30cd2e7661ec7281675e46b6e549d5926e08f",
+      "drive_file_id": "14ciwrBfmEhXD7bKH68EJ7aRhJxi8wtlQ",
+      "drive_url": "https://drive.google.com/file/d/14ciwrBfmEhXD7bKH68EJ7aRhJxi8wtlQ/view?usp=drivesdk"
+    },
+    {
+      "era": "E2", "year": 1998,
+      "source_gen_id": "a12d3343-355a-473b-a0e8-afbb371019b0",
+      "source_sha256": "451a86d998229110e4cb75b4b4c83a87d6fa28220eaba8ab1dd638ef420a4369",
+      "drive_file_id": "1FpNCtswDxpPmV61vuOBSkBAAGL7A4F-K",
+      "drive_url": "https://drive.google.com/file/d/1FpNCtswDxpPmV61vuOBSkBAAGL7A4F-K/view?usp=drivesdk"
+    },
+    {
+      "era": "E3", "year": 2015,
+      "source_gen_id": "2e962835-c849-4d05-b5a9-f025910a774b",
+      "source_sha256": "be5d5f6e21e6993bb7030b866faf131dd6c059328d517d9020c11ef0186f06ca",
+      "drive_file_id": "1ztr70UqXZUuPhm78gGNr6rXluZ02TIgb",
+      "drive_url": "https://drive.google.com/file/d/1ztr70UqXZUuPhm78gGNr6rXluZ02TIgb/view?usp=drivesdk"
+    },
+    {
+      "era": "E4", "year": 2035,
+      "source_gen_id": "23bc0c91-67e8-4fe0-bcd3-91e3f3afec80",
+      "source_sha256": "233e2a32282a90569496dfd97d050321597c95f17021c9d0d7a858c1e6371dc0",
+      "drive_file_id": "1aEluJIkp86K0nONj5j1Amn530DBkJDD-",
+      "drive_url": "https://drive.google.com/file/d/1aEluJIkp86K0nONj5j1Amn530DBkJDD-/view?usp=drivesdk"
+    },
+    {
+      "era": "E5", "year": 2060,
+      "source_gen_id": "45c1101a-c5b7-48d7-abb0-8ce385227130",
+      "source_sha256": "39791fbfe36dc116f5c1d859b30acb04ef31aaa340d97c1706574b6b84fe74c9",
+      "drive_file_id": "14pOeaaKu4N6OY9wQaVdNrMQQiFdLc6-J",
+      "drive_url": "https://drive.google.com/file/d/14pOeaaKu4N6OY9wQaVdNrMQQiFdLc6-J/view?usp=drivesdk"
+    }
+  ],
+  "e0_rig_source_parts": {
+    "base": {
+      "source_gen_id": "3899f8ff-3247-4995-ac8d-e28a5397b897",
+      "source_sha256": "4c8b14dc8a09e0facb76bf26047b98c50d2719b77d95f3e00a006b8125cb32be",
+      "drive_file_id": "1CZixTbpq2PxCxCZrHL8BfYVOrfMX8g0d",
+      "drive_url": "https://drive.google.com/file/d/1CZixTbpq2PxCxCZrHL8BfYVOrfMX8g0d/view?usp=drivesdk"
+    },
+    "pod": {
+      "source_gen_id": "4adb5e9e-79ab-476c-bd76-f8b0e7afcf81",
+      "source_sha256": "32338012feaed4c8b96924ed6eec9856c597bdb409da59374989dd1b0658f5b9",
+      "drive_file_id": "1QPiWlisFiGqTtXlHhKQnztYyauJByWv7",
+      "drive_url": "https://drive.google.com/file/d/1QPiWlisFiGqTtXlHhKQnztYyauJByWv7/view?usp=drivesdk"
+    },
+    "actuator_pair": {
+      "source_gen_id": "4b1d0bc1-fb65-4c2a-82fd-494757cf296c",
+      "source_sha256": "8be4d887b3d72f1cea3413e20504fbb82b0052184f508be9d5e0f7a0874bdbae",
+      "drive_file_id": "1s6XgGMu1l3y0k7XRvIYtqSYh1Mip2_Ew",
+      "drive_url": "https://drive.google.com/file/d/1s6XgGMu1l3y0k7XRvIYtqSYh1Mip2_Ew/view?usp=drivesdk",
+      "split_runtime_parts": ["actuator_left", "actuator_right"]
+    },
+    "canopy": {
+      "status": "absent_in_E0_by_lineage",
+      "runtime_cell": "transparent"
+    }
+  },
+  "late_era_canopy_candidate": {
+    "status": "candidate_only_not_E0",
+    "source_gen_id": "301fb1ee-c5a3-4c53-89e1-5ee5f6750f07",
+    "source_board_sha256": "3ec01924a07096a8ea3550a4c956503be6d1152fd38165b7d445b26c3151b7fb",
+    "source_board_drive_file_id": "1NbVYINDH5XulbR1OgEBDyJhI8sTHyYSi",
+    "derived_cutout_sha256": "aceccf2d3efefb967d0284e2a332d98a389db0d346da1a0f96bbe0e2b139e622",
+    "derived_drive_file_id": "1RxFUBIDQyIUnTAONJwq9BiAftxaRYSPT",
+    "derived_drive_url": "https://drive.google.com/file/d/1RxFUBIDQyIUnTAONJwq9BiAftxaRYSPT/view?usp=drivesdk",
+    "reason": "usable canopy silhouette extracted from a rejected board, but incompatible with E0 gimbal-seat lineage; retain only as a later-era candidate"
+  },
+  "rejected_sources": [
+    {
+      "source_gen_id": "0692a1d7-9a14-4e4a-ac42-cc1357ef801f",
+      "drive_file_id": "1760VF4fDcx8R-uRqfu8e1NgRgs3YPoCI",
+      "reason": "mixed unrelated workbench/base into part sheet and baked presentation background"
+    },
+    {
+      "source_gen_id": "04f209d8-8641-4d03-b69b-ec374ed023d4",
+      "drive_file_id": "1P7UXREdIJ0Yt5mvrmOTV9uK0dt5Od2pT",
+      "reason": "pod contaminated with ground rails/base geometry; unsafe for measured cut-out rig"
+    },
+    {
+      "source_gen_id": "1059f5b6-2948-488b-abc7-6d0a377e97f5",
+      "source_sha256": "8ed19eb920e739196e76e4621784cae33d2309199f9cca732fac1bfc674d0807",
+      "drive_file_id": "1yy7YWlrzeR-4rHD7MtvhdRUPJaRCtNS9",
+      "reason": "canopy request expanded into labeled multi-era concept board instead of one isolated asset"
+    },
+    {
+      "source_gen_id": "47726c0e-7a44-4e23-8e71-49ed1f2ee694",
+      "source_sha256": "9702d8e9ef60ba479f79414d3d2b894a57920ef8772ced03083953a9598ff8e5",
+      "drive_file_id": "1b9YNkMJ0ZjlvWQ7hGGGjFCXXseOpDvFi",
+      "reason": "second canopy request again expanded into a six-era labeled board"
+    },
+    {
+      "source_gen_id": "301fb1ee-c5a3-4c53-89e1-5ee5f6750f07",
+      "source_sha256": "3ec01924a07096a8ea3550a4c956503be6d1152fd38165b7d445b26c3151b7fb",
+      "drive_file_id": "1NbVYINDH5XulbR1OgEBDyJhI8sTHyYSi",
+      "reason": "source board rejected as runtime art; one canopy silhouette retained only as an explicitly derived later-era candidate"
+    }
+  ],
+  "note": "Google Drive stores authoritative full-resolution source bytes. Runtime sprites remain gated on official Pixel Snapper, canonical LP registration, Aseprite indexed/no-dither export and QA. E0 canopy is intentionally absent; mechanism pivots remain pending until processed part measurement and rest-pose reconstruction."
+}

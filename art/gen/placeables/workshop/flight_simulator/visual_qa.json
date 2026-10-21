@@ -1,0 +1,65 @@
+{
+  "asset": "W04 flight_simulator",
+  "reviewed_pipeline_run_id": 39102219817,
+  "review_basis": "art/docs/ASSET_PRODUCTION_PIPELINE.md visual QA gate + ref2game self-review",
+  "overall_status": "rejected",
+  "runtime_publication": "blocked",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "9e308ceaaf57860d77f17898ff9b9a3766e86d096895cb060d2fe38bfbcc170f",
+      "findings": []
+    },
+    "e1_1986": {
+      "status": "rejected",
+      "sha256": "ce2e05aa5eab6698398d9ee8e9dbd006498cc09f5eea54a9f9ed50b8324bdc0c",
+      "findings": [
+        "baked active cyan/blue screen data; screen content is code-owned"
+      ]
+    },
+    "e2_1998": {
+      "status": "rejected",
+      "sha256": "7dc267099ab18dd9797b9f9cea13439e1fe8d4e29e260c3008b04aac6ff466a6",
+      "findings": [
+        "baked CRT/radar-style graphics; screen data is code-owned"
+      ]
+    },
+    "e3_2015": {
+      "status": "rejected",
+      "sha256": "c1ab06e5d29332b1395dfef22521fb08e9c3fb832e6cfe66eb7b4915e562fd0c",
+      "findings": [
+        "active blue display imagery is baked into the physical sprite",
+        "display content must be blank/dark physical glass and rendered by code"
+      ]
+    },
+    "e4_2035": {
+      "status": "rejected",
+      "sha256": "33cf9257812afeeb9e52dfd1a5ea6f1bc33158678ab38d7854238503e50cca2b",
+      "findings": [
+        "panoramic blue scene/data is baked into canopy/display area",
+        "cyan emitted display/glow belongs to code"
+      ]
+    },
+    "e5_2060": {
+      "status": "rejected",
+      "sha256": "3c7c5488f20722f954b3d00cb053a5d640d917e960408b9afb6b55c1b2e6fc5c",
+      "findings": [
+        "panoramic scene is baked into the capsule glazing/display",
+        "strong cyan emitted illumination/glow belongs to code"
+      ]
+    }
+  },
+  "repair_contract": {
+    "preserve": [
+      "approved engineering silhouette",
+      "era lineage",
+      "camera/projection",
+      "physical frame, pod and actuator geometry"
+    ],
+    "replace": [
+      "active screen imagery with blank/dark inert display glass",
+      "baked emitted cyan glow with neutral physical materials"
+    ],
+    "rule": "repair one era per imagegen edit/call, archive the repaired HQ original to Google Drive, rerun Pixel Snapper/Aseprite/automatic QA, then perform a new hash-bound visual review before runtime publication"
+  }
+}

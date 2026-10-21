@@ -1,0 +1,170 @@
+name: Promote rocket modular candidates
+
+on:
+  push:
+    branches:
+      - 2d_rocket-modular-sprites
+    paths:
+      - 'art/gen/rocket_modular/body/visual_qa.json'
+      - 'art/gen/rocket_modular/fins/visual_qa.json'
+      - '.github/workflows/rocket-modular-promote.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: rocket-modular-promote-2d
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: read
+  issues: write
+
+env:
+  ASEPRITE_VERSION: '1.3.18.6'
+  PIXEL_SNAPPER_REV: 'ae20461f60fb39e75d15f184bab1ebec1219511c'
+  GITHUB_TOKEN: ${{ github.token }}
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: 2d_rocket-modular-sprites
+
+      - name: Install art build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            clang cmake ninja-build unzip curl python3-pil jq \
+            libpixman-1-dev libfreetype6-dev libharfbuzz-dev zlib1g-dev \
+            libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev \
+            libfontconfig1-dev libjpeg-dev libpng-dev libwebp-dev
+
+      - name: Restore canonical art tool cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/art-tool-cache
+          key: art-tools-${{ runner.os }}-${{ runner.arch }}-aseprite-1.3.18.6-none-snapper-ae20461f
+
+      - name: Set up canonical art tools
+        run: bash tools/art_pipeline/setup_art_tools.sh "$RUNNER_TEMP/art-tools" "$RUNNER_TEMP/art-tool-cache"
+
+      - name: Restore and promote approved candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          for asset in R_BODY R_FINS; do
+            case "$asset" in
+              R_BODY)
+                review='art/gen/rocket_modular/body/visual_qa.json'
+                branch_candidate='art/candidates/rocket_modular/body'
+                production_manifest='art/gen/rocket_modular/body/promotion-manifest.json'
+                ;;
+              R_FINS)
+                review='art/gen/rocket_modular/fins/visual_qa.json'
+                branch_candidate='art/candidates/rocket_modular/fins'
+                production_manifest='art/gen/rocket_modular/fins/promotion-manifest.json'
+                ;;
+            esac
+            if [ ! -f "$review" ]; then
+              echo "skip $asset: $review not present"
+              continue
+            fi
+
+            dest="$RUNNER_TEMP/candidate-$asset"
+            python3 tools/art_pipeline/restore_asset_checkpoint.py --asset "$asset" --dest "$dest"
+            if [ ! -f "$dest/candidate-manifest.json" ]; then
+              if [ -f "$branch_candidate/candidate-manifest.json" ]; then
+                rm -rf "$dest"
+                mkdir -p "$dest"
+                cp -a "$branch_candidate/." "$dest/"
+                echo "restored $asset from $branch_candidate"
+              elif [ -f "$production_manifest" ]; then
+                echo "$asset is already promoted; no candidate restore needed"
+                rm -rf "$dest"
+                continue
+              else
+                echo "No checkpoint artifact, materialized candidate, or production manifest for $asset" >&2
+                exit 1
+              fi
+            fi
+
+            python3 tools/art_pipeline/process_asset.py \
+              --repo-root . --asset "$asset" --output "$dest" \
+              --state-dir "$dest/.tracker" \
+              --pixel-snapper "$RUNNER_TEMP/art-tools/spritefusion-pixel-snapper" \
+              --aseprite "$RUNNER_TEMP/art-tools/aseprite" --resume
+            python3 tools/art_pipeline/promote_asset.py \
+              --repo-root . --asset "$asset" --candidate "$dest" --state-dir "$dest/.tracker"
+          done
+
+      - name: Install game test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Run game verification and standalone build
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test
+          npm run build
+
+      - name: Mark game tests and sync durable trackers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'tools/art_pipeline')
+          from task_tracker import Tracker, fingerprint
+
+          cfg = json.loads(Path('art/placeables/PIPELINE_CONFIG.json').read_text(encoding='utf-8'))['assets']
+          for asset in ('R_BODY', 'R_FINS'):
+              state_dir = Path(os.environ['RUNNER_TEMP']) / f'candidate-{asset}' / '.tracker'
+              if not state_dir.is_dir():
+                  continue
+              fp = fingerprint({
+                  'step': 'game_tests',
+                  'run_id': os.environ.get('GITHUB_RUN_ID'),
+                  'git_sha': os.environ.get('GITHUB_SHA'),
+                  'checks': ['npm test', 'npm run build'],
+              })
+              for era in cfg[asset]['eras']:
+                  Tracker(state_dir, asset, era['stem']).success(
+                      'game_tests', fp, (), 'npm test and npm run build passed'
+                  )
+          PY
+          for asset in R_BODY R_FINS; do
+            state_dir="$RUNNER_TEMP/candidate-$asset/.tracker"
+            if [ -d "$state_dir/$asset" ]; then
+              python3 tools/art_pipeline/sync_asset_tracker_issue.py \
+                --repo-root . --asset "$asset" \
+                --state-dir "$state_dir" \
+                --artifact-name "branch-candidate-${GITHUB_SHA}" \
+                --run-url "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            else
+              echo "skip tracker sync for $asset: already promoted before this run"
+            fi
+          done
+
+      - name: Commit promoted canonical art to feature branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf art/candidates/rocket_modular
+          if git diff --quiet && git diff --cached --quiet; then
+            echo 'No production changes to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A art/gen/rocket_modular art/candidates/rocket_modular outputs/rocket/runtime-assets.json
+          git commit -m '2D rocket: promote approved modular body and fins'
+          git push origin HEAD:2d_rocket-modular-sprites

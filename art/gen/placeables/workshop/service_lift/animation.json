@@ -1,0 +1,19 @@
+{
+  "asset": "W01 service_lift",
+  "rule": "Never fake mechanical work by moving the whole sprite. Animate only isolated physical parts after part-sheet approval.",
+  "states": ["OFF", "IDLE", "NOTICE", "WORK", "FINISH", "COOLDOWN"],
+  "events": {
+    "workshop_enter": "prepare service rig and approach rocket",
+    "loadout_changed": "remove/install selected module",
+    "launch_prepare": "retract and park all moving parts"
+  },
+  "era_animation": {
+    "E0": {"moving":["carriage","hook"],"code":["chain_length","secondary_cable_sway"],"rig_status":"part sheet required"},
+    "E1": {"moving":["carriage","hook"],"code":["hose_secondary_motion"],"rig_status":"part sheet required"},
+    "E2": {"moving":["bridge_trolley","service_head"],"code":["cable_chain_secondary_motion"],"rig_status":"part sheet required"},
+    "E3": {"moving":["modular_carriage","gripper","service_head"],"code":["indicator_states"],"rig_status":"part sheet required"},
+    "E4": {"moving":["left_arm_upper","left_arm_lower","left_gripper","right_arm_upper","right_arm_lower","right_gripper"],"code":["indicator_states"],"rig_status":"cut-out arm rig required"},
+    "E5": {"moving":["manipulator_1","manipulator_2","manipulator_3","central_tool"],"static":["service_ring"],"code":["cyan_indicator_states","glow"],"rig_status":"cut-out manipulator rig required"}
+  },
+  "pivot_policy": "joint coordinates remain null until isolated part sprites are generated and measured; placement anchors are already measured in manifest.json"
+}

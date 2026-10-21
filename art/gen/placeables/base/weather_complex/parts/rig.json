@@ -1,0 +1,20 @@
+{
+  "asset_id": "B01",
+  "asset": "weather_complex",
+  "canvas": [96, 122],
+  "registration": [48, 118],
+  "atlas_layout": {
+    "cols": 3,
+    "rows": 2,
+    "cell": [96, 122],
+    "order": ["e0_1978", "e1_1986", "e2_1998", "e3_2015", "e4_2035", "e5_2060"]
+  },
+  "eras": {
+    "e0_1978": {"year": 1978, "sensor": {"present": true, "pivot": [42, 29]}, "vane": {"present": true, "pivot": [48, 36]}, "indicator": {"present": true, "pivot": [57, 63]}},
+    "e1_1986": {"year": 1986, "sensor": {"present": true, "pivot": [43, 39]}, "vane": {"present": true, "pivot": [43, 48]}, "indicator": {"present": true, "pivot": [41, 72]}},
+    "e2_1998": {"year": 1998, "sensor": {"present": true, "pivot": [48, 58]}, "vane": {"present": true, "pivot": [43, 52]}, "indicator": {"present": true, "pivot": [49, 84]}},
+    "e3_2015": {"year": 2015, "sensor": {"present": true, "pivot": [55, 52]}, "vane": {"present": true, "pivot": [42, 31]}, "indicator": {"present": true, "pivot": [49, 68]}},
+    "e4_2035": {"year": 2035, "sensor": {"present": true, "pivot": [44, 58]}, "vane": {"present": false, "pivot": null}, "indicator": {"present": true, "pivot": [49, 74]}},
+    "e5_2060": {"year": 2060, "sensor": {"present": true, "pivot": [43, 49]}, "vane": {"present": false, "pivot": null}, "indicator": {"present": true, "pivot": [50, 73]}}
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "heightScaleMetersPerWorldUnit": 10,
+  "eras": [1978, 1986, 1998, 2015, 2035, 2060],
+  "previousEraMix": 0.18,
+  "layers": [
+    {"id":"safe","min":0,"max":30,"aircraft":[]},
+    {"id":"low","min":30,"max":300,"weights":{"low_primary":0.70,"low_multiwing":0.30}},
+    {"id":"mixed","min":300,"max":600,"weights":{"medium_cargo":0.50,"medium_passenger":0.35,"low_primary":0.10,"low_multiwing":0.05}},
+    {"id":"cruise","min":600,"max":1200,"weights":{"medium_passenger":0.60,"medium_cargo":0.35,"high_fighter":0.05}},
+    {"id":"high","min":1200,"max":2000,"weights":{"high_fighter":0.70,"high_experimental":0.30}},
+    {"id":"experimental","min":2000,"max":8500,"weights":{"high_experimental":1.0}},
+    {"id":"edge","min":8500,"max":10000,"weights":{"high_experimental":1.0},"eraMin":5,"relativeSpawnChance":0.05}
+  ],
+  "experimentalCeilingByEraWorldY": [2200, 2500, 3500, 5000, 7000, 9500]
+}

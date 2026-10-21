@@ -1,0 +1,74 @@
+name: B01 part atlas deterministic rebuild
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/art_pipeline/rebuild_b01_part_atlases.py'
+      - 'art/gen/placeables/base/weather_complex/parts/**'
+      - '.github/workflows/b01-atlas-repair.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: Install Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-pil
+      - name: Rebuild B01 E0-E5 cut-outs and atlases from approved anchors
+        run: |
+          python3 tools/art_pipeline/rebuild_b01_part_atlases.py --repo-root .
+          test -s art/gen/placeables/base/weather_complex/parts/atlas_rebuild_qa.json
+      - name: Verify rebuilt B01 rig and render motion sheets from canonical art
+        run: |
+          node outputs/rocket/qa-b01-rig.cjs
+          python3 tools/art_pipeline/b01_motion_sheet.py \
+            --root art/gen/placeables/base/weather_complex/parts \
+            --output-dir "$RUNNER_TEMP/b01-motion-after-rebuild"
+          test -s "$RUNNER_TEMP/b01-motion-after-rebuild/b01_motion_sheet.png"
+          test -s "$RUNNER_TEMP/b01-motion-after-rebuild/motion_qa.json"
+      - name: Remove derived runtime mirror
+        run: rm -rf outputs/rocket/dist/assets/placeables/base/weather_complex/parts
+      - name: Open rebuild PR instead of pushing main
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo 'No B01 rebuild changes required.'
+            exit 0
+          fi
+          branch="2d_b01-rebuild-${GITHUB_RUN_ID}"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
+          git add -A \
+            art/gen/placeables/base/weather_complex/parts \
+            outputs/rocket/dist/assets/placeables/base/weather_complex/parts
+          git commit -m 'B01: rebuild canonical parts and remove runtime mirror'
+          git push origin "$branch"
+          if ! gh pr create \
+            --base main --head "$branch" \
+            --title '2D: rebuild B01 canonical part atlases' \
+            --body 'Deterministic B01 rebuild from approved anchors. Rig and motion QA passed. Runtime consumes canonical art/gen through runtime-assets.json; the old committed runtime mirror is removed.'; then
+            echo "::warning::Rebuild branch $branch was pushed, but GitHub Actions is not allowed to create pull requests. Open it manually; main was not modified."
+          fi
+      - name: Upload B01 rebuild verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: b01-atlas-rebuild-verification
+          path: ${{ runner.temp }}/b01-motion-after-rebuild/
+          retention-days: 3

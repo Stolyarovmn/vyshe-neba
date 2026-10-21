@@ -1,0 +1,17 @@
+name: B03 asset candidate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'art/source_transport/b03_landing_guidance/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    uses: ./.github/workflows/asset-candidate.yml
+    with:
+      asset: B03

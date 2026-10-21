@@ -1,0 +1,11 @@
+{
+  "asset": "W03 telemetry_post",
+  "states": ["OFF", "IDLE", "NOTICE", "WORK", "FINISH", "COOLDOWN"],
+  "rule": "AI paints physical parts; code owns event timing, screen data, dynamic light and FX. Never fake work by bobbing/rotating/scaling the whole sprite.",
+  "contract": {
+    "summary": "flight_return: телеметрия постепенно появляется поверх дисплеев; compare: включается второй слой/ghost; idle: почти статичен. E0 recorder/reels могут вращаться только после отдельного part pass.",
+    "events": {"flight_return":"progressively reveal actual flight data","compare":"overlay best/previous trajectory","idle":"screens remain nearly still; no decorative meaningless loop"},
+    "code_owned": ["screen_data","trajectory_overlay","ghost","indicator_light"],
+    "physical_parts_pending": ["recorder/reels where present"]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "asset_id": "B01",
+  "asset": "weather_complex",
+  "era": "E0",
+  "year": 1978,
+  "source": "art/gen/placeables/base/weather_complex/e0_1978.png",
+  "source_sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c",
+  "method": "pixel-exact cutout decomposition of approved anchor art; no generated replacement",
+  "canvas": [96, 122],
+  "parts": {
+    "body": {"bbox": [18, 30, 75, 118], "pivot": null},
+    "sensor": {"bbox": [25, 17, 56, 30], "pivot": [42, 29]},
+    "vane": {"bbox": [47, 29, 79, 45], "pivot": [48, 36]},
+    "indicator": {"bbox": [56, 55, 70, 78], "pivot": [57, 63]}
+  },
+  "registration": [48, 118],
+  "reconstruction_pixel_exact": true,
+  "decision": "Approved E0 anchor is decomposed deterministically into rigid physical subassemblies. The rebuilt PNGs round-trip through indexed PNG decoding, reconstruct the approved anchor pixel-exactly, and pass motion plus in-game browser QA without whole-sprite fake motion.",
+  "motion_contract": {
+    "sensor": "rigid rotation at measured attachment pivot",
+    "vane": "wind-reactive rigid rotation/sway at measured mast attachment",
+    "indicator": "physical hardware remains rigid; state light/data is code-owned"
+  },
+  "final_qa": {
+    "atlas_rebuild_run_id": 39100143288,
+    "runtime_qa_run_id": 39101045187,
+    "runtime_qa_result": "pass",
+    "visual_review": "pass",
+    "weather_window_mechanic": "two deterministic windows, exactly one choice, no reroll",
+    "status": "ready"
+  },
+  "next_gate": null
+}

@@ -1,0 +1,30 @@
+{
+  "id": "hull_diagnostics",
+  "asset_code": "W06",
+  "type": "workshop_placeable",
+  "runtime_footprint_lp": [184,220],
+  "placement_anchor_lp": {"x":92,"y":214,"kind":"bottom-center"},
+  "placement_sockets": ["rocket_left","rocket_right","floor_back"],
+  "value": "Information / Capability",
+  "cost_tier": "M",
+  "era_layout": {"cols":3,"rows":2,"cell_lp":[184,220],"reading_order":["E0","E1","E2","E3","E4","E5"]},
+  "era_sprites": [
+    {"era":"E0","year":1978,"file":"e0_1978.png"},
+    {"era":"E1","year":1986,"file":"e1_1986.png"},
+    {"era":"E2","year":1998,"file":"e2_1998.png"},
+    {"era":"E3","year":2015,"file":"e3_2015.png"},
+    {"era":"E4","year":2035,"file":"e4_2035.png"},
+    {"era":"E5","year":2060,"file":"e5_2060.png"}
+  ],
+  "part_atlases": {"frame":"frame_eras.png","pad_unit":"pad_unit_eras.png","scan_carriage":"scan_carriage_eras.png","scanner_head":"scanner_head_eras.png"},
+  "measured_motion": [
+    {"era":"E0","year":1978,"rail":{"x":134,"y_min":72,"y_max":174,"axis":"vertical"},"idle_carriage_center":[134,82],"scanner_head_pivot_global":[126,82],"placement_anchor":[92,214]},
+    {"era":"E1","year":1986,"rail":{"x":134,"y_min":70,"y_max":176,"axis":"vertical"},"idle_carriage_center":[134,84],"scanner_head_pivot_global":[125,84],"placement_anchor":[92,214]},
+    {"era":"E2","year":1998,"rail":{"x":134,"y_min":64,"y_max":177,"axis":"vertical"},"idle_carriage_center":[134,80],"scanner_head_pivot_global":[122,80],"placement_anchor":[92,214]},
+    {"era":"E3","year":2015,"rail":{"x":134,"y_min":62,"y_max":179,"axis":"vertical"},"idle_carriage_center":[134,78],"scanner_head_pivot_global":[121,78],"placement_anchor":[92,214]},
+    {"era":"E4","year":2035,"rail":{"x":134,"y_min":58,"y_max":181,"axis":"vertical"},"idle_carriage_center":[134,76],"scanner_head_pivot_global":[120,76],"placement_anchor":[92,214]},
+    {"era":"E5","year":2060,"rail":{"x":140,"y_min":63,"y_max":183,"axis":"vertical"},"idle_carriage_center":[140,74],"scanner_head_pivot_global":[127,74],"placement_anchor":[92,214]}
+  ],
+  "animation": {"event":"diagnose","sequence":["NOTICE","SCAN_DOWN","PAUSE_ON_DAMAGE","SCAN_UP","FINISH"],"code_owned_fx":["scan_beam","screen_data","damage_marker","indicator_light"],"whole_sprite_motion":false},
+  "status": {"anchor_art":"approved_and_normalized","runtime_sprite":"ready","rig_parts":"ready","pivots":"measured_on_authored_1LP_geometry"}
+}

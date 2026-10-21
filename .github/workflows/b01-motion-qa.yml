@@ -1,0 +1,53 @@
+name: B01 motion sheet QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'outputs/rocket/dist/weather-complex-rig.js'
+      - 'art/gen/placeables/base/weather_complex/parts/**'
+      - 'outputs/rocket/qa-b01-rig.cjs'
+      - 'tools/art_pipeline/b01_motion_sheet.py'
+      - '.github/workflows/b01-motion-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  motion-sheet:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Diagnose canonical B01 atlas PNG structure
+        run: |
+          set -euxo pipefail
+          P=art/gen/placeables/base/weather_complex/parts/body_eras.png
+          file "$P"
+          wc -c "$P"
+          xxd -l 40 "$P"
+          git check-attr -a -- "$P" || true
+          SHA=$(git rev-parse HEAD:"$P")
+          echo "blob=$SHA"
+          git cat-file -s "$SHA"
+      - name: Install Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-pil
+      - name: Run B01 causal rig regression QA
+        run: node outputs/rocket/qa-b01-rig.cjs
+      - name: Render B01 E0-E5 motion sheets
+        run: |
+          OUT="$RUNNER_TEMP/b01-motion-qa"
+          python3 tools/art_pipeline/b01_motion_sheet.py \
+            --root art/gen/placeables/base/weather_complex/parts \
+            --output-dir "$OUT"
+          test -s "$OUT/b01_motion_sheet.png"
+          test -s "$OUT/motion_qa.json"
+      - name: Upload B01 motion QA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: b01-motion-qa
+          path: ${{ runner.temp }}/b01-motion-qa/
+          retention-days: 3

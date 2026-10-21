@@ -1,0 +1,21 @@
+{
+  "asset": "w04_flight_simulator",
+  "source": "OpenAI built-in image generation",
+  "approved_generation": {
+    "gen_id": "b1c5b12d-08de-4b34-b728-1493d2b42696",
+    "purpose": "six-era W04 concept/production board used as the final geometry source"
+  },
+  "earlier_reference_generation": {
+    "gen_id": "7700957d-0b95-4a4b-99b9-acc76bae2a97",
+    "purpose": "initial accepted W04 concept board"
+  },
+  "post": {
+    "source_segmentation": "background removed from approved era cells; UI border fragments removed",
+    "detached_task_light_cleanup": "E0/E1 non-manifest background/task-light artifacts removed",
+    "runtime_canvas_lp": [172,160],
+    "placement_anchor_lp": [86,156],
+    "scale_policy": "single common scale across all six eras",
+    "resample": "nearest-neighbor"
+  },
+  "ref2game_contract": "AI paints physical anchor art; code owns motion/effects; active pivots are measured after isolated-part approval"
+}

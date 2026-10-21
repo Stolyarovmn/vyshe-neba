@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "style_bible": "art/style_bible.txt",
+  "runtime_root": "outputs/rocket/dist/assets/infrastructure",
+  "eras": [1978, 1986, 1998, 2015, 2035, 2060],
+  "objects": {
+    "beacons": {"variants":{"1978":"infrastructure/beacons/1978.png","1986":"infrastructure/beacons/1986.png","1998":"infrastructure/beacons/1998.png","2015":"infrastructure/beacons/2015.png","2035":"infrastructure/beacons/2035.png","2060":"infrastructure/beacons/2060.png"}},
+    "weather": {"variants":{"1978":"infrastructure/weather/1978.png","1986":"infrastructure/weather/1986.png","1998":"infrastructure/weather/1998.png","2015":"infrastructure/weather/2015.png","2035":"infrastructure/weather/2035.png","2060":"infrastructure/weather/2060.png"}},
+    "gantry": {"variants":{"1978":"infrastructure/gantry/1978.png","1986":"infrastructure/gantry/1986.png","1998":"infrastructure/gantry/1998.png","2015":"infrastructure/gantry/2015.png","2035":"infrastructure/gantry/2035.png","2060":"infrastructure/gantry/2060.png"}},
+    "fuel": {"variants":{"1978":"infrastructure/fuel/1978.png","1986":"infrastructure/fuel/1986.png","1998":"infrastructure/fuel/1998.png","2015":"infrastructure/fuel/2015.png","2035":"infrastructure/fuel/2035.png","2060":"infrastructure/fuel/2060.png"}},
+    "rescue": {"variants":{"1978":"infrastructure/rescue/1978.png","1986":"infrastructure/rescue/1986.png","1998":"infrastructure/rescue/1998.png","2015":"infrastructure/rescue/2015.png","2035":"infrastructure/rescue/2035.png","2060":"infrastructure/rescue/2060.png"}},
+    "service": {"variants":{"1978":"infrastructure/service/1978.png","1986":"infrastructure/service/1986.png","1998":"infrastructure/service/1998.png","2015":"infrastructure/service/2015.png","2035":"infrastructure/service/2035.png","2060":"infrastructure/service/2060.png"}},
+    "deluge": {"variants":{"1978":"infrastructure/deluge/1978.png","1986":"infrastructure/deluge/1986.png","1998":"infrastructure/deluge/1998.png","2015":"infrastructure/deluge/2015.png","2035":"infrastructure/deluge/2035.png","2060":"infrastructure/deluge/2060.png"}},
+    "radar": {"variants":{"1978":"infrastructure/radar/1978.png","1986":"infrastructure/radar/1986.png","1998":"infrastructure/radar/1998.png","2015":"infrastructure/radar/2015.png","2035":"infrastructure/radar/2035.png","2060":"infrastructure/radar/2060.png"}},
+    "logistics": {"variants":{"1978":"infrastructure/logistics/1978.png","1986":"infrastructure/logistics/1986.png","1998":"infrastructure/logistics/1998.png","2015":"infrastructure/logistics/2015.png","2035":"infrastructure/logistics/2035.png","2060":"infrastructure/logistics/2060.png"}},
+    "control": {"variants":{"1978":"infrastructure/control/1978.png","1986":"infrastructure/control/1986.png","1998":"infrastructure/control/1998.png","2015":"infrastructure/control/2015.png","2035":"infrastructure/control/2035.png","2060":"infrastructure/control/2060.png"}},
+    "recovery": {"variants":{"1978":"infrastructure/recovery/1978.png","1986":"infrastructure/recovery/1986.png","1998":"infrastructure/recovery/1998.png","2015":"infrastructure/recovery/2015.png","2035":"infrastructure/recovery/2035.png","2060":"infrastructure/recovery/2060.png"}},
+    "energy": {"variants":{"1978":"infrastructure/energy/1978.png","1986":"infrastructure/energy/1986.png","1998":"infrastructure/energy/1998.png","2015":"infrastructure/energy/2015.png","2035":"infrastructure/energy/2035.png","2060":"infrastructure/energy/2060.png"}},
+    "observation": {"variants":{"1978":"infrastructure/observation/1978.png","1986":"infrastructure/observation/1986.png","1998":"infrastructure/observation/1998.png","2015":"infrastructure/observation/2015.png","2035":"infrastructure/observation/2035.png","2060":"infrastructure/observation/2060.png"}},
+    "factory": {"variants":{"1978":"infrastructure/factory/1978.png","1986":"infrastructure/factory/1986.png","1998":"infrastructure/factory/1998.png","2015":"infrastructure/factory/2015.png","2035":"infrastructure/factory/2035.png","2060":"infrastructure/factory/2060.png"}}
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "command": "npm test",
+  "exitCode": 0,
+  "date": "2026-10-16",
+  "remoteParent": "cb410667b83360db9ac4c293538b02dc5ae7385c",
+  "runner": "Chromium/SwiftShader via local Playwright bootstrap",
+  "steps": ["build", "infrastructure", "route-engine", "flight-reference", "map", "stage", "feedback", "pad-ui", "audio", "journey", "controls-and-mobile", "world", "world-motion", "aircraft", "atmosphere", "base"],
+  "worldSprites": 166,
+  "aircraft": 36,
+  "assembledScenes": 30,
+  "baseProjectionChecks": 96,
+  "baseNativeFrames": 54,
+  "note": "Final complete rerun passed. An earlier journey camera-bound assertion failed; an isolated diagnostic and complete rerun passed without changing the assertion. Ref2game art-only harness separately passed six states with six missing-HUD-record warnings. See individual reports for coverage limits."
+}

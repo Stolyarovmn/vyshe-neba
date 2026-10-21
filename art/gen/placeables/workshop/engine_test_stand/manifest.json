@@ -1,0 +1,23 @@
+{
+  "id":"engine_test_stand",
+  "asset_code":"W02",
+  "type":"workshop_placeable",
+  "runtime_footprint_lp":[190,126],
+  "placement_sockets":["floor","floor_back"],
+  "placement_anchor_px":[95,122],
+  "value":"Capability",
+  "cost_target":"L",
+  "mechanic":"Run one pre-flight test and choose one temporary mode: thrust, economy or cooling. Initial target effect 5–8%.",
+  "parts":["frame","clamp_left","clamp_right","mount","instrument"],
+  "era_sprites":[
+    {"era":"E0","year":1978,"name":"Гаражная мечта","lineage":"garage fire frame","file":"e0_1978.png","source_cell":{"col":0,"row":0},"source_bbox_px":[30,111,512,469]},
+    {"era":"E1","year":1986,"name":"Своя мастерская","lineage":"industrial test stand","file":"e1_1986.png","source_cell":{"col":1,"row":0},"source_bbox_px":[0,56,470,465]},
+    {"era":"E2","year":1998,"name":"Испытательный центр","lineage":"sensor / CRT test stand","file":"e2_1998.png","source_cell":{"col":2,"row":0},"source_bbox_px":[7,19,482,512]},
+    {"era":"E3","year":2015,"name":"Космический порт","lineage":"enclosed modular test-cell","file":"e3_2015.png","source_cell":{"col":0,"row":1},"source_bbox_px":[17,24,489,443]},
+    {"era":"E4","year":2035,"name":"Орбитальная эра","lineage":"robotic self-positioning stand","file":"e4_2035.png","source_cell":{"col":1,"row":1},"source_bbox_px":[5,11,472,441]},
+    {"era":"E5","year":2060,"name":"Горизонт будущего","lineage":"adaptive real-time test-cell","file":"e5_2060.png","source_cell":{"col":2,"row":1},"source_bbox_px":[2,0,494,441]}
+  ],
+  "normalization":{"same_scale_all_eras":true,"common_scale":0.23935091277890466,"runtime_canvas_px":[190,126],"resample":"nearest-neighbor","palette":"PNG8 <=32 colors","dither":"none"},
+  "animation":{"policy":"rigged parts only; no whole-sprite bob/rotate/scale","states":["OFF","IDLE","NOTICE","WORK","FINISH","COOLDOWN"],"sequence":["clamps_close","burn","instrument_response","shutdown","clamps_open"],"code_owned_fx":["engine_flame","heat_haze","dynamic_light","sparks","instrument_readout"],"rig_parts_status":"pending isolated part generation and measured pivots"},
+  "status":{"anchor_art":"approved","runtime_sprite":"ready_static","work_animation":"pending_rig_pass"}
+}

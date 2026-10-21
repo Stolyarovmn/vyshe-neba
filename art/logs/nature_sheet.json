@@ -1,0 +1,35 @@
+{
+  "name": "nature_sheet",
+  "tool": "imagegen",
+  "source_path": "/workspace/scratch/684fa65e1f5f/generated_images/exec-40da5de8-cc82-4116-ac96-37373dba7dcb.png",
+  "source_sha256": "0287d17d2007172398d17b2522edd0d53d78eec62ffd03ac69a7fb545118d6e0",
+  "raw": "art/raw/nature_sheet.png",
+  "final": "art/gen/nature_sheet.png",
+  "actual_size": [
+    1536,
+    1024
+  ],
+  "alpha": {
+    "ok": true,
+    "kind": "ok",
+    "has_alpha_channel": true,
+    "clear_frac": 0.5381,
+    "soft_edge_ratio": 3.687
+  },
+  "request": {
+    "name": "nature_sheet",
+    "tool": "imagegen",
+    "arguments": {
+      "prompt": "STYLE BIBLE (verbatim):\nVYSHE NEBA — CANONICAL STYLE BIBLE\n\nStyle family: cohesive HD pixel-art / pixel-look game art with deliberate pixel clusters, clear silhouettes, restrained detail and a finished indie-game presentation. It must look designed, not like a filtered 3D render or generic AI illustration.\n\nShape language: large readable masses first, functional construction second, sparse small accents last. Silhouettes must remain legible at actual gameplay size and when reduced by the camera. Avoid meaningless micro-detail, decorative noise and accidental extra parts.\n\nShading: stepped pixel shading is the default. Use a small, intentional tonal ramp per material; add extra tones, controlled dithering or a limited gradient only when they clearly improve material readability. No pillow shading and no soft airbrushed volume on solid small sprites.\n\nPalette temperature: shadows are cool dark blue-gray; lit neutrals are warm off-white/metal; saturated reds, golds and cyans are accents, not mandatory identifiers. Materials may use their own palettes as long as value hierarchy and world coherence are preserved.\n\nLine: prefer dark chromatic selective outlines instead of pure black. The outer contour is usually visually about one logical pixel at runtime, may lighten or disappear on the lit side, and may deepen on the shadow side. Interior lines are sparse and functional.\n\nTexture: intentional pixel clusters, stepped diagonals and broad quiet regions. Avoid random single-pixel noise. Dithering is a deliberate material or transition tool, never a blanket texture.\n\nDetail hierarchy: keep most of the surface calm. Concentrate detail around functional mechanisms, focal points, material changes and attachment areas. Readability at gameplay size has priority over master-image detail.\n\nLighting sentence — use verbatim on every generation: One consistent key light comes from the upper-left, with warm light on upper-left planes and cool blue-gray shadow on lower-right planes; use no baked cast shadow.\n\nProjection: gameplay aircraft and moving hazards use a consistent strict side to slight 3/4 side view chosen for silhouette readability; do not mix top-down, isometric or frontal projections inside one asset family unless a specific gameplay need requires it.\n\nAlpha and composition: isolated runtime sprites use a clean transparent background, complete uncropped silhouette and enough padding for rotation or moving attachments. Solid sprite edges should be crisp and free of accidental semi-transparent fringe.\n\nSystem separation: the image contains the physical object and its materials. Code owns scale, final palette normalization, alpha cleanup, dynamic light response, glow, bloom, cast shadow, propeller motion, turbines, exhaust, afterburner, heat haze, contrails, navigation lights, particles, smoke, motion blur, trails and all other motion or effects.\n\nExclusions: no text, letters, numbers, logos, watermark, pseudo-writing, scenery, UI, baked glow, bloom, light rays, cast shadow, motion blur, particles, smoke trails, speed lines or frozen effects unless the requested asset explicitly requires an environmental element.\n\nArtistic freedom: these rules define the shared language, not a template. A deliberate deviation is allowed when it clearly produces a stronger silhouette, better material, better readability, stronger character or more coherent result. Do not preserve a rule at the expense of visibly better art; do not use “artistic freedom” to excuse technical defects or accidental generator artifacts.\n\nINPUT IMAGES:\nImage 1: style reference: match style, palette, rendering and light; do not copy composition.\n\nASSET:\nExactly 12 isolated natural/game objects, regular 4 columns by 3 rows, wide transparent gutters. Row 1 four distinct irregular asteroids: gray silicate, dark iron, red rock, pale ice, broad stepped planes. Row 2 four clouds: cumulus, long stratocumulus, dense storm cloud, wispy high cloud, no rain/lightning/scenery. Row 3 cell1 full cratered Moon with spherical shading; cell2 full Earth with blue oceans continents and sparse white clouds; cell3 opened parachute canopy with short attachment loops but NO long cords; cell4 small folded parachute pack. No epochs for nature. Same deliberate HD pixel-look, not photo. No text, glow, shadows. Entire isolated objects, genuine alpha.\n\nBACKGROUND:\nReal transparent alpha outside the asset; clean edges, no painted checkerboard, no extra ground or cast shadow.\n\nTarget canvas/aspect: 1536x1024. Keep important content within safe margins.",
+      "referenced_image_paths": [
+        "/workspace/scratch/684fa65e1f5f/vyshe-neba/outputs/rocket/dist/assets/rocket.png"
+      ],
+      "transparent_background": true
+    },
+    "requested_size": "1536x1024",
+    "prompt_file": "/workspace/scratch/684fa65e1f5f/vyshe-neba/art/prompts/nature_sheet.txt",
+    "pixel": true,
+    "note": "Prepared only. Codex must inspect references, call built-in imagegen directly, and import the returned local image."
+  },
+  "imported_at": "2026-10-15T21:39:59.261703+00:00"
+}

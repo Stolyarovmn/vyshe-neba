@@ -1,0 +1,1 @@
+{"generator": {"tool": "imagegen", "size": "1536x1024", "alpha": "native"}, "style_bible": "art/style_bible.txt", "style_ref": ["outputs/rocket/dist/assets/rocket.png"], "prep": {"src": "art/gen", "dst": "outputs/rocket/dist/assets/world", "manifest": "live/world-assets.js", "max": 1024, "skip": ["*_sheet", "transport_reject_*", "sky_color_plate"]}}

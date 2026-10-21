@@ -1,0 +1,14 @@
+{
+  "era": "E3",
+  "year": 2015,
+  "parts": {
+    "seat": {"size_px":[67,90],"source_crop":[842,713,962,835],"pivot":null},
+    "monitors": {"size_px":[91,73],"source_crop":[965,713,1118,835],"pivot":null},
+    "base": {"size_px":[101,82],"source_crop":[1120,713,1248,835],"pivot":null},
+    "actuator_left": {"size_px":[59,83],"source_crop":[838,844,962,966],"pivot":null},
+    "actuator_right": {"size_px":[64,78],"source_crop":[965,844,1117,966],"pivot":null},
+    "console": {"size_px":[46,56],"source_crop":[1118,844,1248,966],"pivot":null},
+    "canopy": {"size_px":[138,121],"source_crop":[565,815,742,948],"pivot":null}
+  },
+  "pivot_policy": "null until measured in assembled reconstruction"
+}

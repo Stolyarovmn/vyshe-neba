@@ -1,0 +1,128 @@
+{
+ "states": {
+  "era-1978": {
+   "ui": 0,
+   "anchors": [
+    {
+     "name": "booster_1978-nozzle",
+     "sim": [
+      900,
+      600
+     ],
+     "drawn": [
+      900,
+      600
+     ],
+     "tol": 0.5,
+     "d": 0
+    }
+   ]
+  },
+  "era-1986": {
+   "ui": 0,
+   "anchors": [
+    {
+     "name": "booster_1986-nozzle",
+     "sim": [
+      900,
+      600
+     ],
+     "drawn": [
+      900,
+      600
+     ],
+     "tol": 0.5,
+     "d": 0
+    }
+   ]
+  },
+  "era-1998": {
+   "ui": 0,
+   "anchors": [
+    {
+     "name": "booster_1998-nozzle",
+     "sim": [
+      900,
+      600
+     ],
+     "drawn": [
+      900,
+      600
+     ],
+     "tol": 0.5,
+     "d": 0
+    }
+   ]
+  },
+  "era-2015": {
+   "ui": 0,
+   "anchors": [
+    {
+     "name": "booster_2015-nozzle",
+     "sim": [
+      900,
+      600
+     ],
+     "drawn": [
+      900,
+      600
+     ],
+     "tol": 0.5,
+     "d": 0
+    }
+   ]
+  },
+  "era-2035": {
+   "ui": 0,
+   "anchors": [
+    {
+     "name": "booster_2035-nozzle",
+     "sim": [
+      900,
+      600
+     ],
+     "drawn": [
+      900,
+      600
+     ],
+     "tol": 0.5,
+     "d": 0
+    }
+   ]
+  },
+  "era-2060": {
+   "ui": 0,
+   "anchors": [
+    {
+     "name": "booster_2060-nozzle",
+     "sim": [
+      900,
+      600
+     ],
+     "drawn": [
+      900,
+      600
+     ],
+     "tol": 0.5,
+     "d": 0
+    }
+   ]
+  }
+ },
+ "cycles": {},
+ "anim": {
+  "attachments": {
+   "on": 1.909,
+   "off": 0
+  }
+ },
+ "fails": [],
+ "warns": [
+  "era-1978: no __UI records (HUD text is not checked)",
+  "era-1986: no __UI records (HUD text is not checked)",
+  "era-1998: no __UI records (HUD text is not checked)",
+  "era-2015: no __UI records (HUD text is not checked)",
+  "era-2035: no __UI records (HUD text is not checked)",
+  "era-2060: no __UI records (HUD text is not checked)"
+ ]
+}
