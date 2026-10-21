@@ -10,6 +10,10 @@ on:
       - '.github/workflows/rocket-modular-promote.yml'
   workflow_dispatch:
 
+concurrency:
+  group: rocket-modular-promote-2d
+  cancel-in-progress: false
+
 permissions:
   contents: write
   actions: read
@@ -88,11 +92,14 @@ jobs:
               --aseprite "$RUNNER_TEMP/art-tools/aseprite" --resume
             python3 tools/art_pipeline/promote_asset.py \
               --repo-root . --asset "$asset" --candidate "$dest" --state-dir "$dest/.tracker"
-            python3 tools/art_pipeline/sync_asset_tracker_issue.py \
-              --repo-root . --asset "$asset" --state-dir "$dest/.tracker" \
-              --artifact-name "branch-candidate-${GITHUB_SHA}" \
-              --run-url "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           done
+
+      - name: Install game test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npx playwright install --with-deps chromium
 
       - name: Run game verification and standalone build
         shell: bash
@@ -100,6 +107,38 @@ jobs:
           set -euo pipefail
           npm test
           npm run build
+
+      - name: Mark game tests and sync durable trackers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'tools/art_pipeline')
+          from task_tracker import Tracker, fingerprint
+
+          cfg = json.loads(Path('art/placeables/PIPELINE_CONFIG.json').read_text(encoding='utf-8'))['assets']
+          for asset in ('R_BODY', 'R_FINS'):
+              state_dir = Path(os.environ['RUNNER_TEMP']) / f'candidate-{asset}' / '.tracker'
+              fp = fingerprint({
+                  'step': 'game_tests',
+                  'run_id': os.environ.get('GITHUB_RUN_ID'),
+                  'git_sha': os.environ.get('GITHUB_SHA'),
+                  'checks': ['npm test', 'npm run build'],
+              })
+              for era in cfg[asset]['eras']:
+                  Tracker(state_dir, asset, era['stem']).success(
+                      'game_tests', fp, (), 'npm test and npm run build passed'
+                  )
+          PY
+          for asset in R_BODY R_FINS; do
+            python3 tools/art_pipeline/sync_asset_tracker_issue.py \
+              --repo-root . --asset "$asset" \
+              --state-dir "$RUNNER_TEMP/candidate-$asset/.tracker" \
+              --artifact-name "branch-candidate-${GITHUB_SHA}" \
+              --run-url "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          done
 
       - name: Commit promoted canonical art to feature branch
         shell: bash
