@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  GROUND_CLEARANCE, GROUND_DISTANCE, ROCKET_VIEW_UNITS, createMapView, groundScale, groundShoreY, groundSink, groundTransform, islandRect,
+  GROUND_CLEARANCE, GROUND_DISTANCE, GROUND_EDGE_LIMIT, ROCKET_VIEW_UNITS, createMapView, groundScale, groundShoreY, groundSink, groundTransform, islandRect,
 } from '../src/render/islandmap.js';
 import { cloudLayers, cloudPass, cloudSize, drawCloudField, fallbackClouds } from '../src/render/clouds.js';
 import { ROCK_MIN_DIAMETER, drawObjects, drawObjectsFront, rockDiameter } from '../src/render/objects.js';
@@ -60,13 +60,11 @@ test('высота читается: к 800 м остров 35-45 % началь
       return { tr, mv: createMapView().set(tr.ox, tr.oy, tr.s, devW, devH) };
     };
     const shore = (alt) => frame(alt).mv.sy(ISLAND.topUnits);
-    // к 800 м северный берег не ближе 2 высот ракеты под её ногами (в узком ландшафте уже за краем кадра)
-    assert.ok(shore(80) - feetY >= GROUND_CLEARANCE * rocket - 1, `${win.name}: берег на 800 м в ${((shore(80) - feetY) / rocket).toFixed(1)} высотах ракеты`);
-    // портрет: остров на 800 м ещё виден полосой у нижнего края
-    if (feetY + 0.62 * (devH - feetY) > feetY + GROUND_CLEARANCE * rocket) {
-      assert.ok(shore(80) < devH && shore(80) > devH * 0.7, `${win.name}: полоса острова на 800 м (${(shore(80) / devH).toFixed(2)})`);
-      assert.ok(shore(150) < devH, `${win.name}: островок на 1500 м виден у нижнего края`);
-    }
+    // к 800 м северный берег в 2,2 высотах ракеты под её ногами, а в низком кадре — у нижнего края (не за ним)
+    const settled = Math.min(feetY + Math.max(0.62 * (devH - feetY), GROUND_CLEARANCE * rocket), devH * GROUND_EDGE_LIMIT);
+    assert.ok(Math.abs(shore(80) - settled) < 1, `${win.name}: берег на 800 м ${(shore(80) / devH).toFixed(2)} высоты кадра`);
+    assert.ok(shore(80) < devH && shore(80) > devH * 0.7, `${win.name}: полоса острова на 800 м у нижнего края`);
+    assert.ok(shore(150) < devH, `${win.name}: островок на 1500 м виден у нижнего края`);
     const islandWidth = ISLAND.widthUnits * frame(150).tr.s;
     assert.ok(islandWidth < devW * 0.7, `${win.name}: остров на 1500 м ${(islandWidth / devW).toFixed(2)} ширины кадра`);
     assert.ok(ISLAND.widthUnits * frame(300).tr.s < devW * 0.4, `${win.name}: на 3 км остров мелкий`);
@@ -76,7 +74,7 @@ test('высота читается: к 800 м остров 35-45 % началь
   }
 });
 
-test('зазор от острова: самолёт на 400 м выше ракеты — не ближе двух высот ракеты к острову уже с 800 м, на 400 м остров уже заметно ниже', () => {
+test('зазор от острова: самолёт на 400 м выше ракеты — не ближе ~двух высот ракеты к острову с 800 м, на 400 м остров уже заметно ниже', () => {
   for (const win of WINDOWS) {
     const devH = win.h * win.dpr;
     const feetY = devH * win.feet;
@@ -86,7 +84,8 @@ test('зазор от острова: самолёт на 400 м выше рак
       const tr = groundTransform({}, alt, win.S, feetY, 0, 0, devH);
       return createMapView().set(tr.ox, tr.oy, tr.s, 100, devH).sy(ISLAND.topUnits) - planeY;
     };
-    for (const alt of [80, 120, 200]) assert.ok(gap(alt) >= 2 * rocket, `${win.name}: на ${alt * 10} м зазор ${(gap(alt) / rocket).toFixed(1)} высот ракеты`);
+    const wanted = win.name === 'портрет' ? 2 : 1.55; // низкий ландшафт: места под ногами ракеты меньше
+    for (const alt of [80, 120, 200]) assert.ok(gap(alt) >= wanted * rocket, `${win.name}: на ${alt * 10} м зазор ${(gap(alt) / rocket).toFixed(1)} высот ракеты`);
     assert.ok(gap(40) > gap(0) + 0.5 * rocket, `${win.name}: на 400 м остров ушёл заметно ниже, чем на старте`);
   }
 });

@@ -74,6 +74,8 @@ export const GROUND_SINK_ALT = 80;
 export const ROCKET_VIEW_UNITS = 60;
 /** Зазор от ног ракеты до северного берега, когда остров ушёл вниз, в высотах ракеты на экране. */
 export const GROUND_CLEARANCE = 2.2;
+/** Предел для низкого кадра (ландшафт): берег не дальше этой доли высоты экрана, чтобы островок оставался у края. */
+export const GROUND_EDGE_LIMIT = 0.97;
 
 /** Относительный масштаб карты на высоте: 1 на земле, ~0,4 на 80 ед., ~0,14 на 150 ед. */
 export function groundScale(altitude) {
@@ -83,19 +85,19 @@ export function groundScale(altitude) {
 /** Доля пути северного берега острова от стартового положения к нижнему: 0 на земле, 1 с высоты GROUND_SINK_ALT. */
 export function groundSink(altitude) {
   const x = Math.min(1, Math.max(0, altitude) / GROUND_SINK_ALT);
-  return 1 - (1 - x) * (1 - x); // быстро в начале подъёма, к GROUND_SINK_ALT замирает
+  return 1 - Math.pow(1 - x, 1.7); // быстро в начале подъёма, к GROUND_SINK_ALT замирает
 }
 
 /**
  * Экранная y северного берега острова (пиксели устройства). На земле берег там, где его рисует карта; с высотой уходит
- * вниз: сначала быстро, к 800 м оказывается не ближе GROUND_CLEARANCE высот ракеты под её ногами (в узком ландшафте —
- * за нижним краем), выше до 1600 м оседает ещё ниже. S — пикселей на единицу, feetY — экранная y низа ракеты.
+ * вниз: сначала быстро, к 800 м оказывается в GROUND_CLEARANCE высотах ракеты под её ногами (в низком ландшафте — у
+ * нижнего края, GROUND_EDGE_LIMIT), выше до 1600 м оседает ещё ниже. S — пикселей на единицу, feetY — экранная y низа ракеты.
  */
 export function groundShoreY(altitude, S, feetY, devH) {
   const north = -ISLAND.topUnits;
   const start = feetY - north * S;
   const room = Math.max(0, devH - feetY);
-  const settled = feetY + Math.max(0.62 * room, GROUND_CLEARANCE * ROCKET_VIEW_UNITS * S);
+  const settled = Math.min(feetY + Math.max(0.62 * room, GROUND_CLEARANCE * ROCKET_VIEW_UNITS * S), Math.max(feetY, devH * GROUND_EDGE_LIMIT));
   const late = 0.07 * room * smoothstep(GROUND_SINK_ALT, 2 * GROUND_SINK_ALT, altitude);
   return start + (settled - start) * groundSink(altitude) + late;
 }

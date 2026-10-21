@@ -105,7 +105,7 @@ export const ERA_SKINS = [
   },
   {
     id: 'e4',
-    hud: { digit: 'cyan', bg: 'ink', bgAlpha: 0.86 },
+    hud: { digit: 'cyan', bg: 'ink', bgAlpha: 0.92 },
     year: 2035,
     title: 'Тёмный карбон',
     palette: {

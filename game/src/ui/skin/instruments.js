@@ -195,7 +195,7 @@ function dotMatrix(kit, str, xRight, yMid, pitch, on, off) {
   const total = s.length * adv - step;
   let x = Math.round((xRight - total) / cc) * cc;
   const y0 = Math.round((yMid - (7 * step) / 2) / cc) * cc;
-  const dot = Math.max(cc, step - cc);
+  const dot = Math.max(cc, step - Math.max(1, Math.round(cc / 2)));
   for (const ch of s) {
     const rows = glyphRows(ch) || [];
     for (let ry = 0; ry < 7; ry++) {
@@ -235,7 +235,7 @@ export function altitude(kit, r, f, o) {
   }
   if (kind === 'led') {
     const unitW = kit.text.measure(unit, kit.fs(10)) + cc * 3;
-    kit.segDisplay({ x: r.x + lampW, y: r.y, w: r.w - lampW, h: r.h }, str, { lit: c.amber, ghost: c.navy2, digits: 4, h: Math.round(r.h * 0.56), padRight: unitW + cc * 2 });
+    kit.segDisplay({ x: r.x + lampW, y: r.y, w: r.w - lampW, h: r.h }, str, { lit: c.amber, ghost: mix(c.navy2, c.ink, 0.6), digits: 4, h: Math.round(r.h * 0.56), padRight: unitW + cc * 2 });
     kit.nine('screen', r.x, r.y, lampW + cc * 2, r.h);
     kit.lamp(lampX, r.y + r.h / 2, Math.round(r.h * 0.34), lampColor, true, alarm);
     kit.drawText(unit, r.x + r.w - cc * 3, r.y + r.h - cc * 5, { size: kit.fs(10), color: c.amber, align: 'right' });
@@ -249,7 +249,7 @@ export function altitude(kit, r, f, o) {
     kit.lamp(lampX, r.y + r.h / 2, Math.round(r.h * 0.34), lampColor, true, alarm);
     const pitch = r.h >= 54 ? 3 : 2;
     const areaR = r.x + r.w - cc * 3 - unitW;
-    dotMatrix(kit, str.padStart(4, ' '), areaR, r.y + r.h / 2, pitch, c.greenLight, mix(c.navy1, c.steel0, 0.45));
+    dotMatrix(kit, str.padStart(4, ' '), areaR, r.y + r.h / 2, pitch, c.greenLight, mix(c.navy1, c.steel0, 0.2));
     kit.drawText(unit, r.x + r.w - cc * 3, r.y + r.h - cc * 5, { size: kit.fs(9), color: c.green, align: 'right' });
     return;
   }
@@ -510,10 +510,10 @@ export function gauge(kit, r, v, color, lowAt) {
   }
   // E5: плавающие полупрозрачные точки; цвет по состоянию, по горящим точкам бежит волна яркости
   {
-    withAlpha(kit, 0.45 * flicker(kit, r.x, 0.1), () => kit.rect(r.x, r.y, r.w, r.h, c.navy0));
+    withAlpha(kit, 0.62 * flicker(kit, r.x, 0.1), () => kit.rect(r.x, r.y, r.w, r.h, c.navy0));
     const n = clamp(Math.floor(len / (cc * 4)), 6, 14);
     const lit = shown * n;
-    const size = cc * 2;
+    const size = clamp(Math.floor((vertical ? r.w : r.h) / cc) * cc - cc * 4, cc * 2, cc * 5);
     const pitch = len / n;
     for (let i = 0; i < n; i++) {
       const on = i + 0.5 <= lit + 0.5;
@@ -577,7 +577,7 @@ export function lever(kit, V, o) {
     for (let i = 0; i <= 4; i++) kit.rect(V.x + cc * 3, Math.round(track.y + (track.h * i) / 4), Math.round(V.w * 0.2), cc, c.steel1);
     kit.nine(lv.touched ? 'btnPress' : 'btn', thumb.x, thumb.y, thumb.w, thumb.h);
     kit.lamp(V.x + V.w - cc * 5, V.y + cc * 5, cc * 4, latch ? c.green : c.navy2, latch);
-    return { thumb, label: c.white };
+    return { thumb, label: c.ink };
   }
   if (kind === 'projection') {
     // E4: проекция: светящиеся деления и «каретка» уровня, рукоятка — контур с тёмной серединой
@@ -690,14 +690,14 @@ export function readout(kit, r, str, o = {}) {
   const s = String(str);
   const lit = o.lit || c.green;
   if (kind === 'led') {
-    kit.segDisplay(r, s, { lit: c.amber, digits: o.digits, h: o.h });
+    kit.segDisplay(r, s, { lit: c.amber, ghost: mix(c.navy2, c.ink, 0.6), digits: o.digits, h: o.h });
     return;
   }
   if (kind === 'digital') {
     kit.nine('screen', r.x, r.y, r.w, r.h);
     kit.rect(r.x + cc * 2, r.y + cc * 2, r.w - cc * 4, r.h - cc * 4, c.navy1);
     const pitch = r.h >= 48 ? 3 : 2;
-    dotMatrix(kit, s, r.x + r.w - cc * 3, r.y + r.h / 2, pitch, c.greenLight, mix(c.navy1, c.steel0, 0.45));
+    dotMatrix(kit, s, r.x + r.w - cc * 3, r.y + r.h / 2, pitch, c.greenLight, mix(c.navy1, c.steel0, 0.2));
     return;
   }
   if (isGlassEra(kind) || kind === 'flat') {

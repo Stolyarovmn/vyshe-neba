@@ -731,6 +731,7 @@ async function tourEra(page, vp, era) {
   await go(page, 'hub');
   await page.waitForTimeout(350);
   await audit('хаб');
+  await checkTargets(page, vp, `E${era}/хаб`);
   await setUi(page, () => { globalThis.__VN_APP__.ui.hub.era = true; });
   await audit('хаб/эпоха', 200);
   await setUi(page, () => { globalThis.__VN_APP__.ui.hub.era = false; });
@@ -738,6 +739,8 @@ async function tourEra(page, vp, era) {
   await setUi(page, () => { globalThis.__VN_APP__.ui.base.sel = 'gantry'; });
   await audit('стройка/башня', 300);
   await go(page, 'rocket');
+  await page.waitForTimeout(250);
+  await checkTargets(page, vp, `E${era}/мастерская`);
   for (const id of ['engine', 'fins']) {
     await setUi(page, (k) => { globalThis.__VN_APP__.ui.rocket.selected = k; }, id);
     await audit(`мастерская/${id}`, 220);
@@ -751,16 +754,19 @@ async function tourEra(page, vp, era) {
   await go(page, 'launch');
   await page.waitForTimeout(300);
   await audit('пульт', 300);
+  await checkTargets(page, vp, `E${era}/пульт`);
   await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: { chute: true, repair: true } }));
   await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
   await page.waitForTimeout(500);
   await audit('полёт', 400);
+  await checkTargets(page, vp, `E${era}/полёт`);
   await page.evaluate(() => globalThis.__VN_APP__.pause());
   await audit('пауза', 250);
   await page.evaluate(() => { const a = globalThis.__VN_APP__; a.resume(); a.abandon(); });
   await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
   await page.waitForTimeout(3200);
   await audit('итоги', 300);
+  await checkTargets(page, vp, `E${era}/итоги`);
   await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); a.prefs.touchControls = 'auto'; });
   return found;
 }

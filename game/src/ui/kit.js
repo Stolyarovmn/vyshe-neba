@@ -6,7 +6,7 @@ import { createText } from './text.js';
 import { createCrt } from './skin/crt.js';
 import { drawSegments, segmentWidth } from './font-pixel.js';
 import { createIcons, hasIcon } from './icons.js';
-import { getTheme, mix } from './theme.js';
+import { getTheme, mix, luminance } from './theme.js';
 import * as Scroll from './scroll.js';
 import { clamp, damp, easeOutCubic, fmtCompact, fmtStat, fmtInt, fmtTiny } from './format.js';
 import { intersect } from './layout.js';
@@ -570,8 +570,8 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     };
     for (let cy = 0; cy < th; cy++) for (let cx = 0; cx < tw; cx++) cellAt(cx, cy, f.mid);
     if (kind === 'brushed') {
-      for (const cx of [1, 2, 3]) cellAt(cx, 1, mix(f.mid, f.hi, 0.22));
-      cellAt(5, 0, mix(f.mid, f.lo, 0.18));
+      for (const cx of [1, 2, 3]) cellAt(cx, 1, mix(f.mid, f.hi, 0.12));
+      cellAt(5, 0, mix(f.mid, f.lo, 0.1));
     } else {
       const dark = mix(f.mid, '#000000', 0.4);
       cellAt(1, 0, dark);
@@ -840,6 +840,9 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     const name = variantName(variant, a, dim);
     nine(name, body.x, body.y, body.w, body.h);
     const labelColor = dim ? c.textMute : o.color || S.th.labelColor(variant);
+    // значки на светлых кнопках (слоновая кость, алюминий): тёмная подпись делает векторный значок сплошным силуэтом,
+    // поэтому значок рисуется тёмно-серым — детали читаются
+    const iconBase = o.iconColor || (luminance(labelColor) < 0.12 ? c.steel0 : labelColor);
     const size = o.size || fs(15);
     const cx = body.x + body.w / 2;
     const cy = body.y + body.h / 2;
@@ -867,11 +870,11 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       const labelY = body.y + body.h - step * 2 - cc - glyphH / 2;
       const areaH = hasLabel ? labelY - glyphH / 2 - step * 2 - body.y : body.h;
       const is = Math.round(Math.min(areaH * 0.9, body.w * 0.62));
-      icon(iconName, cx, body.y + (hasLabel ? areaH / 2 + cc : body.h / 2), is, dim ? c.textMute : o.iconColor || labelColor, dim ? 0.6 : 1);
+      icon(iconName, cx, body.y + (hasLabel ? areaH / 2 + cc : body.h / 2), is, dim ? c.textMute : iconBase, dim ? 0.6 : 1);
       if (hasLabel) drawText(lbl, cx, labelY, { size: lblSize, color: labelColor, align: 'center', maxWidth: body.w - pad * 2, box: body });
     } else {
       if (iconName) {
-        icon(iconName, x + iconSize / 2, midY, iconSize, dim ? c.textMute : o.iconColor || labelColor, dim ? 0.6 : 1);
+        icon(iconName, x + iconSize / 2, midY, iconSize, dim ? c.textMute : iconBase, dim ? 0.6 : 1);
         x += iconSize + (hasLabel ? size * 0.4 : 0);
       }
       if (hasLabel) drawText(lbl, x, midY, { size: lblSize, color: labelColor, box: body });
