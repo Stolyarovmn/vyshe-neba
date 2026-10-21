@@ -90,13 +90,26 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       }
       visible.push(r);
     }
+    const seqOf = new Map(fa.rects.map((r, i) => [r, i]));
+    // пересечение двух строк скрыто, если между их выводом легла непрозрачная рамка, целиком закрывающая общую область
+    const covered = (a, b) => {
+      const ix = Math.max(a.x, b.x);
+      const iy = Math.max(a.y, b.y);
+      const iw = Math.min(a.x + a.w, b.x + b.w) - ix;
+      const ih = Math.min(a.y + a.h, b.y + b.h) - iy;
+      const sa = seqOf.get(a);
+      const sb = seqOf.get(b);
+      const lo = Math.min(sa, sb);
+      const hi = Math.max(sa, sb);
+      return (fa.frames || []).some((fr) => fr.after > lo && fr.after <= hi && ix >= fr.x && iy >= fr.y && ix + iw <= fr.x + fr.w && iy + ih <= fr.y + fr.h);
+    };
     for (let i = 0; i < visible.length; i++) {
       for (let j = i + 1; j < visible.length; j++) {
         const a = visible[i];
         const b = visible[j];
         if (a.str === b.str && Math.abs(a.x - b.x) < 1 && Math.abs(a.y - b.y) < 1) continue;
         const area = intersectArea(a, b);
-        if (area > 8) add(`ov|${a.str}|${b.str}`, { kind: 'overlap', str: a.str, other: b.str, at: `${Math.round(a.x)},${Math.round(a.y)} / ${Math.round(b.x)},${Math.round(b.y)}` });
+        if (area > 8 && !covered(a, b)) add(`ov|${a.str}|${b.str}`, { kind: 'overlap', str: a.str, other: b.str, at: `${Math.round(a.x)},${Math.round(a.y)} / ${Math.round(b.x)},${Math.round(b.y)}` });
       }
     }
     for (const it of fa.issues) {
@@ -472,6 +485,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     if (frameAudit && !f.dither) {
       // непрозрачная рамка закрывает всё, что было выведено под ней раньше: такие строки не проверяются на наложение
       for (const r of frameAudit.rects) if (!r.hidden && r.x + r.w / 2 > x && r.x + r.w / 2 < x + w && r.y + r.h / 2 > y && r.y + r.h / 2 < y + h) r.hidden = true;
+      (frameAudit.frames ||= []).push({ x, y, w, h, after: frameAudit.rects.length });
     }
     const cc = Math.max(1, Math.min(cell(), Math.floor(Math.min(w, h) / 8)));
     if (w < cc * 4 || h < cc * 4) {
@@ -1085,8 +1099,8 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
   function costWidth(cost, size = fs(14)) {
     let w = 0;
     const gap = size * 0.5;
-    if (cost.coins) w += size * 1.4 + text.measure(fmtCompact(cost.coins), size) + gap;
-    if (cost.data) w += size * 1.4 + text.measure(fmtCompact(cost.data), size) + gap;
+    if (cost.coins) w += size * 1.6 + text.measure(fmtCompact(cost.coins), size) + gap;
+    if (cost.data) w += size * 1.6 + text.measure(fmtCompact(cost.data), size) + gap;
     return Math.max(0, w - gap);
   }
 
@@ -1104,7 +1118,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     if (cost.data) items.push({ icon: 'data', val: cost.data, color: c.cyan, ok: o.have ? o.have.data >= cost.data : true });
     for (const it of items) {
       icon(it.icon, cx + size * 0.7, y, size * 1.3, it.color);
-      cx += size * 1.4;
+      cx += size * 1.6;
       const wd = drawText(fmtCompact(it.val), cx, y, { size, color: it.ok ? it.color : c.red, shadow: true }).w;
       cx += wd + size * 0.5;
     }

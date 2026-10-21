@@ -100,8 +100,12 @@ function drawBoard(app, kit, L, r, st, list, rects) {
       const lines = kit.text.wrap(ct.name, textW, size);
       lines.forEach((ln, k) => kit.drawText(ln, rect.x + cc * 5, ry + cc * 10 + k * step, { size, color: c.ink, baseline: 'top' }));
       if (ct.cargo) kit.icon('cart', rect.x + cc * 7, ry + rect.h - cc * 14, Math.round(16 * L.ui), c.cyanDark);
-      kit.icon('coin', rect.x + rect.w - cc * 22, ry + rect.h - cc * 7, Math.round(14 * L.ui), c.amberDeep);
-      kit.drawText(fmtCompact(ct.reward), rect.x + rect.w - cc * 4, ry + rect.h - cc * 7, { size: kit.fs(12), color: c.amberDeep, align: 'right' });
+      // награда: число прижато вправо, значок монеты — перед ним по измеренной ширине, чтобы не налезать на цифры
+      const rewardStr = fmtCompact(ct.reward);
+      const rewardSize = kit.fs(12);
+      const rewardW = kit.text.measure(rewardStr, rewardSize);
+      kit.drawText(rewardStr, rect.x + rect.w - cc * 4, ry + rect.h - cc * 7, { size: rewardSize, color: c.amberDeep, align: 'right' });
+      kit.icon('coin', rect.x + rect.w - cc * 4 - rewardW - cc * 4 - Math.round(7 * L.ui), ry + rect.h - cc * 7, Math.round(14 * L.ui), c.amberDeep);
       if (kit.S.focusVisible && kit.S.focusId === id) kit.focusRing(rect);
       if (st.sel === `sheet:${i}`) kit.focusRing({ x: rect.x, y: ry, w: rect.w, h: rect.h }, c.red);
       if (kit.clicked === id) st.sel = st.sel === `sheet:${i}` ? null : `sheet:${i}`;
