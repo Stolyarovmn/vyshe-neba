@@ -1,5 +1,6 @@
 name: Rocket modular asset candidates
 
+# Text-only source transport is intentional: untouched image-generation originals live in Google Drive.
 on:
   push:
     branches:
