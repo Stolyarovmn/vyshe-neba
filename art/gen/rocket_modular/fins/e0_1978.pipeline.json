@@ -1,0 +1,48 @@
+{
+  "asset_id": "R_FINS",
+  "asset": "rocket_fins",
+  "zone": "vehicle",
+  "era": "E0",
+  "year": 1978,
+  "adapter": "indexed_transport",
+  "source_gen_id": "0f59bf00-e2d4-4244-8908-a8e1f76160fc",
+  "source_sha256": "1c31716a9596d14371107c2526935243c808539686f9b67d77b845576864e665",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1DuLj4_OsrV-1rtFVbpme16dj-R0WDWS5",
+    "drive_url": "https://drive.google.com/file/d/1DuLj4_OsrV-1rtFVbpme16dj-R0WDWS5/view?usp=drivesdk",
+    "original_filename": "rocket_modular_source_0f59bf00-e2d4-4244-8908-a8e1f76160fc.png"
+  },
+  "transport_sha256": "0ee8651a5ae01b20ffc75948770442e616b795ef7bcd031045200bc091531502",
+  "transport_pixel_sha256": "91006ed1a8270433594f9c5c7253c686838f5f5d4f501daa9c4e3192b1089522",
+  "spritefusion_pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "aseprite_version": "1.3.18.6",
+  "aseprite_dithering": "none",
+  "pixel_size": 5,
+  "colors": 32,
+  "target_canvas": [
+    128,
+    64
+  ],
+  "registration_target": [
+    64,
+    62
+  ],
+  "mechanism_pivots": "pending_measured_rig_pass",
+  "output_sha256": "fe2ccb3b966af772a3abaaceb945d521547a581e6b2e9b6f272f740b8298d84b",
+  "reproducibility": {
+    "git_commit": "3461bdab0ce49438b29cefd79d79fb62e30e03ae",
+    "style_bible_sha256": "c1bc86aadb1c2c14117a8ab19690f7c0414648abe22c016f7ca9885be1f07cbb",
+    "production_manifest_sha256": "458d4b7e98f0d530df891db274e1626e1bbf3441a8f9bab054e22a9cbfead83e",
+    "pipeline_config_sha256": "18a2e6479db40e38c4a741a8d19bbcf8a988b5fc3aeb1501c94ea343736e4786",
+    "processor_sha256": "229fa320ab9c6f2fba7473e2a2c65740df937b714f7ca52ed7d08252a6a2e227",
+    "prompt_sha256": "b37715efda36f2408a2fc7bb5136311ae04b08cf2dc70d7aca29a01cf91f669d"
+  },
+  "publication": {
+    "state": "production",
+    "runtime_published": true,
+    "visual_review": "art/gen/rocket_modular/fins/visual_qa.json",
+    "visual_review_sha256": "f7d84bc2fcda971a736a6f555e91eacafe851344fa83033ed36c577bd03e7521",
+    "hash_bound": true
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "asset_id": "R_BODY",
+  "asset": "rocket_body",
+  "overall_status": "approved",
+  "reviewer": "self-review/ref2game",
+  "review_basis": "Visual self-review of the six-era body lineage contact sheet plus exact candidate automatic QA. The approval below is bound to the exact post-pipeline candidate PNG SHA-256 values from candidate-manifest.json.",
+  "checks": {
+    "isolated_component": "pass",
+    "transparent_runtime_sprite": "pass",
+    "readable_silhouette": "pass",
+    "consistent_projection": "pass",
+    "upper_left_lighting": "pass",
+    "era_progression": "pass",
+    "no_text_logos_ui_baked_fx": "pass",
+    "separate_from_capsule_fins_engine": "pass"
+  },
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "029fcda4c65ba95b13b5b0776976a2fce1250de87dc5436267b972b3128dd2b7",
+      "note": "Simple readable early cylindrical shell; restrained construction detail."
+    },
+    "e1_1986": {
+      "status": "approved",
+      "sha256": "c199704ac8f96084b35cc87336f927b19e1215f6e68f995cd36ca80e62ab74d6",
+      "note": "Clear incremental widening and panel development from E0."
+    },
+    "e2_1998": {
+      "status": "approved",
+      "sha256": "53c19dc8d23ae137b2a012c49cd1b793748ec761179fb02c875b3388ac9e5f7b",
+      "note": "More engineered side structure while preserving family proportions."
+    },
+    "e3_2015": {
+      "status": "approved",
+      "sha256": "b8f0f7cac0eed9230a47a5c5451cb85c14f9ccc0a75fb59329a93ed8fcd7857e",
+      "note": "Modernized shell and side modules remain readable at gameplay scale."
+    },
+    "e4_2035": {
+      "status": "approved",
+      "sha256": "6468e9a0f0c8802494842ecf82b64f50671c9354c6e4eba0ef552732253e157b",
+      "note": "Distinct future-era geometry without breaking the established lineage."
+    },
+    "e5_2060": {
+      "status": "approved",
+      "sha256": "37c9685b005a49cb6afbea15203b6d4a033ebbe1e536e8729fc5599741ff8311",
+      "note": "Advanced compact waist and side structures remain a coherent final evolution."
+    }
+  }
+}

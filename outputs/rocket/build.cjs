@@ -47,12 +47,14 @@ const jsSources={
   'content.js':path.join(dist,'content.js'),
   'audio.js':path.join(dist,'audio.js'),
   'vehicle-art.js':path.join(dist,'vehicle-art.js'),
+  '../../../live/rocket-modular.js':path.join(repo,'live','rocket-modular.js'),
   '../../../live/mobile-ux.js':path.join(repo,'live','mobile-ux.js'),
   '../../../live/portrait-ux.js':path.join(repo,'live','portrait-ux.js'),
   'game.js':path.join(dist,'game.js'),
   'weather-complex-rig.js':path.join(dist,'weather-complex-rig.js'),
   'weather-complex-runtime.js':path.join(dist,'weather-complex-runtime.js'),
   'infrastructure.js':path.join(dist,'infrastructure.js'),
+  'base-composition.js':path.join(dist,'base-composition.js'),
   'weather-complex-window.js':path.join(dist,'weather-complex-window.js')
 };
 for(const [logical,source] of Object.entries(jsSources)){
