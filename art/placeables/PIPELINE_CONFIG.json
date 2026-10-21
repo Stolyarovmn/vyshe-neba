@@ -36,17 +36,12 @@
       "prompt_file": "art/prompts/w04_flight_simulator.md",
       "colors": 32,
       "pixel_size": 8,
-      "canvas": [172, 160],
-      "registration": [86, 156],
-      "qa": {"min_coverage": 0.01, "min_bbox_fraction": 0.25},
+      "canvas": [172,160],
+      "registration": [86,156],
+      "qa": {"min_coverage":0.01,"min_bbox_fraction":0.25},
       "visual_review": "art/gen/placeables/workshop/flight_simulator/visual_qa.json",
       "eras": [
-        {"stem": "e0_1978", "era": "E0", "year": 1978},
-        {"stem": "e1_1986", "era": "E1", "year": 1986},
-        {"stem": "e2_1998", "era": "E2", "year": 1998},
-        {"stem": "e3_2015", "era": "E3", "year": 2015},
-        {"stem": "e4_2035", "era": "E4", "year": 2035},
-        {"stem": "e5_2060", "era": "E5", "year": 2060}
+        {"stem":"e0_1978","era":"E0","year":1978},{"stem":"e1_1986","era":"E1","year":1986},{"stem":"e2_1998","era":"E2","year":1998},{"stem":"e3_2015","era":"E3","year":2015},{"stem":"e4_2035","era":"E4","year":2035},{"stem":"e5_2060","era":"E5","year":2060}
       ]
     },
     "B03": {
@@ -60,24 +55,40 @@
       "colors": 32,
       "pixel_size": 12,
       "transport_scale": 4,
-      "canvas": [46, 82],
-      "registration": [23, 78],
-      "qa": {
-        "min_coverage": 0.04,
-        "min_bbox_fraction": 0.35,
-        "min_visible_width": 38,
-        "max_visible_width": 42,
-        "min_visible_height": 70,
-        "max_visible_height": 76
-      },
+      "canvas": [46,82],
+      "registration": [23,78],
+      "qa": {"min_coverage":0.04,"min_bbox_fraction":0.35,"min_visible_width":38,"max_visible_width":42,"min_visible_height":70,"max_visible_height":76},
       "visual_review": "art/gen/placeables/base/landing_guidance/visual_qa.json",
       "eras": [
-        {"stem": "e0_1978", "era": "E0", "year": 1978},
-        {"stem": "e1_1986", "era": "E1", "year": 1986},
-        {"stem": "e2_1998", "era": "E2", "year": 1998},
-        {"stem": "e3_2015", "era": "E3", "year": 2015},
-        {"stem": "e4_2035", "era": "E4", "year": 2035},
-        {"stem": "e5_2060", "era": "E5", "year": 2060}
+        {"stem":"e0_1978","era":"E0","year":1978},{"stem":"e1_1986","era":"E1","year":1986},{"stem":"e2_1998","era":"E2","year":1998},{"stem":"e3_2015","era":"E3","year":2015},{"stem":"e4_2035","era":"E4","year":2035},{"stem":"e5_2060","era":"E5","year":2060}
+      ]
+    },
+    "R_BODY": {
+      "asset":"rocket_body","zone":"vehicle","adapter":"indexed_transport",
+      "source_dir":"art/source_transport/rocket_modular/body",
+      "production_dir":"art/gen/rocket_modular/body",
+      "runtime_target":"world/rocket_modular/body",
+      "prompt_file":"art/prompts/rocket_body.md",
+      "colors":32,"pixel_size":4,"transport_scale":2,
+      "canvas":[64,96],"registration":[32,94],
+      "qa":{"min_coverage":0.04,"min_bbox_fraction":0.45},
+      "visual_review":"art/gen/rocket_modular/body/visual_qa.json",
+      "eras":[
+        {"stem":"e0_1978","era":"E0","year":1978},{"stem":"e1_1986","era":"E1","year":1986},{"stem":"e2_1998","era":"E2","year":1998},{"stem":"e3_2015","era":"E3","year":2015},{"stem":"e4_2035","era":"E4","year":2035},{"stem":"e5_2060","era":"E5","year":2060}
+      ]
+    },
+    "R_FINS": {
+      "asset":"rocket_fins","zone":"vehicle","adapter":"indexed_transport",
+      "source_dir":"art/source_transport/rocket_modular/fins",
+      "production_dir":"art/gen/rocket_modular/fins",
+      "runtime_target":"world/rocket_modular/fins",
+      "prompt_file":"art/prompts/rocket_fins.md",
+      "colors":32,"pixel_size":4,"transport_scale":2,
+      "canvas":[128,64],"registration":[64,62],
+      "qa":{"min_coverage":0.03,"min_bbox_fraction":0.45},
+      "visual_review":"art/gen/rocket_modular/fins/visual_qa.json",
+      "eras":[
+        {"stem":"e0_1978","era":"E0","year":1978},{"stem":"e1_1986","era":"E1","year":1986},{"stem":"e2_1998","era":"E2","year":1998},{"stem":"e3_2015","era":"E3","year":2015},{"stem":"e4_2035","era":"E4","year":2035},{"stem":"e5_2060","era":"E5","year":2060}
       ]
     }
   }
