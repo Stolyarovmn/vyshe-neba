@@ -2,17 +2,11 @@
 // для крайних эпох ещё и панорама city_early / city_future). Слой живёт в плоскости карты, но смещается вниз
 // медленнее самой карты (малый коэффициент параллакса), поэтому читается как горизонт.
 
-import { GROUND_EXPONENT } from './islandmap.js';
 import { citySpriteNames } from './manifest.js';
 import { clamp, mixColor, rgbString, smoothstep } from './util.js';
 
 export const FAR_COAST_Y = -372; // ед. карты: берег лежит севернее острова (его северный край около -249)
-/** Высота (ед.), на которой дальний слой вдвое меньше: он мельчает в ~2,6 раза медленнее острова (малый параллакс). */
-export const FAR_SCALE_DISTANCE = 175;
-/** Куда опускается береговая линия при подъёме: доля высоты кадра от верха. */
-export const FAR_COAST_SCREEN = 0.3;
-/** Высота (ед.), к которой дальний слой доходит до своего места на экране. */
-export const FAR_SETTLE_ALT = 120;
+export const FAR_PARALLAX = 0.55; // доля смещения карты вниз, которую получает дальний слой
 
 const LAND_NEAR = [96, 120, 88];
 const FOREST = [38, 74, 52];
@@ -44,25 +38,9 @@ export function farCityLayout(era, out = []) {
 
 const ROW_DEPTH = [8, 30, 52]; // насколько силуэт отодвинут от берега вглубь суши (ед. карты)
 
-/** Прозрачность дальнего берега по высоте: у земли 1, растворяется в дымке к ~9 км (900 ед.). */
+/** Прозрачность дальнего берега по высоте: у земли 1, растворяется в дымке к 2800. */
 export function farCoastAlpha(altitude) {
-  return 1 - smoothstep(300, 900, Math.max(0, altitude));
-}
-
-/**
- * Преобразование дальнего слоя { s, ox, oy } для карты mv: масштаб убывает медленнее, чем у острова, а береговая линия
- * плавно спускается от своего места на старте к FAR_COAST_SCREEN высоты кадра, так что горизонт остаётся над островом.
- * S, ax, camX — как в groundTransform; startY — экранная y береговой линии при нулевой высоте (по карте острова).
- */
-export function farTransform(out, altitude, S, devH, ax, camX, startY) {
-  const a = Math.max(0, altitude);
-  out.s = S / (1 + Math.pow(a / FAR_SCALE_DISTANCE, GROUND_EXPONENT));
-  out.ox = ax - camX * out.s;
-  const target = devH * FAR_COAST_SCREEN;
-  const k = smoothstep(0, FAR_SETTLE_ALT, a);
-  const coastScreen = startY + (target - startY) * k;
-  out.oy = coastScreen - FAR_COAST_Y * out.s;
-  return out;
+  return 1 - smoothstep(1200, 2800, Math.max(0, altitude));
 }
 
 const landColor = [0, 0, 0];
@@ -108,7 +86,7 @@ export function drawFarCoast(ctx, painter, mv, era, altitude, mood, hazeColor, a
   if (alpha <= 0.01) return;
   const coastTop = mv.sy(FAR_COAST_Y - 60);
   if (coastTop > mv.devH + 40) return;
-  const haze = clamp(0.28 + 0.5 * smoothstep(60, 700, altitude), 0, 0.85);
+  const haze = clamp(0.28 + 0.5 * smoothstep(250, 2200, altitude), 0, 0.85);
   const dark = clamp((mood.storm || 0) * 0.35 + (mood.rain || 0) * 0.15, 0, 0.5);
   mixColor(LAND_NEAR, [30, 40, 46], dark, landColor);
   mixColor(landColor, hazeColor, haze, hazeMixed);
