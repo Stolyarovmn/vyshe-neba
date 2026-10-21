@@ -19,7 +19,7 @@
       "source": "art/gen/environment",
       "target": "environment",
       "include": [
-        "start_island_e0.png"
+        "start_island_hd.png"
       ]
     },
     {

@@ -5,12 +5,16 @@
   "description": "Выше неба — пиксельная игра про ракету и развитие космодрома",
   "scripts": {
     "build": "node outputs/rocket/build.cjs",
-    "test": "node outputs/rocket/verify.cjs"
+    "test": "node outputs/rocket/verify.cjs",
+    "game:build": "node game/tools/build.mjs",
+    "game:test": "node --test \"game/test/**/*.test.mjs\" && npm run game:build && node game/test/browser.cjs && node game/test/ui.browser.cjs && node game/test/moon.browser.cjs && node game/test/render.browser.cjs && node game/test/audio.browser.cjs && node game/tools/economy-bot.mjs",
+    "game:dev": "python -m http.server 8800 --bind 127.0.0.1"
   },
   "engines": {
     "node": ">=22"
   },
   "devDependencies": {
+    "esbuild": "0.25.10",
     "playwright": "1.62.1"
   }
 }

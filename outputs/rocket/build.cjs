@@ -54,6 +54,7 @@ const jsSources={
   'weather-complex-rig.js':path.join(dist,'weather-complex-rig.js'),
   'weather-complex-runtime.js':path.join(dist,'weather-complex-runtime.js'),
   'infrastructure.js':path.join(dist,'infrastructure.js'),
+  'base-composition.js':path.join(dist,'base-composition.js'),
   'weather-complex-window.js':path.join(dist,'weather-complex-window.js')
 };
 for(const [logical,source] of Object.entries(jsSources)){

@@ -1,0 +1,54 @@
+VYSHE NEBA — CANONICAL STYLE BIBLE
+
+Style family: cohesive HD pixel-art / pixel-look game art with deliberate pixel clusters, clear silhouettes, restrained detail and a finished indie-game presentation. It must look designed, not like a filtered 3D render or generic AI illustration.
+
+Shape language: large readable masses first, functional construction second, sparse small accents last. Silhouettes must remain legible at actual gameplay size and when reduced by the camera. Avoid meaningless micro-detail, decorative noise and accidental extra parts.
+
+Shading: stepped pixel shading is the default. Use a small, intentional tonal ramp per material; add extra tones, controlled dithering or a limited gradient only when they clearly improve material readability. No pillow shading and no soft airbrushed volume on solid small sprites.
+
+Palette temperature: shadows are cool dark blue-gray; lit neutrals are warm off-white/metal; saturated reds, golds and cyans are accents, not mandatory identifiers. Materials may use their own palettes as long as value hierarchy and world coherence are preserved.
+
+Line: prefer dark chromatic selective outlines instead of pure black. The outer contour is usually visually about one logical pixel at runtime, may lighten or disappear on the lit side, and may deepen on the shadow side. Interior lines are sparse and functional.
+
+Texture: intentional pixel clusters, stepped diagonals and broad quiet regions. Avoid random single-pixel noise. Dithering is a deliberate material or transition tool, never a blanket texture.
+
+Detail hierarchy: keep most of the surface calm. Concentrate detail around functional mechanisms, focal points, material changes and attachment areas. Readability at gameplay size has priority over master-image detail.
+
+Lighting sentence — use verbatim on every generation: One consistent key light comes from the upper-left, with warm light on upper-left planes and cool blue-gray shadow on lower-right planes; use no baked cast shadow.
+
+Projection: gameplay aircraft and moving hazards use a consistent strict side to slight 3/4 side view chosen for silhouette readability; do not mix top-down, isometric or frontal projections inside one asset family unless a specific gameplay need requires it.
+
+Alpha and composition: isolated runtime sprites use a clean transparent background, complete uncropped silhouette and enough padding for rotation or moving attachments. Solid sprite edges should be crisp and free of accidental semi-transparent fringe.
+
+System separation: the image contains the physical object and its materials. Code owns scale, final palette normalization, alpha cleanup, dynamic light response, glow, bloom, cast shadow, propeller motion, turbines, exhaust, afterburner, heat haze, contrails, navigation lights, particles, smoke, motion blur, trails and all other motion or effects.
+
+Exclusions: no text, letters, numbers, logos, watermark, pseudo-writing, scenery, UI, baked glow, bloom, light rays, cast shadow, motion blur, particles, smoke trails, speed lines or frozen effects unless the requested asset explicitly requires an environmental element.
+
+Artistic freedom: these rules define the shared language, not a template. A deliberate deviation is allowed when it clearly produces a stronger silhouette, better material, better readability, stronger character or more coherent result. Do not preserve a rule at the expense of visibly better art; do not use “artistic freedom” to excuse technical defects or accidental generator artifacts.
+
+ASSET
+Cargo Terminal (B07, slug cargo_terminal)
+
+ROLE
+Capability building: opens cargo contracts. Light/medium/heavy cargo changes mass and landing difficulty and raises the reward. Player reads a loading gantry with containers.
+
+GAMEPLAY FOOTPRINT
+178×126 LP target; final scale is normalized by code. One object occupies roughly 60–75% of the image height with generous transparent padding.
+
+RIG PART
+Full object anchor (one complete cargo terminal). Not a part sheet.
+
+ERA
+E4 / 2035: robotic cells, autonomous manipulators, enclosed mechanics.
+
+LINEAGE STAGE
+E4: autonomous cargo gantry with enclosed drives.
+
+MOTION REQUIREMENT
+gantry static; trolley travels along the gantry beam; hoist cable and hook move independently; a container payload is a separate physical object loaded and unloaded.
+
+REFERENCE
+Attach the approved B07 E3 image as the primary visual reference and the approved E0 anchor as the identity reference. The new era evolves the same machine; do not redesign its identity from scratch.
+
+CONSTRAINTS
+exactly ONE complete object centered on the canvas; square canvas; complete uncropped silhouette; transparent background; strict side to slight 3/4 side view, bottom-center registration on a flat ground line with no ground plane drawn; no text, numbers, logos or pseudo-writing; no people; no baked glow, smoke, particles, cast shadow, light rays or motion blur; not a sprite sheet, turnaround, grid, era board or animation strip; all mechanical parts physically plausible; keep continuity with the previous approved era; artistic deviation is allowed when it clearly improves silhouette, readability or character without breaking function.

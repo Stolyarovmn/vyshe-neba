@@ -130,6 +130,7 @@ jobs:
           echo "TRACKER_READY=1" >> "$GITHUB_ENV"
 
       - name: Upload game-test checkpoint
+        continue-on-error: true
         if: always() && env.TRACKER_READY == '1'
         uses: actions/upload-artifact@v4
         with:
@@ -144,6 +145,7 @@ jobs:
         run: sha256sum 'outputs/Выше неба.html' > 'outputs/Выше неба.html.sha256'
 
       - name: Upload standalone game and QA evidence
+        continue-on-error: true
         if: always()
         uses: actions/upload-artifact@v4
         with:

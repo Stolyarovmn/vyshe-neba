@@ -1,0 +1,19 @@
+{
+  "asset": "backdrop_environments.webp",
+  "source": "outputs/rocket/dist/assets/environments.png",
+  "source_sha256": "b3a5cc9c533d3dcc800b96f32c2508aec597c2cbf3f816cd227c1153fce6bc94",
+  "size": [
+    1536,
+    1024
+  ],
+  "encoding": "WebP lossy q88, method 6, RGB (без альфы)",
+  "output_sha256": "24dca10c0a87529c89d18f98658fa08e4884266c0d5e2f187c2f580eddc45b72",
+  "output_bytes": 483330,
+  "status": "derived_runtime_copy_of_approved_art",
+  "note": "Только перекодирование для веса сборки; композиция и кадры не менялись.",
+  "grid": [
+    2,
+    2
+  ],
+  "cells": "launch-earth, shop, shop, launch-moon"
+}

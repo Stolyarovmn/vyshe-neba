@@ -5,7 +5,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  await page.goto(pathToFileURL(path.resolve(__dirname,'../Выше неба.html')).href);await page.waitForTimeout(250);
  const report=await page.evaluate(async()=>{
   const routeSky=new Image();routeSky.src=__GAME_ASSETS__['sky-color-plate.png'];await routeSky.decode();
-  const islandProbe=new Image();islandProbe.src=__GAME_ASSETS__['environment/start_island_e0.png'];await islandProbe.decode();
+  const islandProbe=new Image();islandProbe.src=__GAME_ASSETS__['environment/start_island_hd.png'];await islandProbe.decode();
   const art={routeSky},profile=Game.profile,qa=WorldArt.qa();
   const render=async(x,weather,time=2)=>{
    const c=document.createElement('canvas');c.width=960;c.height=600;const ctx=c.getContext('2d');let islandDraws=0;
@@ -24,7 +24,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  });
  assert(report.qa.island.width>=1500,'Island must reserve enough horizontal build space');
  assert(report.qa.island.left<0&&report.qa.island.left+report.qa.island.width>1000,'Launch origin and future expansion area must fit on the island');
- assert(report.assetSize[0]>=300&&report.assetSize[1]>=120,'Runtime island resolution unexpectedly small');
+ assert(report.assetSize[0]>=1600&&report.assetSize[1]>=700,`Runtime island must use the HD source, got ${report.assetSize.join('x')}`);
  assert(report.clear.islandDraws>=1,'Starter island was not drawn near launch origin');
  assert.equal(report.remote.islandDraws,0,'Finite starter island must not repeat in remote world bands');
  assert(report.qa.stormWater.rough>report.qa.clearWater.rough*2,'Storm water must be visibly rougher than clear water');
