@@ -11,9 +11,9 @@ const G=()=>window.Game,B=()=>window.BaseInfrastructure;
  */
 const SLOT_POSITIONS={
  padL1:[410,456], padR1:[550,456], padL2:[392,412], padR2:[568,412],
- apronL1:[306,444], apronR1:[654,444], apronL2:[322,366], apronR2:[676,366],
- perL1:[266,408], perR1:[762,414], perL2:[356,302], perR2:[734,306],
- remoteL1:[296,336], remoteR1:[838,380], remoteL2:[470,258], remoteR2:[820,278]
+ apronL1:[306,444], apronR1:[654,444], apronL2:[322,374], apronR2:[676,366],
+ perL1:[266,408], perR1:[762,414], perL2:[356,335], perR2:[734,306],
+ remoteL1:[296,336], remoteR1:[838,380], remoteL2:[470,274], remoteR2:[820,278]
 };
 
 /* Functional composition:
@@ -41,14 +41,16 @@ function applySlotGeometry(){
 function preferredSlotFree(st,id,slotId){
  return !Object.entries(st.layout||{}).some(([other,sid])=>other!==id&&sid===slotId);
 }
+function worldForSlot(slot){return{x:slot.x-480,y:468-slot.y};}
 function migrate(){
  const b=B(),g=G();if(!b||!g)return false;
  applySlotGeometry();
  const st=b.state?.();if(!st)return false;
  let changed=false;
  if((Number(st.layoutVersion)||0)<VERSION){
-  const next={...st.layout};
-  const used=new Set(Object.entries(next).filter(([id])=>!PREFERRED_LAYOUT[id]).map(([,sid])=>sid));
+  const ownedSet=new Set(st.owned||[]);
+  const next=Object.fromEntries(Object.entries(st.layout||{}).filter(([id])=>ownedSet.has(id)&&!PREFERRED_LAYOUT[id]));
+  const used=new Set(Object.values(next));
   for(const id of st.owned||[]){
    const sid=PREFERRED_LAYOUT[id];
    if(sid&&!used.has(sid)){next[id]=sid;used.add(sid);}
@@ -70,5 +72,5 @@ function migrate(){
 function tick(){migrate();requestAnimationFrame(tick);}
 
 applySlotGeometry();migrate();requestAnimationFrame(tick);
-window.BaseComposition={version:VERSION,slotPositions:SLOT_POSITIONS,preferredLayout:PREFERRED_LAYOUT,migrate};
+window.BaseComposition={version:VERSION,slotPositions:SLOT_POSITIONS,preferredLayout:PREFERRED_LAYOUT,worldForSlot,migrate};
 })();
