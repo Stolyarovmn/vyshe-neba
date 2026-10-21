@@ -389,7 +389,7 @@ test('лёгкие runtime-копии: файлы цел, в каталоге в
   }
   assert.ok(saved > 2 * 1024 * 1024, `сэкономлено ${(saved / 1048576).toFixed(1)} МБ`);
   // оригиналы подготовленного арта остаются нетронутыми рядом
-  assert.ok(fs.existsSync(path.join(repoRoot, 'outputs', 'rocket', 'dist', 'assets', 'world', 'outpost_moon_2060.png')));
+  assert.ok(fs.existsSync(path.join(repoRoot, 'art', 'gen', 'outpost_moon_2060.png')));
   // целый спрайт шара в сборку не входит, но его размеры нужны для сборки из частей
   for (const year of ERA_YEARS) assert.equal(ASSET_FILES[`balloon_${year}`], undefined);
   BALLOON_FULL_SIZES.forEach((size, era) => {

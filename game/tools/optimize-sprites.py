@@ -18,7 +18,7 @@ import numpy as np
 from PIL import Image
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-SRC_DIR = os.path.join(ROOT, 'outputs', 'rocket', 'dist', 'assets', 'world')
+SRC_DIRS = [os.path.join(ROOT, 'outputs', 'rocket', 'dist', 'assets', 'world'), os.path.join(ROOT, 'art', 'gen')]
 OUT_DIR = os.path.join(ROOT, 'art', 'gen', 'runtime')
 # должен совпадать с RUNTIME_SPRITE_PATTERN в manifest.js
 PATTERN = re.compile(
@@ -37,11 +37,15 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     report = {}
     total_in = total_out = 0
-    for file in sorted(os.listdir(SRC_DIR)):
+    sources = {}
+    for src_dir in SRC_DIRS:
+        for file in os.listdir(src_dir):
+            sources.setdefault(file, os.path.join(src_dir, file))
+    for file in sorted(sources):
         name, ext = os.path.splitext(file)
         if ext != '.png' or not PATTERN.match(name):
             continue
-        src = os.path.join(SRC_DIR, file)
+        src = sources[file]
         dst = os.path.join(OUT_DIR, file)
         image = Image.open(src).convert('RGBA')
         quantized = image.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
