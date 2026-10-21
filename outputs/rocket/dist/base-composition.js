@@ -42,9 +42,27 @@ function preferredSlotFree(st,id,slotId){
  return !Object.entries(st.layout||{}).some(([other,sid])=>other!==id&&sid===slotId);
 }
 function worldForSlot(slot){return{x:slot.x-480,y:468-slot.y};}
+function installProjectionAdapter(){
+ const g=G(),b=B();if(!g?.project||!b?.slots||g.__baseCompositionProjectV===VERSION)return false;
+ const project=g.project.bind(g);
+ g.project=function(x,y){
+  /* Legacy infrastructure renderers pass ((slot.x-480)*1.2, 0).
+   * Recognize only that exact signature and restore both world axes.
+   */
+  if(y===0){
+   for(const slot of b.slots){
+    const legacyX=(slot.x-480)*1.2;
+    if(Math.abs(x-legacyX)<1e-7){const p=worldForSlot(slot);return project(p.x,p.y);}
+   }
+  }
+  return project(x,y);
+ };
+ g.__baseCompositionProjectV=VERSION;
+ return true;
+}
 function migrate(){
  const b=B(),g=G();if(!b||!g)return false;
- applySlotGeometry();
+ applySlotGeometry();installProjectionAdapter();
  const st=b.state?.();if(!st)return false;
  let changed=false;
  if((Number(st.layoutVersion)||0)<VERSION){
@@ -71,6 +89,6 @@ function migrate(){
 }
 function tick(){migrate();requestAnimationFrame(tick);}
 
-applySlotGeometry();migrate();requestAnimationFrame(tick);
+applySlotGeometry();installProjectionAdapter();migrate();requestAnimationFrame(tick);
 window.BaseComposition={version:VERSION,slotPositions:SLOT_POSITIONS,preferredLayout:PREFERRED_LAYOUT,worldForSlot,migrate};
 })();
