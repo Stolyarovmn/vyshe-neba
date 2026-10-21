@@ -21,6 +21,32 @@
       "include": [
         "start_island_hd.png"
       ]
+    },
+    {
+      "asset_id": "R_BODY",
+      "source": "art/gen/rocket_modular/body",
+      "target": "world/rocket_modular/body",
+      "include": [
+        "e0_1978.png",
+        "e1_1986.png",
+        "e2_1998.png",
+        "e3_2015.png",
+        "e4_2035.png",
+        "e5_2060.png"
+      ]
+    },
+    {
+      "asset_id": "R_FINS",
+      "source": "art/gen/rocket_modular/fins",
+      "target": "world/rocket_modular/fins",
+      "include": [
+        "e0_1978.png",
+        "e1_1986.png",
+        "e2_1998.png",
+        "e3_2015.png",
+        "e4_2035.png",
+        "e5_2060.png"
+      ]
     }
   ]
 }
