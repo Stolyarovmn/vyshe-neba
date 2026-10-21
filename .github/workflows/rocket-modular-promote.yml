@@ -54,15 +54,33 @@ jobs:
           set -euo pipefail
           for asset in R_BODY R_FINS; do
             case "$asset" in
-              R_BODY) review='art/gen/rocket_modular/body/visual_qa.json' ;;
-              R_FINS) review='art/gen/rocket_modular/fins/visual_qa.json' ;;
+              R_BODY)
+                review='art/gen/rocket_modular/body/visual_qa.json'
+                branch_candidate='art/candidates/rocket_modular/body'
+                ;;
+              R_FINS)
+                review='art/gen/rocket_modular/fins/visual_qa.json'
+                branch_candidate='art/candidates/rocket_modular/fins'
+                ;;
             esac
             if [ ! -f "$review" ]; then
               echo "skip $asset: $review not present"
               continue
             fi
+
             dest="$RUNNER_TEMP/candidate-$asset"
             python3 tools/art_pipeline/restore_asset_checkpoint.py --asset "$asset" --dest "$dest"
+            if [ ! -f "$dest/candidate-manifest.json" ]; then
+              if [ ! -f "$branch_candidate/candidate-manifest.json" ]; then
+                echo "No checkpoint artifact and no materialized branch candidate for $asset" >&2
+                exit 1
+              fi
+              rm -rf "$dest"
+              mkdir -p "$dest"
+              cp -a "$branch_candidate/." "$dest/"
+              echo "restored $asset from $branch_candidate"
+            fi
+
             python3 tools/art_pipeline/process_asset.py \
               --repo-root . --asset "$asset" --output "$dest" \
               --state-dir "$dest/.tracker" \
@@ -70,18 +88,30 @@ jobs:
               --aseprite "$RUNNER_TEMP/art-tools/aseprite" --resume
             python3 tools/art_pipeline/promote_asset.py \
               --repo-root . --asset "$asset" --candidate "$dest" --state-dir "$dest/.tracker"
+            python3 tools/art_pipeline/sync_asset_tracker_issue.py \
+              --repo-root . --asset "$asset" --state-dir "$dest/.tracker" \
+              --artifact-name "branch-candidate-${GITHUB_SHA}" \
+              --run-url "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           done
+
+      - name: Run game verification and standalone build
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test
+          npm run build
 
       - name: Commit promoted canonical art to feature branch
         shell: bash
         run: |
           set -euo pipefail
+          rm -rf art/candidates/rocket_modular
           if git diff --quiet && git diff --cached --quiet; then
             echo 'No production changes to commit.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A art/gen/rocket_modular outputs/rocket/runtime-assets.json
+          git add -A art/gen/rocket_modular art/candidates/rocket_modular outputs/rocket/runtime-assets.json
           git commit -m '2D rocket: promote approved modular body and fins'
           git push origin HEAD:2d_rocket-modular-sprites
