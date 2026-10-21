@@ -70,9 +70,10 @@ const FRAMES = {
   paper: { hi: 'paper2', mid: 'paper1', lo: 'paper0', edge: 'cork0' },
   cork: { hi: 'cork2', mid: 'cork1', lo: 'cork0', edge: 'ink' },
   // «стекло» без полупрозрачности: тёмная шашечная сетка пикселей, сквозь которую виден фон
-  hud: { hi: 'steel1', mid: 'navy0', lo: 'ink', edge: 'ink', dither: true },
+  // кнопки и подсказки полёта: сплошной тёмный фон — под подписями шахматки нет
+  hud: { hi: 'steel1', mid: 'navy0', lo: 'ink', edge: 'ink' },
   glass: { hi: 'steel1', mid: 'navy0', lo: 'ink', edge: 'ink', dither: true },
-  panelGlass: { hi: 'steel1', mid: 'navy1', lo: 'ink', edge: 'ink', dither: true },
+  panelGlass: { hi: 'steel1', mid: 'navy1', lo: 'ink', edge: 'ink' },
 };
 
 const LABEL = {

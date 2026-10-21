@@ -164,19 +164,33 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
     ['era', fmtClock(result.time), ''],
   ];
   const sh = Math.round((compact ? 36 : 44) * U(L));
-  const stack = w < 420 * U(L) && L.portrait;
+  // узкая колонка: три карточки в ряд — значок и единица сверху, цифры на своём табло снизу
+  const cards = w < 420 * U(L);
+  const ch = Math.round(sh * (compact ? 1.4 : 1.5));
+  const cw = (w - L.gap * 2) / 3;
   boards.forEach(([icon, val, unit], i) => {
     const k = easeOutCubic(clamp((elapsed - 0.35 - i * 0.18) / 0.5, 0, 1));
-    const r = stack ? { x, y: y + i * (sh + L.gap * 0.6), w, h: sh } : { x: x + i * ((w - L.gap * 2) / 3 + L.gap), y, w: (w - L.gap * 2) / 3, h: sh };
     const shown = i === 2 ? fmtClock(result.time * k) : countStr(val, k);
+    const digits = Math.max(3, val.length);
+    if (cards) {
+      const r = { x: x + i * (cw + L.gap), y, w: cw, h: ch };
+      const isz = Math.round(sh * 0.4);
+      kit.nine('raised', r.x, r.y, r.w, r.h);
+      kit.icon(icon, r.x + cc * 4 + isz / 2, r.y + cc * 3 + isz / 2, isz, c.cyan);
+      if (unit) kit.drawText(unit, r.x + r.w - cc * 4, r.y + cc * 3 + isz / 2, { size: Math.max(8, kit.fs(9)), color: c.steel3, align: 'right' });
+      const top = r.y + cc * 3 + isz + cc;
+      inst.readout(kit, { x: r.x + cc * 2, y: top, w: r.w - cc * 4, h: r.y + r.h - cc * 3 - top }, shown, { lit: c.green, digits, h: Math.round(sh * 0.5) });
+      return;
+    }
+    const r = { x: x + i * (cw + L.gap), y, w: cw, h: sh };
     // справа остаётся место под единицу измерения, чтобы она не налезала на цифры
     const unitW = unit ? kit.text.measure(unit, Math.max(8, kit.fs(9))) + cc * 5 : 0;
-    inst.readout(kit, { x: r.x + sh * 0.9, y: r.y, w: r.w - sh * 0.9 - unitW, h: r.h }, shown, { lit: c.green, digits: Math.max(3, val.length), h: Math.round(sh * 0.5) });
+    inst.readout(kit, { x: r.x + sh * 0.9, y: r.y, w: r.w - sh * 0.9 - unitW, h: r.h }, shown, { lit: c.green, digits, h: Math.round(sh * 0.5) });
     kit.nine('raised', r.x, r.y, sh * 0.9, r.h);
     kit.icon(icon, r.x + sh * 0.45, r.y + r.h / 2, Math.round(sh * 0.5), c.cyan);
     if (unit) kit.drawText(unit, r.x + r.w - cc * 3, r.y + r.h - cc * 4, { size: Math.max(8, kit.fs(9)), color: c.steel2, align: 'right' });
   });
-  y += stack ? 3 * (sh + L.gap * 0.6) : sh + L.gap;
+  y += (cards ? ch : sh) + L.gap;
   return y;
 }
 
@@ -259,10 +273,10 @@ function drawRewardsColumn(app, kit, L, col, top, res, st, elapsed, dt) {
   const rd = { x: x + half + L.gap, y, w: half, h: th };
   const showC = Math.abs(coinsDelta) * totalK;
   const showD = dataDelta * totalK;
-  kit.nine('raised', rc.x, rc.y, rc.w, rc.h);
+  kit.nine('screen', rc.x, rc.y, rc.w, rc.h);
   kit.icon('coin', rc.x + th * 0.5, rc.y + th / 2, Math.round(th * 0.6), c.gold);
   inst.bigDigits(kit, `${coinsDelta < 0 ? '-' : ''}${Math.round(showC)}`, rc.x + rc.w - cc * 4, rc.y + (th - Math.round(th * 0.5)) / 2, Math.round(th * 0.5), coinsDelta >= 0 ? c.gold : c.red, 'right');
-  kit.nine('raised', rd.x, rd.y, rd.w, rd.h);
+  kit.nine('screen', rd.x, rd.y, rd.w, rd.h);
   kit.icon('data', rd.x + th * 0.5, rd.y + th / 2, Math.round(th * 0.6), c.cyan);
   inst.bigDigits(kit, String(Math.round(showD)), rd.x + rd.w - cc * 4, rd.y + (th - Math.round(th * 0.5)) / 2, Math.round(th * 0.5), c.cyan, 'right');
   y += th + L.gap;

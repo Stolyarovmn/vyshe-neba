@@ -5,7 +5,7 @@
 // масштаб уменьшается с высотой, а карта «уходит» вниз (см. flight.js).
 
 import { ISLAND } from './manifest.js';
-import { clamp, hash2, mixColor, rgbString } from './util.js';
+import { clamp, hash2, mixColor, rgbString, smoothstep } from './util.js';
 
 /** Преобразование карта -> экран; интерфейс совместим с view из camera.js, чтобы использовать painter. */
 export function createMapView() {
@@ -58,31 +58,59 @@ export function createMapView() {
 
 // --- параллакс земли в полёте -------------------------------------------------------------
 
-/** Высота (ед.), на которой карта вдвое меньше: чем выше ракета, тем мельче остров. */
-export const GROUND_DISTANCE = 900;
+/**
+ * Параллакс земли в полёте. Единицы высоты — единицы мира (1 ед. = 10 м): остров ~1270 ед. шириной, ракета ~60 ед.
+ * высотой, поэтому он должен отдаляться и уходить вниз очень быстро: к 800 м (80 ед.) — в 35-45 % начального масштаба
+ * у нижнего края, к 1500 м — островок у края кадра, к ~3 км растворяется в море и дымке.
+ */
 
-/** Относительный масштаб карты на высоте: 1 на земле, убывает к нулю. */
+/** Высота (ед.), на которой карта вдвое меньше: около 670 м. */
+export const GROUND_DISTANCE = 67;
+/** Крутизна спада масштаба: у земли почти нет изменения (старт читается), затем быстрое отдаление. */
+export const GROUND_EXPONENT = 2.24;
+/** Высота (ед.), к которой северный берег острова дошёл до своего нижнего положения на экране (800 м). */
+export const GROUND_SINK_ALT = 80;
+/** Высота ракеты в единицах мира: от неё считается зазор до острова. */
+export const ROCKET_VIEW_UNITS = 60;
+/** Зазор от ног ракеты до северного берега, когда остров ушёл вниз, в высотах ракеты на экране. */
+export const GROUND_CLEARANCE = 2.2;
+/** Предел для низкого кадра (ландшафт): берег не дальше этой доли высоты экрана, чтобы островок оставался у края. */
+export const GROUND_EDGE_LIMIT = 0.97;
+
+/** Относительный масштаб карты на высоте: 1 на земле, ~0,4 на 80 ед., ~0,14 на 150 ед. */
 export function groundScale(altitude) {
-  return 1 / (1 + Math.max(0, altitude) / GROUND_DISTANCE);
+  return 1 / (1 + Math.pow(Math.max(0, altitude) / GROUND_DISTANCE, GROUND_EXPONENT));
+}
+
+/** Доля пути северного берега острова от стартового положения к нижнему: 0 на земле, 1 с высоты GROUND_SINK_ALT. */
+export function groundSink(altitude) {
+  const x = Math.min(1, Math.max(0, altitude) / GROUND_SINK_ALT);
+  return 1 - Math.pow(1 - x, 1.7); // быстро в начале подъёма, к GROUND_SINK_ALT замирает
 }
 
 /**
- * Смещение карты вниз относительно ракеты (ед. мира): у земли быстро (чтобы по тени было видно высоту),
- * выше медленнее — дальний план отстаёт от ракеты, это и есть параллакс.
+ * Экранная y северного берега острова (пиксели устройства). На земле берег там, где его рисует карта; с высотой уходит
+ * вниз: сначала быстро, к 800 м оказывается в GROUND_CLEARANCE высотах ракеты под её ногами (в низком ландшафте — у
+ * нижнего края, GROUND_EDGE_LIMIT), выше до 1600 м оседает ещё ниже. S — пикселей на единицу, feetY — экранная y низа ракеты.
  */
-export function groundDrop(altitude) {
-  const a = Math.max(0, altitude);
-  return 0.6 * Math.min(a, 250) + 0.25 * Math.max(0, a - 250);
+export function groundShoreY(altitude, S, feetY, devH) {
+  const north = -ISLAND.topUnits;
+  const start = feetY - north * S;
+  const room = Math.max(0, devH - feetY);
+  const settled = Math.min(feetY + Math.max(0.62 * room, GROUND_CLEARANCE * ROCKET_VIEW_UNITS * S), Math.max(feetY, devH * GROUND_EDGE_LIMIT));
+  const late = 0.07 * room * smoothstep(GROUND_SINK_ALT, 2 * GROUND_SINK_ALT, altitude);
+  return start + (settled - start) * groundSink(altitude) + late;
 }
 
 /**
  * Преобразование карты для вида полёта: S — пикселей на единицу в основном виде, feetY — экранная y низа ракеты,
- * ax/camX — экранный якорь и мировая x камеры. Записывает { s, ox, oy } в out и возвращает его.
+ * ax/camX — экранный якорь и мировая x камеры, devH — высота кадра (пиксели устройства). Остров мельчает и его
+ * северный берег уходит вниз (groundShoreY), карта сжимается вокруг берега. Записывает { s, ox, oy } в out.
  */
-export function groundTransform(out, altitude, S, feetY, ax, camX) {
+export function groundTransform(out, altitude, S, feetY, ax, camX, devH = 0) {
   out.s = S * groundScale(altitude);
   out.ox = ax - camX * out.s;
-  out.oy = feetY + S * groundDrop(altitude);
+  out.oy = groundShoreY(altitude, S, feetY, devH) - ISLAND.topUnits * out.s;
   return out;
 }
 

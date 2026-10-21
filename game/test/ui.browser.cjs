@@ -731,6 +731,7 @@ async function tourEra(page, vp, era) {
   await go(page, 'hub');
   await page.waitForTimeout(350);
   await audit('хаб');
+  await checkTargets(page, vp, `E${era}/хаб`);
   await setUi(page, () => { globalThis.__VN_APP__.ui.hub.era = true; });
   await audit('хаб/эпоха', 200);
   await setUi(page, () => { globalThis.__VN_APP__.ui.hub.era = false; });
@@ -738,6 +739,8 @@ async function tourEra(page, vp, era) {
   await setUi(page, () => { globalThis.__VN_APP__.ui.base.sel = 'gantry'; });
   await audit('стройка/башня', 300);
   await go(page, 'rocket');
+  await page.waitForTimeout(250);
+  await checkTargets(page, vp, `E${era}/мастерская`);
   for (const id of ['engine', 'fins']) {
     await setUi(page, (k) => { globalThis.__VN_APP__.ui.rocket.selected = k; }, id);
     await audit(`мастерская/${id}`, 220);
@@ -751,16 +754,19 @@ async function tourEra(page, vp, era) {
   await go(page, 'launch');
   await page.waitForTimeout(300);
   await audit('пульт', 300);
+  await checkTargets(page, vp, `E${era}/пульт`);
   await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: { chute: true, repair: true } }));
   await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
   await page.waitForTimeout(500);
   await audit('полёт', 400);
+  await checkTargets(page, vp, `E${era}/полёт`);
   await page.evaluate(() => globalThis.__VN_APP__.pause());
   await audit('пауза', 250);
   await page.evaluate(() => { const a = globalThis.__VN_APP__; a.resume(); a.abandon(); });
   await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
   await page.waitForTimeout(3200);
   await audit('итоги', 300);
+  await checkTargets(page, vp, `E${era}/итоги`);
   await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); a.prefs.touchControls = 'auto'; });
   return found;
 }
@@ -829,6 +835,97 @@ async function runEraViewport(browser, vp) {
   console.log(`OK эпохи ${vp.name}`);
 }
 
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Контактные листы для самопроверки: для каждой эпохи E0–E5 — мозаика work/ui-audit-era-N.png из экранов (хаб, мастерская,
+// пульт запуска, полёт, итоги) в портрете и ландшафте. Листы просматривает человек (или агент) и исправляет увиденное.
+// ---------------------------------------------------------------------------------------------------------------------
+
+const SHEET_SCREENS = [
+  ['hub', 'хаб'],
+  ['rocket', 'мастерская'],
+  ['launch', 'пульт'],
+  ['flight', 'полёт'],
+  ['results', 'итоги'],
+];
+
+async function captureEraScreens(page, era) {
+  const shots = {};
+  await page.evaluate((e) => {
+    const t = globalThis.__VN_TEST__;
+    const p = t.profile();
+    p.era = e;
+    p.coins = 12450;
+    p.data = 380;
+    for (const k of Object.keys(p.buildings)) p.buildings[k] = Math.max(p.buildings[k], 2);
+    for (const k of Object.keys(p.parts)) p.parts[k] = Math.max(p.parts[k], 2);
+    p.inventory = { chute: 2, repair: 3, canister: 1, magnet: 1 };
+    t.setProfile(p);
+    const a = globalThis.__VN_APP__;
+    a.history.length = 0;
+    a.prefs.touchControls = 'on';
+    a.skinEra = e;
+  }, era);
+  await go(page, 'hub');
+  await page.waitForTimeout(700);
+  shots.hub = await page.screenshot();
+  await go(page, 'rocket');
+  await page.waitForTimeout(300);
+  await setUi(page, () => { globalThis.__VN_APP__.ui.rocket.selected = 'fins'; });
+  await page.waitForTimeout(700);
+  shots.rocket = await page.screenshot();
+  await go(page, 'launch');
+  await page.waitForTimeout(800);
+  shots.launch = await page.screenshot();
+  await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: { chute: true, repair: true } }));
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+  await page.waitForTimeout(500);
+  await page.keyboard.down('KeyW');
+  await page.waitForTimeout(1500);
+  await page.keyboard.down('KeyD');
+  await page.waitForTimeout(500);
+  shots.flight = await page.screenshot();
+  await page.keyboard.up('KeyD');
+  await page.keyboard.up('KeyW');
+  await page.evaluate(() => { globalThis.__VN_APP__.abandon(); });
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
+  await page.waitForTimeout(2800);
+  shots.results = await page.screenshot();
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); a.prefs.touchControls = 'auto'; });
+  return shots;
+}
+
+async function contactSheets(browser) {
+  const sizes = { portrait: { width: 390, height: 844 }, landscape: { width: 1280, height: 720 } };
+  const byEra = Array.from({ length: 6 }, () => ({}));
+  for (const [name, vp] of Object.entries(sizes)) {
+    const context = await browser.newContext({ viewport: vp, deviceScaleFactor: 1, hasTouch: name === 'portrait', isMobile: name === 'portrait' });
+    const page = await context.newPage();
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+    page.on('console', (m) => { if (m.type() === 'error') errors.push(`console: ${m.text()}`); });
+    await page.goto(pathToFileURL(gameFile).href);
+    await page.waitForFunction(() => globalThis.__VN_TEST__, null, { timeout: 20000 });
+    await page.waitForTimeout(800);
+    for (let era = 0; era <= 5; era++) byEra[era][name] = await captureEraScreens(page, era);
+    assert(errors.length === 0, `листы ${name}: ошибки: ${errors.join(' | ')}`);
+    await context.close();
+  }
+  const sheetCtx = await browser.newContext({ viewport: { width: 1900, height: 1200 } });
+  const sheet = await sheetCtx.newPage();
+  for (let era = 0; era <= 5; era++) {
+    const img = (buf, w) => `<img style="width:${w}px;display:block;border:1px solid #334" src="data:image/png;base64,${buf.toString('base64')}">`;
+    const cell = (buf, w, label) => `<div style="display:inline-block;margin:6px;vertical-align:top">${img(buf, w)}<div>${label}</div></div>`;
+    const portrait = SHEET_SCREENS.map(([id, label]) => cell(byEra[era].portrait[id], 355, `E${era} портрет · ${label}`)).join('');
+    const landscape = SHEET_SCREENS.map(([id, label]) => cell(byEra[era].landscape[id], 600, `E${era} ландшафт · ${label}`)).join('');
+    await sheet.setContent(`<body style="margin:0;background:#10131c;color:#c4d0e4;font:13px monospace;width:1900px"><div style="padding:6px">${portrait}</div><div style="padding:6px">${landscape}</div></body>`);
+    await sheet.waitForTimeout(300);
+    await sheet.screenshot({ path: path.join(outDir, `ui-audit-era-${era}.png`), fullPage: true });
+  }
+  await sheetCtx.close();
+  console.log('OK контактные листы work/ui-audit-era-0..5.png');
+}
+
 /** Только страж текста на минимальных размерах окна (320×568 и 568×320). */
 async function runAuditViewport(browser, vp, collect = null) {
   const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
@@ -863,6 +960,10 @@ ${formatIssues(issues)}`);
   }
   const browser = await launch();
   try {
+    if (process.env.UI_SHEETS_ONLY) {
+      await contactSheets(browser);
+      return;
+    }
     if (process.env.UI_ERA_ONLY) {
       for (const vp of VIEWPORTS) if (process.env.UI_ERA_ONLY === '1' || process.env.UI_ERA_ONLY.split(',').includes(vp.name)) await runEraViewport(browser, vp);
       return;
@@ -877,6 +978,7 @@ ${formatIssues(all)}` : 'Замечаний нет');
     }
     for (const vp of VIEWPORTS) await runViewport(browser, vp);
     for (const vp of AUDIT_VIEWPORTS) await runAuditViewport(browser, vp);
+    await contactSheets(browser);
   } finally {
     await browser.close();
   }

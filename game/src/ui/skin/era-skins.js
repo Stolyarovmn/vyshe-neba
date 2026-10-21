@@ -8,11 +8,13 @@
 // labels   — цвет подписи на кнопке по её варианту (если материал светлый — тёмная подпись);
 // crt      — экран: цвет люминофора, кривизна стекла, строки, виньетка, свечение, мерцание, послесвечение;
 // lamp     — форма подсветки кнопок и ламп: bulb | led | bar | line | dot;
+// hud      — цвет цифр приборов (digit), фон под ними (bg) и его непрозрачность (bgAlpha): тест проверяет контраст ≥ 4,5;
 // instr    — вид приборов HUD: analog | led | digital | flat | projection | holo.
 
 export const ERA_SKINS = [
   {
     id: 'e0',
+    hud: { digit: 'white', bg: 'ink', bgAlpha: 1 },
     year: 1978,
     title: 'Бакелит и лампы',
     palette: {
@@ -37,6 +39,7 @@ export const ERA_SKINS = [
   },
   {
     id: 'e1',
+    hud: { digit: 'amber', bg: 'ink', bgAlpha: 1 },
     year: 1986,
     title: 'Слоновая кость и янтарь',
     palette: {
@@ -62,6 +65,7 @@ export const ERA_SKINS = [
   },
   {
     id: 'e2',
+    hud: { digit: 'greenLight', bg: 'navy1', bgAlpha: 1 },
     year: 1998,
     title: 'Серый пластик',
     palette: {
@@ -81,6 +85,7 @@ export const ERA_SKINS = [
   },
   {
     id: 'e3',
+    hud: { digit: 'white', bg: 'navy0', bgAlpha: 1 },
     year: 2015,
     title: 'Анодированный алюминий',
     palette: {
@@ -100,6 +105,7 @@ export const ERA_SKINS = [
   },
   {
     id: 'e4',
+    hud: { digit: 'cyan', bg: 'ink', bgAlpha: 0.92 },
     year: 2035,
     title: 'Тёмный карбон',
     palette: {
@@ -124,6 +130,7 @@ export const ERA_SKINS = [
   },
   {
     id: 'e5',
+    hud: { digit: 'cyan', bg: 'navy0', bgAlpha: 0.86 },
     year: 2060,
     title: 'Умные материалы',
     palette: {

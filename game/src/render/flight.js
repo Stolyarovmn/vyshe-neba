@@ -6,7 +6,7 @@ import { createCamera, createView } from './camera.js';
 import { applyEvents, createScreenFx } from './events.js';
 import { drawTerrain } from './ground.js';
 import {
-  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundDrop, groundTransform,
+  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundTransform,
 } from './islandmap.js';
 import { drawCloudField, fallbackClouds } from './clouds.js';
 import { drawPlacedBuildings } from './buildings.js';
@@ -14,7 +14,7 @@ import { drawLaunchMount, drawPadRing } from './launchpad.js';
 import { drawObjects, drawObjectsFront, drawRadarMarks, warmRings } from './objects.js';
 import { createRingFx } from './rings.js';
 import { drawMagnetField } from './magnet.js';
-import { FAR_PARALLAX, drawFarCoast, farCoastAlpha } from './horizon.js';
+import { FAR_COAST_Y, drawFarCoast, farCoastAlpha, farTransform } from './horizon.js';
 import {
   drawFlash, drawLandingZone, drawPadPointer, drawPredict, drawSpeedLines, drawTransferWarp, landingZoneAlpha,
 } from './overlays.js';
@@ -56,6 +56,8 @@ export function createFlightRenderer(painter, shared) {
   const view = createView();
   const mapView = createMapView();
   const farView = createMapView();
+  const seaView = createMapView();
+  const farTr = { s: 1, ox: 0, oy: 0 };
   const groundTr = { s: 1, ox: 0, oy: 0 };
   const particles = createParticles(900);
   const fx = createScreenFx();
@@ -387,22 +389,27 @@ export function createFlightRenderer(painter, shared) {
     const altitude = Math.max(0, flight.alt ?? -flight.y);
     const seaAlpha = 1 - smoothstep(900, 3000, altitude);
     if (seaAlpha <= 0.01) return;
-    groundTransform(groundTr, altitude, view.S, view.sy(flight.y), view.ax, view.camX);
+    const feetY = view.sy(flight.y);
+    groundTransform(groundTr, altitude, view.S, feetY, view.ax, view.camX, view.devH);
     mapView.set(groundTr.ox, groundTr.oy, groundTr.s, view.devW, view.devH);
-    const landAlpha = 1 - smoothstep(450, 2400, altitude);
+    // остров растворяется в море и дымке к ~3 км (300 ед.)
+    const landAlpha = 1 - smoothstep(170, 320, altitude);
     const previous = ctx.globalAlpha;
     ctx.globalAlpha = previous * seaAlpha;
-    drawSea(ctx, mapView, time, mood, smoothstep(120, 1400, altitude) * 0.8, HAZE_COLOR);
-    // дальний берег с городом эпохи: тот же масштаб, но смещается вниз медленнее карты
+    // море: волны мельчают медленнее острова (иначе на высоте они превращаются в шум); у острова масштаб общий
+    seaView.set(groundTr.ox, groundTr.oy, Math.max(groundTr.s, view.S * 0.24), view.devW, view.devH);
+    drawSea(ctx, seaView, time, mood, smoothstep(40, 900, altitude) * 0.8, HAZE_COLOR);
+    // дальний берег с городом эпохи: мельчает втрое медленнее острова, береговая линия остаётся над ним
     const farAlpha = farCoastAlpha(altitude);
     if (farAlpha > 0.01) {
-      farView.set(groundTr.ox, view.sy(flight.y) + view.S * groundDrop(altitude) * FAR_PARALLAX, groundTr.s, view.devW, view.devH);
+      farTransform(farTr, altitude, view.S, view.devH, view.ax, view.camX, feetY + FAR_COAST_Y * view.S);
+      farView.set(farTr.ox, farTr.oy, farTr.s, view.devW, view.devH);
       drawFarCoast(ctx, painter, farView, state.era, altitude, mood, HAZE_COLOR, farAlpha);
     }
     if (landAlpha > 0.01) {
       ctx.globalAlpha = previous * landAlpha;
       drawIslandHd(ctx, painter, mapView);
-      const shadow = 0.42 * (1 - smoothstep(0, 500, altitude));
+      const shadow = 0.42 * (1 - smoothstep(0, 60, altitude));
       drawGroundShadow(ctx, mapView, flight.x + 7 + altitude * 0.04, 6 + altitude * 0.03, 17 + altitude * 0.02, 9 + altitude * 0.012, shadow);
       drawLaunchMount(ctx, mapView, state.era, time);
       if (profile) drawPlacedBuildings(ctx, painter, mapView, profile, time, null);
@@ -497,7 +504,7 @@ export function createFlightRenderer(painter, shared) {
     if (pad && zone > 0.01) {
       const ok = !!(flight.landing && flight.landing.ok) && Math.abs(flight.x - pad.x) <= pad.half;
       if (body === 'earth') {
-        const ringAlpha = zone * (1 - smoothstep(450, 2400, flight.alt ?? 0));
+        const ringAlpha = zone * (1 - smoothstep(170, 320, flight.alt ?? 0));
         drawPadRing(ctx, mapView, pad, !!pad.lit, ok, time, ringAlpha);
       } else {
         drawLandingZone(ctx, view, pad, !!pad.lit, ok, time, flight.alt, zone);

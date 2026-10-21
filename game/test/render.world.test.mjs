@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { GROUND_DISTANCE, createMapView, groundDrop, groundScale, groundTransform, islandRect } from '../src/render/islandmap.js';
+import {
+  GROUND_CLEARANCE, GROUND_DISTANCE, GROUND_EDGE_LIMIT, ROCKET_VIEW_UNITS, createMapView, groundScale, groundShoreY, groundSink, groundTransform, islandRect,
+} from '../src/render/islandmap.js';
 import { cloudLayers, cloudPass, cloudSize, drawCloudField, fallbackClouds } from '../src/render/clouds.js';
 import { ROCK_MIN_DIAMETER, drawObjects, drawObjectsFront, rockDiameter } from '../src/render/objects.js';
 import { clampCenter, createHub, fitScale } from '../src/render/hub.js';
@@ -10,32 +12,82 @@ import { createView } from '../src/render/camera.js';
 import { ISLAND } from '../src/render/manifest.js';
 import { fakeAssets, makeStubCanvas, stubContext } from './render-helpers.mjs';
 
-test('земля в полёте: на земле масштаб 1 без смещения, выше мельче и ниже, плавно', () => {
+const WINDOWS = [
+  // w, h, dpr, S (пикселей устройства на единицу), доля высоты экрана под ногами ракеты
+  { name: 'портрет', w: 390, h: 844, dpr: 3, S: 3.4, feet: 0.66 },
+  { name: 'ландшафт', w: 1280, h: 720, dpr: 1, S: 2.1, feet: 0.77 },
+  { name: 'телефон-ландшафт', w: 844, h: 390, dpr: 2, S: 2.9, feet: 0.74 },
+];
+
+test('земля в полёте: на земле масштаб 1 без смещения, выше мельче, северный берег уходит вниз плавно', () => {
   assert.equal(groundScale(0), 1);
-  assert.equal(groundDrop(0), 0);
+  assert.equal(groundSink(0), 0);
   assert.ok(Math.abs(groundScale(GROUND_DISTANCE) - 0.5) < 1e-9);
-  let previousScale = 1;
-  let previousDrop = 0;
-  for (let a = 5; a <= 6000; a += 5) {
-    const s = groundScale(a);
-    const d = groundDrop(a);
-    assert.ok(s < previousScale && d > previousDrop, `монотонность на ${a}`);
-    assert.ok(previousScale - s < 0.01 && d - previousDrop < 3.1, `нет скачка на ${a}`);
-    previousScale = s;
-    previousDrop = d;
+  for (const win of WINDOWS) {
+    const devH = win.h * win.dpr;
+    const feetY = devH * win.feet;
+    const start = groundTransform({}, 0, win.S, feetY, 400, 25, devH);
+    assert.equal(start.s, win.S);
+    assert.ok(Math.abs(start.oy - feetY) < 1e-6, `${win.name}: на земле карта стоит на ногах ракеты`);
+    assert.equal(start.ox, 400 - 25 * win.S);
+    let previousScale = 1;
+    let previousShore = groundShoreY(0, win.S, feetY, devH);
+    for (let a = 1; a <= 6000; a += 1) {
+      const s = groundScale(a);
+      const shore = groundShoreY(a, win.S, feetY, devH);
+      assert.ok(s < previousScale, `${win.name}: масштаб убывает на ${a}`);
+      assert.ok(shore >= previousShore - 1e-9, `${win.name}: берег не поднимается на ${a}`);
+      assert.ok(previousScale - s < 0.02 && shore - previousShore < devH * 0.045, `${win.name}: нет скачка на ${a}`);
+      previousScale = s;
+      previousShore = shore;
+    }
   }
-  const tr = groundTransform({}, 0, 3, 500, 400, 25);
-  assert.equal(tr.s, 3);
-  assert.equal(tr.oy, 500);
-  assert.equal(tr.ox, 400 - 25 * 3);
 });
 
-test('параллакс: карта уходит вниз медленнее ракеты, у земли высота читается по расстоянию до тени', () => {
-  const near = groundTransform({}, 100, 3, 500, 400, 0);
-  const high = groundTransform({}, 1000, 3, 500, 400, 0);
-  assert.ok(near.oy > 500 && high.oy > near.oy);
-  assert.ok(high.oy - 500 < 3 * 1000, 'медленнее, чем при прямом сносе вниз');
-  assert.ok(near.oy - 500 >= 3 * 100 * 0.55, 'у земли смещение заметно');
+test('высота читается: к 800 м остров 35-45 % начального масштаба у нижнего края, к 1500 м — островок, к 3 км растворён', () => {
+  // 1 ед. мира = 10 м
+  assert.ok(groundScale(80) > 0.35 && groundScale(80) < 0.45, `800 м: ${groundScale(80)}`);
+  assert.ok(groundScale(40) > 0.6 && groundScale(40) < 0.9, `400 м: ${groundScale(40)}`);
+  assert.ok(groundScale(150) < 0.2, `1500 м: ${groundScale(150)}`);
+  assert.ok(groundScale(300) < 0.05, `3 км: ${groundScale(300)}`);
+  for (const win of WINDOWS) {
+    const devW = win.w * win.dpr;
+    const devH = win.h * win.dpr;
+    const feetY = devH * win.feet;
+    const rocket = ROCKET_VIEW_UNITS * win.S;
+    const frame = (alt) => {
+      const tr = groundTransform({}, alt, win.S, feetY, devW / 2, 0, devH);
+      return { tr, mv: createMapView().set(tr.ox, tr.oy, tr.s, devW, devH) };
+    };
+    const shore = (alt) => frame(alt).mv.sy(ISLAND.topUnits);
+    // к 800 м северный берег в 2,2 высотах ракеты под её ногами, а в низком кадре — у нижнего края (не за ним)
+    const settled = Math.min(feetY + Math.max(0.62 * (devH - feetY), GROUND_CLEARANCE * rocket), devH * GROUND_EDGE_LIMIT);
+    assert.ok(Math.abs(shore(80) - settled) < 1, `${win.name}: берег на 800 м ${(shore(80) / devH).toFixed(2)} высоты кадра`);
+    assert.ok(shore(80) < devH && shore(80) > devH * 0.7, `${win.name}: полоса острова на 800 м у нижнего края`);
+    assert.ok(shore(150) < devH, `${win.name}: островок на 1500 м виден у нижнего края`);
+    const islandWidth = ISLAND.widthUnits * frame(150).tr.s;
+    assert.ok(islandWidth < devW * 0.7, `${win.name}: остров на 1500 м ${(islandWidth / devW).toFixed(2)} ширины кадра`);
+    assert.ok(ISLAND.widthUnits * frame(300).tr.s < devW * 0.4, `${win.name}: на 3 км остров мелкий`);
+    // остров только уходит вниз: 400 м -> 800 м -> 1200 м -> 2000 м
+    const heights = [40, 80, 120, 200].map(shore);
+    heights.forEach((y, i) => { if (i) assert.ok(y >= heights[i - 1] - 1e-6, `${win.name}: берег ниже с ростом высоты`); });
+  }
+});
+
+test('зазор от острова: самолёт на 400 м выше ракеты — не ближе ~двух высот ракеты к острову с 800 м, на 400 м остров уже заметно ниже', () => {
+  for (const win of WINDOWS) {
+    const devH = win.h * win.dpr;
+    const feetY = devH * win.feet;
+    const rocket = ROCKET_VIEW_UNITS * win.S;
+    const planeY = feetY - 40 * win.S; // 400 м выше ракеты, как в нижнем поясе sim
+    const gap = (alt) => {
+      const tr = groundTransform({}, alt, win.S, feetY, 0, 0, devH);
+      return createMapView().set(tr.ox, tr.oy, tr.s, 100, devH).sy(ISLAND.topUnits) - planeY;
+    };
+    const wanted = win.name === 'портрет' ? 2 : 1.55; // низкий ландшафт: места под ногами ракеты меньше
+    for (const alt of [80, 120, 200]) assert.ok(gap(alt) >= wanted * rocket, `${win.name}: на ${alt * 10} м зазор ${(gap(alt) / rocket).toFixed(1)} высот ракеты`);
+    assert.ok(gap(40) > gap(0) + 0.5 * rocket, `${win.name}: на 400 м остров ушёл заметно ниже, чем на старте`);
+  }
 });
 
 test('MapView: преобразования обратимы, границы соответствуют экрану', () => {
