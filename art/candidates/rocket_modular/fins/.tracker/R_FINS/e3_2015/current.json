@@ -5,8 +5,8 @@
   "status": "blocked",
   "current_step": "visual_review",
   "resume_allowed": true,
-  "created_at": "2026-10-21T08:11:58Z",
-  "updated_at": "2026-10-21T08:11:59Z",
+  "created_at": "2026-10-21T08:14:29Z",
+  "updated_at": "2026-10-21T08:14:30Z",
   "steps_order": [
     "generate",
     "edit",
@@ -27,7 +27,7 @@
       "attempt": 0,
       "fingerprint": "472636cdc220541694b6fcdbda4fc0bed9c045e8be7596ce2d73ad65040f7793",
       "started_at": null,
-      "finished_at": "2026-10-21T08:11:58Z",
+      "finished_at": "2026-10-21T08:14:29Z",
       "reason": "source identity recovered from provenance",
       "error": null,
       "outputs": {}
@@ -37,7 +37,7 @@
       "attempt": 0,
       "fingerprint": "472636cdc220541694b6fcdbda4fc0bed9c045e8be7596ce2d73ad65040f7793",
       "started_at": null,
-      "finished_at": "2026-10-21T08:11:58Z",
+      "finished_at": "2026-10-21T08:14:29Z",
       "reason": "no separate edit/repair checkpoint declared",
       "error": null,
       "outputs": {}
@@ -47,7 +47,7 @@
       "attempt": 0,
       "fingerprint": "472636cdc220541694b6fcdbda4fc0bed9c045e8be7596ce2d73ad65040f7793",
       "started_at": null,
-      "finished_at": "2026-10-21T08:11:58Z",
+      "finished_at": "2026-10-21T08:14:29Z",
       "reason": "Google Drive original provenance present",
       "error": null,
       "outputs": {}
@@ -56,8 +56,8 @@
       "status": "success",
       "attempt": 1,
       "fingerprint": "612faf2c5ee7f8b8ea0e086140e9c6969caba2cd91469d492bd777db24c05139",
-      "started_at": "2026-10-21T08:11:58Z",
-      "finished_at": "2026-10-21T08:11:58Z",
+      "started_at": "2026-10-21T08:14:29Z",
+      "finished_at": "2026-10-21T08:14:29Z",
       "reason": null,
       "error": null,
       "outputs": {
@@ -71,8 +71,8 @@
       "status": "success",
       "attempt": 1,
       "fingerprint": "cff3ce39dc7632306701e0c44322190e7fef699ac1d36e5c31b08986f38dfd8e",
-      "started_at": "2026-10-21T08:11:58Z",
-      "finished_at": "2026-10-21T08:11:58Z",
+      "started_at": "2026-10-21T08:14:29Z",
+      "finished_at": "2026-10-21T08:14:29Z",
       "reason": null,
       "error": null,
       "outputs": {
@@ -86,8 +86,8 @@
       "status": "success",
       "attempt": 1,
       "fingerprint": "85609591b8719aa699f927e0592993194bbfeed24506314de311daaff32b4490",
-      "started_at": "2026-10-21T08:11:58Z",
-      "finished_at": "2026-10-21T08:11:59Z",
+      "started_at": "2026-10-21T08:14:29Z",
+      "finished_at": "2026-10-21T08:14:29Z",
       "reason": null,
       "error": null,
       "outputs": {
@@ -101,8 +101,8 @@
       "status": "success",
       "attempt": 1,
       "fingerprint": "9d85b21f433794a1769c51c2aba5fa14adf2603904661cda32ebe0c82031ca6e",
-      "started_at": "2026-10-21T08:11:59Z",
-      "finished_at": "2026-10-21T08:11:59Z",
+      "started_at": "2026-10-21T08:14:29Z",
+      "finished_at": "2026-10-21T08:14:29Z",
       "reason": null,
       "error": null,
       "outputs": {
@@ -116,8 +116,8 @@
       "status": "success",
       "attempt": 1,
       "fingerprint": "88c7918cfa5fcd164475146e3c0a12c712d8b5f7b9dcaee5ad4fcd7390627cca",
-      "started_at": "2026-10-21T08:11:59Z",
-      "finished_at": "2026-10-21T08:11:59Z",
+      "started_at": "2026-10-21T08:14:29Z",
+      "finished_at": "2026-10-21T08:14:29Z",
       "reason": null,
       "error": null,
       "outputs": {
@@ -132,12 +132,12 @@
       "attempt": 0,
       "fingerprint": "6de2bd6ad90d7c68e8a872e01dfc389236f8ba92def091aef6ced5821a6d32dd",
       "started_at": null,
-      "finished_at": "2026-10-21T08:11:59Z",
+      "finished_at": "2026-10-21T08:14:30Z",
       "reason": null,
       "error": null,
       "outputs": {
         "@/candidate-manifest.json": {
-          "sha256": "eb39b486fa43343873c04626f230334a2f54e06819640b573af1c2897de6fada",
+          "sha256": "f8b07cf615af74c2fd5f915cdaa86f91b46e9d9dcdffab317eacb351b88dba31",
           "size": 2619
         }
       }
@@ -147,7 +147,7 @@
       "attempt": 0,
       "fingerprint": null,
       "started_at": null,
-      "finished_at": "2026-10-21T08:11:59Z",
+      "finished_at": "2026-10-21T08:14:30Z",
       "reason": "awaiting hash-bound visual approval for this exact candidate",
       "error": null,
       "outputs": {}

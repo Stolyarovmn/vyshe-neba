@@ -31,7 +31,7 @@
   "mechanism_pivots": "pending_measured_rig_pass",
   "output_sha256": "aab12ca653d2513fcd7f4b96932fe0d28d228021e4814b51182dd2f56581341a",
   "reproducibility": {
-    "git_commit": "e89bfcfb16ae9adc70ba7856ba2e8486569a7bb5",
+    "git_commit": "8ab9b329d4d21c5d7d4f83cf6ef01c12e499415a",
     "style_bible_sha256": "c1bc86aadb1c2c14117a8ab19690f7c0414648abe22c016f7ca9885be1f07cbb",
     "production_manifest_sha256": "458d4b7e98f0d530df891db274e1626e1bbf3441a8f9bab054e22a9cbfead83e",
     "pipeline_config_sha256": "18a2e6479db40e38c4a741a8d19bbcf8a988b5fc3aeb1501c94ea343736e4786",
