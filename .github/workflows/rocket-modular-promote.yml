@@ -61,10 +61,12 @@ jobs:
               R_BODY)
                 review='art/gen/rocket_modular/body/visual_qa.json'
                 branch_candidate='art/candidates/rocket_modular/body'
+                production_manifest='art/gen/rocket_modular/body/promotion-manifest.json'
                 ;;
               R_FINS)
                 review='art/gen/rocket_modular/fins/visual_qa.json'
                 branch_candidate='art/candidates/rocket_modular/fins'
+                production_manifest='art/gen/rocket_modular/fins/promotion-manifest.json'
                 ;;
             esac
             if [ ! -f "$review" ]; then
@@ -75,14 +77,19 @@ jobs:
             dest="$RUNNER_TEMP/candidate-$asset"
             python3 tools/art_pipeline/restore_asset_checkpoint.py --asset "$asset" --dest "$dest"
             if [ ! -f "$dest/candidate-manifest.json" ]; then
-              if [ ! -f "$branch_candidate/candidate-manifest.json" ]; then
-                echo "No checkpoint artifact and no materialized branch candidate for $asset" >&2
+              if [ -f "$branch_candidate/candidate-manifest.json" ]; then
+                rm -rf "$dest"
+                mkdir -p "$dest"
+                cp -a "$branch_candidate/." "$dest/"
+                echo "restored $asset from $branch_candidate"
+              elif [ -f "$production_manifest" ]; then
+                echo "$asset is already promoted; no candidate restore needed"
+                rm -rf "$dest"
+                continue
+              else
+                echo "No checkpoint artifact, materialized candidate, or production manifest for $asset" >&2
                 exit 1
               fi
-              rm -rf "$dest"
-              mkdir -p "$dest"
-              cp -a "$branch_candidate/." "$dest/"
-              echo "restored $asset from $branch_candidate"
             fi
 
             python3 tools/art_pipeline/process_asset.py \
@@ -121,6 +128,8 @@ jobs:
           cfg = json.loads(Path('art/placeables/PIPELINE_CONFIG.json').read_text(encoding='utf-8'))['assets']
           for asset in ('R_BODY', 'R_FINS'):
               state_dir = Path(os.environ['RUNNER_TEMP']) / f'candidate-{asset}' / '.tracker'
+              if not state_dir.is_dir():
+                  continue
               fp = fingerprint({
                   'step': 'game_tests',
                   'run_id': os.environ.get('GITHUB_RUN_ID'),
@@ -133,11 +142,16 @@ jobs:
                   )
           PY
           for asset in R_BODY R_FINS; do
-            python3 tools/art_pipeline/sync_asset_tracker_issue.py \
-              --repo-root . --asset "$asset" \
-              --state-dir "$RUNNER_TEMP/candidate-$asset/.tracker" \
-              --artifact-name "branch-candidate-${GITHUB_SHA}" \
-              --run-url "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            state_dir="$RUNNER_TEMP/candidate-$asset/.tracker"
+            if [ -d "$state_dir/$asset" ]; then
+              python3 tools/art_pipeline/sync_asset_tracker_issue.py \
+                --repo-root . --asset "$asset" \
+                --state-dir "$state_dir" \
+                --artifact-name "branch-candidate-${GITHUB_SHA}" \
+                --run-url "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            else
+              echo "skip tracker sync for $asset: already promoted before this run"
+            fi
           done
 
       - name: Commit promoted canonical art to feature branch
