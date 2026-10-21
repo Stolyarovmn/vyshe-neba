@@ -1,0 +1,46 @@
+{
+  "asset_id": "R_BODY",
+  "asset": "rocket_body",
+  "zone": "vehicle",
+  "era": "E3",
+  "year": 2015,
+  "adapter": "indexed_transport",
+  "source_gen_id": "0f59bf00-e2d4-4244-8908-a8e1f76160fc",
+  "source_sha256": "1c31716a9596d14371107c2526935243c808539686f9b67d77b845576864e665",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1DuLj4_OsrV-1rtFVbpme16dj-R0WDWS5",
+    "drive_url": "https://drive.google.com/file/d/1DuLj4_OsrV-1rtFVbpme16dj-R0WDWS5/view?usp=drivesdk",
+    "original_filename": "rocket_modular_source_0f59bf00-e2d4-4244-8908-a8e1f76160fc.png"
+  },
+  "transport_sha256": "8126b90bfaf82b67e474cc4e9926a8a4f70ee826306c7a0797f4c5e5da0927e9",
+  "transport_pixel_sha256": "b89aeef2837198c118707bcdc69c7d2c039450937ad2bb75ce79bbc9f5b38286",
+  "spritefusion_pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "aseprite_version": "1.3.18.6",
+  "aseprite_dithering": "none",
+  "pixel_size": 5,
+  "colors": 32,
+  "target_canvas": [
+    64,
+    96
+  ],
+  "registration_target": [
+    32,
+    94
+  ],
+  "mechanism_pivots": "pending_measured_rig_pass",
+  "output_sha256": "b8f0f7cac0eed9230a47a5c5451cb85c14f9ccc0a75fb59329a93ed8fcd7857e",
+  "reproducibility": {
+    "git_commit": "e89bfcfb16ae9adc70ba7856ba2e8486569a7bb5",
+    "style_bible_sha256": "c1bc86aadb1c2c14117a8ab19690f7c0414648abe22c016f7ca9885be1f07cbb",
+    "production_manifest_sha256": "458d4b7e98f0d530df891db274e1626e1bbf3441a8f9bab054e22a9cbfead83e",
+    "pipeline_config_sha256": "18a2e6479db40e38c4a741a8d19bbcf8a988b5fc3aeb1501c94ea343736e4786",
+    "processor_sha256": "229fa320ab9c6f2fba7473e2a2c65740df937b714f7ca52ed7d08252a6a2e227",
+    "prompt_sha256": "828888cc34856519c5f8ee702bce99a65b1f99dd5560fb69189ef2d116e4acac"
+  },
+  "publication": {
+    "state": "candidate",
+    "runtime_published": false,
+    "visual_review_required": true
+  }
+}

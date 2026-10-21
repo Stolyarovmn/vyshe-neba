@@ -1,0 +1,85 @@
+{
+  "version": 2,
+  "asset_id": "R_FINS",
+  "asset": "rocket_fins",
+  "production_dir": "art/gen/rocket_modular/fins",
+  "runtime_target": "world/rocket_modular/fins",
+  "state": "awaiting_visual_approval",
+  "visual_review": "art/gen/rocket_modular/fins/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "fe2ccb3b966af772a3abaaceb945d521547a581e6b2e9b6f272f740b8298d84b",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    },
+    {
+      "stem": "e1_1986",
+      "era": "E1",
+      "year": 1986,
+      "png": "e1_1986.png",
+      "sha256": "56efe253f150838c7396b230c0dc915f01afbd5ca1fd35574c08daf7cb5917ed",
+      "qa": "e1_1986.qa.json",
+      "pipeline": "e1_1986.pipeline.json"
+    },
+    {
+      "stem": "e2_1998",
+      "era": "E2",
+      "year": 1998,
+      "png": "e2_1998.png",
+      "sha256": "3cc13bd6a84488219fd5299d9e3016911e7220061aaa88aa0488ed46186b2280",
+      "qa": "e2_1998.qa.json",
+      "pipeline": "e2_1998.pipeline.json"
+    },
+    {
+      "stem": "e3_2015",
+      "era": "E3",
+      "year": 2015,
+      "png": "e3_2015.png",
+      "sha256": "aab12ca653d2513fcd7f4b96932fe0d28d228021e4814b51182dd2f56581341a",
+      "qa": "e3_2015.qa.json",
+      "pipeline": "e3_2015.pipeline.json"
+    },
+    {
+      "stem": "e4_2035",
+      "era": "E4",
+      "year": 2035,
+      "png": "e4_2035.png",
+      "sha256": "ed5bea57c5bd41b40287867a86dde572e4f4147d950a586afb4d59aca0bfda81",
+      "qa": "e4_2035.qa.json",
+      "pipeline": "e4_2035.pipeline.json"
+    },
+    {
+      "stem": "e5_2060",
+      "era": "E5",
+      "year": 2060,
+      "png": "e5_2060.png",
+      "sha256": "bfe2888d2388366b5825a828e55182c2a5184eedf6bc846bf5e22ce04260a8ca",
+      "qa": "e5_2060.qa.json",
+      "pipeline": "e5_2060.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "e89bfcfb16ae9adc70ba7856ba2e8486569a7bb5",
+    "style_bible_sha256": "c1bc86aadb1c2c14117a8ab19690f7c0414648abe22c016f7ca9885be1f07cbb",
+    "production_manifest_sha256": "458d4b7e98f0d530df891db274e1626e1bbf3441a8f9bab054e22a9cbfead83e",
+    "pipeline_config_sha256": "18a2e6479db40e38c4a741a8d19bbcf8a988b5fc3aeb1501c94ea343736e4786",
+    "processor_sha256": "229fa320ab9c6f2fba7473e2a2c65740df937b714f7ca52ed7d08252a6a2e227",
+    "prompt_sha256": "b37715efda36f2408a2fc7bb5136311ae04b08cf2dc70d7aca29a01cf91f669d"
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978",
+      "e1_1986",
+      "e2_1998",
+      "e3_2015",
+      "e4_2035",
+      "e5_2060"
+    ]
+  }
+}

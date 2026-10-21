@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "asset_id": "R_FINS",
+  "era": "e5_2060",
+  "status": "blocked",
+  "current_step": "visual_review",
+  "resume_allowed": true,
+  "created_at": "2026-10-21T08:11:59Z",
+  "updated_at": "2026-10-21T08:11:59Z",
+  "steps_order": [
+    "generate",
+    "edit",
+    "archive_original",
+    "source_prepare",
+    "pixel_snap",
+    "normalize",
+    "aseprite_index",
+    "qa_auto",
+    "candidate_manifest",
+    "visual_review",
+    "promote",
+    "game_tests"
+  ],
+  "steps": {
+    "generate": {
+      "status": "success",
+      "attempt": 0,
+      "fingerprint": "ba6e631f50c6bd37d88dcbd2a94ccc7cfd749b9308fbf1b9c76aa6069ab3c88d",
+      "started_at": null,
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": "source identity recovered from provenance",
+      "error": null,
+      "outputs": {}
+    },
+    "edit": {
+      "status": "skipped",
+      "attempt": 0,
+      "fingerprint": "ba6e631f50c6bd37d88dcbd2a94ccc7cfd749b9308fbf1b9c76aa6069ab3c88d",
+      "started_at": null,
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": "no separate edit/repair checkpoint declared",
+      "error": null,
+      "outputs": {}
+    },
+    "archive_original": {
+      "status": "success",
+      "attempt": 0,
+      "fingerprint": "ba6e631f50c6bd37d88dcbd2a94ccc7cfd749b9308fbf1b9c76aa6069ab3c88d",
+      "started_at": null,
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": "Google Drive original provenance present",
+      "error": null,
+      "outputs": {}
+    },
+    "source_prepare": {
+      "status": "success",
+      "attempt": 1,
+      "fingerprint": "adc7547f2486628a8dc8937d4d66ce902e4712b4e36155b53250ee580be293c2",
+      "started_at": "2026-10-21T08:11:59Z",
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": null,
+      "error": null,
+      "outputs": {
+        "@/.work/e5_2060/e5_2060_presnap.png": {
+          "sha256": "1b30401f5dbf11ea276ffe9b2b8b33b29b45b224e9774f52f438423778042e87",
+          "size": 18625
+        }
+      }
+    },
+    "pixel_snap": {
+      "status": "success",
+      "attempt": 1,
+      "fingerprint": "19989edc9f5e3839a95a3bc64073f806d300d1663e7c63d40f95fc3e9434e26a",
+      "started_at": "2026-10-21T08:11:59Z",
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": null,
+      "error": null,
+      "outputs": {
+        "@/.work/e5_2060/e5_2060_snapped.png": {
+          "sha256": "5c96a14e703aa106ea4a350e3f7359bfd6bae6ec24d146d47bfcc1b0ccbd048f",
+          "size": 5823
+        }
+      }
+    },
+    "normalize": {
+      "status": "success",
+      "attempt": 1,
+      "fingerprint": "df8d728c9a957316a2f366566f128eadb16cce519c338a5e62b022f76e832bb6",
+      "started_at": "2026-10-21T08:11:59Z",
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": null,
+      "error": null,
+      "outputs": {
+        "@/.work/e5_2060/e5_2060_normalized.png": {
+          "sha256": "7e237b1940085eba8f254d861a3548ca59f26738dd58401b944053a594bfbc2d",
+          "size": 4195
+        }
+      }
+    },
+    "aseprite_index": {
+      "status": "success",
+      "attempt": 1,
+      "fingerprint": "6bd356c63834d854dd7a68a9f05797c1fd2abbf782d48c7c738d63cc2de3cb1e",
+      "started_at": "2026-10-21T08:11:59Z",
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": null,
+      "error": null,
+      "outputs": {
+        "@/e5_2060.png": {
+          "sha256": "bfe2888d2388366b5825a828e55182c2a5184eedf6bc846bf5e22ce04260a8ca",
+          "size": 1486
+        }
+      }
+    },
+    "qa_auto": {
+      "status": "success",
+      "attempt": 1,
+      "fingerprint": "f7c637833856d4b4f2bba5eb402ad3ef030ea4fe4edb9a5d2c3569aed2a02010",
+      "started_at": "2026-10-21T08:11:59Z",
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": null,
+      "error": null,
+      "outputs": {
+        "@/e5_2060.qa.json": {
+          "sha256": "4db6d591866dd1c253128be02e3ab3ac0996d7bd5aef48249229852cd87f8d3c",
+          "size": 502
+        }
+      }
+    },
+    "candidate_manifest": {
+      "status": "success",
+      "attempt": 0,
+      "fingerprint": "6de2bd6ad90d7c68e8a872e01dfc389236f8ba92def091aef6ced5821a6d32dd",
+      "started_at": null,
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": null,
+      "error": null,
+      "outputs": {
+        "@/candidate-manifest.json": {
+          "sha256": "eb39b486fa43343873c04626f230334a2f54e06819640b573af1c2897de6fada",
+          "size": 2619
+        }
+      }
+    },
+    "visual_review": {
+      "status": "blocked",
+      "attempt": 0,
+      "fingerprint": null,
+      "started_at": null,
+      "finished_at": "2026-10-21T08:11:59Z",
+      "reason": "awaiting hash-bound visual approval for this exact candidate",
+      "error": null,
+      "outputs": {}
+    },
+    "promote": {
+      "status": "pending",
+      "attempt": 0,
+      "fingerprint": null,
+      "started_at": null,
+      "finished_at": null,
+      "reason": null,
+      "error": null,
+      "outputs": {}
+    },
+    "game_tests": {
+      "status": "pending",
+      "attempt": 0,
+      "fingerprint": null,
+      "started_at": null,
+      "finished_at": null,
+      "reason": null,
+      "error": null,
+      "outputs": {}
+    }
+  }
+}
