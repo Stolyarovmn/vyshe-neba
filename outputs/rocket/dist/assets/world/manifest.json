@@ -1059,6 +1059,102 @@
         0.5
       ]
     },
+    "outpost_mars_1978": {
+      "width": 232,
+      "height": 214,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_mars_1986": {
+      "width": 222,
+      "height": 304,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_mars_1998": {
+      "width": 207,
+      "height": 223,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_mars_2015": {
+      "width": 224,
+      "height": 278,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_mars_2035": {
+      "width": 233,
+      "height": 288,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_mars_2060": {
+      "width": 250,
+      "height": 285,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_moon_1978": {
+      "width": 227,
+      "height": 233,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_moon_1986": {
+      "width": 225,
+      "height": 309,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_moon_1998": {
+      "width": 216,
+      "height": 209,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_moon_2015": {
+      "width": 216,
+      "height": 271,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_moon_2035": {
+      "width": 218,
+      "height": 281,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "outpost_moon_2060": {
+      "width": 255,
+      "height": 281,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
     "pack": {
       "width": 247,
       "height": 190,
