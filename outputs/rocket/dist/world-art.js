@@ -18,7 +18,7 @@ function earthAtlas(art){
 function islandAsset(){
  if(islandImage)return islandImage;
  islandImage=new Image();
- islandImage.src=root.__GAME_ASSETS__?.['environment/start_island_e0.png']||'assets/environment/start_island_e0.png';
+ islandImage.src=root.__GAME_ASSETS__?.['environment/start_island_hd.png']||'assets/environment/start_island_hd.png';
  islandReady=islandImage.decode().catch(()=>{});
  return islandImage;
 }
@@ -80,7 +80,7 @@ function draw(ctx,cam,r,p,art){
    }
   }
   drawOcean(ctx,cam,r,project,z);
-  const island=islandAsset(),islandHeight=ISLAND_WORLD_WIDTH*(island.naturalHeight||166)/(island.naturalWidth||384);
+  const island=islandAsset(),islandHeight=ISLAND_WORLD_WIDTH*(island.naturalHeight||821)/(island.naturalWidth||1916);
   if(island.complete&&island.naturalWidth&&right>ISLAND_WORLD_LEFT&&left<ISLAND_WORLD_LEFT+ISLAND_WORLD_WIDTH){
    const q=project(ISLAND_WORLD_LEFT,ISLAND_WORLD_TOP);
    ctx.drawImage(island,q.x,q.y,ISLAND_WORLD_WIDTH*z,islandHeight*z);
