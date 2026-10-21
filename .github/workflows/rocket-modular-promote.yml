@@ -1,0 +1,87 @@
+name: Promote rocket modular candidates
+
+on:
+  push:
+    branches:
+      - 2d_rocket-modular-sprites
+    paths:
+      - 'art/gen/rocket_modular/body/visual_qa.json'
+      - 'art/gen/rocket_modular/fins/visual_qa.json'
+      - '.github/workflows/rocket-modular-promote.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  issues: write
+
+env:
+  ASEPRITE_VERSION: '1.3.18.6'
+  PIXEL_SNAPPER_REV: 'ae20461f60fb39e75d15f184bab1ebec1219511c'
+  GITHUB_TOKEN: ${{ github.token }}
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: 2d_rocket-modular-sprites
+
+      - name: Install art build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            clang cmake ninja-build unzip curl python3-pil jq \
+            libpixman-1-dev libfreetype6-dev libharfbuzz-dev zlib1g-dev \
+            libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev \
+            libfontconfig1-dev libjpeg-dev libpng-dev libwebp-dev
+
+      - name: Restore canonical art tool cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/art-tool-cache
+          key: art-tools-${{ runner.os }}-${{ runner.arch }}-aseprite-1.3.18.6-none-snapper-ae20461f
+
+      - name: Set up canonical art tools
+        run: bash tools/art_pipeline/setup_art_tools.sh "$RUNNER_TEMP/art-tools" "$RUNNER_TEMP/art-tool-cache"
+
+      - name: Restore and promote approved candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          for asset in R_BODY R_FINS; do
+            case "$asset" in
+              R_BODY) review='art/gen/rocket_modular/body/visual_qa.json' ;;
+              R_FINS) review='art/gen/rocket_modular/fins/visual_qa.json' ;;
+            esac
+            if [ ! -f "$review" ]; then
+              echo "skip $asset: $review not present"
+              continue
+            fi
+            dest="$RUNNER_TEMP/candidate-$asset"
+            python3 tools/art_pipeline/restore_asset_checkpoint.py --asset "$asset" --dest "$dest"
+            python3 tools/art_pipeline/process_asset.py \
+              --repo-root . --asset "$asset" --output "$dest" \
+              --state-dir "$dest/.tracker" \
+              --pixel-snapper "$RUNNER_TEMP/art-tools/spritefusion-pixel-snapper" \
+              --aseprite "$RUNNER_TEMP/art-tools/aseprite" --resume
+            python3 tools/art_pipeline/promote_asset.py \
+              --repo-root . --asset "$asset" --candidate "$dest" --state-dir "$dest/.tracker"
+          done
+
+      - name: Commit promoted canonical art to feature branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet && git diff --cached --quiet; then
+            echo 'No production changes to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A art/gen/rocket_modular outputs/rocket/runtime-assets.json
+          git commit -m '2D rocket: promote approved modular body and fins'
+          git push origin HEAD:2d_rocket-modular-sprites
