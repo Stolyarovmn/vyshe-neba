@@ -6,13 +6,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createPainter } from '../src/render/painter.js';
 import { createView } from '../src/render/camera.js';
-import { createMapView } from '../src/render/islandmap.js';
+import { createMapView, groundScale } from '../src/render/islandmap.js';
 import { CLOUD_SPRITE_BY_KIND, cloudSize, cloudSpriteName, cloudTint, drawCloudField } from '../src/render/clouds.js';
 import {
   SPACE_ALT_UNITS, balloonRig, balloonSwing, drawObjects, rockMaterial,
 } from '../src/render/objects.js';
 import {
-  FAR_COAST_Y, coastY, drawFarCoast, farCityLayout, farCoastAlpha,
+  FAR_COAST_SCREEN, FAR_COAST_Y, FAR_SCALE_DISTANCE, coastY, drawFarCoast, farCityLayout, farCoastAlpha, farTransform,
 } from '../src/render/horizon.js';
 import {
   OUTPOST_DISTANCE, OUTPOST_PARALLAX, drawTerrain, outpostPlacement,
@@ -285,12 +285,12 @@ test('город на горизонте: силуэт нужной эпохи, 
   assert.equal(layout[0].row, 2, 'панорама позади всех рядов');
 });
 
-test('берег и параллакс: линия берега в разумных пределах, слой растворяется к 2800, drawFarCoast рисует берег и город', () => {
+test('берег и параллакс: линия берега в разумных пределах, слой растворяется к 9 км, drawFarCoast рисует берег и город', () => {
   for (let x = -3000; x <= 3000; x += 50) assert.ok(Math.abs(coastY(x) - FAR_COAST_Y) < 40, `x=${x}`);
   assert.equal(farCoastAlpha(0), 1);
-  assert.equal(farCoastAlpha(1200), 1);
-  assert.equal(farCoastAlpha(2800), 0);
-  assert.ok(farCoastAlpha(2000) > 0 && farCoastAlpha(2000) < 1);
+  assert.equal(farCoastAlpha(300), 1);
+  assert.equal(farCoastAlpha(900), 0);
+  assert.ok(farCoastAlpha(600) > 0 && farCoastAlpha(600) < 1);
   assert.ok(FAR_COAST_Y < -249.4, 'дальний берег севернее острова');
   const { painter, names } = recordingPainter();
   const mv = createMapView().set(200, 1500, 2, 400, 800);
@@ -395,4 +395,25 @@ test('лёгкие runtime-копии: файлы цел, в каталоге в
   BALLOON_FULL_SIZES.forEach((size, era) => {
     assert.deepEqual(pngSize(path.join(repoRoot, 'outputs', 'rocket', 'dist', 'assets', 'world', `balloon_${ERA_YEARS[era]}.png`)), size);
   });
+});
+
+test('дальний слой: мельчает втрое медленнее острова, береговая линия спускается к месту под горизонтом и остаётся над островом', () => {
+  const S = 3.4;
+  const devH = 2532;
+  const feetY = devH * 0.66;
+  const startY = feetY + FAR_COAST_Y * S;
+  const at0 = farTransform({}, 0, S, devH, 585, 0, startY);
+  assert.equal(at0.s, S);
+  assert.ok(Math.abs(at0.oy + FAR_COAST_Y * at0.s - startY) < 1e-6, 'на земле берег там же, где на карте острова');
+  let previousScale = S + 1;
+  for (const alt of [20, 80, 150, 300, 600]) {
+    const tr = farTransform({}, alt, S, devH, 585, 0, startY);
+    assert.ok(tr.s < previousScale);
+    previousScale = tr.s;
+    assert.ok(tr.s > groundScale(alt) * S, `${alt}: дальний слой крупнее острова`);
+    const coast = tr.oy + FAR_COAST_Y * tr.s;
+    assert.ok(coast > 0 && coast < devH * 0.7, `${alt}: береговая линия у верхней трети (${(coast / devH).toFixed(2)})`);
+    if (alt >= 150) assert.ok(Math.abs(coast - devH * FAR_COAST_SCREEN) < 2, `${alt}: на месте`);
+  }
+  assert.ok(Math.abs(farTransform({}, FAR_SCALE_DISTANCE, S, devH, 0, 0, startY).s - S / 2) < 1e-9);
 });

@@ -349,32 +349,35 @@ export function settingsLayout(L) {
 
 export function launchLayout(L) {
   const { body } = screenFrame(L, { header: true });
-  const panel = centerCard(L, body, 760, L.portrait ? 640 : 2000);
   const p = R(L.pad * 0.9);
-  const inner = rect(panel.x + p, panel.y + p, panel.w - p * 2, panel.h - p * 2);
   const startH = Math.max(72, R(76 * L.ui));
   const lampsH = R(26 * L.ui);
   const consH = Math.max(MIN_TOUCH + 12, R(70 * L.ui));
   if (L.portrait) {
+    // корпус пульта подгоняется под содержимое: ряд ламп, планеты на всю доступную высоту, гнёзда и ПУСК без пустот между ними
+    const cw = Math.min(body.w, R(760 * L.ui));
+    const fixedH = lampsH + consH + startH + L.gap * 4;
+    const maxInnerH = body.h - p * 2;
+    const destH = clamp(maxInnerH - fixedH, R(140 * L.ui), R(300 * L.ui));
+    const innerH = Math.min(maxInnerH, fixedH + destH);
+    const panelH = innerH + p * 2;
+    const panel = rect(body.x + (body.w - cw) / 2, body.y + (body.h - panelH) / 2, cw, panelH);
+    const inner = rect(panel.x + p, panel.y + p, panel.w - p * 2, innerH);
+    const lamps = rect(inner.x, inner.y, inner.w, lampsH);
     const start = rect(inner.x, bottom(inner) - startH, inner.w, startH);
     const cons = rect(inner.x, start.y - L.gap - consH, inner.w, consH);
-    const lamps = rect(inner.x, inner.y, inner.w, lampsH);
     const destArea = rect(inner.x, bottom(lamps) + L.gap, inner.w, Math.max(0, cons.y - L.gap - bottom(lamps) - L.gap));
-    return { panel, inner, lamps, destArea, dest: destRow(L, destArea), cons, consSlots: row(cons, 4, L.gap), start };
+    return { panel, inner, lamps, destArea, dest: row(destArea, 3, L.gap), cons, consSlots: row(cons, 4, L.gap), start };
   }
+  const panel = centerCard(L, body, 760, 2000);
+  const inner = rect(panel.x + p, panel.y + p, panel.w - p * 2, panel.h - p * 2);
   const rightW = clamp(R(inner.w * 0.3), R(180 * L.ui), R(280 * L.ui));
   const leftW = inner.w - rightW - L.gap;
   const lamps = rect(inner.x, inner.y, leftW, lampsH);
   const cons = rect(inner.x, bottom(inner) - consH, leftW, consH);
   const destArea = rect(inner.x, bottom(lamps) + L.gap, leftW, Math.max(0, cons.y - L.gap - bottom(lamps) - L.gap));
   const start = rect(inner.x + leftW + L.gap, inner.y + R(inner.h / 2 - startH * 0.9), rightW, startH * 1.8);
-  return { panel, inner, lamps, destArea, dest: destRow(L, destArea), cons, consSlots: row(cons, 4, L.gap), start };
-}
-
-/** Три кнопки-планеты: ограничены по высоте и стоят по центру области. */
-function destRow(L, area) {
-  const h = Math.min(area.h, R(220 * L.ui));
-  return row(rect(area.x, area.y + (area.h - h) / 2, area.w, h), 3, L.gap);
+  return { panel, inner, lamps, destArea, dest: row(destArea, 3, L.gap), cons, consSlots: row(cons, 4, L.gap), start };
 }
 
 // --- итоги: бланк ---

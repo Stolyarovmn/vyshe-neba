@@ -46,3 +46,26 @@ test('E0 — тёмные экраны с зелёным люминофором,
   assert.ok(ar > ab && ag > ab, 'янтарный люминофор');
   assert.ok(luminance(getTheme({}, 0).c.navy0) < 0.01, 'экран E0 тёмный');
 });
+
+import { contrast, mix } from '../src/ui/theme.js';
+
+test('цифры и цвета состояний приборов читаются на подложке в каждой эпохе (≥ 4,5 в худшем случае — подложка поверх белого)', () => {
+  for (const settings of [{}, { colorblind: true }]) {
+    for (let era = 0; era < ERA_COUNT; era++) {
+      const th = getTheme(settings, era);
+      const tok = th.skin.hud;
+      const bg = mix(th.c[tok.bg], '#ffffff', 1 - tok.bgAlpha);
+      for (const key of [tok.digit, 'green', 'amber', 'red', 'cyan']) {
+        const ratio = contrast(th.c[key], bg);
+        assert.ok(ratio >= 4.5, `эпоха ${era}${settings.colorblind ? ' (дальтоники)' : ''}: ${key} на подложке ${tok.bg} (α ${tok.bgAlpha}): ${ratio.toFixed(2)}`);
+      }
+    }
+  }
+});
+
+test('у каждой эпохи свои формы приборов, а не только цвет: набор видов приборов не повторяется', () => {
+  assert.equal(new Set(ERA_SKINS.map((s) => s.instr)).size, ERA_COUNT);
+  for (const s of ERA_SKINS) assert.ok(['analog', 'led', 'digital', 'flat', 'projection', 'holo'].includes(s.instr), s.id);
+  // подложка стеклянных эпох не должна быть прозрачнее 0,7: иначе цифры теряются на ярком фоне
+  for (const s of ERA_SKINS) assert.ok(s.hud.bgAlpha >= 0.7, `${s.id}: bgAlpha ${s.hud.bgAlpha}`);
+});

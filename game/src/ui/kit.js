@@ -736,13 +736,13 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       rect(rr.x, rr.y, rr.w, rr.h, c.ink);
       rect(rr.x + cc, rr.y + cc, rr.w - cc * 2, rr.h - cc * 2, c.navy0);
     } else {
-      // проекция и голограмма: стекло шашечным узором (фон сцены просвечивает), у щитков со своим текстом — сплошное;
-      // по углам светящиеся скобки
-      if (o.opaque) rect(rr.x, rr.y, rr.w, rr.h, c.navy0);
-      else {
-        S.ctx.fillStyle = ditherPattern(c.navy0, cc);
-        S.ctx.fillRect(rr.x, rr.y, rr.w, rr.h);
-      }
+      // проекция и голограмма: ровная полупрозрачная тёмная подложка без шахматки (фон сцены лишь слегка просвечивает,
+      // контраст цифр проверяет тест по худшему случаю); у щитков со своим текстом — сплошная; по углам светящиеся скобки
+      const tok = S.skin.hud;
+      const prevA = S.ctx.globalAlpha;
+      S.ctx.globalAlpha = prevA * (o.opaque ? 1 : tok.bgAlpha);
+      rect(rr.x, rr.y, rr.w, rr.h, c[tok.bg] || c.navy0);
+      S.ctx.globalAlpha = prevA;
       const arm = cc * 4;
       const col = sk.kind === 'holo' ? c.cyan : c.cyan;
       for (const [x, y, sx, sy] of [[rr.x, rr.y, 1, 1], [rr.x + rr.w, rr.y, -1, 1], [rr.x, rr.y + rr.h, 1, -1], [rr.x + rr.w, rr.y + rr.h, -1, -1]]) {

@@ -97,7 +97,8 @@ function drawInstruments(app, kit, L, s, f, hud) {
   const alt = fmtAlt(f.alt);
   const unit = t(alt.unit === 'km' ? 'unit.km' : 'unit.m');
   const alarm = app.time < s.alarmUntil || DANGER_WARNS.some((k) => s.warn[k] !== undefined && app.time - s.warn[k] < 1.2);
-  inst.altitude(kit, I.alt, f, { alt, unit, alarm, meters: Math.max(0, f.alt) * 10 });
+  const zones = (app.mods.sim.ZONES?.[f.body] || []).filter((z) => z.from > f.alt);
+  inst.altitude(kit, I.alt, f, { alt, unit, alarm, meters: Math.max(0, f.alt) * 10, nextZone: zones.length ? zones[0].from * 10 : 0 });
 
   // вертикальная скорость: число и лента или стрелка; красная зона — быстрее допуска посадки
   const climb = f.climb ?? -f.vy;
@@ -418,9 +419,7 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   if (!touch) {
     // без сенсорных органов управления на месте диска — указатель крена: стрелка и зона допустимого отклонения
     const G = { cx: hud.disc.cx, cy: hud.disc.cy, r: Math.round(hud.disc.r * 0.8) };
-    kit.ring(G.cx, G.cy, G.r, G.r, c.ink);
-    kit.ring(G.cx, G.cy, G.r - cc * 2, G.r - cc * 2, c.steel1);
-    kit.ring(G.cx, G.cy, G.r - cc * 5, G.r - cc * 5, c.navy1);
+    inst.wheel(kit, G, { finger: null, knobX: G.cx, kr: 0, hot: lim !== null && Math.abs(f.angle || 0) >= lim * 0.93 });
     drawAttitude(app, kit, G, f, lim);
     return;
   }
@@ -431,37 +430,25 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   app.hudTargets['flight-tilt'] = { x: D.cx - D.r, y: D.cy - D.r, w: D.r * 2, h: D.r * 2 };
   let finger = null;
   for (const p of tm.pointers.values()) if (p.role === 'disc') finger = p;
-  kit.ring(D.cx, D.cy, D.r, D.r, c.ink);
-  kit.ring(D.cx, D.cy, D.r - cc * 2, D.r - cc * 2, finger ? c.steel0 : c.steel1);
-  kit.ring(D.cx, D.cy, D.r - cc * 5, D.r - cc * 5, c.navy1);
+  const knobX = D.cx + (finger ? clamp((finger.x - D.cx) / (D.r * 0.78), -1, 1) : 0) * D.r * 0.78;
+  const kr = Math.round(D.r * 0.34);
+  const base = inst.wheel(kit, D, { finger, knobX, kr, hot: lim !== null && Math.abs(f.angle || 0) >= lim * 0.93 });
   // дуга ограничителя и стрелка крена по верхней дуге диска
   drawAttitude(app, kit, D, f, lim);
   kit.icon('back', D.cx - D.r * 0.66, D.cy + D.r * 0.15, Math.round(D.r * 0.3), c.textDim);
   kit.icon('arrow', D.cx + D.r * 0.66, D.cy + D.r * 0.15, Math.round(D.r * 0.3), c.textDim);
-  const knobX = D.cx + (finger ? clamp((finger.x - D.cx) / (D.r * 0.78), -1, 1) : 0) * D.r * 0.78;
-  const kr = Math.round(D.r * 0.34);
-  kit.ring(knobX, D.cy, kr, kr, c.ink);
-  kit.ring(knobX, D.cy, kr - cc, kr - cc, finger ? c.amber : c.steel1);
-  kit.ring(knobX - cc, D.cy - cc, kr - cc * 3, kr - cc * 3, finger ? c.amberLight : c.steel2);
-  kit.rect(Math.round(knobX - cc), Math.round(D.cy - kr * 0.5), cc * 2, Math.round(kr), c.ink);
+  base.knob();
   kit.drawText(t('hud.tilt'), D.cx, D.cy + D.r * 0.72, { size: kit.fs(9), color: c.textMute, align: 'center' });
 
   // рычаг тяги: паз со светодиодной шкалой, рукоятка и фиксатор
   const V = hud.lever;
   app.hudTargets['flight-thrust'] = V;
   const lv = tm.leverState(mode);
-  kit.nine('inset', V.x, V.y, V.w, V.h);
-  const track = { x: V.x + V.w * 0.4, y: V.y + 12 * L.ui, w: V.w * 0.2, h: V.h - 24 * L.ui };
-  kit.ledBar(track, { value: f.throttle, color: f.boost?.active ? c.red : c.amber, vertical: true, segments: 12 });
-  for (let i = 0; i <= 4; i++) kit.rect(V.x + cc * 3, Math.round(track.y + (track.h * i) / 4 - cc / 2), Math.round(V.w * 0.22), cc, c.steel2);
-  const thumbH = Math.round(30 * L.ui);
-  const ty = Math.round(V.y + 8 * L.ui + (1 - lv.value) * (V.h - 16 * L.ui - thumbH));
-  kit.nine(lv.touched ? 'primaryPress' : 'primary', V.x + cc * 2, ty, V.w - cc * 4, thumbH);
-  for (let i = 0; i < 2; i++) kit.rect(V.x + cc * 6, ty + thumbH * 0.16 + i * cc * 2, V.w - cc * 12, cc, c.amberDeep);
+  // рычаг по эпохе: металл (E0), светодиоды (E1), цифровая шкала (E2), тонкий ползунок (E3), проекция (E4), голограмма (E5);
   // фиксатор: в режиме «Пилот» рычаг держит положение — лампа горит; в «Аркаде» отпускание сбрасывает тягу
-  kit.lamp(V.x + V.w - cc * 5, V.y + cc * 5, cc * 4, mode === 'pilot' ? c.green : c.navy2, mode === 'pilot');
+  const lw = inst.lever(kit, V, { lv, thr: f.throttle, boost: !!f.boost?.active, mode, u: L.ui });
   // подпись на самой рукоятке: «держи» в аркаде, процент в режиме «Пилот»
-  kit.drawText(mode === 'arcade' ? t('hud.hold') : `${Math.round(lv.value * 100)}`, V.x + V.w / 2, ty + thumbH * 0.72, { size: kit.fs(9), color: c.ink, align: 'center', maxWidth: V.w - cc * 8 });
+  kit.drawText(mode === 'arcade' ? t('hud.hold') : `${Math.round(lv.value * 100)}`, V.x + V.w / 2, lw.thumb.y + lw.thumb.h * 0.72, { size: kit.fs(9), color: lw.label, align: 'center', maxWidth: V.w - cc * 8 });
   kit.drawText(t('hud.thrust'), V.x + V.w / 2, V.y - kit.fs(8), { size: kit.fs(9), color: c.textMute, align: 'center' });
 }
 
