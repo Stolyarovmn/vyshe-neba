@@ -98,7 +98,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm ci
+          npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
 
       - name: Run game verification and standalone build
