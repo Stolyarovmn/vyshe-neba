@@ -38,6 +38,9 @@ for(let a=0;a<usedSlots.length;a++)for(let b=a+1;b<usedSlots.length;b++){
 for(const s of usedSlots){
  assert(s.x>=240&&s.x<=870&&s.y>=240&&s.y<=470,`${s.id}: outside starter-island composition envelope at ${s.x},${s.y}`);
  assert(Math.hypot(s.x-480,s.y-468)>=65,`${s.id}: intrudes into the rocket/start-table exclusion zone`);
+ const projected=game.project((s.x-480)*1.2,0);
+ assert.equal(projected.x,s.x,`${s.id}: launch projection lost horizontal composition`);
+ assert.equal(projected.y,s.y,`${s.id}: launch projection lost island depth`);
 }
 
 /* The HD island metadata measures the launch-pad center at source px (388,375).
