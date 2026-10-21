@@ -68,7 +68,7 @@ const SPEC = {
     name: 'Сервисная команда',
     need: 'Нужна сервисная команда',
     desc: 'Чинит обшивку между полётами и снижает цену двигателя и стабилизаторов.',
-    cost: 55, weight: 1, minEra: 0, dataWeight: 0.6, dependsOn: null,
+    cost: 40, weight: 1, minEra: 0, dataWeight: 0.6, dependsOn: null,
     effects: {
       repairOnLand: [0.1, 0.2, 0.32, 0.46, 0.62, 0.8],
       discountEngineFins: [0.03, 0.06, 0.09, 0.12, 0.15, 0.18],
@@ -78,7 +78,7 @@ const SPEC = {
   rescue: {
     name: 'Спасательная станция',
     need: 'Нужна спасательная станция',
-    desc: 'Возвращает часть стоимости при аварии и обслуживает капсулу и парашют.',
+    desc: 'Возвращает часть стоимости при аварии, обслуживает капсулу и с 3-го уровня выдаёт парашют бесплатно.',
     cost: 65, weight: 1, minEra: 0, dataWeight: 0.6, dependsOn: 'service',
     effects: {
       rescueRefund: [0.15, 0.28, 0.4, 0.52, 0.64, 0.75],

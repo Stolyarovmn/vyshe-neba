@@ -26,7 +26,6 @@ export function deriveRocket(profile) {
   const capsule = moduleStats(profile, 'capsule');
   const legs = moduleStats(profile, 'legs');
   const fins = moduleStats(profile, 'fins');
-  const chute = moduleStats(profile, 'parachute');
   const avionics = moduleStats(profile, 'avionics');
   const { effects } = base;
 
@@ -63,7 +62,7 @@ export function deriveRocket(profile) {
 
   const flightHull = { hp: hull.hp, debrisResist: round(Math.min(0.9, hull.debrisResist + 0.5 * effects.hullWear), 3) };
   const flightLegs = { vTol: legs.vTol, hTol: legs.hTol, angTol: legs.angTol };
-  const flightFins = { turn: fins.turn, dragCut: fins.dragCut };
+  const flightFins = { turn: fins.turn, dragCut: fins.dragCut, maxTilt: fins.maxTilt };
   const flightAvionics = { predict: avionics.predict, assist: avionics.assist };
   const limits = {
     speed: Math.min(190, engine.speed + 2 * profile.era),
@@ -90,7 +89,8 @@ export function deriveRocket(profile) {
     angTol: flightLegs.angTol,
     turn: flightFins.turn,
     dragCut: flightFins.dragCut,
-    chuteLevel: chute.level,
+    maxTilt: flightFins.maxTilt,
+    maxTiltDeg: Math.round((flightFins.maxTilt * 180) / Math.PI),
     predict: flightAvionics.predict,
     assist: flightAvionics.assist,
     transferSave: avionics.transferSave,
@@ -101,7 +101,6 @@ export function deriveRocket(profile) {
     hull: flightHull,
     legs: flightLegs,
     fins: flightFins,
-    parachute: { level: chute.level },
     avionics: flightAvionics,
     limits,
     transferCost,
@@ -141,7 +140,6 @@ export function makeFlightConfig(profile, { destination = 'earth', consumables =
     hull: rocket.hull,
     legs: rocket.legs,
     fins: rocket.fins,
-    parachute: rocket.parachute,
     avionics: rocket.avionics,
     base: base.flight,
     consumables: resolveConsumables(profile, consumables).active,

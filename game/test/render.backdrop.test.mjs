@@ -16,7 +16,12 @@ test('ячейки фонов: мастерская по эпохе, лавка,
   assert.deepEqual(backdropCell('workshop', 99), { atlas: 'backdrop_interior', col: 2, row: 1 });
   assert.deepEqual(backdropCell('shop', 0), { atlas: 'backdrop_env', col: 0, row: 1 });
   assert.deepEqual(backdropCell('shop', 0, 1), { atlas: 'backdrop_env', col: 1, row: 0 });
-  assert.deepEqual(backdropCell('launch-earth', 0), { atlas: 'backdrop_env', col: 0, row: 0 });
+  const fallback = { atlas: 'backdrop_env', col: 0, row: 0 };
+  assert.deepEqual(backdropCell('launch-earth', 0), { atlas: 'backdrop_base', col: 0, row: 0, fallback });
+  assert.deepEqual(backdropCell('launch-earth', 2), { atlas: 'backdrop_base', col: 2, row: 0, fallback });
+  assert.deepEqual(backdropCell('launch-earth', 3), { atlas: 'backdrop_base', col: 0, row: 1, fallback });
+  assert.deepEqual(backdropCell('launch-earth', 5), { atlas: 'backdrop_base', col: 2, row: 1, fallback });
+  assert.deepEqual(backdropCell('launch-earth', 99), { atlas: 'backdrop_base', col: 2, row: 1, fallback });
   assert.deepEqual(backdropCell('launch-moon', 0), { atlas: 'backdrop_env', col: 1, row: 1 });
 });
 

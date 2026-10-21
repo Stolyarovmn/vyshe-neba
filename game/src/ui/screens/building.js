@@ -33,7 +33,6 @@ export function drawBuildingCallout(app, kit, key, o = {}) {
   const rows = st.next ? deltaRows(infos, st.effects, st.next.effects).filter((r) => r.changed) : [];
   const power = st.next?.power;
   const c = kit.c;
-  const u = kit.L.ui;
   const hasPower = !!(power && (power.supply || power.use));
   infoCallout(app, kit, {
     id: `bld-${key}`,
@@ -55,13 +54,13 @@ export function drawBuildingCallout(app, kit, key, o = {}) {
     canBuy: st.next && st.locked.length === 0,
     buyLabel: st.level === 0 ? t('card.build') : t('card.upgrade'),
     buyId: `build-${key}`,
-    extraH: hasPower ? Math.round(26 * u) : 0,
+    extraH: hasPower ? (uu) => Math.round(26 * uu) : 0,
     extra: hasPower
-      ? (r) => {
+      ? (r, uu) => {
         const good = !!power.supply;
-        kit.icon('bolt', r.x + Math.round(10 * u), r.y + Math.round(13 * u), Math.round(18 * u), good ? c.green : c.amber);
-        kit.drawText(good ? `+${power.supply}` : `−${power.use}`, r.x + Math.round(26 * u), r.y + Math.round(13 * u), { size: kit.fs(13), color: good ? c.green : c.amber });
-        return Math.round(26 * u);
+        kit.icon('bolt', r.x + Math.round(10 * uu), r.y + Math.round(13 * uu), Math.round(18 * uu), good ? c.green : c.amber);
+        kit.drawText(good ? `+${power.supply}` : `−${power.use}`, r.x + Math.round(26 * uu), r.y + Math.round(13 * uu), { size: kit.fs(13), color: good ? c.green : c.amber });
+        return Math.round(26 * uu);
       }
       : undefined,
     onBuy: () => {

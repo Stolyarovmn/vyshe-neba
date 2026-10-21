@@ -113,20 +113,24 @@ export function createAutopilot(options = {}) {
     return clamp((3 * error - 0.6 * s.av) / s.turnRate, -1, 1);
   }
 
+  // How far the pilot may lean: well inside the hull's soft limit, so a rocket with little RCS flies nearly upright.
+  const leanCap = (s) => 0.8 * s.cfg.fins.maxTilt;
+
   // Horizontal guidance toward the pad: returns the angle to hold.
   function steerAngle(s, climbing = false) {
     const dx = s.x - s.pad.x;
-    const aim = climbing && takeRings ? ringAim(s) : null;
-    const reach = Math.max(1.5, s.g * 0.4 * Math.tan(0.4)); // sideways acceleration the tilt can really give
+    const aim = climbing && takeRings && leanCap(s) >= 0.3 ? ringAim(s) : null;
+    const reach = Math.max(1.5, s.g * 0.4 * Math.tan(Math.min(0.4, leanCap(s)))); // sideways acceleration the tilt can really give
     const maxSpeed = Math.min(60, 3 + 0.35 * s.alt, Math.sqrt(2 * 0.6 * reach * Math.abs(dx)));
     const wanted = (aim ?? -Math.sign(dx) * maxSpeed) + dodgeFor(s);
     const accel = 1.5 * (wanted - s.vx);
-    const limit = clamp(0.06 + s.alt * 0.01, 0.06, 0.45);
+    const limit = Math.min(clamp(0.06 + s.alt * 0.01, 0.06, 0.45), leanCap(s));
     return clamp(Math.atan2(accel, Math.max(s.g, 3)), -limit, limit);
   }
 
   // Too far from the pad for the height left: slow the descent down and slide over.
   function descentCap(s) {
+    if (leanCap(s) < 0.3) return Infinity; // too little lean to slide over: just come down upright
     const dx = Math.abs(s.x - s.pad.x);
     return dx > 40 + 0.15 * s.alt ? 18 : Infinity;
   }
@@ -142,6 +146,9 @@ export function createAutopilot(options = {}) {
     return clamp((s.g + wantedAccel) / (s.maxAccel * Math.cos(s.angle)), 0, 1);
   }
 
+  // Turning the nose all the way down needs free rotation.
+  const canFlip = (s) => s.cfg.fins.maxTilt >= 2.9;
+
   function decide(s) {
     const out = { ...IDLE };
     if (s.ended) return out;
@@ -154,7 +161,7 @@ export function createAutopilot(options = {}) {
 
     if (mode === 'climb' || mode === 'coast') {
       if (s.liftedOff && s.climb < 0 && !spaceGoal) mode = 'descend';
-      else if (spaceGoal && s.phase === 'space') mode = s.cfg.destination === 'earth' ? 'flip' : 'wait';
+      else if (spaceGoal && s.phase === 'space') mode = s.cfg.destination === 'earth' && canFlip(s) ? 'flip' : 'wait';
       else if (s.liftedOff && s.climb < 0 && s.phase === 'descent') mode = 'descend';
     }
 
@@ -170,7 +177,7 @@ export function createAutopilot(options = {}) {
     if (mode === 'wait') {
       out.tilt = tiltToward(s, 0);
       if (s.canTransfer) out.transfer = true;
-      else if (s.fuelTotal < s.transferCostFuel) mode = 'flip'; // not enough fuel to go: turn back
+      else if (s.fuelTotal < s.transferCostFuel && canFlip(s)) mode = 'flip'; // not enough fuel to go: turn back
       return out;
     }
 

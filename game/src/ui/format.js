@@ -28,6 +28,15 @@ function trimZeros(s) {
   return (s.includes('.') ? s.replace(/\.?0+$/, '') : s).replace('.', ',');
 }
 
+/** Самая короткая запись для тесных табличек: 9 999, 12К, 1,5М. */
+export function fmtTiny(n) {
+  const a = Math.abs(n);
+  if (a < 10000) return fmtInt(n);
+  if (a < 1e6) return `${Math.round(n / 1e3)}К`;
+  if (a < 1e9) return `${trimZeros((n / 1e6).toFixed(a < 1e7 ? 1 : 0))}М`;
+  return `${trimZeros((n / 1e9).toFixed(1))}Г`;
+}
+
 /** Число с фиксированным числом знаков и запятой: 3,5. */
 export function fmtNum(n, digits = 1) {
   if (!Number.isFinite(n)) return '0';

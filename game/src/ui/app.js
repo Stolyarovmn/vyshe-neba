@@ -661,7 +661,9 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     }
     if (app.screen === 'results') return ['top', L.area.y + L.gap + 24 * L.ui, null];
     const G = chromeLayout(L, { back: true, era: app.screen === 'base' });
-    const left = (G.era ? G.era.x + G.era.w : G.back.x + G.back.w) + L.gap;
+    // уведомление стоит правее левых табличек первого ряда (во втором ряду на узком экране табличек сверху нет)
+    const firstRow = ['back', 'era', 'gear'].map((k) => G[k]).filter((r) => r && r.y === G.y);
+    const left = Math.max(...firstRow.map((r) => r.x + r.w), L.area.x) + L.gap;
     const right = G.coins.x - L.gap;
     return ['top', G.y + G.h / 2, { x: left, y: G.y, w: Math.max(80, right - left), h: G.h }];
   }
@@ -692,6 +694,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     }
 
     const events = input.drain(dt);
+    kit.S.auditScreen = app.screen;
     kit.begin(ctx, { L, settings: app.settings, time: app.time, dt, events });
     try {
       const t0 = performance.now();

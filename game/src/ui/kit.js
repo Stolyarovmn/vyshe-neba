@@ -7,7 +7,7 @@ import { drawSegments, segmentWidth } from './font-pixel.js';
 import { createIcons, hasIcon } from './icons.js';
 import { getTheme, mix } from './theme.js';
 import * as Scroll from './scroll.js';
-import { clamp, damp, easeOutCubic, fmtCompact, fmtStat, fmtInt } from './format.js';
+import { clamp, damp, easeOutCubic, fmtCompact, fmtStat, fmtInt, fmtTiny } from './format.js';
 import { intersect } from './layout.js';
 import { t } from '../i18n/index.js';
 
@@ -46,6 +46,69 @@ export function createKit({ sfx = () => {} } = {}) {
     cursor: 'default',
     sliderDrag: null,
     modalOpen: false,
+    auditOn: false,
+    auditLabel: '',
+  };
+
+  // ---------- страж текста ----------
+  // Включается тестом: измеряет каждую выведенную строку и сообщает об обрезанных многоточием,
+  // вышедших за кадр и налезающих друг на друга надписях. Накопленные замечания забирает audit.take().
+  const auditFound = new Map();
+  let frameAudit = null;
+  const intersectArea = (a, b) => {
+    const w = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+    const h = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+    return w > 0 && h > 0 ? w * h : 0;
+  };
+  function auditAnalyze(fa) {
+    const L = S.L;
+    const view = { x: 0, y: 0, w: L.w, h: L.h };
+    const add = (key, issue) => {
+      if (!auditFound.has(key)) auditFound.set(key, { label: S.auditLabel, screen: S.auditScreen || '', ...issue });
+    };
+    const visible = [];
+    for (const r of fa.rects) {
+      if (r.hidden) continue;
+      const clipped = r.clip ? intersect(r, r.clip) : r;
+      if (!clipped) continue; // целиком за пределами области прокрутки
+      if (r.clip) {
+        // частично срезанная прокруткой строка — норма; полностью видимые проверяются дальше
+        if (clipped.w < r.w - 0.5 || clipped.h < r.h - 0.5) continue;
+      } else if (r.x < view.x - 0.5 || r.y < view.y - 0.5 || r.x + r.w > view.w + 0.5 || r.y + r.h > view.h + 0.5) {
+        add(`off|${r.str}`, { kind: 'offscreen', str: r.str, at: `${Math.round(r.x)},${Math.round(r.y)} ${Math.round(r.w)}×${Math.round(r.h)} в окне ${L.w}×${L.h}` });
+      }
+      visible.push(r);
+    }
+    for (let i = 0; i < visible.length; i++) {
+      for (let j = i + 1; j < visible.length; j++) {
+        const a = visible[i];
+        const b = visible[j];
+        if (a.str === b.str && Math.abs(a.x - b.x) < 1 && Math.abs(a.y - b.y) < 1) continue;
+        const area = intersectArea(a, b);
+        if (area > 8) add(`ov|${a.str}|${b.str}`, { kind: 'overlap', str: a.str, other: b.str, at: `${Math.round(a.x)},${Math.round(a.y)} / ${Math.round(b.x)},${Math.round(b.y)}` });
+      }
+    }
+    for (const it of fa.issues) {
+      if (it.kind === 'truncated') add(`cut|${it.str}`, { kind: 'truncated', str: it.str, shown: it.shown, at: `${Math.round(it.rect.x)},${Math.round(it.rect.y)}` });
+      else if (it.kind === 'margin') add(`mar|${it.str}`, { kind: 'margin', str: it.str, at: `текст ${Math.round(it.rect.x)},${Math.round(it.rect.y)} ${Math.round(it.rect.w)}×${Math.round(it.rect.h)} в рамке ${Math.round(it.box.x)},${Math.round(it.box.y)} ${Math.round(it.box.w)}×${Math.round(it.box.h)}` });
+    }
+  }
+  const audit = {
+    /** Включить/выключить страж; label попадает в отчёт (экран и состояние). */
+    enable(on, label = '') {
+      S.auditOn = !!on;
+      S.auditLabel = label;
+      if (!on) frameAudit = null;
+    },
+    setLabel(label) {
+      S.auditLabel = label;
+    },
+    /** Забрать накопленные замечания и очистить список. */
+    take() {
+      const out = [...auditFound.values()];
+      auditFound.clear();
+      return out;
+    },
   };
 
   // ---------- кадр ----------
@@ -53,6 +116,9 @@ export function createKit({ sfx = () => {} } = {}) {
   function begin(ctx, frame) {
     S.ctx = ctx;
     S.L = frame.L;
+    frameAudit = S.auditOn ? { rects: [], issues: [] } : null;
+    text.setAudit(frameAudit);
+    text.setClip(null);
     S.settings = frame.settings || {};
     S.th = getTheme(S.settings);
     S.time = frame.time;
@@ -95,6 +161,11 @@ export function createKit({ sfx = () => {} } = {}) {
     drawSparks();
     drawToasts();
     drawTooltip();
+    if (frameAudit) {
+      auditAnalyze(frameAudit);
+      text.setAudit(null);
+      frameAudit = null;
+    }
     S.ctx = null;
     S.prevClicked = S.clicked;
   }
@@ -286,11 +357,13 @@ export function createKit({ sfx = () => {} } = {}) {
     ctx.clip();
     const prev = S.clips[S.clips.length - 1];
     S.clips.push(prev ? intersect(prev, r) || { x: 0, y: 0, w: 0, h: 0 } : r);
+    text.setClip(S.clips[S.clips.length - 1]);
   }
 
   function popClip() {
     S.ctx.restore();
     S.clips.pop();
+    text.setClip(S.clips[S.clips.length - 1] || null);
   }
 
   function withLayer(layer, fn) {
@@ -383,6 +456,10 @@ export function createKit({ sfx = () => {} } = {}) {
     y = Math.round(y);
     w = Math.round(w);
     h = Math.round(h);
+    if (frameAudit && !f.dither) {
+      // непрозрачная рамка закрывает всё, что было выведено под ней раньше: такие строки не проверяются на наложение
+      for (const r of frameAudit.rects) if (!r.hidden && r.x + r.w / 2 > x && r.x + r.w / 2 < x + w && r.y + r.h / 2 > y && r.y + r.h / 2 < y + h) r.hidden = true;
+    }
     const cc = Math.max(1, Math.min(cell(), Math.floor(Math.min(w, h) / 8)));
     if (w < cc * 4 || h < cc * 4) {
       rect(x, y, w, h, f.edge);
@@ -482,13 +559,15 @@ export function createKit({ sfx = () => {} } = {}) {
   function plate(x, y, w, h, iconName, value, color) {
     const cc = cell();
     nine('raised', x, y, w, h);
-    nine('screen', x + h - cc * 2, y + cc * 3, w - h - cc, h - cc * 6);
-    icon(iconName, x + h * 0.5 - cc, y + h / 2, Math.round(h * 0.7), color);
-    const size = Math.round(h * 0.42);
-    const room = w - h - cc * 5;
+    const iw = Math.round(h * 0.82); // ширина области значка
+    const screen = { x: x + iw - cc * 2, y: y + cc * 3, w: w - iw - cc, h: h - cc * 6 };
+    nine('screen', screen.x, screen.y, screen.w, screen.h);
+    icon(iconName, x + iw * 0.5 - cc, y + h / 2, Math.round(h * 0.62), color);
+    const size = Math.round(h * 0.34);
+    const room = screen.w - cc * 5;
     let str = typeof value === 'number' ? fmtInt(value) : String(value);
-    if (text.measure(str, size) > room && typeof value === 'number') str = fmtCompact(value);
-    drawText(str, x + w - cc * 4, y + h / 2, { size, color, align: 'right', maxWidth: room, shadow: true });
+    if (text.measure(str, size) > room && typeof value === 'number') str = fmtTiny(value);
+    drawText(str, screen.x + screen.w - cc * 3, y + h / 2, { size, color, align: 'right', maxWidth: room, shadow: true, box: screen });
   }
 
   // ---------- кнопки ----------
@@ -557,8 +636,9 @@ export function createKit({ sfx = () => {} } = {}) {
     const cy = body.y + body.h / 2;
     const iconSize = o.iconSize || Math.round(size * 1.5);
     const hasLabel = !!label;
-    const pad = cc * 3;
-    const labelMax = o.stack ? body.w - pad : body.w - pad * 2 - (iconName ? iconSize + size * 0.4 : 0) - (locked ? iconSize : 0);
+    // внутреннее поле не меньше двух «пикселей» шрифта
+    const pad = Math.max(cc * 3, text.stepFor(size).css * 2 + cc);
+    const labelMax = o.stack ? body.w - pad * 2 : body.w - pad * 2 - (iconName ? iconSize + size * 0.4 : 0) - (locked ? iconSize : 0);
     let lbl = label;
     let lblSize = size;
     if (hasLabel) {
@@ -572,17 +652,22 @@ export function createKit({ sfx = () => {} } = {}) {
     const midY = sub ? cy - size * 0.42 : cy;
     let x = startX;
     if (o.stack && iconName) {
-      const is = Math.round(Math.min(body.h * 0.5, body.w * 0.55));
-      icon(iconName, cx, body.y + body.h * 0.4, is, dim ? c.textMute : o.iconColor || labelColor, dim ? 0.6 : 1);
-      if (hasLabel) drawText(lbl, cx, body.y + body.h * 0.82, { size: lblSize, color: labelColor, align: 'center', maxWidth: body.w - pad });
+      // значок над подписью: подпись прижата к низу с полем в два пикселя шрифта, значок занимает остаток
+      const step = text.stepFor(lblSize).css;
+      const glyphH = 7 * step;
+      const labelY = body.y + body.h - step * 2 - cc - glyphH / 2;
+      const areaH = hasLabel ? labelY - glyphH / 2 - step * 2 - body.y : body.h;
+      const is = Math.round(Math.min(areaH * 0.9, body.w * 0.62));
+      icon(iconName, cx, body.y + (hasLabel ? areaH / 2 + cc : body.h / 2), is, dim ? c.textMute : o.iconColor || labelColor, dim ? 0.6 : 1);
+      if (hasLabel) drawText(lbl, cx, labelY, { size: lblSize, color: labelColor, align: 'center', maxWidth: body.w - pad * 2, box: body });
     } else {
       if (iconName) {
         icon(iconName, x + iconSize / 2, midY, iconSize, dim ? c.textMute : o.iconColor || labelColor, dim ? 0.6 : 1);
         x += iconSize + (hasLabel ? size * 0.4 : 0);
       }
-      if (hasLabel) drawText(lbl, x, midY, { size: lblSize, color: labelColor });
+      if (hasLabel) drawText(lbl, x, midY, { size: lblSize, color: labelColor, box: body });
     }
-    if (sub) drawText(sub, o.align === 'left' ? startX : cx, cy + size * 0.85, { size: Math.max(9, Math.round(size * 0.7)), color: dim ? c.textMute : labelColor, align: o.align === 'left' ? 'left' : 'center', maxWidth: body.w - pad * 2 });
+    if (sub) drawText(sub, o.align === 'left' ? startX : cx, cy + size * 0.85, { size: Math.max(9, Math.round(size * 0.7)), color: dim ? c.textMute : labelColor, align: o.align === 'left' ? 'left' : 'center', maxWidth: body.w - pad * 2, box: body });
     if (locked) icon('lock', body.x + body.w - iconSize * 0.75, body.y + iconSize * 0.75, Math.round(iconSize * 0.9), c.amber);
     if (o.lamp) lamp(body.x + body.w - cc * 5, body.y + cc * 5, cc * 5, o.lamp === true ? c.green : o.lamp, !dim);
     if (badgeText !== undefined && badgeText !== null && badgeText !== false) badge(body.x + body.w - cc * 2, body.y + cc * 2, badgeText);
@@ -685,9 +770,14 @@ export function createKit({ sfx = () => {} } = {}) {
     const good = delta === 0 ? null : better === 'up' ? delta > 0 : delta < 0;
     const accent = good === null ? c.textDim : good ? c.green : c.red;
     const size = fs(12);
-    const lineY = r.y + r.h * 0.3;
-    drawText(label, r.x, lineY, { size, color: c.textDim, maxWidth: r.w * 0.5 });
+    // подпись прижата к верху строки с полем в один пиксель шрифта, полоска — к низу; зазор между ними не меньше двух пикселей
+    const glyphStep = text.stepFor(fs(13)).css;
+    const lineY = r.y + glyphStep + (7 * glyphStep) / 2;
     const afterStr = `${fmt(after)}${unit}`;
+    const beforeStr = `${fmt(before)}${unit}`;
+    // под подпись остаётся всё, что не заняли числа «было → станет»
+    const valuesW = text.measure(afterStr, fs(13)) + (delta !== 0 ? text.measure(beforeStr, size) + fs(18) + cc * 2 : 0);
+    drawText(label, r.x, lineY, { size, color: c.textDim, maxWidth: Math.max(r.w * 0.3, r.w - valuesW - cc * 4) });
     let x = r.x + r.w;
     drawText(afterStr, x, lineY, { size: fs(13), color: accent, align: 'right' });
     x -= text.measure(afterStr, fs(13)) + cc * 2;
@@ -697,7 +787,7 @@ export function createKit({ sfx = () => {} } = {}) {
       drawText(`${fmt(before)}${unit}`, x, lineY, { size, color: c.textMute, align: 'right' });
     }
     const maxV = o.max ?? Math.max(before, after, 1e-9) * 1.15;
-    const barH = Math.max(cc * 3, Math.round(r.h * 0.26));
+    const barH = Math.max(cc * 3, Math.min(cc * 4, Math.round(r.h * 0.22)));
     const by = r.y + r.h - barH - cc;
     const n = clamp(Math.floor(r.w / (cc * 4)), 8, 28);
     const bw = Math.floor((r.w - cc * (n - 1)) / n);
@@ -895,7 +985,7 @@ export function createKit({ sfx = () => {} } = {}) {
     const x = clamp(S.pointer.x + 14, L.area.x + 4, L.area.x + L.area.w - w - 4);
     const y = clamp(S.pointer.y + 18, L.area.y + 4, L.area.y + L.area.h - h - 4);
     nine('screen', x, y, w, h);
-    lines.forEach((ln, i) => drawText(ln, x + size * 0.8, y + size * 0.5 + i * size * 1.5 + size * 0.6, { size, color: c.text }));
+    lines.forEach((ln, i) => drawText(ln, x + size * 0.8, y + size * 0.5 + i * size * 1.5 + size * 0.6, { size, color: c.text, noAudit: true }));
   }
 
   // ---------- выноска-щиток ----------
@@ -1215,6 +1305,7 @@ export function createKit({ sfx = () => {} } = {}) {
     S,
     text,
     icons,
+    audit,
     begin,
     end,
     hit,

@@ -77,8 +77,9 @@ const touchdown = (config = {}, start = {}) => {
 };
 
 test('sideways speed and a tilted hull are crash reasons too', () => {
+  const free = { fins: { turn: 1, maxTilt: Math.PI } };
   assert.equal(touchdown({}, { vx: 40 }).end.reason, 'landing-drift');
-  assert.equal(touchdown({}, { angle: 0.6 }).end.reason, 'landing-tilt');
+  assert.equal(touchdown(free, { angle: 0.6 }).end.reason, 'landing-tilt');
   assert.equal(touchdown({}, { vy: 30, vx: 20 }).end.reason, 'landing-speed', 'the worst excess is reported');
 });
 
@@ -95,7 +96,7 @@ test('stronger legs widen the tolerance, beacons widen it on the pad, rough grou
 test('perfect landings need a gentle, vertical touchdown on the pad', () => {
   assert.equal(touchdown({}, { vy: 5 }).end.perfect, true);
   assert.equal(touchdown({}, { vy: 10 }).end.perfect, false);
-  assert.equal(touchdown({}, { vy: 5, angle: 0.25 }).end.perfect, false);
+  assert.equal(touchdown({ fins: { turn: 1, maxTilt: Math.PI } }, { vy: 5, angle: 0.25 }).end.perfect, false);
   assert.equal(touchdown({}, { vy: 5, x: 400 }).end.perfect, false);
 });
 
@@ -112,48 +113,82 @@ test('a hard but legal landing costs hull and can break it', () => {
   assert.equal(end.reason, 'hull-destroyed');
 });
 
-test('the parachute slows the fall to a survivable speed and counts as used', () => {
-  const config = { weather: 'clear', parachute: { level: 4 }, start: { body: 'earth', alt: 400 } };
-  const state = createFlight(startRocket(config));
+// --- the parachute is a shop item now: one fixed canopy, thick air only -------------------------------------------
+
+const withChute = (extra = {}, config = {}) => createFlight(startRocket({
+  weather: 'clear', consumables: { chute: 1 }, ...config, start: { body: 'earth', alt: 600, ...extra },
+}));
+
+test('the canopy opens after a short delay, then brakes the fall to a fixed 4.5 units/s and lands softly', () => {
+  const state = withChute({}, { fins: { turn: 1, maxTilt: Math.PI } });
+  state.objects = [];
   advance(state, { throttle: 0 }, 2);
   assert.equal(state.chute.deployed, false);
-  const events = advance(state, { throttle: 0, parachute: true }, 1);
-  assert.ok(events.some((e) => e.type === 'parachute'));
-  advance(state, { throttle: 1 }, 2);
-  assert.equal(state.throttle, 0, 'the engine is off under the canopy');
-  assert.ok(Math.abs(state.vy - (12 - 0.4 * 4)) < 1e-9, 'terminal speed of a level 4 canopy');
-  advance(state, { parachute: true }, 60);
+  const fall = state.vy;
+  assert.ok(fall > 60);
+
+  const events = advance(state, { throttle: 0, parachute: true }, 1 / 120);
+  assert.deepEqual(events.map((e) => e.type), ['parachute']);
+  assert.equal(state.chute.deployed, true);
+  assert.equal(state.chute.open, false);
+  advance(state, { throttle: 1 }, 0.4);
+  assert.equal(state.throttle, 0, 'the engine is cut as soon as the cord is pulled');
+  assert.ok(state.vy >= fall - 1, 'the canopy has not braked yet: it needs about 0.6 s to inflate');
+  assert.ok(state.chute.t > 0.5 && state.chute.t < 1);
+
+  advance(state, { parachute: true }, 0.4);
+  assert.equal(state.chute.open, true);
+  advance(state, { parachute: true }, 1);
+  assert.ok(state.vy < fall / 2, 'braking has begun');
+  advance(state, { parachute: true }, 1.5);
+  assert.ok(Math.abs(state.vy - 4.5) < 1e-9, `sinks at ${state.vy}`);
+
+  advance(state, { parachute: true }, 120);
   assert.equal(state.phase, 'landed');
   const result = summarize(state);
   assert.equal(result.usedChute, true);
+  assert.ok(result.landing.v < 5);
   assert.equal(result.outcome, 'landed');
 });
 
-test('a better parachute lets the rocket fall slower and the chute needs thick air', () => {
-  const sink = (level) => {
-    const state = createFlight(startRocket({ weather: 'clear', parachute: { level }, start: { body: 'earth', alt: 1500 } }));
-    advance(state, { throttle: 0, parachute: true }, 8);
-    return state.vy;
-  };
-  assert.ok(sink(10) < sink(1));
-  assert.ok(sink(1) < 12);
+test('the canopy exists only if it was taken along; the parachute module level no longer matters', () => {
+  const without = createFlight(startRocket({ weather: 'clear', parachute: { level: 18 }, start: { body: 'earth', alt: 800 } }));
+  assert.equal(without.cfg.parachute.level, 0, 'the level is ignored and kept at 0 for old readers');
+  assert.equal(without.chute.consumable, false);
+  advance(without, { throttle: 0 }, 2);
+  const events = advance(without, { throttle: 0, parachute: true }, 1);
+  assert.equal(without.chute.deployed, false);
+  assert.ok(!events.some((e) => e.type === 'parachute'));
+  assert.ok(!events.some((e) => e.kind === 'chute-air'), 'no canopy, no thin-air warning either');
+});
 
-  const thin = createFlight(startRocket({ weather: 'clear', parachute: { level: 5 }, start: { body: 'earth', alt: 6000 } }));
+test('the canopy needs thick air: not at 60 km, not on Mars, not on the Moon', () => {
+  const thin = withChute({ alt: 6000 });
   const events = advance(thin, { throttle: 0, parachute: true }, 1);
   assert.equal(thin.chute.deployed, false);
   assert.ok(events.some((e) => e.type === 'warn' && e.kind === 'chute-air'));
   assert.equal(thin.canTransfer, false);
+
+  for (const body of ['mars', 'moon']) {
+    const state = createFlight(startRocket({ consumables: { chute: 1 }, start: { body, alt: 600, vy: 30 } }));
+    advance(state, { parachute: true }, 1);
+    assert.equal(state.chute.deployed, false, body);
+  }
+  const dense = withChute({ alt: 2500 });
+  dense.objects = [];
+  advance(dense, { parachute: true, throttle: 0 }, 1);
+  assert.equal(dense.chute.deployed, true, 'the air at 25 km is thick enough');
 });
 
-test('the parachute consumable acts like a basic canopy and Mars air is too thin for it', () => {
-  const state = createFlight(startRocket({ weather: 'clear', consumables: { chute: 1 }, start: { body: 'earth', alt: 600 } }));
-  advance(state, { throttle: 0, parachute: true }, 8);
-  assert.equal(state.chute.deployed, true);
-  assert.ok(state.vy < 13);
-
-  const mars = createFlight(startRocket({ consumables: { chute: 1 }, start: { body: 'mars', alt: 600, vy: 30 } }));
-  advance(mars, { parachute: true }, 1);
-  assert.equal(mars.chute.deployed, false);
+test('the canopy cannot be used while climbing, and a second pull changes nothing', () => {
+  const rising = withChute({ vy: -40 });
+  advance(rising, { parachute: true, throttle: 0 }, 0.2);
+  assert.equal(rising.chute.deployed, false, 'only a falling rocket can use it');
+  advance(rising, { throttle: 0 }, 2);
+  advance(rising, { parachute: true }, 0.1);
+  assert.equal(rising.chute.deployed, true);
+  const events = advance(rising, { parachute: true }, 1);
+  assert.ok(!events.some((e) => e.type === 'parachute'));
 });
 
 test('stronger rockets land too: the heavy rocket with a fast return', () => {

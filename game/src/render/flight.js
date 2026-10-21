@@ -6,12 +6,15 @@ import { createCamera, createView } from './camera.js';
 import { applyEvents, createScreenFx } from './events.js';
 import { drawTerrain } from './ground.js';
 import {
-  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundTransform,
+  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundDrop, groundTransform,
 } from './islandmap.js';
 import { drawCloudField, fallbackClouds } from './clouds.js';
 import { drawPlacedBuildings } from './buildings.js';
 import { drawLaunchMount, drawPadRing } from './launchpad.js';
-import { drawObjects, drawObjectsFront, drawRadarMarks } from './objects.js';
+import { drawObjects, drawObjectsFront, drawRadarMarks, warmRings } from './objects.js';
+import { createRingFx } from './rings.js';
+import { drawMagnetField } from './magnet.js';
+import { FAR_PARALLAX, drawFarCoast, farCoastAlpha } from './horizon.js';
 import {
   drawFlash, drawLandingZone, drawPadPointer, drawPredict, drawSpeedLines, drawTransferWarp, landingZoneAlpha,
 } from './overlays.js';
@@ -52,9 +55,12 @@ export function createFlightRenderer(painter, shared) {
   const camera = createCamera();
   const view = createView();
   const mapView = createMapView();
+  const farView = createMapView();
   const groundTr = { s: 1, ox: 0, oy: 0 };
   const particles = createParticles(900);
   const fx = createScreenFx();
+  const ringFx = createRingFx();
+  const sceneInfo = { body: 'earth' };
   const rng = createRng(0x51f7);
   const pose = createRocketPose();
   const pieces = makePieces();
@@ -95,12 +101,20 @@ export function createFlightRenderer(painter, shared) {
     camera.reset();
     fx.flash = 0;
     fx.slowmo = 0;
+    ringFx.clear();
+    const era = flight && flight.cfg ? clamp(flight.cfg.era | 0, 0, 5) : null;
+    if (era !== null) {
+      env.era = era;
+      warmRings(painter, era);
+    }
   }
 
   const env = {
     particles,
     camera,
     fx,
+    ringFx,
+    era: 0,
     rng,
     flight: null,
     body: 'earth',
@@ -379,6 +393,12 @@ export function createFlightRenderer(painter, shared) {
     const previous = ctx.globalAlpha;
     ctx.globalAlpha = previous * seaAlpha;
     drawSea(ctx, mapView, time, mood, smoothstep(120, 1400, altitude) * 0.8, HAZE_COLOR);
+    // дальний берег с городом эпохи: тот же масштаб, но смещается вниз медленнее карты
+    const farAlpha = farCoastAlpha(altitude);
+    if (farAlpha > 0.01) {
+      farView.set(groundTr.ox, view.sy(flight.y) + view.S * groundDrop(altitude) * FAR_PARALLAX, groundTr.s, view.devW, view.devH);
+      drawFarCoast(ctx, painter, farView, state.era, altitude, mood, HAZE_COLOR, farAlpha);
+    }
     if (landAlpha > 0.01) {
       ctx.globalAlpha = previous * landAlpha;
       drawIslandHd(ctx, painter, mapView);
@@ -418,6 +438,7 @@ export function createFlightRenderer(painter, shared) {
     env.body = flight.body || 'earth';
     const cfg = flight.cfg || params.config || {};
     state.era = clamp(cfg.era | 0, 0, 5);
+    env.era = state.era;
     state.skin = cfg.skin || 'classic';
     const profile = params.profile || (shared && shared.profile) || null;
 
@@ -436,11 +457,13 @@ export function createFlightRenderer(painter, shared) {
     weatherMood(flight.weather, mood);
     const camAlt = -view.camY;
     const body = flight.body || 'earth';
+    sceneInfo.body = body;
     anchorDev.x = view.ax;
     anchorDev.y = view.ay;
 
     fx.flash = Math.max(0, fx.flash - dt * 2.4);
     fx.slowmo = Math.max(0, fx.slowmo - dt);
+    ringFx.update(dt);
 
     emitExhaust(flight, dt);
     emitGround(flight, dt, profile);
@@ -488,15 +511,16 @@ export function createFlightRenderer(painter, shared) {
     drawPredict(
       ctx, view, flight.predict, time, flight.liftedOff === false ? 0 : smoothstep(8, 45, flight.alt ?? 0), body === 'earth' ? mapView : view,
     );
-    drawObjects(ctx, painter, view, flight.objects, state.era, time);
+    drawObjects(ctx, painter, view, flight.objects, state.era, time, ringFx, sceneInfo);
     drawRadarMarks(ctx, view, flight.objects, time, anchorDev);
+    drawMagnetField(ctx, painter, view, flight, state.era, time, state.reduce);
 
     particles.draw(ctx, view, 0);
     drawPieces(ctx);
     drawRocket(ctx, painter, view, pose, time);
     drawChute(ctx, painter, view, pose, time);
     particles.draw(ctx, view, 1);
-    drawObjectsFront(ctx, painter, view, flight.objects, state.era);
+    drawObjectsFront(ctx, painter, view, flight.objects, state.era, ringFx, time);
     drawCloudField(ctx, painter, view, clouds, 1, time, flashPower, mood.wind);
 
     drawSpeedLines(ctx, view, flight.vx || 0, flight.vy || 0, flight.atmo ?? 1, time);
@@ -520,6 +544,7 @@ export function createFlightRenderer(painter, shared) {
     camera,
     particles,
     fx,
+    ringFx,
     pose,
     view,
 

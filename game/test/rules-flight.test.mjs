@@ -14,7 +14,7 @@ const everything = (level) => Object.fromEntries(Object.keys(BUILDINGS).map((k) 
 test('makeFlightConfig follows ARCHITECTURE 6.1 and survives the simulation normaliser', () => {
   const profile = deepFreeze(makeProfile());
   const config = makeFlightConfig(profile, { destination: 'earth', seed: 42 });
-  for (const key of ['seed', 'era', 'destination', 'skin', 'stages', 'hull', 'legs', 'fins', 'parachute', 'avionics', 'base', 'consumables', 'transferCost']) {
+  for (const key of ['seed', 'era', 'destination', 'skin', 'stages', 'hull', 'legs', 'fins', 'avionics', 'base', 'consumables', 'transferCost']) {
     assert.ok(key in config, `config.${key}`);
   }
   assert.equal(config.seed, 42);
@@ -23,8 +23,9 @@ test('makeFlightConfig follows ARCHITECTURE 6.1 and survives the simulation norm
   for (const stage of config.stages) assert.deepEqual(Object.keys(stage).sort(), ['burnRate', 'fuel', 'id', 'mass', 'thrust', 'turn']);
   assert.deepEqual(Object.keys(config.hull).sort(), ['debrisResist', 'hp']);
   assert.deepEqual(Object.keys(config.legs).sort(), ['angTol', 'hTol', 'vTol']);
-  assert.deepEqual(Object.keys(config.fins).sort(), ['dragCut', 'turn']);
-  assert.deepEqual(config.parachute, { level: 0 });
+  assert.deepEqual(Object.keys(config.fins).sort(), ['dragCut', 'maxTilt', 'turn']);
+  assert.deepEqual(config.fins, { turn: 0.45, dragCut: 0, maxTilt: 0.2 }, 'the stock stabilizers steer weakly');
+  assert.equal('parachute' in config, false, 'the parachute is only a consumable');
   assert.deepEqual(config.avionics, { predict: 0, assist: 0 });
   assert.deepEqual(Object.keys(config.transferCost).sort(), ['mars', 'moon']);
   assert.doesNotThrow(() => JSON.stringify(config));
@@ -53,21 +54,34 @@ test('stages come in separation order, booster first', () => {
 test('modules and the base feed the config', () => {
   const profile = makeProfile({
     era: 2,
-    parts: { engine: 6, tank: 6, hull: 3, legs: 3, fins: 3, parachute: 3, capsule: 3, avionics: 4 },
+    parts: { engine: 6, tank: 6, hull: 3, legs: 3, fins: 3, capsule: 3, avionics: 4 },
     buildings: { ...everything(3), observation: 0, recovery: 0, energy: 5 },
   });
   const config = makeFlightConfig(profile);
   const stock = makeFlightConfig(makeProfile());
   const core = config.stages.find((s) => s.id === 'core');
   assert.ok(core.thrust > 72 && core.fuel > 175 && core.burnRate < 9);
-  assert.ok(config.hull.hp > 100 && config.legs.vTol > 13 && config.fins.turn > 1);
-  assert.equal(config.parachute.level, 3);
+  assert.ok(config.hull.hp > 100 && config.legs.vTol > 13);
+  assert.ok(config.fins.turn > stock.fins.turn && config.fins.maxTilt > stock.fins.maxTilt);
   assert.deepEqual(config.avionics, { predict: 1, assist: 0 });
   assert.ok(config.base.radar > 0 && config.base.beacons > 0 && config.base.weather > 0 && config.base.income > 1);
   assert.ok(config.base.rescueRefund > 0 && config.base.padSafety > 0 && config.base.repairOnLand > 0);
   assert.ok(config.transferCost.moon < stock.transferCost.moon, 'avionics save fuel on the transfer');
   assert.ok(config.limits.speed > stock.limits.speed && config.limits.fall > stock.limits.fall);
   assert.equal(config.era, 2);
+});
+
+test('fins steer: the tilt limit shows in config and in the rocket summary in degrees', () => {
+  const fins = (level) => makeProfile({ buildings: { service: 3 }, parts: { fins: level } });
+  assert.equal(makeFlightConfig(fins(0)).fins.maxTilt, 0.2);
+  assert.equal(deriveRocket(fins(0)).summary.maxTiltDeg, 11);
+  assert.equal(deriveRocket(fins(8)).summary.maxTiltDeg, 69);
+  assert.equal(makeFlightConfig(fins(12)).fins.maxTilt, Math.PI);
+  assert.equal(deriveRocket(fins(12)).summary.maxTiltDeg, 180);
+  assert.equal(deriveRocket(fins(12)).fins.maxTilt, Math.PI);
+  assert.ok(deriveRocket(fins(18)).summary.turn > deriveRocket(fins(12)).summary.turn);
+  assert.equal('chuteLevel' in deriveRocket(fins(0)).summary, false);
+  assert.equal('parachute' in deriveRocket(fins(0)), false);
 });
 
 test('deriveRocket gives flat numbers for the was -> becomes bars', () => {
@@ -148,12 +162,17 @@ test('settleFlight: a crash pays less, costs a loss and resets the streak', () =
   assert.equal(after.coins, profile.coins + report.coins.gross - report.coins.charged + report.awarded.achievements.reduce((s, a) => s + a.reward, 0) + report.awarded.contracts.reduce((s, c) => s + c.reward, 0));
   assert.match(report.hint.text, /Слишком быстро/);
   assert.equal(report.hint.part, 'legs');
+  assert.equal(report.hint.shop, 'chute', 'the parachute is bought in the shop');
+  assert.match(report.hint.text, /парашют можно купить в лавке/);
+  assert.doesNotMatch(report.hint.text, /прокач/i);
+  const onMoon = settleFlight(makeProfile({ coins: 50, era: 3 }), crashedResult({ destination: 'moon', maxAlt: 10000 })).report.hint;
+  assert.equal(onMoon.shop, undefined, 'no parachute advice where it cannot work');
   const landed = settleFlight(profile, landedResult({ maxAlt: 200 })).report;
   assert.ok(report.coins.travel < landed.coins.travel);
 });
 
 test('settleFlight: a crash never pushes the purse below zero', () => {
-  const heavy = makeProfile({ coins: 0, era: 5, parts: { engine: 18, tank: 18, hull: 18, booster: 18, capsule: 18, legs: 18, fins: 18, parachute: 18, avionics: 18 } });
+  const heavy = makeProfile({ coins: 0, era: 5, parts: { engine: 18, tank: 18, hull: 18, booster: 18, capsule: 18, legs: 18, fins: 18, avionics: 18 } });
   for (const coins of [0, 1, 7, 100]) {
     const { profile: after, report } = settleFlight({ ...heavy, coins }, crashedResult({ maxAlt: 0, distance: 0, coinsPicked: 0 }));
     assert.ok(after.coins >= 0, `coins ${coins} -> ${after.coins}`);

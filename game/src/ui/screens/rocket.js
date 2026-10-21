@@ -76,7 +76,7 @@ export default {
     drawNodes(app, kit, L, G, st);
 
     const standOn = st.stand >= 0;
-    if (kit.button('stand', G.stand, { label: t('rocket.stand'), icon: 'stand', variant: standOn ? 'good' : 'btn', size: kit.fs(13), tip: t('rocket.stand.tip'), lamp: standOn ? kit.c.amberLight : false }) && !standOn) {
+    if (kit.button('stand', G.stand, { label: t('rocket.stand'), icon: 'stand', stack: true, variant: standOn ? 'good' : 'btn', size: kit.fs(10), tip: t('rocket.stand.tip'), lamp: standOn ? kit.c.amberLight : false }) && !standOn) {
       st.stand = 0;
       st.selected = null;
     }

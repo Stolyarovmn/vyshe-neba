@@ -1,8 +1,8 @@
 // Поверхность Луны и Марса: плитки грунта и посадочная площадка. Ось Y вниз, поверхность — y = 0.
 // Море и остров Земли теперь рисует islandmap.js (вид сверху-3/4).
 
-import { PAD_LANDING_ANCHOR_Y, TERRAIN_LANDING_ANCHOR_Y, eraYear } from './manifest.js';
-import { clamp } from './util.js';
+import { TERRAIN_LANDING_ANCHOR_Y, outpostSpriteName, padLandingAnchor, padSpriteName } from './manifest.js';
+import { smoothstep } from './util.js';
 import { fillWorldRect } from './painter.js';
 
 // --- Луна и Марс -----------------------------------------------------------------
@@ -20,6 +20,7 @@ export function drawTerrain(ctx, painter, view, body, era, pad, time) {
   const name = body === 'mars' ? 'terrain_mars' : 'terrain_moon';
   const asset = painter.assets.get(name);
   if (view.sy(-30) > view.devH) return;
+  if (pad) drawOutpost(ctx, painter, view, body, era, pad);
   if (!asset) {
     fallbackGround(ctx, view, body);
   } else {
@@ -62,13 +63,44 @@ function fallbackGround(ctx, view, body) {
   ctx.fillRect(0, y, view.devW, Math.max(1, view.px));
 }
 
+// --- станция-база на дальнем плане -------------------------------------------------------------
+
+export const OUTPOST_PARALLAX = 0.6; // дальний план смещается по X медленнее камеры
+export const OUTPOST_DISTANCE = 270; // ед. мира от площадки (в сторону от ракеты — Луна справа, Марс слева)
+export const OUTPOST_FEET_Y = 2; // ед. мира: ноги чуть ниже линии поверхности, грунт перекрывает основания
+export const OUTPOST_SCALE = 0.55; // ед. мира на пиксель спрайта: база меньше площадки, она далеко
+const OUTPOST_TINT = { moon: { r: 10, g: 14, b: 26, a: 0.3 }, mars: { r: 70, g: 30, b: 20, a: 0.28 } };
+
+/** Положение базы на дальнем плане: мировая x с параллаксом и прозрачность по высоте камеры (у земли 1, выше растворяется). */
+export function outpostPlacement(padX, side, camX, camAlt, out = { x: 0, alpha: 1 }) {
+  const baseX = padX + side * OUTPOST_DISTANCE;
+  out.x = camX + (baseX - camX) * OUTPOST_PARALLAX;
+  out.alpha = 1 - smoothstep(40, 320, camAlt);
+  return out;
+}
+
+const placement = { x: 0, alpha: 1 };
+
+function drawOutpost(ctx, painter, view, body, era, pad) {
+  const name = outpostSpriteName(body, era);
+  const asset = painter.assets.get(name);
+  if (!asset) return;
+  outpostPlacement(pad.x, body === 'mars' ? -1 : 1, view.camX, -view.camY, placement);
+  if (placement.alpha <= 0.02) return;
+  const w = asset.w * OUTPOST_SCALE;
+  const h = asset.h * OUTPOST_SCALE;
+  if (placement.x + w / 2 < view.left || placement.x - w / 2 > view.right) return;
+  // ноги базы прячутся за гребнем грунта: низ чуть ниже линии поверхности (y = 0)
+  painter.sprite(ctx, view, name, placement.x, OUTPOST_FEET_Y, { w, h, ax: 0.5, ay: 1, alpha: placement.alpha * 0.96, tint: OUTPOST_TINT[body === 'mars' ? 'mars' : 'moon'], smooth: true });
+}
+
 function drawPad(ctx, painter, view, body, era, pad, time) {
   const base = body === 'mars' ? 'pad_mars' : 'pad_moon';
-  const name = `${base}_${eraYear(era)}`;
+  const name = padSpriteName(base, era);
   const width = pad.w || 170;
   const asset = painter.assets.get(name);
   if (asset) {
-    painter.sprite(ctx, view, name, pad.x, 0, { w: width, ay: PAD_LANDING_ANCHOR_Y[base][clamp(era | 0, 0, 5)] });
+    painter.sprite(ctx, view, name, pad.x, 0, { w: width, ay: padLandingAnchor(base, era) });
   } else {
     fillWorldRect(ctx, view, pad.x - width / 2, -3, width, 6, body === 'mars' ? '#713f35' : '#616d80');
   }

@@ -34,9 +34,10 @@ test('eras: six eras with caps and the transitions of DESIGN 4.2', () => {
   assert.ok(coins.every((v, i) => i === 0 || v > coins[i - 1]), 'projects get more expensive');
 });
 
-test('parts: nine modules with 18 monotonic levels', () => {
-  assert.equal(PART_IDS.length, 9);
-  assert.deepEqual([...PART_IDS].sort(), ['avionics', 'booster', 'capsule', 'engine', 'fins', 'hull', 'legs', 'parachute', 'tank']);
+test('parts: eight modules with 18 monotonic levels (the parachute is a shop item)', () => {
+  assert.equal(PART_IDS.length, 8);
+  assert.equal(PARTS.parachute, undefined);
+  assert.deepEqual([...PART_IDS].sort(), ['avionics', 'booster', 'capsule', 'engine', 'fins', 'hull', 'legs', 'tank']);
   for (const id of PART_IDS) {
     const part = PARTS[id];
     assert.equal(part.levels.length, 18, `${id} levels`);
@@ -71,6 +72,39 @@ test('parts: the stock rocket equals the simulation reference stages', () => {
   assert.equal(PARTS.tank.base.fuel, STAGE_DEFAULTS.core.fuel);
   assert.equal(PARTS.capsule.base.fuel, STAGE_DEFAULTS.capsule.fuel);
   assert.equal(PARTS.booster.levels[0].stats.fuel > STAGE_DEFAULTS.booster.fuel, true);
+});
+
+test('fins: tilt and turn grow with the level (0.2 rad -> free rotation, 0.45 -> 2.2)', () => {
+  const fins = PARTS.fins;
+  const at = (level) => (level === 0 ? fins.base : fins.levels[level - 1].stats);
+  assert.equal(at(0).maxTilt, 0.2);
+  assert.equal(at(0).turn, 0.45);
+  assert.ok(Math.abs(at(8).maxTilt - 1.2) < 1e-9 && Math.abs(at(8).turn - 1.1) < 1e-9, 'about the middle');
+  assert.equal(at(12).maxTilt, Math.PI, 'free rotation from level 12');
+  assert.ok(Math.abs(at(12).turn - 1.6) < 1e-9);
+  assert.ok(Math.abs(at(18).turn - 2.2) < 1e-9);
+  for (let level = 13; level <= 18; level++) assert.equal(at(level).maxTilt, Math.PI);
+  for (let level = 1; level <= 12; level++) assert.ok(at(level).maxTilt > at(level - 1).maxTilt, `tilt grows at level ${level}`);
+  for (let level = 13; level <= 18; level++) {
+    assert.ok(at(level).turn > at(level - 1).turn && at(level).dragCut > at(level - 1).dragCut, `turn and drag cut grow at level ${level}`);
+  }
+  const labels = Object.fromEntries(fins.statInfo.map((info) => [info.key, info]));
+  assert.equal(labels.maxTilt.label, 'Угол наклона');
+  assert.equal(labels.maxTilt.unit, '°');
+  assert.ok(Math.abs(labels.maxTilt.factor - 180 / Math.PI) < 1e-9);
+  assert.equal(labels.turn.label, 'Поворот');
+  assert.equal(labels.dragCut.label, 'Меньше сноса');
+  assert.equal(fins.desc, 'Маневровые двигатели и стабилизаторы: шире угол наклона и быстрее поворот.');
+});
+
+test('fins: the first levels are cheap and need only the first service team', () => {
+  const cheapest = Math.min(...Object.values(BUILDINGS).map((b) => b.levels[0].cost));
+  for (let level = 1; level <= 3; level++) {
+    assert.ok(PARTS.fins.levels[level - 1].cost <= 80, `fins level ${level} costs ${PARTS.fins.levels[level - 1].cost}`);
+    assert.deepEqual(PARTS.fins.levels[level - 1].requires, [{ building: 'service', level: 1 }]);
+  }
+  assert.ok(BUILDINGS.service.levels[0].cost <= 2 * cheapest, 'the service team is among the cheapest buildings');
+  assert.equal(BUILDINGS.service.minEra, 0);
 });
 
 test('buildings: fourteen keys that match the island layout, six levels each', () => {

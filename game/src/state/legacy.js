@@ -10,14 +10,14 @@ import { MAX_BUILDING_LEVEL, MAX_PART_LEVEL } from '../data/economy.js';
 import { powerBalance } from '../rules/base.js';
 import { fresh, normalizeProfile } from './profile.js';
 
-// Old module id -> [new module id, old maximum level].
+// Old module id -> [new module id, old maximum level]. The old parachute upgrade has no counterpart: the
+// parachute is a shop consumable now, so those levels are dropped without a refund (see save.js).
 const MODULE_MAP = {
   fuel: ['tank', 20],
   engine: ['engine', 20],
   legs: ['legs', 12],
   hull: ['hull', 15],
   fins: ['fins', 18],
-  parachute: ['parachute', 12],
   booster: ['booster', 8],
 };
 

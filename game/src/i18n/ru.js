@@ -76,6 +76,7 @@ export default {
   'building.short.recovery': 'Возврат',
 
   // показатели «было → станет» (слово или два)
+  'stat.maxTilt': 'Угол наклона',
   'stat.thrust': 'Тяга',
   'stat.speed': 'Скорость',
   'stat.burnRate': 'Расход',
@@ -151,6 +152,7 @@ export default {
   'launch.countdown': 'Запуск',
   'launch.closed': 'Цель закрыта',
   'launch.error': 'Не собрать ракету',
+  'launch.noChute': 'Парашют — в лавке',
   'dest.earth': 'Земля',
   'dest.moon': 'Луна',
   'dest.mars': 'Марс',
@@ -164,7 +166,7 @@ export default {
   'hud.pause': 'Пауза',
   'hud.boost': 'Форс',
   'hud.chute': 'Парашют',
-  'hud.canister': 'Канистра',
+  'hud.canister': 'Топливо',
   'hud.repair': 'Ремонт',
   'hud.transfer': 'Перелёт',
   'hud.hold': 'ДЕРЖИ',

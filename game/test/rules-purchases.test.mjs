@@ -72,11 +72,12 @@ test('buyPart: expensive levels need data', () => {
 });
 
 test('buyPart: a maxed module has no next level', () => {
-  const profile = makeProfile({ coins: 1e9, data: 1e9, era: 5, parts: { parachute: 18 } });
-  const state = getPartState(profile, 'parachute');
+  const profile = makeProfile({ coins: 1e9, data: 1e9, era: 5, parts: { avionics: 18 } });
+  const state = getPartState(profile, 'avionics');
   assert.equal(state.maxed, true);
   assert.equal(state.next, null);
-  assert.equal(buyPart(profile, 'parachute').ok, false);
+  assert.equal(buyPart(profile, 'avionics').ok, false);
+  assert.throws(() => getPartState(profile, 'parachute'), /Unknown part/);
 });
 
 test('buyBuilding: energy node and dependencies (level N needs energy N-1)', () => {

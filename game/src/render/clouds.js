@@ -6,8 +6,13 @@
 
 import { clamp, hash2 } from './util.js';
 
-const STORM_TINT = { r: 40, g: 48, b: 66, a: 0.62 };
 const FLASH_TINT = { r: 245, g: 248, b: 255, a: 0.9 };
+// Вариация плотности: плотные облака чуть темнее (лёгкая тонировка поверх готового спрайта вида).
+const DENSE_TINT = { r: 70, g: 84, b: 112 };
+const STORM_DENSE_TINT = { r: 22, g: 28, b: 44 };
+
+/** Готовый спрайт по виду облака (nature_sheet): cumulus, stratus, storm (грозовое), cirrus. */
+export const CLOUD_SPRITE_BY_KIND = { cumulus: 'cloud_0', stratus: 'cloud_1', storm: 'cloud_2', cirrus: 'cloud_3' };
 
 /** Какая половина слоёв (0 — позади ракеты, 1 — поверх неё): часть облаков перед ракетой для глубины. */
 export function cloudPass(cloud) {
@@ -22,8 +27,24 @@ export function cloudLayers(cloud) {
   return cloud.kind === 'cumulus' || cloud.kind === 'storm' ? 1 + Math.round(d * 2) : 1 + Math.round(d);
 }
 
-function spriteFor(cloud) {
-  return `cloud_${Math.floor(hash2(cloud.id | 0, 5, 9) * 4)}`;
+/** Имя спрайта облака: у каждого вида свой готовый рисунок, грозовое — тёмное «из коробки», без тонировки кодом. */
+export function cloudSpriteName(cloud) {
+  if (cloud.kind === 'storm' || cloud.storm) return CLOUD_SPRITE_BY_KIND.storm;
+  return CLOUD_SPRITE_BY_KIND[cloud.kind] || CLOUD_SPRITE_BY_KIND.cumulus;
+}
+
+/** Тонировка по плотности: null у разреженных облаков, у плотных — мягкий тёмный оттенок (не больше ~0,3). */
+export function cloudTint(cloud, out = { r: 0, g: 0, b: 0, a: 0 }) {
+  const d = clamp(cloud.density ?? 0.5, 0, 1);
+  const storm = cloud.kind === 'storm' || cloud.storm;
+  const base = storm ? STORM_DENSE_TINT : DENSE_TINT;
+  const level = storm ? clamp((d - 0.55) / 0.45, 0, 1) * 0.3 : clamp((d - 0.6) / 0.4, 0, 1) * 0.26;
+  if (level < 0.02) return null;
+  out.r = base.r;
+  out.g = base.g;
+  out.b = base.b;
+  out.a = level;
+  return out;
 }
 
 /**
@@ -32,18 +53,18 @@ function spriteFor(cloud) {
  */
 export function cloudSize(cloud, aspect) {
   const w = Math.max(40, cloud.w || 200);
-  const shape = { cumulus: 1, stratus: 0.3, cirrus: 0.18, storm: 1.25 }[cloud.kind] ?? 1;
-  // Высота sim учитывается (облака плоские или высокие), но в пределах, где спрайт ещё похож на облако.
+  const shape = { cumulus: 1, stratus: 0.34, cirrus: 0.26, storm: 1.2 }[cloud.kind] ?? 1;
+  // Высота sim учитывается (облака плоские или высокие), но в пределах, где готовый спрайт ещё похож на облако.
   const h = cloud.h || w * aspect * shape;
   switch (cloud.kind) {
     case 'stratus':
-      return [w, clamp(h, w * 0.03, w * 0.25)];
+      return [w, clamp(h, w * 0.18, w * 0.4)];
     case 'cirrus':
-      return [w, clamp(h, w * 0.02, w * 0.15)];
+      return [w, clamp(h, w * 0.14, w * 0.4)];
     case 'storm':
-      return [w, clamp(h, w * 0.4, w * 1.6)];
+      return [w, clamp(h, w * 0.55, w * 1.15)];
     default:
-      return [w, clamp(h, w * 0.22, w * 0.9)];
+      return [w, clamp(h, w * 0.35, w * 0.8)];
   }
 }
 
@@ -81,8 +102,11 @@ export function cloudPieces(cloud, w, h, out = []) {
 
 const pieceBuffer = [];
 
+const tintScratch = { r: 0, g: 0, b: 0, a: 0 };
+
 function drawOne(ctx, painter, view, cloud, flashing) {
-  const asset = painter.assets.get(spriteFor(cloud));
+  const spriteName = cloudSpriteName(cloud);
+  const asset = painter.assets.get(spriteName);
   if (!asset) return;
   const aspect = asset.h / asset.w;
   const [w, h] = cloudSize(cloud, aspect);
@@ -92,21 +116,24 @@ function drawOne(ctx, painter, view, cloud, flashing) {
   const layers = cloudLayers(cloud);
   const baseA = baseAlpha(cloud);
   const storm = cloud.kind === 'storm' || cloud.storm;
-  const angle = cloud.kind === 'cirrus' ? -0.045 : 0;
+  const tint = cloudTint(cloud, tintScratch) || undefined;
+  const angle = 0;
   const pieces = cloudPieces(cloud, w, h, pieceBuffer);
   // Куски перекрываются: общую прозрачность снижаем, чтобы банк не «горел» белым.
   const alpha = pieces.length > 1 ? baseA * 0.72 : baseA;
   for (let p = 0; p < pieces.length; p++) {
     const piece = pieces[p];
-    const name = pieces.length > 1 ? `cloud_${Math.floor(hash2(cloud.id | 0, p, 23) * 4)}` : spriteFor(cloud);
+    const name = spriteName;
+    const mirror = pieces.length > 1 && hash2(cloud.id | 0, p, 23) < 0.5;
     for (let i = 0; i < layers; i++) {
       const t = layers === 1 ? 0 : i / (layers - 1) - 0.5;
       painter.sprite(ctx, view, name, x + piece.dx + t * piece.w * 0.14, y + piece.dy - Math.abs(t) * piece.h * 0.12 + t * piece.h * 0.06, {
         w: piece.w * (1 - Math.abs(t) * 0.18),
         h: piece.h * (1 - Math.abs(t) * 0.16),
         alpha: alpha * (i === 0 ? 1 : 0.62),
-        tint: storm ? STORM_TINT : undefined,
+        tint,
         angle,
+        flipX: mirror,
         smooth: true,
       });
     }

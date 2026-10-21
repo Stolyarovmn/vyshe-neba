@@ -110,7 +110,7 @@ test('кольца: горизонтальные рисуются двумя п�
   const front = stubContext(400, 600);
   drawObjectsFront(front, painter, view, horizontal, 2);
   assert.ok(back.calls.drawImage >= 1 && front.calls.drawImage >= 1);
-  assert.ok(back.calls.clip >= 1 && front.calls.clip >= 1, 'половины вырезаются клипом');
+  assert.equal(back.calls.clip || 0, 0, 'половины — отдельные слои мастер-текстуры, без клипа');
   const legacy = stubContext(400, 600);
   drawObjectsFront(legacy, painter, view, vertical, 2);
   assert.equal(legacy.calls.drawImage || 0, 0, 'у вертикального кольца нет передней половины');

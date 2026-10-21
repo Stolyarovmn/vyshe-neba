@@ -34,7 +34,6 @@ const MODULE_NAMES = {
   'Капсула': 'capsule',
   'Посадочные опоры': 'legs',
   'Стабилизаторы и РСУ': 'fins',
-  'Парашют': 'parachute',
   'Авионика': 'avionics',
 };
 
@@ -62,9 +61,10 @@ function parseModuleRequirements(cell) {
   return out;
 }
 
-test('DESIGN 4.3: nine modules, 18 levels, requirements per level', () => {
+test('DESIGN 4.3: eight modules, 18 levels, requirements per level', () => {
   const rows = tableAfter('### 4.3 Модули ракеты');
-  assert.equal(rows.length, 9, 'nine rows');
+  assert.equal(rows.length, 8, 'eight rows: the parachute is a consumable');
+  assert.match(design, /### 4\.3 Модули ракеты \(8 слотов\)/);
   assert.deepEqual(rows.map((row) => MODULE_NAMES[row[0]]).sort(), [...PART_IDS].sort());
   for (const row of rows) {
     const id = MODULE_NAMES[row[0]];

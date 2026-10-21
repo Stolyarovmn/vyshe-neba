@@ -104,6 +104,23 @@ test('migration: an older v:1 save without newer fields is filled with defaults'
   assert.deepEqual(validateProfile(result.profile), []);
 });
 
+test('migration: the removed parachute module is dropped without an error', () => {
+  const old = { ...playedProfile(), parts: { ...playedProfile().parts, parachute: 7 } };
+  const result = parseSave(JSON.stringify(old));
+  assert.equal(result.ok, true);
+  assert.equal('parachute' in result.profile.parts, false);
+  assert.equal(Object.keys(result.profile.parts).length, 8);
+  assert.deepEqual(result.profile.parts, playedProfile().parts, 'the other modules stay as they were');
+  assert.equal(result.profile.coins, 1234, 'no refund: the coins stay as they were');
+  assert.ok(result.issues.some((issue) => /Парашют/.test(issue)), 'the player is told why');
+  assert.deepEqual(validateProfile(result.profile), []);
+  // A save that never had the module raises no note, and a strict check flags a stray key.
+  assert.deepEqual(parseSave(serialize(playedProfile())).issues, []);
+  assert.ok(validateProfile(old).length > 0);
+  const store = createSaveStore({ storage: createMemoryStorage({ 'vyshe-neba:save': JSON.stringify(old) }) });
+  assert.equal(store.load().status, 'loaded');
+});
+
 test('migration: a newer version is refused, the table is ready for the next version', () => {
   const result = parseSave(JSON.stringify({ ...playedProfile(), v: 99 }));
   assert.equal(result.ok, false);
@@ -148,6 +165,7 @@ test('legacy: the previous edition save is recognised and converted', () => {
   assert.ok(Object.values(p.parts).every((level) => level <= 3 * (p.era + 1)), 'modules respect the era cap');
   assert.equal(p.parts.capsule, 0);
   assert.equal(p.parts.avionics, 0);
+  assert.equal('parachute' in p.parts, false, 'the old parachute upgrade has no counterpart');
   assert.equal(p.inventory.canister, 3, 'the old boost canister');
   assert.equal(p.skin, 'wasp');
   assert.deepEqual(p.skins, ['classic', 'wasp']);

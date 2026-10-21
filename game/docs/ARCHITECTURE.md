@@ -42,7 +42,7 @@ Profile = {
   v: 1,
   coins: 0, data: 0,
   era: 0,                          // 0..5
-  parts:     { engine:0, tank:0, hull:0, booster:0, capsule:0, legs:0, fins:0, parachute:0, avionics:0 }, // уровни 0..18
+  parts:     { engine:0, tank:0, hull:0, booster:0, capsule:0, legs:0, fins:0, avionics:0 }, // уровни 0..18, 8 модулей (парашют — расходник inventory.chute)
   buildings: { beacons:0, gantry:0, deluge:0, service:0, rescue:0, fuel:0, logistics:0, factory:0,
                weather:0, control:0, radar:0, energy:0, observation:0, recovery:0 },                   // уровни 0..6
   inventory: { chute:0, repair:0, canister:0, magnet:0 },
@@ -101,8 +101,7 @@ FlightConfig = {
   stages: [ { id:'booster'|'core'|'capsule', thrust, fuel, burnRate, mass, turn } ],  // порядок: сначала сбрасываемая
   hull:   { hp, debrisResist },
   legs:   { vTol, hTol, angTol },       // допуски посадки (ед./с, ед./с, рад)
-  fins:   { turn, dragCut },
-  parachute: { level },                  // 0 — нет
+  fins:   { turn, dragCut, maxTilt },   // turn — множитель скорости поворота; maxTilt — мягкий предел наклона, рад (π — свободное вращение)
   avionics:  { predict:0|1|2, assist:0|1 },
   base:   { radar:0..1, beacons:0..1, weather:0..1, income:1, fuelDropRate:1, repairOnLand:0..1, rescueRefund:0..1,
             padSafety:0..1, dataMult:1, perfectBonus:1 },
@@ -185,7 +184,7 @@ renderer.layout(w, h, dpr, safeInsets)           // -> Layout
 
 **Sim** (`game/src/sim`): `createFlight`, `step`, `summarize`, `createAutopilot({skill, mission:'hop'|'space'|'land', targetAlt, seed}).next(state, dt)`, `runFlight`, `advance`. В `FlightConfig` добавлены `start` ({body, alt, x, vx, vy, angle, stageIndex, fuel01}), `limits` ({speed, fall}) и фиксированная `weather`. В `FlightState` добавлены `climb`, `fuelTotal`, `fuel01`, `weightless`, `transferCostFuel`, `approach`, `chute`, `boost`, `maxAccel`, `turnRate`. `reason` — код (`landing-speed`, `landing-drift`, `landing-tilt`, `hull-destroyed`, `lost-in-space`, `lost-contact`), виновник в `killer`. `FlightResult.landing` содержит фактические допуски (`vTol`, `hTol`, `angTol`, `onPad`). Событие `storm` имеет `phase`, событие `warn` — `kind`. Опасности и предметы: `objects[].kind` (`coin|fuel|ring|repair|plane|balloon|asteroid|debris`).
 
-**Rules/Data/State**: `cap.building = id + 1`; `milestones.maxAlt` и `stats.distance` хранятся в метрах, а `FlightResult.maxAlt`/`distance` — в единицах игры (×10). `settleFlight(profile, result, config?)` принимает конфиг для списания расходников. Покупки возвращают `awarded`. Дополнительно: `refillContracts`, `buyConsumable`, `buySkin`, `selectSkin`, `checkAchievements`. Веха E0 → E1: одна мягкая посадка и высота 3 км. Парашют: скорость снижения `12 − 0.4·уровень` (минимум 3,5), поэтому все 18 уровней значимы.
+**Rules/Data/State**: `cap.building = id + 1`; `milestones.maxAlt` и `stats.distance` хранятся в метрах, а `FlightResult.maxAlt`/`distance` — в единицах игры (×10). `settleFlight(profile, result, config?)` принимает конфиг для списания расходников. Покупки возвращают `awarded`. Дополнительно: `refillContracts`, `buyConsumable`, `buySkin`, `selectSkin`, `checkAchievements`. Веха E0 → E1: одна мягкая посадка и высота 3 км. Парашют — только расходник из лавки (`inventory.chute`, бесплатный с 3-го уровня спасательной станции); в `FlightConfig` нет `parachute.level`. `fins.maxTilt` — мягкий предел наклона (рад), растёт с уровнем стабилизаторов до π на уровне 12.
 
 **Render**: `renderer.flight.start(flight, config)`, `renderer.events(list, flight?)`, `renderer.flight.timeScale` (замедление после касания/аварии), `hub.hitTest(x, y)` (ключ постройки, `'rocket'` или `null`), `hub.screenPos`, `hub.pan`, `hub.focus`, `hub.setSelected`. Все `draw` рисуют в пикселях устройства (`canvas.width = w·dpr`). Спрайты построек radar/recovery/logistics/energy/observation пока программные; спрайт `bld_<ключ>_<год>` в `ASSET_FILES` подхватывается автоматически (см. `art/docs/MISSING_ASSETS_PROMPTS.md`).
 

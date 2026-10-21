@@ -3,6 +3,7 @@
 //   { era }          minimum era id
 //   { destination }  the destination is open (Moon, Mars)
 //   { part, level }  the rocket module has at least this level
+// A parachute is a consumable from the shop, so contracts about it only need the era.
 // `until` ({ era }) hides goals about the current era once it has been left.
 // `cargo` contracts get the logistics terminal bonus. Goals are evaluated by rules/goals.js.
 
@@ -41,7 +42,7 @@ export const CONTRACT_TEMPLATES = [
   template(20, 'm20', 'Рядом с опасностью', 'Дважды разминись с обломком за полёт', 220, { type: 'near', min: 2 }, era0),
   template(21, 'm21', 'Лунный ювелир', 'Идеально сядь на Луну', 350, { type: 'perfectOn', body: 'moon' }, { destination: 'moon' }, { cargo: true }),
   template(22, 'm22', 'Мезосфера ждёт', 'Поднимись на 50 км', 400, alt(50000), era2),
-  template(23, 'm23', 'На мягком куполе', 'Вернись на парашюте', 250, { type: 'chuteLand' }, { part: 'parachute', level: 1 }),
+  template(23, 'm23', 'На мягком куполе', 'Вернись на парашюте', 250, { type: 'chuteLand' }, era0),
   template(24, 'm24', 'Свой космопорт', 'Развей базу до 2015 года', 450, { type: 'era', min: 3 }, era2, { until: era2 }),
   template(25, 'm25', 'Пять ворот', 'Пройди 5 колец за полёт', 400, { type: 'rings', min: 5 }, era1),
   template(26, 'm26', 'Возвращение с края', 'Сядь после подъёма на 30 км', 500, { type: 'landAlt', min: 30000 }, era1),

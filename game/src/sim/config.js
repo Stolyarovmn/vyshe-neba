@@ -11,6 +11,9 @@ export const STAGE_DEFAULTS = {
 
 export const START_STAGE_IDS = ['core', 'capsule'];
 
+// Attitude control of the unimproved rocket: slow turns and only a slight lean until the RCS module is bought.
+export const FINS_DEFAULT = { turn: 0.5, maxTilt: 0.2 };
+
 const BASE_DEFAULTS = {
   radar: 0,
   beacons: 0,
@@ -64,6 +67,13 @@ function normalizeStart(input) {
   };
 }
 
+function normalizeFins(input) {
+  const fins = section(input, { turn: FINS_DEFAULT.turn, dragCut: 0, maxTilt: FINS_DEFAULT.maxTilt });
+  fins.turn = Math.max(0.05, fins.turn);
+  fins.maxTilt = Math.max(0.05, Math.min(Math.PI, fins.maxTilt));
+  return fins;
+}
+
 export function normalizeConfig(input = {}) {
   const stageInputs = Array.isArray(input.stages) && input.stages.length
     ? input.stages
@@ -77,8 +87,10 @@ export function normalizeConfig(input = {}) {
     stages: stageInputs.map(normalizeStage),
     hull: section(input.hull, { hp: 100, debrisResist: 0 }),
     legs: section(input.legs, { vTol: 13, hTol: 18, angTol: 0.32 }),
-    fins: section(input.fins, { turn: 1, dragCut: 0 }),
-    parachute: { level: Math.max(0, Math.floor(num(input.parachute?.level, 0))) },
+    // fins.turn multiplies the stage turn rate, maxTilt (rad) is the soft limit on the lean from vertical (>= 3: free rotation).
+    fins: normalizeFins(input.fins),
+    // The canopy is a shop item now (consumables.chute). The level is kept at 0 so old readers do not break.
+    parachute: { level: 0 },
     avionics: {
       predict: Math.max(0, Math.min(2, Math.floor(num(input.avionics?.predict, 0)))),
       assist: input.avionics?.assist ? 1 : 0,

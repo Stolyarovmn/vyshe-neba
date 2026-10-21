@@ -154,6 +154,17 @@ function gateGoals(profile) {
   return options.sort((a, b) => a.cost - b.cost).slice(0, missing);
 }
 
+// Stabilizers are cheap and without them the rocket hardly steers, so a rational player keeps them level
+// with the era: the fins level that gives the tilt of the era (free rotation from level 12).
+const FINS_BY_ERA = [3, 6, 9, 12, 12, 12];
+
+function controlGoals(profile) {
+  const level = FINS_BY_ERA[profile.era];
+  if (profile.parts.fins >= level) return [];
+  const chain = planChain(profile, 'part', 'fins', level);
+  return chain ? [{ kind: 'part', id: 'fins', level, cost: chain.cost }] : [];
+}
+
 const goalCache = new Map();
 
 // Coins above the era project that cannot be used for it yet (data or milestone still missing) go into the
@@ -176,7 +187,7 @@ function surplusGoal(profile, skill) {
 function needs(profile) {
   const key = structureKey(profile);
   if (goalCache.has(key)) return goalCache.get(key);
-  const goals = [...missingDestinationGoals(profile)];
+  const goals = [...controlGoals(profile), ...missingDestinationGoals(profile)];
   const capabilityGoal = bestCapabilityGoal(profile);
   if (capabilityGoal) goals.push(capabilityGoal);
   goals.push(...gateGoals(profile));
@@ -306,11 +317,13 @@ export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = 
   const log = { purchases: 0, items: [] };
   const eras = [];
   let flights = 0;
+  let firstFinsFlight = null; // flights completed when the first stabilizer level was bought
 
   while (profile.era < Math.min(5, untilEra + 1) && seconds / 60 < maxMinutes && flights < 20000) {
     const before = log.purchases;
     profile = shop(profile, log, skill);
     seconds += (log.purchases - before) * OVERHEAD.purchaseSeconds;
+    if (firstFinsFlight === null && profile.parts.fins >= 1) firstFinsFlight = flights;
 
     const eraState = R.getEraState(profile);
     if (eraState.ok) {
@@ -354,7 +367,7 @@ export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = 
     if (result.outcome === 'landed') eraLandings += 1;
     eraEarned += settled.report.coins.gross;
   }
-  return { eras, minutes: seconds / 60, flights, profile, reachedFinalEra: profile.era >= 5 };
+  return { eras, minutes: seconds / 60, flights, profile, reachedFinalEra: profile.era >= 5, firstFinsFlight };
 }
 
 export function evaluate(run) {

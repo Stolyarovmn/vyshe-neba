@@ -14,6 +14,12 @@ export const SAVE_KEY = 'vyshe-neba:save';
 // The current version is 1, so the table is empty; a bump adds one entry and the loop below applies it.
 export const MIGRATIONS = {};
 
+// Modules that were removed from Profile.parts without a version bump. The parachute is now a shop
+// consumable (inventory.chute). Old saves load without error: normalizeProfile ignores unknown part keys.
+// The coins once spent on the module are NOT refunded: the game is not released yet, and a partial refund
+// would need the old price table. migrate() only leaves a note in `issues`.
+const REMOVED_PARTS = { parachute: 'Модуль «Парашют» убран: теперь парашют — расходник из лавки' };
+
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 export function serialize(profile, { now = null } = {}) {
@@ -47,6 +53,11 @@ export function migrate(raw) {
     version += 1;
   }
   const normalized = normalizeProfile({ ...current, v: PROFILE_VERSION });
+  if (normalized.ok && isObject(current.parts)) {
+    for (const [id, note] of Object.entries(REMOVED_PARTS)) {
+      if (Number(current.parts[id]) > 0) normalized.issues.push(note);
+    }
+  }
   return { ...normalized, migratedFrom: startVersion < PROFILE_VERSION ? startVersion : null };
 }
 

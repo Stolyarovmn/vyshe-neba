@@ -36,13 +36,14 @@ function zonesCrossed(previousAltM, altM) {
   return ZONES.filter((zone) => zone.from > 0 && zone.from > previousAltM && zone.from <= altM);
 }
 
+// A parachute is not a module: the hint points to the shop. It only works in dense air, i.e. on Earth.
 const CRASH_HINTS = {
-  'landing-speed': { part: 'legs', text: (v, tol) => `Слишком быстро: ${v} ед./с при допуске ${tol}. Помогут посадочные опоры и парашют.` },
+  'landing-speed': { part: 'legs', text: (v, tol) => `Слишком быстро: ${v} ед./с при допуске ${tol}. Помогут посадочные опоры; парашют можно купить в лавке.` },
   'landing-drift': { part: 'fins', text: (v, tol) => `Снос при касании: ${v} ед./с при допуске ${tol}. Помогут стабилизаторы и опоры.` },
   'landing-tilt': { part: 'fins', text: (v, tol) => `Корпус наклонён: ${v}° при допуске ${tol}°. Помогут стабилизаторы и авионика.` },
 };
 
-function explainCrash(profile, result, config) {
+function explainCrash(profile, result, config, body) {
   const legs = config?.legs ?? deriveRocket(profile).legs;
   const landing = result.landing ?? {};
   const hint = CRASH_HINTS[result.reason];
@@ -50,7 +51,12 @@ function explainCrash(profile, result, config) {
     return { code: result.reason ?? 'crash', part: 'hull', text: 'Ракета разбита. Прочная обшивка и ремонт сохраняют корпус.' };
   }
   const deg = (rad) => Math.round((rad * 180) / Math.PI);
-  if (result.reason === 'landing-speed') return { code: result.reason, part: hint.part, building: 'beacons', text: hint.text(Math.round(num(landing.v)), Math.round(landing.vTol ?? legs.vTol)) };
+  if (result.reason === 'landing-speed') {
+    const text = hint.text(Math.round(num(landing.v)), Math.round(landing.vTol ?? legs.vTol));
+    return body === 'earth'
+      ? { code: result.reason, part: hint.part, building: 'beacons', shop: 'chute', text }
+      : { code: result.reason, part: hint.part, building: 'beacons', text: text.replace('; парашют можно купить в лавке', '') };
+  }
   if (result.reason === 'landing-drift') return { code: result.reason, part: hint.part, building: 'beacons', text: hint.text(Math.round(num(landing.h)), Math.round(landing.hTol ?? legs.hTol)) };
   return { code: result.reason, part: hint.part, building: 'control', text: hint.text(deg(num(landing.ang)), deg(landing.angTol ?? legs.angTol)) };
 }
@@ -140,7 +146,7 @@ export function settleFlight(profile, result, config = null) {
     body,
     reason: result.reason ?? null,
     perfect: landed && !!result.perfect,
-    hint: crashed ? explainCrash(profile, result, config) : null,
+    hint: crashed ? explainCrash(profile, result, config, body) : null,
     coins: { travel, loot, landing, perfect, expedition, storm, gross, charged, saved: landed ? potentialLoss : 0 },
     multipliers: { income: base.flight.income, perfectBonus: base.flight.perfectBonus, dataMult, expeditionPay: effects.expeditionPay, stormBonus: effects.stormBonus },
     data: { zones: zoneData, body: bodyData, trickle, total: dataGain },

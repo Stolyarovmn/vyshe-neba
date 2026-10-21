@@ -7,7 +7,7 @@ export function startRocket(overrides = {}) {
   return normalizeConfig({ seed: 1, era: 0, ...overrides });
 }
 
-// A late-game style rocket that can reach space and make a transfer: strong engines, big tanks, sturdy legs.
+// A late-game style rocket that can reach space and make a transfer: strong engines, big tanks, sturdy legs and free rotation.
 export function heavyRocket(overrides = {}) {
   return normalizeConfig({
     seed: 1,
@@ -19,8 +19,7 @@ export function heavyRocket(overrides = {}) {
     ],
     hull: { hp: 240, debrisResist: 8 },
     legs: { vTol: 28, hTol: 28, angTol: 0.5 },
-    fins: { turn: 1.5, dragCut: 0.3 },
-    parachute: { level: 6 },
+    fins: { turn: 1.5, dragCut: 0.3, maxTilt: Math.PI },
     avionics: { predict: 2, assist: 1 },
     transferCost: { moon: 0.25, mars: 0.4 },
     ...overrides,

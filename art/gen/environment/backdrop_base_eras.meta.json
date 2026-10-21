@@ -1,0 +1,19 @@
+{
+  "asset": "backdrop_base_eras.webp",
+  "source": "outputs/rocket/dist/assets/base-eras.png",
+  "source_sha256": "556ca6c212fdcfc18a4841f545fadc917671c76028ffd0c16b6b65a6a18076c2",
+  "size": [
+    1774,
+    887
+  ],
+  "encoding": "WebP lossy q88, method 6, RGB (без альфы)",
+  "output_sha256": "50a8e32bd5e9a2e4f95ccd2a6ea1b9f276bed48fdef33525b5fe3bdf26e4faf3",
+  "output_bytes": 458502,
+  "status": "derived_runtime_copy_of_approved_art",
+  "note": "Только перекодирование для веса сборки; композиция и кадры не менялись.",
+  "grid": [
+    3,
+    2
+  ],
+  "cells": "база на закате, E0..E5 слева направо, сверху вниз (launch-earth по эпохе)"
+}

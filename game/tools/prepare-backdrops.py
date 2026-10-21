@@ -3,7 +3,8 @@
 
 Исходники (утверждённый арт): outputs/rocket/dist/assets/interior-eras.png (3,3 МБ) и environments.png (3,0 МБ).
 PNG такого размера, встроенные в один HTML как base64, весят около 8 МБ, поэтому рантайм берёт WebP q88
-(≈1 МБ на оба файла). Кадры и композиция не меняются; сетки: interior 3x2, environments 2x2.
+(≈1 МБ на оба файла). Кадры и композиция не меняются; сетки: interior 3x2, environments 2x2, base-eras 3x2
+(панорама базы по эпохам на закате, 1774x887, для launch-earth).
 
 Запуск:  work/venv/Scripts/python.exe game/tools/prepare-backdrops.py   (нужны pillow)
 """
@@ -21,6 +22,7 @@ QUALITY = 88
 JOBS = [
     ('outputs/rocket/dist/assets/interior-eras.png', 'backdrop_interior_eras.webp', {'grid': [3, 2], 'cells': 'E0..E5 слева направо, сверху вниз'}),
     ('outputs/rocket/dist/assets/environments.png', 'backdrop_environments.webp', {'grid': [2, 2], 'cells': 'launch-earth, shop, shop, launch-moon'}),
+    ('outputs/rocket/dist/assets/base-eras.png', 'backdrop_base_eras.webp', {'grid': [3, 2], 'cells': 'база на закате, E0..E5 слева направо, сверху вниз (launch-earth по эпохе)'}),
 ]
 
 

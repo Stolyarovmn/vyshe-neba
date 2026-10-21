@@ -37,16 +37,29 @@ test('bot: the first era takes 25-35 minutes on average (DESIGN 4.7)', async () 
   assert.ok(mean >= TARGETS[0].design.min && mean <= TARGETS[0].design.max, `mean first era ${mean.toFixed(1)} min`);
 });
 
-test('bot: other seeds stay within +-30% of every target', async () => {
-  for (const seed of [2, 3, 4]) {
-    const run = await runBot({ seed });
-    assert.equal(run.reachedFinalEra, true, `seed ${seed}`);
-    for (const target of TARGETS) {
-      const actual = run.eras.find((e) => e.era === target.era).minutes;
-      assert.ok(Math.abs(actual - target.minutes) / target.minutes <= 0.3, `seed ${seed}: E${target.era} took ${actual.toFixed(1)} min (target ${target.minutes}); ${describe(run)}`);
-    }
-    assert.ok(run.minutes >= CAMPAIGN.min && run.minutes <= CAMPAIGN.max, `seed ${seed}: campaign ${run.minutes.toFixed(0)} min`);
+test('bot: luck moves single runs, not the balance', async () => {
+  // Every era: the mean over six seeds is within +-15% of the target, no single run is further than +-40%.
+  const seeds = [1, 2, 3, 4, 5, 6];
+  const runs = [];
+  for (const seed of seeds) runs.push(await runBot({ seed }));
+  for (const target of TARGETS) {
+    const minutes = runs.map((run, i) => {
+      assert.equal(run.reachedFinalEra, true, `seed ${seeds[i]}`);
+      return run.eras.find((e) => e.era === target.era).minutes;
+    });
+    const mean = minutes.reduce((a, b) => a + b, 0) / minutes.length;
+    assert.ok(Math.abs(mean - target.minutes) / target.minutes <= 0.15, `E${target.era}: mean ${mean.toFixed(1)} min, target ${target.minutes}`);
+    minutes.forEach((m, i) => assert.ok(Math.abs(m - target.minutes) / target.minutes <= 0.4, `seed ${seeds[i]}: E${target.era} took ${m.toFixed(1)} min (target ${target.minutes}); ${describe(runs[i])}`));
   }
+  for (const run of runs) assert.ok(run.minutes >= CAMPAIGN.min && run.minutes <= CAMPAIGN.max, `campaign ${run.minutes.toFixed(0)} min`);
+});
+
+test('bot: the first stabilizers are bought on the second or third flight', async () => {
+  const run = await runBot({ seed: 1, untilEra: 0 });
+  const firstLevel = run.eras[0].items.findIndex((item) => item.startsWith('P:fins1='));
+  assert.ok(firstLevel >= 0, 'fins are among the first purchases of the era');
+  assert.ok(run.eras[0].items.slice(0, 3).some((item) => item.startsWith('B:service')), 'the service team opens them first');
+  assert.ok(run.firstFinsFlight >= 1 && run.firstFinsFlight <= 3, `fins bought after flight ${run.firstFinsFlight}`);
 });
 
 test('bot: a clumsier pilot is slower but still finishes', async () => {

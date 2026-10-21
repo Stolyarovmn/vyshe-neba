@@ -53,19 +53,26 @@ export default {
       kit.lamp(cx + lampSize * 0.5, G.lamps.y + G.lamps.h / 2, lampSize, ok ? c.green : c.red, true, !ok);
     }
 
-    // три планеты
+    // три планеты: картинка, название и (для закрытой цели) замок с нужным условием — каждое на своём месте кнопки
     dests.forEach((d, i) => {
       const r = G.dest[i];
       const on = st.dest === d.id;
-      const clicked = kit.button(`launch-dest-${d.id}`, r, {
-        variant: on ? 'cardOn' : 'card', locked: !d.ok, icon: DEST_ICON[d.id], stack: true, label: t(`dest.${d.id}`),
-        size: kit.fs(L.portrait ? 12 : 14), iconColor: d.id === 'mars' ? '#e8845a' : c.text, lamp: on ? c.green : false,
-      });
+      const cc = kit.cell();
+      const clicked = kit.button(`launch-dest-${d.id}`, r, { variant: on ? 'cardOn' : 'card', locked: !d.ok, lamp: on ? c.green : false });
       if (clicked) st.dest = d.id;
       else if (kit.denied === `launch-dest-${d.id}`) kit.toast(t('launch.closed'), { kind: 'bad', icon: 'lock' });
+      const nameSize = kit.fs(L.portrait ? 12 : 14);
+      const glyphH = 7 * kit.text.stepFor(nameSize).css;
+      const chipH = d.ok ? 0 : Math.round(28 * L.ui);
+      // нижний край тела кнопки выше её «борта» на два пикселя клетки; под названием — поле
+      const nameY = r.y + r.h - cc * 2 - cc * 4 - chipH - glyphH / 2;
+      const room = nameY - glyphH / 2 - cc * 3 - (r.y + cc * 4);
+      const pic = Math.max(cc * 8, Math.min(Math.round(r.w * 0.62), Math.round(room)));
+      kit.icon(DEST_ICON[d.id], r.x + r.w / 2, r.y + cc * 4 + room / 2, pic, d.id === 'mars' ? '#e8845a' : c.text, d.ok ? 1 : 0.6);
+      kit.drawText(t(`dest.${d.id}`), r.x + r.w / 2, nameY, { size: nameSize, color: d.ok ? (on ? c.amberLight : c.text) : c.textMute, align: 'center', maxWidth: r.w - cc * 8, box: { x: r.x, y: r.y, w: r.w, h: r.h - cc * 2 } });
       if (!d.ok) {
         const why = d.reasons.filter((x) => !isFundsReason(x)).slice(0, 1);
-        if (why.length) lockRows(app, kit, r.x + L.gap * 0.5, r.y + r.h - Math.round(34 * L.ui), r.w - L.gap, why, { compact: true });
+        if (why.length) lockRows(app, kit, r.x + cc * 2, r.y + r.h - cc * 5 - chipH, r.w - cc * 4, why, { compact: true });
       }
     });
 
@@ -83,7 +90,10 @@ export default {
       kit.drawText(isFree ? t('cons.free') : `×${have}`, slot.x + slot.w - kit.cell() * 3, slot.y + slot.h - kit.cell() * 5, { size: kit.fs(11), color: isFree ? c.green : have ? c.amberLight : c.textMute, align: 'right', shadow: true });
       if (id === 'chute' && usable && st.dest !== 'earth') kit.icon('warn', slot.x + kit.cell() * 5, slot.y + slot.h - kit.cell() * 5, Math.round(14 * L.ui), c.amber);
       if (clicked) {
-        if (!usable) app.go('shop', {}, { push: true });
+        if (!usable) {
+          if (id === 'chute') kit.toast(t('launch.noChute'), { kind: 'info', icon: 'cart' });
+          app.go('shop', {}, { push: true });
+        }
         else if (!isFree) st.cons[id] = !st.cons[id];
       }
     });

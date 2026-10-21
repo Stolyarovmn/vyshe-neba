@@ -156,11 +156,12 @@ function applyEvent(e, env) {
       for (let i = 0; i < count; i++) {
         const a = (i / count) * Math.PI * 2;
         particles.emit(
-          PARTICLE.GLINT, x + Math.cos(a) * half * 0.9, y + Math.sin(a) * half * 0.27,
+          PARTICLE.GLINT, x + Math.cos(a) * half * 0.82, y + Math.sin(a) * half * 0.3,
           Math.cos(a) * 46, Math.sin(a) * 14 - 6, 0.45 + (i % 3) * 0.08, 2.4, 0.6, 0, 1.2, variant,
         );
       }
       particles.emit(PARTICLE.FLASH, x, y, 0, 0, 0.35, 8, 40, 0, 0, variant);
+      if (env.ringFx) env.ringFx.trigger(e, env.flight && Number.isFinite(env.flight.x) ? env.flight.x : x, env.era, env.reduceMotion);
       camera.addTrauma(e.quality === 'center' ? 0.18 : 0.1);
       break;
     }

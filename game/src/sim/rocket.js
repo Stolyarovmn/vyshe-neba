@@ -9,6 +9,9 @@ export const THROTTLE_RISE = 3; // per second: 0 -> 100% in a third of a second
 export const THROTTLE_FALL = 4;
 export const RCS_FUEL_SHARE = 0.2; // share of burnRate spent while turning at full rate
 export const MAX_TURN_RATE = 3.5;
+export const TILT_FREE = 3; // a lean limit at or above this (rad) means the rocket may rotate freely
+const TILT_SOFT_FROM = 0.7; // share of the limit where the commanded lean starts to fade and the restoring moment starts
+const TILT_RESTORE = 2.5; // rad/s², restoring moment at the limit
 export const MASS_SHED_BONUS = 0.35; // thrust gain when every other stage has been shed
 export const BOOST = { thrust: 1.32, burn: 1.7, heatUp: 0.24, cool: 0.18, unlock: 0.3, speed: 1.15 };
 
@@ -66,9 +69,9 @@ export function stageAccel(s) {
   return stage.thrust * (1 + MASS_SHED_BONUS * shed);
 }
 
-export function turnRate(s, weightless) {
-  const stage = activeStage(s);
-  return Math.min(MAX_TURN_RATE, stage.turn * s.cfg.fins.turn * (weightless ? 2 : 1));
+// The jets are the same in air and in vacuum: the RCS module decides how fast the rocket turns.
+export function turnRate(s) {
+  return Math.min(MAX_TURN_RATE, activeStage(s).turn * s.cfg.fins.turn);
 }
 
 // Drops every empty stage that has a successor. The throttle value is deliberately left alone.
@@ -141,8 +144,24 @@ export function updateBoost(s, wanted, canThrust, dt, events) {
 
 // Rotation: `tilt` commands an angular rate, RCS jets burn the active tank.
 // Turning never changes the velocity vector - only thrust does.
-export function updateAttitude(s, cmd, dt, weightless, density, events) {
-  const rate = turnRate(s, weightless);
+// Soft limit on the lean from vertical: past 85% of the limit the angle bends toward it and never reaches it.
+function softLimitAngle(angle, max) {
+  const start = max * 0.85;
+  const excess = Math.abs(angle) - start;
+  if (excess <= 0) return angle;
+  const band = max - start;
+  return Math.sign(angle) * (start + band * Math.tanh(excess / band));
+}
+
+// A command that pushes further away from vertical fades out as the limit comes near.
+function fadeOutward(angle, wanted, max) {
+  if (wanted * angle <= 0) return wanted;
+  const over = Math.abs(angle) / max;
+  return wanted * clamp((1 - over) / (1 - TILT_SOFT_FROM), 0, 1);
+}
+
+export function updateAttitude(s, cmd, dt, density, events) {
+  const rate = turnRate(s);
   s.turnRate = rate;
   const stage = activeStage(s);
   const rcsAvailable = stage.fuel > 0 && !s.chute.deployed;
@@ -151,6 +170,10 @@ export function updateAttitude(s, cmd, dt, weightless, density, events) {
   if (cmd.stabilize) wanted = clamp(-s.angle * 5, -rate, rate);
   else if (Math.abs(cmd.tilt) > 0.001) wanted = cmd.tilt * rate;
   else if (s.cfg.avionics.assist) wanted = clamp(-s.angle * 1.5, -0.4 * rate, 0.4 * rate);
+
+  const limited = s.cfg.fins.maxTilt < TILT_FREE;
+  const maxTilt = s.cfg.fins.maxTilt;
+  if (limited) wanted = fadeOutward(s.angle, wanted, maxTilt);
 
   const intensity = rcsAvailable ? Math.min(1, Math.abs(wanted) / rate) : 0;
   if (rcsAvailable && intensity > 0.02) {
@@ -163,5 +186,15 @@ export function updateAttitude(s, cmd, dt, weightless, density, events) {
   s.rcs.left = wanted < 0 && rcsAvailable ? intensity : 0;
   s.rcs.right = wanted > 0 && rcsAvailable ? intensity : 0;
 
-  s.angle = wrapAngle(s.angle + s.av * dt);
+  if (limited) {
+    // Passive restoring moment of the fins and a soft stop: no sudden wall, the lean just stops growing.
+    const over = Math.abs(s.angle) / maxTilt;
+    if (over > TILT_SOFT_FROM) s.av -= Math.sign(s.angle) * Math.min(1, (over - TILT_SOFT_FROM) / (1 - TILT_SOFT_FROM)) * TILT_RESTORE * dt;
+    const raw = wrapAngle(s.angle + s.av * dt);
+    const next = softLimitAngle(raw, maxTilt);
+    if (next !== raw && Math.abs(raw) > Math.abs(s.angle)) s.av *= 0.6; // pushing into the soft stop: the turn dies away
+    s.angle = next;
+  } else {
+    s.angle = wrapAngle(s.angle + s.av * dt);
+  }
 }

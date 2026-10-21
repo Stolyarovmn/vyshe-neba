@@ -46,6 +46,10 @@ const MAX_ATLASES = 40;
 
 export function createText() {
   let dpr = 1;
+  // страж текста: пока он включён, каждая выведенная строка записывается (рамка, строка, область отсечения),
+  // а обрезанные многоточием строки и выход за поля контейнера попадают в issues
+  let audit = null;
+  let clip = null;
   const atlases = new Map();
   const unitCache = new Map();
 
@@ -99,6 +103,13 @@ export function createText() {
     return at;
   }
 
+  const setAudit = (a) => {
+    audit = a;
+  };
+  const setClip = (r) => {
+    clip = r;
+  };
+
   function setDpr(v) {
     if (v !== dpr) {
       dpr = v;
@@ -140,6 +151,7 @@ export function createText() {
     const { color = '#fff', align = 'left', baseline = 'middle', alpha = 1 } = o;
     let text = normalize(str);
     if (!text) return { w: 0, h: size };
+    const original = text;
     if (o.maxWidth) {
       const f = fit(text, o.maxWidth, size);
       text = normalize(f.str);
@@ -151,6 +163,16 @@ export function createText() {
     const glyphH = GLYPH_H * css;
     const top = baseline === 'top' ? y + (lineH - glyphH) / 2 : baseline === 'bottom' ? y - (lineH + glyphH) / 2 : y - glyphH / 2;
     let cx = align === 'center' ? x - total / 2 : align === 'right' ? x - total : x;
+    if (audit && !o.noAudit) {
+      const rect = { x: cx, y: top, w: total, h: glyphH, str: text, clip };
+      audit.rects.push(rect);
+      if (text !== original && !o.allowCut) audit.issues.push({ kind: 'truncated', str: original, shown: text, rect });
+      if (o.box) {
+        const m = 2 * css;
+        const b = o.box;
+        if (cx < b.x + m - 0.01 || cx + total > b.x + b.w - m + 0.01 || top < b.y + css - 0.01 || top + glyphH > b.y + b.h - css + 0.01) audit.issues.push({ kind: 'margin', str: text, rect, box: b });
+      }
+    }
     const shadow = o.shadow || o.outline ? (typeof (o.shadow || o.outline) === 'string' ? o.shadow || o.outline : '#05070e') : null;
     const at = atlasFor(dev, color, shadow ? '#05070e' : null);
     const prevAlpha = ctx.globalAlpha;
@@ -176,10 +198,18 @@ export function createText() {
     const lines = wrap(str, maxWidth, size);
     const max = o.maxLines ?? Infinity;
     const shown = lines.length > max ? lines.slice(0, max) : lines;
-    if (lines.length > max) shown[max - 1] = ellipsize(`${shown[max - 1]} ${lines[max]}`, maxWidth, measurer(size));
+    if (lines.length > max) {
+      shown[max - 1] = ellipsize(`${shown[max - 1]} ${lines[max]}`, maxWidth, measurer(size));
+      if (audit && !o.allowCut) audit.issues.push({ kind: 'truncated', str: String(str), shown: shown[max - 1], rect: { x, y, w: maxWidth, h: lh, str: shown[max - 1], clip } });
+    }
     const ax = o.align === 'center' ? x + maxWidth / 2 : o.align === 'right' ? x + maxWidth : x;
     shown.forEach((ln, i) => draw(ctx, ln, ax, y + i * lh, { ...o, baseline: 'top', maxWidth: undefined }));
     return shown.length * lh;
+  }
+
+  /** Шаг строк абзаца: не меньше 1,25 высоты строки (7 клеток шрифта + 2 клетки зазора). */
+  function lineStep(size, lineHeight = 1.4) {
+    return Math.max(size * lineHeight, stepFor(size).css * 9);
   }
 
   function blockHeight(str, maxWidth, size, lineHeight = 1.4) {
@@ -187,7 +217,7 @@ export function createText() {
   }
 
   return {
-    draw, block, blockHeight, measure, wrap, fit, fitWords, setDpr, scaleFor, stepFor, clear: () => atlases.clear(),
+    draw, block, blockHeight, measure, wrap, fit, fitWords, setDpr, scaleFor, stepFor, setAudit, setClip, lineStep, clear: () => atlases.clear(),
     get cacheSize() { return atlases.size; },
   };
 }

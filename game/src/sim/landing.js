@@ -3,7 +3,8 @@
 import { BODIES, densityAt, gravityAt } from './bodies.js';
 import { clamp, wrapAngle } from './math.js';
 
-export const CHUTE = { minDensity: 0.35, terminalBase: 12, terminalPerLevel: 0.4, terminalMin: 3.5, decel: 110 };
+// The canopy is a shop item: one fixed canopy that needs dense air and a moment to inflate.
+export const CHUTE = { minDensity: 0.35, terminal: 4.5, openTime: 0.6, decel: 110 };
 const OFF_PAD_FACTOR = 0.7; // rough ground: every tolerance shrinks
 const BEACON_TOLERANCE_GAIN = 0.25; // full beacon coverage widens tolerances by this much on the pad
 const PERFECT = { v: 0.46, h: 0.34, ang: 0.44 }; // share of the tolerance a perfect landing must stay under
@@ -64,12 +65,8 @@ export function evaluateTouchdown(s) {
   return { ...limits, v, h, ang, ok: !reason, reason, perfect, damage };
 }
 
-export function chuteLevel(s) {
-  return Math.max(s.cfg.parachute.level, s.chute.consumable ? 1 : 0);
-}
-
 export function hasChute(s) {
-  return chuteLevel(s) > 0;
+  return s.chute.consumable;
 }
 
 export function canParachute(s) {
@@ -77,21 +74,24 @@ export function canParachute(s) {
   return s.vy > 0 && s.atmo >= CHUTE.minDensity && s.phase !== 'pad' && s.phase !== 'transfer';
 }
 
+// Pulling the cord cuts the engine at once; the canopy only brakes after `openTime`.
 export function deployChute(s, events) {
   s.chute.deployed = true;
   s.chute.used = true;
+  s.chute.open = false;
+  s.chute.t = 0;
   s.throttle = 0;
-  events.push({ type: 'parachute', level: chuteLevel(s), x: s.x, y: s.y });
+  events.push({ type: 'parachute', x: s.x, y: s.y });
 }
 
-export function chuteTerminalSpeed(s) {
-  return Math.max(CHUTE.terminalMin, CHUTE.terminalBase - CHUTE.terminalPerLevel * chuteLevel(s));
-}
-
-// An open canopy brakes the fall down to the terminal speed (strongly, then it holds) and damps sway and tilt.
+// Inflation, then braking of the fall down to the terminal speed (strongly, then it holds), with sway and tilt damped.
 export function applyChute(s, dt) {
-  const terminal = chuteTerminalSpeed(s);
-  if (s.vy > terminal) s.vy = Math.max(terminal, s.vy - CHUTE.decel * dt);
+  if (!s.chute.open) {
+    s.chute.t = Math.min(1, s.chute.t + dt / CHUTE.openTime);
+    if (s.chute.t >= 1) s.chute.open = true;
+    return;
+  }
+  if (s.vy > CHUTE.terminal) s.vy = Math.max(CHUTE.terminal, s.vy - CHUTE.decel * dt);
   s.vx *= Math.exp(-0.6 * dt);
   s.angle *= Math.exp(-2 * dt);
   s.av = 0;

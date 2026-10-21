@@ -132,7 +132,7 @@ function drawInstruments(app, kit, L, s, f, hud) {
       const iy = r.y - Math.round(13 * u);
       if (low) kit.lamp(r.x + r.w / 2, iy, Math.round(16 * u), c.red, true, true);
       else kit.icon(iconName, r.x + r.w / 2, iy, Math.round(18 * u), color);
-      if (caption) kit.drawText(caption, r.x + r.w / 2, r.y + r.h + Math.round(10 * u), { size: kit.fs(10), color: c.textDim, align: 'center' });
+      if (caption) kit.drawText(caption, r.x, r.y + r.h + Math.round(10 * u), { size: kit.fs(10), color: c.textDim });
     } else {
       const shift = Math.round(r.h * 1.5);
       kit.ledBar({ x: r.x + shift, y: r.y, w: r.w - shift, h: r.h }, { value: v, color, warn: lowAt, segments: 10 });
@@ -288,7 +288,7 @@ function pickHint(app, s, f, tut) {
   if (tut) out.push({ pri: 2, key: `tut:${tut.text}`, text: tut.text, icon: tut.icon, kind: 'tip' });
   if (f.canTransfer) out.push({ pri: 2, key: 'transfer', text: app.touchUi ? t('hint.transfer.touch') : t('hint.transfer'), icon: 'transfer', kind: 'good' });
   if (f.lowFuel >= 1 && f.fuelTotal > 0) out.push({ pri: 1, key: 'lowfuel', text: t('hint.lowFuel'), icon: 'fuel', kind: 'bad' });
-  if (f.liftedOff && f.vy > 20 && f.alt < 380 && f.fuelTotal <= 0.01 && !f.chute.deployed && (f.cfg.parachute.level > 0 || f.chute.consumable)) out.push({ pri: 3, key: 'chute', text: t('hint.chute'), icon: 'chute', kind: 'bad' });
+  if (f.liftedOff && f.vy > 20 && f.alt < 380 && f.fuelTotal <= 0.01 && !f.chute.deployed && f.chute.consumable) out.push({ pri: 3, key: 'chute', text: t('hint.chute'), icon: 'chute', kind: 'bad' });
   // ветер: боковое ускорение weather.push (знак — направление, + вправо); прогноз weather.forecast — если открыт
   const w = f.weather;
   const push = w ? w.push || 0 : 0;
@@ -380,7 +380,8 @@ function drawControls(app, kit, L, s, f, hud, touch) {
     const heat = f.boost?.heat ?? 0;
     hudButton(app, kit, L, 'boost', B.boost, { icon: 'boost', variant: f.boost?.active ? 'primary' : 'hud', disabled: !!f.boost?.locked, iconColor: heat > 0.8 ? c.red : c.amber, label: t('hud.boost'), heat });
   }
-  const hasChute = f.cfg.parachute.level > 0 || f.chute.consumable;
+  // парашют — только расходник из лавки
+  const hasChute = !!f.chute.consumable;
   const chuteBody = app.data.BODIES?.[f.body]?.parachute !== false;
   hudButton(app, kit, L, 'parachute', B.parachute, { icon: 'chute', variant: f.chute.deployed ? 'good' : 'hud', disabled: !hasChute || !chuteBody || f.chute.deployed, label: t('hud.chute') });
   hudButton(app, kit, L, 'canister', B.canister, { icon: 'canister', variant: 'hud', disabled: !(f.consumables.canister > 0), count: f.consumables.canister || undefined, label: t('hud.canister') });
@@ -432,10 +433,11 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   const thumbH = Math.round(30 * L.ui);
   const ty = Math.round(V.y + 8 * L.ui + (1 - lv.value) * (V.h - 16 * L.ui - thumbH));
   kit.nine(lv.touched ? 'primaryPress' : 'primary', V.x + cc * 2, ty, V.w - cc * 4, thumbH);
-  for (let i = 0; i < 3; i++) kit.rect(V.x + cc * 6, ty + thumbH * 0.3 + i * cc * 2, V.w - cc * 12, cc, c.amber0 ?? c.amberDeep);
+  for (let i = 0; i < 2; i++) kit.rect(V.x + cc * 6, ty + thumbH * 0.16 + i * cc * 2, V.w - cc * 12, cc, c.amberDeep);
   // фиксатор: в режиме «Пилот» рычаг держит положение — лампа горит; в «Аркаде» отпускание сбрасывает тягу
   kit.lamp(V.x + V.w - cc * 5, V.y + cc * 5, cc * 4, mode === 'pilot' ? c.green : c.navy2, mode === 'pilot');
-  kit.drawText(mode === 'arcade' ? t('hud.hold') : `${Math.round(lv.value * 100)}`, V.x + V.w / 2, V.y + V.h + kit.fs(8), { size: kit.fs(9), color: lv.touched ? c.amberLight : c.textMute, align: 'center', baseline: 'top' });
+  // подпись на самой рукоятке: «держи» в аркаде, процент в режиме «Пилот»
+  kit.drawText(mode === 'arcade' ? t('hud.hold') : `${Math.round(lv.value * 100)}`, V.x + V.w / 2, ty + thumbH * 0.72, { size: kit.fs(9), color: c.ink, align: 'center', maxWidth: V.w - cc * 8 });
   kit.drawText(t('hud.thrust'), V.x + V.w / 2, V.y - kit.fs(8), { size: kit.fs(9), color: c.textMute, align: 'center' });
 }
 

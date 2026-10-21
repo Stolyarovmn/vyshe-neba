@@ -20,6 +20,12 @@ const VIEWPORTS = [
   { name: 'phone-landscape', width: 844, height: 390, touch: true },
 ];
 
+// минимальные размеры окна: только страж текста и отступов
+const AUDIT_VIEWPORTS = [
+  { name: 'min-portrait', width: 320, height: 568 },
+  { name: 'min-landscape', width: 568, height: 320 },
+];
+
 function launch() {
   const exe = process.env.CHROMIUM_EXECUTABLE_PATH;
   const args = process.env.CHROMIUM_ARGS ? JSON.parse(process.env.CHROMIUM_ARGS) : ['--no-sandbox'];
@@ -166,6 +172,167 @@ async function checkGuard(page, vp, label) {
   const bad = ['fillText', 'strokeText', 'roundRect', 'arcTo', 'createLinearGradient', 'createRadialGradient', 'createConicGradient'].filter((k) => g[k] > 0);
   assert(bad.length === 0, `${vp.name}/${label}: в слое интерфейса запрещённые вызовы: ${bad.map((k) => `${k}=${g[k]}`).join(', ')}`);
   assert(g.drawImage > 50 && g.fillRect > 500, `${vp.name}/${label}: страж не видит рисования интерфейса (drawImage=${g.drawImage}, fillRect=${g.fillRect})`);
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Страж текста и отступов: обход всех экранов и их состояний; каждая выведенная строка измеряется шрифтом (font-pixel) до вывода.
+// Падает, если строка обрезана многоточием, вышла за кадр, налезает на другую или вплотную к краю своей рамки.
+// ---------------------------------------------------------------------------------------------------------------------
+
+async function auditState(page, vp, label, wait = 280) {
+  await page.evaluate((l) => globalThis.__VN_APP__.kit.audit.enable(true, l), label);
+  await page.waitForTimeout(wait);
+  const issues = await page.evaluate(() => {
+    const a = globalThis.__VN_APP__.kit.audit;
+    const r = a.take();
+    a.enable(false);
+    return r;
+  });
+  return issues.map((i) => ({ ...i, label: `${vp.name}/${label}` }));
+}
+
+const go = (page, name, params = {}) => page.evaluate(([n, p]) => globalThis.__VN_APP__.go(n, p), [name, params]);
+const setUi = (page, fn, arg) => page.evaluate(fn, arg);
+
+/** Обходит экраны и состояния, возвращает все замечания стража. era — принудительная эпоха профиля (или null). */
+async function tourScreens(page, vp, era = null) {
+  const found = [];
+  const audit = async (label, wait) => {
+    found.push(...(await auditState(page, vp, era === null ? label : `E${era}/${label}`, wait)));
+  };
+  // профиль с постройками и модулями, чтобы показать как можно больше состояний
+  await page.evaluate((e) => {
+    const t = globalThis.__VN_TEST__;
+    const p = t.profile();
+    p.coins = 123456;
+    p.data = 654;
+    for (const k of Object.keys(p.buildings)) p.buildings[k] = Math.max(p.buildings[k], 1);
+    for (const k of Object.keys(p.parts)) p.parts[k] = Math.max(p.parts[k], 1);
+    p.inventory = { chute: 2, repair: 3, canister: 1, magnet: 9 };
+    if (e !== null && e !== undefined) p.era = e;
+    t.setProfile(p);
+    globalThis.__VN_APP__.history.length = 0;
+  }, era);
+
+  // хаб
+  await go(page, 'hub');
+  await page.waitForTimeout(350);
+  await audit('хаб');
+  await setUi(page, () => { globalThis.__VN_APP__.ui.hub.era = true; });
+  await audit('хаб/эпоха');
+  await setUi(page, () => { const h = globalThis.__VN_APP__.ui.hub; h.era = false; h.sel = 'beacons'; });
+  await audit('хаб/маяки');
+  await setUi(page, () => { const h = globalThis.__VN_APP__.ui.hub; h.sel = null; });
+
+  // стройка: все четырнадцать зданий и эпоха
+  await go(page, 'base');
+  await page.waitForTimeout(350);
+  await audit('стройка');
+  const keys = ['beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel', 'logistics', 'factory', 'weather', 'control', 'radar', 'energy', 'observation', 'recovery'];
+  for (const k of keys) {
+    await setUi(page, (key) => { const b = globalThis.__VN_APP__.ui.base; b.era = false; b.sel = key; }, k);
+    await audit(`стройка/${k}`, 160);
+  }
+  await setUi(page, () => { const b = globalThis.__VN_APP__.ui.base; b.sel = null; b.era = true; });
+  await audit('стройка/эпоха');
+
+  // мастерская: каждый модуль
+  await go(page, 'rocket');
+  await page.waitForTimeout(350);
+  await audit('мастерская');
+  for (const id of ['engine', 'tank', 'hull', 'booster', 'capsule', 'legs', 'fins', 'avionics']) {
+    await setUi(page, (k) => { globalThis.__VN_APP__.ui.rocket.selected = k; }, id);
+    await audit(`мастерская/${id}`, 160);
+  }
+
+  // доска
+  await go(page, 'journal');
+  await page.waitForTimeout(350);
+  await audit('доска');
+  await setUi(page, () => { globalThis.__VN_APP__.ui.journal.sel = 'sheet:0'; });
+  await audit('доска/лист');
+  await setUi(page, () => { const a = globalThis.__VN_APP__.data.ACHIEVEMENTS[0]; globalThis.__VN_APP__.ui.journal.sel = `medal:${a.id}`; });
+  await audit('доска/медаль');
+
+  // лавка
+  await go(page, 'shop');
+  await page.waitForTimeout(350);
+  await audit('лавка');
+  for (const sel of ['item:chute', 'item:repair', 'item:canister', 'item:magnet', 'skin:wasp', 'skin:arctic', 'skin:classic']) {
+    await setUi(page, (k) => { globalThis.__VN_APP__.ui.shop.sel = k; }, sel);
+    await audit(`лавка/${sel}`, 160);
+  }
+
+  // пульт запуска
+  await go(page, 'launch');
+  await page.waitForTimeout(350);
+  await audit('пульт');
+  await setUi(page, () => { globalThis.__VN_APP__.ui.launch.cons = { chute: true, repair: true }; });
+  await audit('пульт/расходники');
+
+  // обратный отсчёт и полёт: сенсорный и клавиатурный макеты, пауза, справка, итоги
+  for (const mode of ['on', 'off']) {
+    await setUi(page, (m) => { globalThis.__VN_APP__.prefs.touchControls = m; }, mode);
+    await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: { chute: true, repair: true } }));
+    await page.waitForTimeout(500);
+    await audit(`отсчёт/${mode}`, 200);
+    await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+    await page.waitForTimeout(500);
+    await audit(`полёт/${mode}`, 400);
+    await page.evaluate(() => globalThis.__VN_APP__.pause());
+    await audit(`пауза/${mode}`, 250);
+    await page.evaluate(() => { globalThis.__VN_APP__.resume(); globalThis.__VN_APP__.queueCard('help', true); });
+    await audit(`справка/${mode}`, 250);
+    await page.evaluate(() => { const a = globalThis.__VN_APP__; a.cards.length = 0; a.abandon(); });
+    await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
+    await page.waitForTimeout(3300);
+    await audit(`итоги/${mode}`, 300);
+    await page.evaluate(() => { globalThis.__VN_APP__.results = null; globalThis.__VN_APP__.go('hub'); });
+  }
+  await setUi(page, () => { globalThis.__VN_APP__.prefs.touchControls = 'auto'; });
+
+  // итоги после аварии и после посадки (подсказки, допуски, награды)
+  for (const mission of ['crash', 'land']) {
+    await go(page, 'launch');
+    await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: {} }));
+    await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+    if (mission === 'land') {
+      await page.evaluate(() => globalThis.__VN_APP__.autoplay({ mission: 'hop', skill: 1, targetAlt: 300 }));
+      await page.evaluate(() => globalThis.__VN_TEST__.step(120 * 240));
+    } else {
+      // авария: три секунды полной тяги, затем падение без тяги до конца полёта
+      await page.evaluate(() => {
+        const a = globalThis.__VN_APP__;
+        const s = a.session;
+        const cmd = (throttle) => ({ throttle, tilt: 0, stabilize: false, boost: false, parachute: false, canister: false, repair: false, transfer: false, pause: false });
+        for (let i = 0; i < 360; i++) a.sim.step(s.flight, cmd(1), 1 / 120);
+        for (let n = 0; !s.flight.ended && n < 60000; n++) a.sim.step(s.flight, cmd(0), 1 / 120);
+        a.finishFlight();
+      });
+    }
+    await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 20000 });
+    await page.waitForTimeout(3300);
+    await audit(`итоги/${mission}`, 300);
+    await page.evaluate(() => { globalThis.__VN_APP__.results = null; globalThis.__VN_APP__.go('hub'); });
+  }
+
+  // настройки: прокрутка сверху донизу
+  await go(page, 'settings');
+  await page.waitForTimeout(350);
+  const at = { x: vp.width / 2, y: vp.height / 2 };
+  for (let i = 0; i < 12; i++) {
+    await audit(`настройки/${i}`, 140);
+    await page.mouse.move(at.x, at.y);
+    await page.mouse.wheel(0, Math.round(vp.height * 0.7));
+    await page.waitForTimeout(220);
+  }
+  await go(page, 'hub');
+  return found;
+}
+
+function formatIssues(issues) {
+  return issues.map((i) => `  [${i.label}] ${i.kind}: «${i.str}»${i.other ? ` × «${i.other}»` : ''}${i.shown ? ` → «${i.shown}»` : ''} (${i.at})`).join('\n');
 }
 
 const shot = (page, vp, name) => page.screenshot({ path: path.join(outDir, `ui-${vp.name}-${name}.png`) });
@@ -498,10 +665,41 @@ async function runViewport(browser, vp) {
   const saved = await hook(page, () => globalThis.__VN_TEST__.profile());
   assert(saved.coins === coins && saved.buildings.beacons === 1 && saved.parts.legs === 1, `${vp.name}: прогресс не сохранился`);
 
+  // страж текста и отступов на всех экранах
+  const issues = await tourScreens(page, vp);
+  assert(issues.length === 0, `${vp.name}: текст не помещается (${issues.length}):
+${formatIssues(issues)}`);
+  await checkGuard(page, vp, 'обход экранов');
+
   const hookErrors = await hook(page, () => globalThis.__VN_TEST__.errors || []);
   assert(errors.length === 0 && hookErrors.length === 0, `${vp.name}: ошибки: ${[...errors, ...hookErrors].join(' | ')}`);
   await context.close();
   console.log(`OK ${vp.name} ${vp.width}x${vp.height}`);
+}
+
+/** Только страж текста на минимальных размерах окна (320×568 и 568×320). */
+async function runAuditViewport(browser, vp, collect = null) {
+  const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
+  const page = await context.newPage();
+  await page.addInitScript(GUARD_SCRIPT);
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+  page.on('console', (m) => {
+    if (m.type() === 'error') errors.push(`console: ${m.text()}`);
+  });
+  await page.goto(pathToFileURL(gameFile).href);
+  await page.waitForFunction(() => globalThis.__VN_TEST__, null, { timeout: 20000 });
+  await page.waitForTimeout(800);
+  const issues = await tourScreens(page, vp);
+  await shot(page, vp, '01-hub');
+  if (collect) collect.push(...issues);
+  else assert(issues.length === 0, `${vp.name}: текст не помещается (${issues.length}):
+${formatIssues(issues)}`);
+  await checkGuard(page, vp, 'обход экранов');
+  const hookErrors = await hook(page, () => globalThis.__VN_TEST__.errors || []);
+  assert(errors.length === 0 && hookErrors.length === 0, `${vp.name}: ошибки: ${[...errors, ...hookErrors].join(' | ')}`);
+  await context.close();
+  console.log(`OK ${vp.name} ${vp.width}x${vp.height} (страж текста)`);
 }
 
 (async () => {
@@ -512,7 +710,16 @@ async function runViewport(browser, vp) {
   }
   const browser = await launch();
   try {
+    if (process.env.UI_AUDIT_ONLY) {
+      // отладка стража текста: все размеры окна, замечания собираются и печатаются целиком
+      const all = [];
+      for (const vp of [...VIEWPORTS, ...AUDIT_VIEWPORTS]) await runAuditViewport(browser, { touch: true, ...vp }, all);
+      console.log(all.length ? `Замечаний: ${all.length}
+${formatIssues(all)}` : 'Замечаний нет');
+      process.exit(all.length ? 1 : 0);
+    }
     for (const vp of VIEWPORTS) await runViewport(browser, vp);
+    for (const vp of AUDIT_VIEWPORTS) await runAuditViewport(browser, vp);
   } finally {
     await browser.close();
   }

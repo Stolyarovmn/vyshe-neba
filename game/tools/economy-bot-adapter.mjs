@@ -183,15 +183,21 @@ function expedition(config, bodyId, waste) {
 
 // A human burns several times the ideal fuel (corrections, hovering, dodging) and flies slower than the
 // cruise model: `waste` is the extra fuel share, `pace`/`base`/`cap` stretch the duration in seconds.
-export const PILOT = { waste: 2.5, assistRelief: 0.8, pace: 1.4, base: 25, cap: 210 };
+export const PILOT = { waste: 2, controlWaste: 0.5, assistRelief: 0.8, pace: 1.4, base: 25, cap: 210 };
+
+// 1 when the rocket barely steers (stock stabilizers, 0.2 rad of tilt), 0 from 1.2 rad (fins level 8) on.
+function controlLoss(config) {
+  return clamp(1 - ((config.fins.maxTilt ?? Math.PI) - 0.2) / 1.0, 0, 1);
+}
 
 function wasteOf(config) {
-  return PILOT.waste - PILOT.assistRelief * (config.avionics.assist ? 1 : 0); // a human pilot is not a perfect hoverslam
+  // A human pilot is not a perfect hoverslam; a weakly steerable rocket costs even more fuel to correct.
+  return PILOT.waste + PILOT.controlWaste * controlLoss(config) - PILOT.assistRelief * (config.avionics.assist ? 1 : 0);
 }
 
 function cacheKey(config, destination, target) {
   const stages = config.stages.map((s) => [s.id, s.thrust, s.fuel, s.burnRate, s.mass].join(':')).join('|');
-  return [destination, Math.round(target), wasteOf(config), stages, config.legs.vTol, config.base.beacons, config.fins.dragCut,
+  return [destination, Math.round(target), wasteOf(config), stages, config.legs.vTol, config.base.beacons, config.fins.dragCut, config.fins.maxTilt,
     config.limits?.speed, config.limits?.fall, config.avionics.assist, config.transferCost?.moon, config.transferCost?.mars].join('#');
 }
 
@@ -228,7 +234,8 @@ export function landingChance(config, destination, altUnits, skill) {
   const aids = 0.08 * config.avionics.assist + 0.03 * config.avionics.predict;
   const altKm = (altUnits * METERS_PER_UNIT) / 1000;
   const difficulty = 0.03 * Math.log2(1 + altKm) + (destination === 'moon' ? 0.06 : destination === 'mars' ? 0.1 : 0);
-  return clamp(0.5 + 0.35 * skill + legsBonus + aids - difficulty, 0.3, 0.97);
+  const steering = 0.2 * controlLoss(config); // a rocket that cannot tilt is hard to put on the pad
+  return clamp(0.5 + 0.35 * skill + legsBonus + aids - difficulty - steering, 0.3, 0.97);
 }
 
 export function flightSeconds(modelSeconds, destination) {

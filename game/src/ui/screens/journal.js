@@ -93,9 +93,12 @@ function drawBoard(app, kit, L, r, st, list, rects) {
       kit.rect(rect.x + cc * 2, ry + cc * 2, rect.w, rect.h, c.ink);
       kit.nine('paper', rect.x, ry, rect.w, rect.h);
       pin(kit, rect.x + rect.w / 2, ry + cc * 4, c.red);
-      const size = kit.fs(11);
-      const lines = kit.text.wrap(ct.name, rect.w - cc * 8, size).slice(0, 3);
-      lines.forEach((ln, k) => kit.drawText(ln, rect.x + cc * 4, ry + cc * 10 + k * size * 1.15, { size, color: c.ink, baseline: 'top' }));
+      // название переносится по словам; размер подбирается так, чтобы самое длинное слово не рвалось
+      const textW = rect.w - cc * 10;
+      const size = kit.text.fitWords(ct.name, textW, kit.fs(11));
+      const step = kit.text.lineStep(size);
+      const lines = kit.text.wrap(ct.name, textW, size);
+      lines.forEach((ln, k) => kit.drawText(ln, rect.x + cc * 5, ry + cc * 10 + k * step, { size, color: c.ink, baseline: 'top' }));
       if (ct.cargo) kit.icon('cart', rect.x + cc * 7, ry + rect.h - cc * 14, Math.round(16 * L.ui), c.cyanDark);
       kit.icon('coin', rect.x + rect.w - cc * 22, ry + rect.h - cc * 7, Math.round(14 * L.ui), c.amberDeep);
       kit.drawText(fmtCompact(ct.reward), rect.x + rect.w - cc * 4, ry + rect.h - cc * 7, { size: kit.fs(12), color: c.amberDeep, align: 'right' });

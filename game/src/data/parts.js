@@ -1,4 +1,4 @@
-// Nine rocket modules, 18 levels each (three per era). levels[i] describes level i + 1.
+// Eight rocket modules, 18 levels each (three per era). levels[i] describes level i + 1.
 // Stats are absolute values on the simulation scale; `base` holds the values of level 0.
 // The requirements of every module follow the table in DESIGN.md section 4.3.
 
@@ -56,7 +56,22 @@ function buildPart(spec) {
   };
 }
 
-const stat = (key, label, unit, dir, digits = 0) => ({ key, label, unit, dir, digits });
+// `factor` converts the stored value to the displayed one (radians -> degrees).
+const stat = (key, label, unit, dir, digits = 0, factor = 1) => ({ key, label, unit, dir, digits, factor });
+
+// Soft tilt limit of the stabilizers, radians: 0.20 at level 0, 1.2 at level 8, free rotation (PI) from level 12.
+function finsTilt(level) {
+  if (level <= 8) return round(0.2 + 0.125 * level, 3);
+  if (level < 12) return round(1.2 + ((Math.PI - 1.2) / 4) * (level - 8), 3);
+  return Math.PI;
+}
+
+// Rotation speed multiplier: 0.45 at level 0, 1.1 at level 8, 1.6 at level 12, 2.2 at level 18.
+function finsTurn(level) {
+  if (level <= 8) return round(0.45 + 0.08125 * level, 3);
+  if (level <= 12) return round(1.1 + 0.125 * (level - 8), 3);
+  return round(1.6 + 0.1 * (level - 12), 3);
+}
 
 export const PARTS = {
   engine: buildPart({
@@ -146,24 +161,14 @@ export const PARTS = {
   fins: buildPart({
     id: 'fins',
     name: 'Стабилизаторы и РСУ',
-    desc: 'Скорость поворота и снос под ветром.',
+    desc: 'Маневровые двигатели и стабилизаторы: шире угол наклона и быстрее поворот.',
     need: 'Нужны стабилизаторы',
-    cost: { base: 55, growth: 1.29 },
+    // Cheap early levels: without them the rocket barely steers, so players buy the first ones at once.
+    cost: { base: 35, growth: 1.29 },
     dataWeight: 0.6,
-    stats: (level) => ({ turn: round(1 + 0.11 * level, 2), dragCut: round(1 - 1 / (1 + 0.06 * level), 3) }),
-    statInfo: [stat('turn', 'Поворот', '×', 1, 2), stat('dragCut', 'Меньше сноса', '%', 1, 3)],
+    stats: (level) => ({ maxTilt: finsTilt(level), turn: finsTurn(level), dragCut: round(1 - 1 / (1 + 0.06 * level), 3) }),
+    statInfo: [stat('maxTilt', 'Угол наклона', '°', 1, 0, 180 / Math.PI), stat('turn', 'Поворот', '×', 1, 2), stat('dragCut', 'Меньше сноса', '%', 1, 3)],
     requires: (level) => [{ building: 'service', level: ceilDiv(level, 4) }],
-  }),
-  parachute: buildPart({
-    id: 'parachute',
-    name: 'Парашют',
-    desc: 'Аварийный спуск в плотной атмосфере. Выше уровень — ниже скорость снижения.',
-    need: 'Нужен парашют',
-    cost: { base: 45, growth: 1.28 },
-    dataWeight: 0.5,
-    stats: (level) => ({ level, descent: Math.max(3.5, round(12 - 0.4 * level, 2)) }),
-    statInfo: [stat('level', 'Купол', 'ур.', 1, 0), stat('descent', 'Скорость снижения', 'ед./с', -1, 1)],
-    requires: (level) => [{ building: 'rescue', level: ceilDiv(level, 4) }],
   }),
   avionics: buildPart({
     id: 'avionics',

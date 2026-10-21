@@ -45,7 +45,7 @@ function makeObjects(body, era) {
       } else if (roll < 0.84) {
         for (let i = 0; i < 5; i++) add({ kind: 'coin', hazard: false, r: 9, x: x + i * 30, y: -alt - i * 8 });
       } else if (roll < 0.9) {
-        add({ kind: 'ring', hazard: false, r: 35, orient: 'horizontal', halfWidth: 38, x, y: -alt });
+        add({ kind: 'ring', hazard: false, r: 35, orient: 'horizontal', halfWidth: 72, x, y: -alt });
       } else if (roll < 0.95) {
         add({ kind: 'fuel', hazard: false, r: 15, x, y: -alt });
       } else {
@@ -58,7 +58,7 @@ function makeObjects(body, era) {
       const roll = rng();
       if (roll < 0.3) addRock(add, rng, x, alt, { dx: 4, dy: 2 });
       else if (roll < 0.6) for (let i = 0; i < 5; i++) add({ kind: 'coin', hazard: false, r: 9, x: x + i * 30, y: -alt });
-      else if (roll < 0.75) add({ kind: 'ring', hazard: false, r: 35, orient: 'horizontal', halfWidth: 38, x, y: -alt });
+      else if (roll < 0.75) add({ kind: 'ring', hazard: false, r: 35, orient: 'horizontal', halfWidth: 72, x, y: -alt });
       else if (roll < 0.85) add({ kind: 'fuel', hazard: false, r: 15, x, y: -alt });
     }
   }

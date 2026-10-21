@@ -20,8 +20,11 @@ export function backdropCell(kind, era, variant = 0) {
     case 'launch-moon':
       return { atlas: 'backdrop_env', col: 1, row: 1 };
     case 'launch-earth':
-    default:
-      return { atlas: 'backdrop_env', col: 0, row: 0 };
+    default: {
+      // панорама базы на закате по эпохе (base-eras, 3x2); общий кадр environments — запасной
+      const e = clamp(era | 0, 0, 5);
+      return { atlas: 'backdrop_base', col: e % 3, row: Math.floor(e / 3), fallback: { atlas: 'backdrop_env', col: 0, row: 0 } };
+    }
   }
 }
 
@@ -56,8 +59,12 @@ export function createBackdrop(painter) {
      */
     draw(ctx, params) {
       const { kind, era = 0, rect, time = 0, dim = 0 } = params;
-      const cell = backdropCell(kind, era, params.variant || 0);
-      const asset = painter.assets.get(cell.atlas);
+      let cell = backdropCell(kind, era, params.variant || 0);
+      let asset = painter.assets.get(cell.atlas);
+      if (!asset && cell.fallback) {
+        cell = cell.fallback;
+        asset = painter.assets.get(cell.atlas);
+      }
       const { x, y, w, h } = rect;
       ctx.save();
       ctx.beginPath();

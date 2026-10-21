@@ -228,6 +228,52 @@ async function checkModules(browser, base, vp) {
   await context.close();
 }
 
+/** Подключённый арт в полёте: горизонт с городом, кольца, шары из частей, магнит, астероиды, базы на Луне и Марсе. */
+async function checkArt(browser, base, vp) {
+  const run = async (query, script, shotName, minColors = 20) => {
+    const { page, context, errors } = await openPreview(browser, base, vp, query);
+    await page.evaluate(() => window.__preview.advance(6));
+    const result = await page.evaluate(script);
+    const colors = await distinctColors(page);
+    assert(colors > minColors, `${shotName} (${vp.name}): картинка выглядит пустой (${colors} цветов)`);
+    await page.screenshot({ path: path.join(outDir, `render-art-${shotName}-${vp.name}.png`) });
+    assert(errors.length === 0, `${shotName} (${vp.name}): ошибки страницы: ${errors.join('; ')}`);
+    await context.close();
+    return result;
+  };
+  const scene = `(() => { const p = window.__preview; const f = p.state().flight; f.cfg.consumables = { magnet: 1 }; f.objects.length = 0;
+    const add = (o) => f.objects.push({ active: true, hazard: false, r: 30, ox: o.x, oy: o.y, motion: 'none', phase: 0.2, ...o });
+    add({ id: 901, kind: 'ring', orient: 'horizontal', halfWidth: 72, x: f.x, y: f.y - 95 });
+    add({ id: 902, kind: 'balloon', hazard: true, lineage: 'mid', gen: 3, x: f.x + 190, y: f.y - 150 });
+    add({ id: 903, kind: 'balloon', hazard: true, lineage: 'high', gen: 5, x: f.x - 190, y: f.y - 190 });
+    for (let i = 0; i < 4; i++) add({ id: 910 + i, kind: 'coin', r: 9, x: f.x + 70 + i * 16, y: f.y - 40 - i * 12 });
+    p.advance(30);
+    return { assets: p.assets.size, errors: p.assets.errors.length, rings: p.renderer.flight.ringFx.ghosts.length }; })()`;
+  const info = await run('mode=flight&scenario=static&alt=520&era=4&objs=0&weather=clear', scene, 'horizon-rings', 40);
+  assert(info.errors === 0 && info.assets > 230, `${vp.name}: ассеты ${JSON.stringify(info)}`);
+
+  // пролёт кольца: событие sim запускает вспышку, она гаснет сама
+  const pass = await run('mode=flight&scenario=static&alt=520&era=2&objs=0&weather=clear', `(() => { const p = window.__preview; const f = p.state().flight; const fx = p.renderer.flight.ringFx;
+    p.events([{ type: 'ring', x: f.x, y: f.y - 60, halfWidth: 70, offset: 0.1, quality: 'center', dir: 'up' }]);
+    p.advance(12);
+    const during = fx.ghosts.length;
+    p.advance(90);
+    return { during, after: fx.ghosts.length }; })()`, 'ring-pass', 20);
+  assert(pass.during === 1 && pass.after === 0, `${vp.name}: вспышка кольца ${JSON.stringify(pass)}`);
+
+  const rocks = `(() => { const p = window.__preview; const f = p.state().flight; f.objects.length = 0;
+    for (let i = 0; i < 6; i++) f.objects.push({ id: 30 + i * 7, kind: 'asteroid', active: true, hazard: true, lineage: 'rock', gen: 0, size: 'medium', r: 28, radius: 28, dir: 1, phase: 0.1 * i, motion: 'none', ox: f.x - 160 + (i % 3) * 130, oy: f.y - 150 - Math.floor(i / 3) * 130, x: f.x - 160 + (i % 3) * 130, y: f.y - 150 - Math.floor(i / 3) * 130 });
+    p.advance(10); return f.objects.length; })()`;
+  await run('mode=flight&scenario=static&alt=12500&era=3&objs=0&weather=clear', rocks, 'rocks-space', 8);
+  await run('mode=flight&scenario=static&alt=300&era=3&objs=0&body=mars', rocks, 'rocks-mars', 8);
+  await run('mode=flight&scenario=static&alt=30&era=0&objs=0&body=moon', '1', 'moon-e0', 10);
+  await run('mode=flight&scenario=static&alt=30&era=5&objs=0&body=mars', '1', 'mars-e5', 10);
+  const clouds = await run('mode=flight&scenario=static&alt=520&era=3&objs=0&weather=cloudy', `(() => { const p = window.__preview; const f = p.state().flight; f.clouds.length = 0;
+    [['cumulus', 220, 0.5, 90], ['stratus', 700, 0.4, 20], ['storm', 380, 0.95, 500], ['cirrus', 600, 0.25, 15]].forEach(([kind, w, d, h], i) => f.clouds.push({ id: 5 + i * 3, kind, ox: f.x - 330 + (i % 2) * 520, x: f.x - 330 + (i % 2) * 520, alt: 740 - Math.floor(i / 2) * 230, w, h, density: d, storm: kind === 'storm', vx: 0 }));
+    p.advance(10); return f.clouds.length; })()`, 'clouds', 20);
+  assert(clouds === 4, `${vp.name}: облака ${clouds}`);
+}
+
 async function checkBackdrops(browser, base) {
   for (const vp of [VIEWPORTS[0], VIEWPORTS[1]]) {
     for (const kind of ['workshop', 'shop', 'launch-earth', 'launch-moon']) {
@@ -321,6 +367,8 @@ async function frameBudget(browser, base) {
       console.log(`ok: входы, стройка, праздник, ночь ${vp.name}`);
       await checkModules(browser, url, vp);
       console.log(`ok: хитбоксы модулей ${vp.name}`);
+      await checkArt(browser, url, vp);
+      console.log(`ok: арт полёта (горизонт, кольца, шары, астероиды, базы) ${vp.name}`);
       await checkFlight(browser, url, vp);
       console.log(`ok: полёт ${vp.name}`);
     }

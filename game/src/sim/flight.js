@@ -97,7 +97,7 @@ export function createFlight(config) {
       speed: cfg.limits.speed ?? Math.min(SPEED_CAP, SPEED_PER_THRUST * core.thrust),
       fall: cfg.limits.fall ?? Math.min(125, Math.max(60, 88 + 0.67 * (cfg.legs.vTol - 13))),
     },
-    chute: { deployed: false, used: false, consumable: cfg.consumables.chute === 1 },
+    chute: { deployed: false, used: false, open: false, t: 0, consumable: cfg.consumables.chute === 1 },
     consumables: { repair: cfg.consumables.repair, canister: cfg.consumables.canister },
     latch: { canister: false, repair: false },
     hitTimer: 0,
@@ -215,7 +215,6 @@ function tick(s, cmd, dt, events) {
   const alt = -s.y;
   const g = gravityAt(body, alt);
   const density = densityAt(body, alt);
-  const weightless = g <= 0;
 
   updateWeather(s.weather, s.body, alt, dt, s.cfg.base.weather > 0 || s.cfg.avionics.predict > 0);
   updateClouds(s, dt);
@@ -251,7 +250,7 @@ function tick(s, cmd, dt, events) {
     thrust = accel * burnFuel(s, burn, events);
   }
 
-  if (s.liftedOff) updateAttitude(s, cmd, dt, weightless, density, events);
+  if (s.liftedOff) updateAttitude(s, cmd, dt, density, events);
   else s.rcs.left = s.rcs.right = 0;
 
   const fins = s.cfg.fins.dragCut;

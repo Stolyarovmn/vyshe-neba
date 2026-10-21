@@ -65,7 +65,7 @@ export default {
     const compact = !L.portrait && L.h < 460;
     const hdrH = Math.round((compact ? 44 : 56) * U(L));
     const bodyId = res.report.body || result.body || res.destination;
-    const bodyName = app.data.DESTINATIONS?.[res.destination]?.name || app.data.BODIES?.[bodyId]?.name;
+    const bodyName = t(`dest.${res.destination}`) !== `dest.${res.destination}` ? t(`dest.${res.destination}`) : app.data.DESTINATIONS?.[res.destination]?.name || app.data.BODIES?.[bodyId]?.name;
     const hx = card.x + L.pad;
     const hy = card.y + L.pad + hdrH / 2;
     kit.icon(bodyId === 'moon' || bodyId === 'mars' ? bodyId : 'earth', hx + Math.round(18 * U(L)), hy, Math.round(36 * U(L)), c.text);
@@ -135,13 +135,15 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
   let y = top;
   const compact = !L.portrait && L.h < 460;
   if (crashed && report.hint) {
-    y += kit.paragraph(report.hint.text, x, y, w, { size: kit.fs(12), color: c.ink, lineHeight: 1.25, maxLines: compact ? 2 : 3 }) + L.gap * 0.5;
+    y += kit.paragraph(report.hint.text, x, y, w, { size: kit.fs(12), color: c.ink, lineHeight: 1.25 }) + L.gap * 0.5;
   }
   const lg = result.landing;
   if ((crashed || landed) && lg && lg.vTol) y += drawTolerances(kit, L, x, y, w, lg) + L.gap * 0.5;
   if (crashed && report.hint) {
     const chips = [];
-    if (report.hint.part) chips.push({ id: 'results-goto-part', label: partShort(app, report.hint.part), icon: partIcon(report.hint.part), go: () => app.go('rocket', { select: report.hint.part }, { push: true }) });
+    if (report.hint.part && report.hint.part !== 'parachute') chips.push({ id: 'results-goto-part', label: partShort(app, report.hint.part), icon: partIcon(report.hint.part), go: () => app.go('rocket', { select: report.hint.part }, { push: true }) });
+    // парашют теперь расходник: после аварии без него подсказываем лавку
+    if (report.hint.part === 'parachute' || !res.consumables?.chute) chips.push({ id: 'results-goto-shop', label: t('dock.shop'), icon: 'chute', go: () => app.go('shop', {}, { push: true }) });
     if (report.hint.building) chips.push({ id: 'results-goto-building', label: buildingShort(app, report.hint.building), icon: buildingIcon(report.hint.building, 1), go: () => app.go('base', { select: report.hint.building }, { push: true }) });
     if (chips.length) {
       const bw = (w - L.gap * (chips.length - 1)) / chips.length;

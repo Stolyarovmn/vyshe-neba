@@ -8,7 +8,8 @@ import { chromeLayout } from '../layout.js';
 const MIN_ROW = 44; // нижняя граница высоты нажимаемых строк и кнопок щитка
 
 export const BUILDING_KEYS = ['beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel', 'logistics', 'factory', 'weather', 'control', 'radar', 'energy', 'observation', 'recovery'];
-export const PART_KEYS = ['engine', 'tank', 'hull', 'booster', 'capsule', 'legs', 'fins', 'parachute', 'avionics'];
+// восемь модулей: парашют стал расходником лавки и в прокачке не участвует
+export const PART_KEYS = ['engine', 'tank', 'hull', 'booster', 'capsule', 'legs', 'fins', 'avionics'];
 
 export const BUILDING_ICON = {
   beacons: 'target', gantry: 'building', deluge: 'fuel', service: 'repair', rescue: 'shield', fuel: 'canister', logistics: 'cart',
@@ -58,7 +59,9 @@ export function statShort(info) {
 /** Форматирование показателя по описанию { unit, digits }: доли — в процентах, «×» — множитель. */
 export function fmtInfo(info, v) {
   if (typeof v !== 'number' || !Number.isFinite(v)) return '—';
+  if (info.factor && info.factor !== 1) v *= info.factor; // например, радианы → градусы
   if (info.unit === '%') return `${Math.round(v * 100)}%`;
+  if (info.unit === '°') return `${Math.round(v)}°`;
   const s = Number(v.toFixed(info.digits ?? 1)).toString().replace('.', ',');
   return info.unit === '×' ? `×${s}` : s;
 }
@@ -126,7 +129,7 @@ export function drawChrome(app, kit, o = {}) {
   if (o.back && G.back && kit.iconButton('back', G.back, { icon: 'back', label: t('common.back'), variant: 'btn' })) app.back();
   if (o.era && G.era) {
     const cc = kit.cell();
-    if (kit.button('plate-era', G.era, { variant: o.eraOpen ? 'cardOn' : 'raised', icon: 'era', label: String(ERA_YEARS[p.era] ?? ''), size: Math.round(G.era.h * 0.4), iconSize: Math.round(G.era.h * 0.58), lamp: false })) out.era = true;
+    if (kit.button('plate-era', G.era, { variant: o.eraOpen ? 'cardOn' : 'raised', icon: 'era', label: String(ERA_YEARS[p.era] ?? ''), size: Math.round(G.era.h * 0.3), iconSize: Math.round(G.era.h * 0.46), lamp: false })) out.era = true;
     void cc;
   }
   if (o.gear && G.gear && kit.iconButton('hub-gear', G.gear, { icon: 'gear', label: t('more.settings'), variant: 'btn' })) out.gear = true;
@@ -199,16 +202,31 @@ export function lockRows(app, kit, x, y, w, reasons, o = {}) {
 
 // ---------- щиток модуля и постройки ----------
 
-/** Масштаб размеров щитка: если щиток не помещается в bounds, его строки ужимаются (но не меньше 0,62). */
+/**
+ * Масштаб размеров щитка: если щиток не помещается в bounds, его строки ужимаются (но не меньше 0,62).
+ * Если не помещается и так, щиток получает всю безопасную область окна: он важнее фона. Возвращает { u, bounds }.
+ */
 function fitScale(L, bounds, calcH) {
-  const avail = (bounds?.h ?? L.area.h) - L.gap * 2;
-  let u = L.ui;
-  for (let i = 0; i < 3; i++) {
-    const h = calcH(u);
-    if (h <= avail) break;
-    u = Math.max(L.ui * 0.62, u * Math.max(0.7, avail / h));
-  }
-  return u;
+  const tryFit = (b) => {
+    const avail = (b?.h ?? L.area.h) - L.gap * 2;
+    let u = L.ui;
+    for (let i = 0; i < 4; i++) {
+      const h = calcH(u);
+      if (h <= avail) return u;
+      u = Math.max(L.ui * 0.62, u * Math.max(0.7, avail / h));
+    }
+    return calcH(u) <= avail ? u : null;
+  };
+  const u = tryFit(bounds);
+  if (u !== null) return { u, bounds };
+  // сначала вся область под угловыми табличками, и только если и там тесно — всё окно
+  const row = chromeLayout(L, { back: true, era: true, gear: true }).row;
+  const top = row.y + row.h + L.gap;
+  const below = { x: L.area.x, y: top, w: L.area.w, h: L.area.y + L.area.h - top };
+  const ub = tryFit(below);
+  if (ub !== null) return { u: ub, bounds: below };
+  const full = { x: L.area.x, y: L.area.y, w: L.area.w, h: L.area.h };
+  return { u: tryFit(full) ?? L.ui * 0.62, bounds: full };
 }
 
 /**
@@ -225,24 +243,27 @@ export function infoCallout(app, kit, spec) {
   const locks = (spec.locks || []).filter((r) => !isFundsReason(r)).slice(0, 2);
   const dims = (uu) => {
     const touch = (n) => Math.max(MIN_ROW, Math.round(n * uu));
+    // абсолютные минимумы: при сжатии щитка строки не должны слипаться (подпись, зазор, полоска помещаются всегда)
+    const atLeast = (n, min) => Math.max(min, Math.round(n * uu));
     return {
-      titleH: Math.round(34 * uu),
-      segH: Math.round(18 * uu),
-      rowH: Math.round(36 * uu),
-      lockH: (spec.goto ? touch(44) : Math.round(28 * uu)) + Math.round(L.gap * 0.3),
-      lineH: spec.line ? Math.round(24 * uu) : 0,
-      footH: spec.next === false || spec.noBuy ? Math.round(32 * uu) : touch(52),
+      titleH: atLeast(34, 28),
+      segH: atLeast(18, 16),
+      rowH: atLeast(36, 30),
+      lockH: (spec.goto ? touch(44) : atLeast(28, 26)) + Math.round(L.gap * 0.3),
+      lineH: spec.line ? atLeast(24, 20) : 0,
+      footH: spec.next === false || spec.noBuy ? atLeast(32, 28) : touch(52),
     };
   };
   const calcH = (uu) => {
     const d = dims(uu);
-    return L.pad * 2 + d.titleH + (spec.max ? d.segH : 0) + d.lineH + rows.length * (d.rowH + Math.round(L.gap * 0.3)) + locks.length * d.lockH + (spec.extraH || 0) + d.footH + L.gap;
+    const extra = typeof spec.extraH === 'function' ? spec.extraH(uu) : spec.extraH || 0;
+    return L.pad * 2 + d.titleH + (spec.max ? d.segH : 0) + d.lineH + rows.length * (d.rowH + Math.round(L.gap * 0.3)) + locks.length * d.lockH + extra + d.footH + L.gap;
   };
-  const u = fitScale(L, spec.bounds, calcH);
+  const { u, bounds } = fitScale(L, spec.bounds, calcH);
   const w = Math.min(Math.round(310 * L.ui), 420, L.area.w - L.gap * 2);
   const { titleH, segH, rowH, lockH, lineH, footH } = dims(u);
   const h = calcH(u);
-  const co = kit.callout(spec.id, spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds: spec.bounds, side: spec.side, variant: 'panel' });
+  const co = kit.callout(spec.id, spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds, side: spec.side, variant: 'panel' });
   const r = co.inner;
   let y = r.y;
   // содержимое щитка лежит выше слоя самого щитка, иначе щиток перехватывает нажатия кнопок
@@ -269,7 +290,7 @@ export function infoCallout(app, kit, spec) {
     y += rowH + Math.round(L.gap * 0.3);
   }
   if (locks.length) y += lockRows(app, kit, r.x, y, r.w, locks, { goto: spec.goto });
-  if (spec.extra) y += spec.extra({ x: r.x, y, w: r.w }) || 0;
+  if (spec.extra) y += spec.extra({ x: r.x, y, w: r.w }, u) || 0;
 
   // подвал: цена и кнопка / «макс»
   const fy = r.y + r.h - footH;
@@ -283,12 +304,18 @@ export function infoCallout(app, kit, spec) {
     kit.lamp(r.x + Math.round(10 * u), fy + footH / 2, Math.round(15 * u), c.green, true);
     kit.drawText(spec.doneText || t('card.maxed'), r.x + Math.round(26 * u), fy + footH / 2, { size: kit.fs(14), color: c.green });
   } else {
-    const btnW = Math.round(r.w * 0.52);
+    // кнопка берёт столько, сколько нужно подписи со значком; не хватает места — значок убирается
+    const bsize = kit.fs(15);
+    const costW = spec.cost ? kit.costWidth(spec.cost, kit.fs(13)) : 0;
+    const availBtn = r.w - costW - L.gap;
+    const want = kit.text.measure(spec.buyLabel, bsize) + Math.round(bsize * 1.9) + kit.cell() * 8;
+    const withIcon = want <= availBtn;
+    const btnW = Math.round(Math.max(Math.min(r.w * 0.52, availBtn), Math.min(want, availBtn)));
     if (spec.cost) kit.costChip(r.x, fy + footH / 2, spec.cost, { have: { coins: p.coins, data: p.data }, size: kit.fs(13) });
     const funds = (spec.locks || []).some(isFundsReason);
     const sub = !spec.canBuy && !funds ? undefined : undefined;
     void sub;
-    if (kit.button(spec.buyId, { x: r.x + r.w - btnW, y: fy, w: btnW, h: footH }, { label: spec.buyLabel, variant: 'primary', disabled: !spec.canBuy, size: kit.fs(15), icon: 'plus', lamp: spec.canBuy ? kit.c.green : false })) spec.onBuy?.();
+    if (kit.button(spec.buyId, { x: r.x + r.w - btnW, y: fy, w: btnW, h: footH }, { label: spec.buyLabel, variant: 'primary', disabled: !spec.canBuy, size: bsize, icon: withIcon ? 'plus' : undefined, lamp: spec.canBuy ? kit.c.green : false })) spec.onBuy?.();
   }
   });
   return co;
@@ -318,14 +345,14 @@ export function eraCallout(app, kit, spec) {
   const es = app.rules.getEraState(p);
   const conds = eraConditions(es);
   const calcH = (uu) => L.pad * 2 + Math.round(36 * uu) + Math.round(38 * uu) + (es.final ? 0 : conds.length * Math.round(28 * uu)) + (es.final ? Math.round(32 * uu) : Math.max(MIN_ROW, Math.round(52 * uu))) + L.gap * 1.5;
-  const u = fitScale(L, spec.bounds, calcH);
+  const { u, bounds } = fitScale(L, spec.bounds, calcH);
   const w = Math.min(Math.round(310 * L.ui), 420, L.area.w - L.gap * 2);
   const titleH = Math.round(36 * u);
   const lampsH = Math.round(38 * u);
   const condH = Math.round(28 * u);
   const footH = es.final ? Math.round(32 * u) : Math.max(MIN_ROW, Math.round(52 * u));
   const h = calcH(u);
-  const co = kit.callout(spec.id || 'era', spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds: spec.bounds, side: spec.side, variant: 'panel' });
+  const co = kit.callout(spec.id || 'era', spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds, side: spec.side, variant: 'panel' });
   const r = co.inner;
   let y = r.y;
   let advanced = false;

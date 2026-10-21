@@ -82,22 +82,41 @@ export function chromeLayout(L, o = {}) {
   const y = a.y + g;
   const left0 = a.x + g;
   const right0 = right(a) - g;
-  const want = { back: o.back ? h : 0, era: o.era ? R(96 * L.ui) : 0, gear: o.gear ? h : 0, coins: R(112 * L.ui), data: R(92 * L.ui) };
-  const min = { era: R(72 * L.ui), coins: R(76 * L.ui), data: R(64 * L.ui) };
-  const keys = Object.keys(want).filter((k) => want[k]);
-  let over = keys.reduce((s, k) => s + want[k], 0) + g * (keys.length - 1) - (right0 - left0);
-  for (const k of ['coins', 'era', 'data']) {
-    if (over <= 0 || !want[k]) continue;
-    const cut = Math.min(over, want[k] - min[k]);
-    want[k] -= cut;
-    over -= cut;
+  const want = { back: o.back ? h : 0, era: o.era ? R(96 * L.ui) : 0, gear: o.gear ? h : 0, coins: R(120 * L.ui), data: R(96 * L.ui) };
+  const min = { era: R(96 * L.ui), coins: R(108 * L.ui), data: R(84 * L.ui) };
+  const total = () => Object.keys(want).filter((k) => want[k]).reduce((s, k, i, a2) => s + want[k] + (i ? g : 0), 0);
+  const shrink = () => {
+    let over = total() - (right0 - left0);
+    for (const k of ['coins', 'era', 'data']) {
+      if (over <= 0 || !want[k]) continue;
+      const cut = Math.min(over, want[k] - min[k]);
+      want[k] -= cut;
+      over -= cut;
+    }
+    return over;
+  };
+  // на узком экране шестерёнка, а затем табличка эпохи уходят во второй ряд, иначе таблички пришлось бы сжимать до нечитаемых
+  const row2 = [];
+  const kept = {};
+  for (const k of ['gear', 'era']) {
+    if (shrink() > 0 && want[k]) {
+      kept[k] = want[k];
+      row2.unshift(k);
+      want[k] = 0;
+    }
   }
-  const out = { y, h, row: rect(left0, y, right0 - left0, h) };
+  shrink();
+  const out = { y, h, row: rect(left0, y, right0 - left0, row2.length ? h * 2 + g : h) };
   let x = left0;
   for (const k of ['back', 'era', 'gear']) {
     if (!want[k]) continue;
     out[k] = rect(x, y, want[k], h);
     x += want[k] + g;
+  }
+  let x2 = left0;
+  for (const k of row2) {
+    out[k] = rect(x2, y + h + g, kept[k], h);
+    x2 += kept[k] + g;
   }
   out.data = rect(right0 - want.data, y, want.data, h);
   out.coins = rect(out.data.x - g - want.coins, y, want.coins, h);
@@ -215,7 +234,7 @@ export function sheetRect(L, { dock = true } = {}) {
 // --- ракета: мастерская ---
 
 /** Девять горячих точек вдоль сборки. t — положение по высоте (0 — верх), берётся из render/rocket-view.js; side — сторона подписи. */
-const SPOT_SIDE = { parachute: 1, capsule: -1, avionics: 1, tank: -1, hull: 1, booster: 1, engine: -1, legs: 1, fins: -1 };
+const SPOT_SIDE = { capsule: -1, avionics: 1, tank: -1, hull: 1, booster: 1, engine: -1, legs: 1, fins: -1 };
 export const ROCKET_SPOTS = Object.entries(SPOT_SIDE)
   .map(([id, side]) => ({ id, side, t: MODULE_VIEW[id].tAnchor }))
   .sort((p, q) => p.t - q.t);
