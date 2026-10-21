@@ -1,0 +1,31 @@
+name: Rocket modular asset candidates
+
+on:
+  push:
+    branches:
+      - 2d_rocket-modular-sprites
+    paths:
+      - 'art/source_transport/rocket_modular/**'
+      - 'art/prompts/rocket_body.md'
+      - 'art/prompts/rocket_fins.md'
+      - 'art/placeables/PIPELINE_CONFIG.json'
+      - '.github/workflows/rocket-modular-candidate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  body:
+    uses: ./.github/workflows/asset-candidate.yml
+    with:
+      asset: R_BODY
+    secrets: inherit
+
+  fins:
+    uses: ./.github/workflows/asset-candidate.yml
+    with:
+      asset: R_FINS
+    secrets: inherit
