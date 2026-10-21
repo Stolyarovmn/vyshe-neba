@@ -1,41 +1,641 @@
 {
-  "version": 2,
+  "version": 3,
   "world": {
-    "island_asset": "art/gen/environment/start_island_e0.png",
-    "island_world_left": -330,
-    "island_world_top": 510,
-    "island_world_width": 1650,
-    "water_surface_y": 150,
-    "launch_origin": [0, 0]
+    "island_asset": "art/gen/environment/start_island_hd.png",
+    "land_mask": "art/gen/environment/start_island_hd.land.json",
+    "island_size_px": [
+      1916,
+      821
+    ],
+    "launch_origin_px": [
+      388,
+      375
+    ],
+    "units_per_px": 0.665,
+    "pad_core": {
+      "center_px": [
+        388,
+        375
+      ],
+      "radius_px": 52,
+      "trench_px": [
+        372,
+        403,
+        405,
+        486
+      ]
+    },
+    "coordinates": "px: пиксели HD-острова, начало слева сверху, ось Y вниз; якорь — низ спрайта по центру. world: единицы мира относительно launch_origin_px (1 ед. = 10 м), ось Y вниз; uv: доли размера острова.",
+    "sea": "код рисует море вокруг острова; бирюзовая кайма входит в арт острова"
   },
   "rules": {
-    "starter_scene": "Only the starter launch table/pad is present. Every purchasable base expansion is absent until bought.",
-    "placement": "Every purchase has a deterministic reserved world anchor on the island. The fully developed base must fit without overlapping the launch core or leaving the island.",
-    "water": "Water is a continuous runtime layer and changes palette/wave response with weather; it is not baked into the island asset."
+    "starter_scene": "Есть только стартовая площадка с чистым столом; башня и все покупаемые расширения появляются после покупки.",
+    "placement": "У каждой покупки зарезервирован якорь на суше. След (footprint_px) не выходит за остров, не пересекает ракету, пламенный канал и другие постройки.",
+    "water": "Море вокруг острова рисует код с подобранным цветом и реакцией на погоду; бирюзовая кайма мелководья — часть арта острова.",
+    "sprite_scale": "sprite_px — целевой видимый размер спрайта в пикселях острова (пропорционален footprint из art/placeables/PRODUCTION_MANIFEST.md, 1 LP ≈ 1.45 px)."
   },
   "purchases": {
-    "beacons": {"name":"Стартовые маяки","zone":"launch_core","anchors":[[-92,4],[92,4]],"reason":"По обе стороны стартового стола."},
-    "gantry": {"name":"Башня обслуживания","zone":"launch_core","anchor":[150,12],"reason":"Рядом со стартовым столом, но вне траектории ракеты."},
-    "deluge": {"name":"Охлаждение площадки","zone":"launch_core","anchor":[235,8],"reason":"У кромки стартовой площадки, короткие магистрали воды."},
-    "service": {"name":"Сервисная команда","zone":"service_central","anchor":[335,12],"reason":"Первый технический двор после стартовой площадки."},
-    "rescue": {"name":"Спасательная станция","zone":"service_central","anchor":[445,14],"reason":"Быстрый выезд к старту и береговой дороге."},
-    "fuel": {"name":"Топливный комплекс","zone":"fuel_east","anchor":[560,16],"reason":"Отделён от стартовой зоны сервисным сектором."},
-    "logistics": {"name":"Логистический терминал","zone":"logistics_east","anchor":[685,12],"reason":"На широкой восточной террасе с доступом к берегу."},
-    "factory": {"name":"Производственный цех","zone":"industrial_east","anchor":[815,16],"reason":"Рядом с логистикой, дальше от стартового стола."},
-    "weather": {"name":"Метеостанция","zone":"command_north","anchor":[760,92],"reason":"На возвышенности без экранирования."},
-    "control": {"name":"Центр управления","zone":"command_north","anchor":[905,78],"reason":"За промышленной зоной с прямой видимостью старта."},
-    "radar": {"name":"Радар слежения","zone":"command_north","anchor":[1035,96],"reason":"На отдельной восточной высоте с открытым горизонтом."},
-    "energy": {"name":"Энергетический узел","zone":"utility_east","anchor":[1085,30],"reason":"Между потребителями, но вне стартовой зоны."},
-    "observation": {"name":"Наблюдательный комплекс","zone":"perimeter_east","anchor":[1180,102],"reason":"На дальней возвышенности с обзором стартовой площадки."},
-    "recovery": {"name":"Система возврата","zone":"recovery_east","anchor":[1210,14],"reason":"У дальнего восточного края и береговой логистики."}
+    "beacons": {
+      "name": "Стартовые маяки",
+      "zone": "launch_core",
+      "anchors": [
+        [
+          283,
+          395
+        ],
+        [
+          493,
+          395
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.1477,
+          0.48112
+        ],
+        [
+          0.25731,
+          0.48112
+        ]
+      ],
+      "anchors_world": [
+        [
+          -69.83,
+          13.3
+        ],
+        [
+          69.83,
+          13.3
+        ]
+      ],
+      "sprite_px": [
+        100,
+        77
+      ],
+      "footprint_px": [
+        90,
+        26
+      ],
+      "reason": "По обе стороны стартовой площадки, на уровне ракеты."
+    },
+    "gantry": {
+      "name": "Башня обслуживания",
+      "zone": "launch_core",
+      "anchors": [
+        [
+          480,
+          305
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.25052,
+          0.3715
+        ]
+      ],
+      "anchors_world": [
+        [
+          61.18,
+          -46.55
+        ]
+      ],
+      "sprite_px": [
+        113,
+        190
+      ],
+      "footprint_px": [
+        102,
+        34
+      ],
+      "reason": "У северо-восточного края площадки, вне траектории ракеты."
+    },
+    "deluge": {
+      "name": "Охлаждение площадки",
+      "zone": "launch_core",
+      "anchors": [
+        [
+          492,
+          452
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.25678,
+          0.55055
+        ]
+      ],
+      "anchors_world": [
+        [
+          69.16,
+          51.21
+        ]
+      ],
+      "sprite_px": [
+        130,
+        118
+      ],
+      "footprint_px": [
+        117,
+        32
+      ],
+      "reason": "У юго-восточного края площадки, рядом с пламенным каналом."
+    },
+    "service": {
+      "name": "Сервисная команда",
+      "zone": "service_central",
+      "anchors": [
+        [
+          640,
+          395
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.33403,
+          0.48112
+        ]
+      ],
+      "anchors_world": [
+        [
+          167.58,
+          13.3
+        ]
+      ],
+      "sprite_px": [
+        120,
+        102
+      ],
+      "footprint_px": [
+        108,
+        30
+      ],
+      "reason": "На бетонной дороге к востоку от площадки."
+    },
+    "rescue": {
+      "name": "Спасательная станция",
+      "zone": "service_central",
+      "anchors": [
+        [
+          740,
+          340
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.38622,
+          0.41413
+        ]
+      ],
+      "anchors_world": [
+        [
+          234.08,
+          -23.28
+        ]
+      ],
+      "sprite_px": [
+        125,
+        115
+      ],
+      "footprint_px": [
+        112,
+        30
+      ],
+      "reason": "Конец бетонной дороги: быстрый выезд к старту."
+    },
+    "fuel": {
+      "name": "Топливный комплекс",
+      "zone": "fuel_east",
+      "anchors": [
+        [
+          870,
+          470
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.45407,
+          0.57247
+        ]
+      ],
+      "anchors_world": [
+        [
+          320.53,
+          63.18
+        ]
+      ],
+      "sprite_px": [
+        170,
+        93
+      ],
+      "footprint_px": [
+        153,
+        32
+      ],
+      "reason": "Грунтовая площадка, отделена от старта сервисной зоной."
+    },
+    "logistics": {
+      "name": "Логистический терминал",
+      "zone": "logistics_east",
+      "anchors": [
+        [
+          1200,
+          470
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.6263,
+          0.57247
+        ]
+      ],
+      "anchors_world": [
+        [
+          539.98,
+          63.18
+        ]
+      ],
+      "sprite_px": [
+        190,
+        105
+      ],
+      "footprint_px": [
+        171,
+        34
+      ],
+      "reason": "Центральная грунтовая площадка с выездом к берегу."
+    },
+    "factory": {
+      "name": "Производственный цех",
+      "zone": "industrial_east",
+      "anchors": [
+        [
+          920,
+          255
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.48017,
+          0.3106
+        ]
+      ],
+      "anchors_world": [
+        [
+          353.78,
+          -79.8
+        ]
+      ],
+      "sprite_px": [
+        190,
+        145
+      ],
+      "footprint_px": [
+        171,
+        34
+      ],
+      "reason": "Большая площадка вверху, дальше от старта."
+    },
+    "weather": {
+      "name": "Метеостанция",
+      "zone": "command_north",
+      "anchors": [
+        [
+          1000,
+          350
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.52192,
+          0.42631
+        ]
+      ],
+      "anchors_world": [
+        [
+          406.98,
+          -16.62
+        ]
+      ],
+      "sprite_px": [
+        142,
+        180
+      ],
+      "footprint_px": [
+        100,
+        28
+      ],
+      "reason": "Вершина скального холма без экранирования."
+    },
+    "control": {
+      "name": "Центр управления",
+      "zone": "command_north",
+      "anchors": [
+        [
+          1320,
+          250
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.68894,
+          0.30451
+        ]
+      ],
+      "anchors_world": [
+        [
+          619.78,
+          -83.12
+        ]
+      ],
+      "sprite_px": [
+        170,
+        135
+      ],
+      "footprint_px": [
+        153,
+        34
+      ],
+      "reason": "Площадка вверху справа с прямой видимостью старта."
+    },
+    "radar": {
+      "name": "Радар слежения",
+      "zone": "command_north",
+      "anchors": [
+        [
+          860,
+          170
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.44885,
+          0.20706
+        ]
+      ],
+      "anchors_world": [
+        [
+          313.88,
+          -136.33
+        ]
+      ],
+      "sprite_px": [
+        170,
+        190
+      ],
+      "footprint_px": [
+        140,
+        34
+      ],
+      "reason": "Высокая гряда на северо-западе с открытым горизонтом."
+    },
+    "energy": {
+      "name": "Энергетический узел",
+      "zone": "utility_east",
+      "anchors": [
+        [
+          1500,
+          380
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.78288,
+          0.46285
+        ]
+      ],
+      "anchors_world": [
+        [
+          739.48,
+          3.33
+        ]
+      ],
+      "sprite_px": [
+        200,
+        115
+      ],
+      "footprint_px": [
+        180,
+        36
+      ],
+      "reason": "Большая площадка справа, между потребителями."
+    },
+    "observation": {
+      "name": "Наблюдательный комплекс",
+      "zone": "perimeter_east",
+      "anchors": [
+        [
+          1380,
+          320
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.72025,
+          0.38977
+        ]
+      ],
+      "anchors_world": [
+        [
+          659.68,
+          -36.58
+        ]
+      ],
+      "sprite_px": [
+        150,
+        175
+      ],
+      "footprint_px": [
+        120,
+        34
+      ],
+      "reason": "Скальный холм справа с обзором стартовой площадки."
+    },
+    "recovery": {
+      "name": "Система возврата",
+      "zone": "recovery_east",
+      "anchors": [
+        [
+          1610,
+          478
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.84029,
+          0.58222
+        ]
+      ],
+      "anchors_world": [
+        [
+          812.63,
+          68.5
+        ]
+      ],
+      "sprite_px": [
+        200,
+        112
+      ],
+      "footprint_px": [
+        180,
+        34
+      ],
+      "reason": "Берег справа внизу, у дальней береговой логистики."
+    }
+  },
+  "entries": {
+    "workshop": {
+      "name": "Мастерская",
+      "zone": "launch_core",
+      "anchors": [
+        [
+          330,
+          262
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.17223,
+          0.31912
+        ]
+      ],
+      "anchors_world": [
+        [
+          -38.57,
+          -75.15
+        ]
+      ],
+      "sprite_px": [
+        130,
+        157
+      ],
+      "footprint_px": [
+        114,
+        28
+      ],
+      "reason": "Сервисный подъёмник эпохи к северу от площадки: отсюда собирают ракету."
+    },
+    "monument": {
+      "name": "Памятник эпох",
+      "zone": "launch_core",
+      "anchors": [
+        [
+          232,
+          276
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.12109,
+          0.33618
+        ]
+      ],
+      "anchors_world": [
+        [
+          -103.74,
+          -65.84
+        ]
+      ],
+      "sprite_px": [
+        50,
+        120
+      ],
+      "footprint_px": [
+        44,
+        22
+      ],
+      "reason": "Обелиск на северо-западной косе: лампы по пройденным эпохам; спрайт не заходит на доску контрактов."
+    },
+    "board": {
+      "name": "Доска контрактов",
+      "zone": "launch_core",
+      "anchors": [
+        [
+          210,
+          352
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.1096,
+          0.42875
+        ]
+      ],
+      "anchors_world": [
+        [
+          -118.37,
+          -15.3
+        ]
+      ],
+      "sprite_px": [
+        78,
+        72
+      ],
+      "footprint_px": [
+        60,
+        20
+      ],
+      "reason": "У западного края площадки, рядом со стартовой зоной, ниже памятника."
+    },
+    "shop": {
+      "name": "Лавка",
+      "zone": "launch_core",
+      "anchors": [
+        [
+          578,
+          352
+        ]
+      ],
+      "anchors_uv": [
+        [
+          0.30167,
+          0.42875
+        ]
+      ],
+      "anchors_world": [
+        [
+          126.35,
+          -15.3
+        ]
+      ],
+      "sprite_px": [
+        120,
+        98
+      ],
+      "footprint_px": [
+        110,
+        30
+      ],
+      "reason": "Прилавок у начала дороги, между площадкой и сервисным двором."
+    }
   },
   "asset_families": {
-    "B01_weather_complex": {"purchase":"weather","zone":"command_north"},
-    "B02_tracking_radar": {"purchase":"radar","zone":"command_north"},
-    "B03_landing_guidance": {"purchase":"beacons","zone":"launch_core"},
-    "B04_recovery_complex": {"purchase":"recovery","zone":"recovery_east"},
-    "B05_fuel_depot": {"purchase":"fuel","zone":"fuel_east"},
-    "B06_deep_comms": {"purchase":"control","zone":"command_north"},
-    "B07_cargo_terminal": {"purchase":"logistics","zone":"logistics_east"}
+    "B01_weather_complex": {
+      "purchase": "weather",
+      "zone": "command_north"
+    },
+    "B02_tracking_radar": {
+      "purchase": "radar",
+      "zone": "command_north"
+    },
+    "B03_landing_guidance": {
+      "purchase": "beacons",
+      "zone": "launch_core"
+    },
+    "B04_recovery_complex": {
+      "purchase": "recovery",
+      "zone": "recovery_east"
+    },
+    "B05_fuel_depot": {
+      "purchase": "fuel",
+      "zone": "fuel_east"
+    },
+    "B06_deep_comms": {
+      "purchase": "control",
+      "zone": "command_north"
+    },
+    "B07_cargo_terminal": {
+      "purchase": "logistics",
+      "zone": "logistics_east"
+    }
   }
 }

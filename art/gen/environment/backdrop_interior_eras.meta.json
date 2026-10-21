@@ -1,0 +1,19 @@
+{
+  "asset": "backdrop_interior_eras.webp",
+  "source": "outputs/rocket/dist/assets/interior-eras.png",
+  "source_sha256": "ba95b20de39a492c0f2c50b5448567b0b2a98f9827d629611350faa9f6561262",
+  "size": [
+    1774,
+    887
+  ],
+  "encoding": "WebP lossy q88, method 6, RGB (без альфы)",
+  "output_sha256": "3a88b358f94a53b3e5d7290f57e63f5962fc57158d9326599ca4b7790be51b6f",
+  "output_bytes": 553022,
+  "status": "derived_runtime_copy_of_approved_art",
+  "note": "Только перекодирование для веса сборки; композиция и кадры не менялись.",
+  "grid": [
+    3,
+    2
+  ],
+  "cells": "E0..E5 слева направо, сверху вниз"
+}
