@@ -5,6 +5,7 @@ import { t } from '../../i18n/index.js';
 import { resultsLayout } from '../layout.js';
 import { clamp, easeOutCubic, fmtAlt, fmtClock, fmtCompact, fmtInt, fmtSpeed } from '../format.js';
 import * as inst from '../skin/instruments.js';
+import { drawSheet, drawRule, sheetInset, reportOf } from '../skin/report.js';
 import { drawChrome, partShort, buildingShort, partIcon, buildingIcon } from './common.js';
 
 const FLY_COINS = 7;
@@ -25,6 +26,7 @@ export default {
     st.fly = null;
     st.arrived = 0;
     st.stamped = false;
+    st.contentH = null;
   },
   onBack() {
     return true;
@@ -37,13 +39,31 @@ export default {
       return;
     }
     const c = kit.c;
+    const M = reportOf(kit);
     const { result } = res;
-    const G = resultsLayout(L);
+    // лист по высоте содержимого (оно известно по предыдущему кадру), носитель — по эпохе базы
+    const inset = sheetInset(kit);
+    const compact = !L.portrait && L.h < 460;
+    const cc = kit.cell();
     const outcome = result.outcome;
     const landed = outcome === 'landed';
     const crashed = outcome === 'crashed';
     const elapsed = app.time - st.t0;
-    const cc = kit.cell();
+    // шапка: название тела слева, штамп справа; в узком листе штамп уходит на вторую строку (шрифт не мельчится)
+    const bodyId = res.report.body || result.body || res.destination;
+    const bodyName = t(`dest.${res.destination}`) !== `dest.${res.destination}` ? t(`dest.${res.destination}`) : app.data.DESTINATIONS?.[res.destination]?.name || app.data.BODIES?.[bodyId]?.name;
+    const stampLabel = landed ? (result.perfect ? t('results.perfect') : t('results.landed')) : crashed ? t('results.crashed') : t('results.abandoned');
+    const stampSize = kit.fs(L.portrait ? 18 : 22);
+    const stampW = kit.text.measure(stampLabel, stampSize) + cc * 14;
+    const stampH = Math.round(7 * kit.text.stepFor(stampSize).css + cc * 12);
+    const G0 = resultsLayout(L, { inset });
+    const nameMax = G0.card.w * 0.34;
+    const nameW = Math.round(42 * U(L)) + (bodyName ? Math.min(kit.text.measure(bodyName, kit.fs(16)), nameMax) : 0);
+    const stackStamp = nameW + stampW + L.gap * 2 > G0.card.w - G0.pad.x * 2;
+    const rowH = Math.round((compact ? 44 : 56) * U(L));
+    const hdrH = rowH + (stackStamp ? stampH + Math.round(L.gap * 0.5) : 0);
+    const need = st.contentH == null ? 0 : L.pad * 2 + inset.y * 2 + hdrH + L.gap * 2 + st.contentH + G0.buttons.h;
+    const G = resultsLayout(L, { inset, height: need });
 
     // таблички: число монет догоняет итог по мере прилёта монет
     const coinsDelta = (res.after.coins || 0) - (res.before.coins || 0);
@@ -55,24 +75,15 @@ export default {
     // бланк: слегка «падает» сверху
     const drop = Math.round(clamp(1 - elapsed / 0.3, 0, 1) * 4) * cc * 4;
     const card = { x: G.card.x, y: G.card.y - drop, w: G.card.w, h: G.card.h };
-    kit.rect(card.x + cc * 3, card.y + cc * 3, card.w, card.h, c.ink);
-    kit.nine('paper', card.x, card.y, card.w, card.h);
+    drawSheet(kit, card);
     kit.hit('results-card', card, {});
-    // скрепка
-    kit.rect(card.x + card.w / 2 - cc * 6, card.y - cc * 2, cc * 12, cc * 6, c.steel2);
-    kit.rect(card.x + card.w / 2 - cc * 4, card.y - cc, cc * 8, cc * 4, c.steel0);
 
     // шапка: куда летели и штамп
-    const compact = !L.portrait && L.h < 460;
-    const hdrH = Math.round((compact ? 44 : 56) * U(L));
-    const bodyId = res.report.body || result.body || res.destination;
-    const bodyName = t(`dest.${res.destination}`) !== `dest.${res.destination}` ? t(`dest.${res.destination}`) : app.data.DESTINATIONS?.[res.destination]?.name || app.data.BODIES?.[bodyId]?.name;
-    const hx = card.x + L.pad;
-    const hy = card.y + L.pad + hdrH / 2;
-    kit.icon(bodyId === 'moon' || bodyId === 'mars' ? bodyId : 'earth', hx + Math.round(18 * U(L)), hy, Math.round(36 * U(L)), c.text);
-    if (bodyName) kit.drawText(bodyName, hx + Math.round(42 * U(L)), hy, { size: kit.fs(16), color: c.ink, maxWidth: card.w * 0.34 });
-    const stampLabel = landed ? (result.perfect ? t('results.perfect') : t('results.landed')) : crashed ? t('results.crashed') : t('results.abandoned');
-    const stampColor = landed ? c.greenDark : crashed ? c.redDark : c.steel0;
+    const hx = card.x + G.pad.x;
+    const hy = card.y + G.pad.y + rowH / 2;
+    kit.icon(bodyId === 'moon' || bodyId === 'mars' ? bodyId : 'earth', hx + Math.round(18 * U(L)), hy, Math.round(36 * U(L)), M.ink);
+    if (bodyName) kit.drawText(bodyName, hx + Math.round(42 * U(L)), hy, { size: kit.fs(16), color: M.ink, maxWidth: nameMax });
+    const stampColor = landed ? M.good : crashed ? M.bad : M.dim;
     if (elapsed > 0.5) {
       const k = clamp((elapsed - 0.5) / 0.18, 0, 1);
       if (!st.stamped) {
@@ -80,14 +91,15 @@ export default {
         app.sfx(landed ? 'coin' : 'hit');
         if (!landed) app.shake?.(1);
       }
-      const size = kit.fs(L.portrait ? 18 : 22);
       const off = Math.round((1 - k) * 4) * cc * 2;
       kit.S.ctx.globalAlpha = k;
-      kit.stamp(stampLabel, card.x + card.w - L.pad - kit.text.measure(stampLabel, size) / 2 - cc * 6, hy + off, stampColor, size);
+      const sy = stackStamp ? card.y + G.pad.y + rowH + Math.round(L.gap * 0.25) + stampH / 2 : hy;
+      kit.stamp(stampLabel, card.x + card.w - G.pad.x - stampW / 2, sy + off, stampColor, stampSize);
       kit.S.ctx.globalAlpha = 1;
     }
 
-    const bodyTop = card.y + L.pad + hdrH + L.gap;
+    drawRule(kit, hx, card.y + G.pad.y + hdrH + Math.round(L.gap * 0.4), card.w - G.pad.x * 2);
+    const bodyTop = card.y + G.pad.y + hdrH + L.gap;
     const body = { x: G.content.x, y: bodyTop, w: G.content.w, h: G.content.y + G.content.h - bodyTop - drop * 0 };
     const wide = !L.portrait && body.w > 520 * U(L);
     kit.scrollArea('results-scroll', { x: body.x, y: body.y - drop, w: body.w, h: body.h }, undefined, (top) => {
@@ -97,7 +109,8 @@ export default {
       const right = wide ? { x: body.x + colW + L.gap * 2, w: colW } : left;
       const y1 = drawFlightColumn(app, kit, L, left, top, res, elapsed);
       const y2 = drawRewardsColumn(app, kit, L, right, wide ? top : y1, res, st, elapsed, dt);
-      return Math.max(y1, y2) - top + L.gap;
+      st.contentH = Math.max(y1, y2) - top + L.gap;
+      return st.contentH;
     });
 
     drawFlyingCoins(app, kit, st, dt);
@@ -128,6 +141,7 @@ function again(app, res) {
 /** Причина аварии, допуски полосками, три сегментных табло. Возвращает нижнюю границу. */
 function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
   const c = kit.c;
+  const M = reportOf(kit);
   const cc = kit.cell();
   const { result, report } = res;
   const landed = result.outcome === 'landed';
@@ -136,7 +150,7 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
   let y = top;
   const compact = !L.portrait && L.h < 460;
   if (crashed && report.hint) {
-    y += kit.paragraph(report.hint.text, x, y, w, { size: kit.fs(12), color: c.ink, lineHeight: 1.25 }) + L.gap * 0.5;
+    y += kit.paragraph(report.hint.text, x, y, w, { size: kit.fs(12), color: M.ink, lineHeight: 1.25 }) + L.gap * 0.5;
   }
   const lg = result.landing;
   if ((crashed || landed) && lg && lg.vTol) y += drawTolerances(kit, L, x, y, w, lg) + L.gap * 0.5;
@@ -147,11 +161,20 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
     if (report.hint.part === 'parachute' || !res.consumables?.chute) chips.push({ id: 'results-goto-shop', label: t('dock.shop'), icon: 'chute', go: () => app.go('shop', {}, { push: true }) });
     if (report.hint.building) chips.push({ id: 'results-goto-building', label: buildingShort(app, report.hint.building), icon: buildingIcon(report.hint.building, 1), go: () => app.go('base', { select: report.hint.building }, { push: true }) });
     if (chips.length) {
-      const bw = (w - L.gap * (chips.length - 1)) / chips.length;
-      chips.forEach((ch, i) => {
-        if (kit.button(ch.id, { x: x + i * (bw + L.gap), y, w: bw, h: L.touch(compact ? 44 : 46) }, { label: ch.label, icon: ch.icon, variant: 'btn', size: kit.fs(12), lamp: c.amberLight })) ch.go();
-      });
-      y += L.touch(compact ? 44 : 46) + L.gap * (compact ? 0.5 : 1);
+      // в один ряд (с лампой, если хватает места; без неё — если нет); не помещаются и так — по одной в строке
+      const csize = kit.fs(12);
+      const fits = (lamp) => chips.reduce((sum, ch) => sum + kit.buttonNeed(ch.label, csize, { lamp, icon: ch.icon }), L.gap * (chips.length - 1)) <= w;
+      const lamp = fits(true) ? c.amberLight : false;
+      const oneRow = fits(true) || fits(false);
+      const rows = oneRow ? [chips] : chips.map((ch) => [ch]);
+      const bh = L.touch(compact ? 44 : 46);
+      for (const row of rows) {
+        const bw = (w - L.gap * (row.length - 1)) / row.length;
+        row.forEach((ch, i) => {
+          if (kit.button(ch.id, { x: x + i * (bw + L.gap), y, w: bw, h: bh }, { label: ch.label, icon: ch.icon, variant: 'btn', size: csize, lamp, fixedScale: true })) ch.go();
+        });
+        y += bh + L.gap * (compact ? 0.5 : 1);
+      }
     }
   }
 
@@ -177,7 +200,7 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
       const isz = Math.round(sh * 0.4);
       kit.nine('raised', r.x, r.y, r.w, r.h);
       kit.icon(icon, r.x + cc * 4 + isz / 2, r.y + cc * 3 + isz / 2, isz, c.cyan);
-      if (unit) kit.drawText(unit, r.x + r.w - cc * 4, r.y + cc * 3 + isz / 2, { size: Math.max(8, kit.fs(9)), color: c.steel3, align: 'right' });
+      if (unit) kit.drawText(unit, r.x + r.w - cc * 4, r.y + cc * 3 + isz / 2, { size: Math.max(8, kit.fs(9)), color: kit.readable(c.steel3, kit.frameMid('raised')), align: 'right' });
       const top = r.y + cc * 3 + isz + cc;
       inst.readout(kit, { x: r.x + cc * 2, y: top, w: r.w - cc * 4, h: r.y + r.h - cc * 3 - top }, shown, { lit: c.green, digits, h: Math.round(sh * 0.5) });
       return;
@@ -188,7 +211,7 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
     inst.readout(kit, { x: r.x + sh * 0.9, y: r.y, w: r.w - sh * 0.9 - unitW, h: r.h }, shown, { lit: c.green, digits, h: Math.round(sh * 0.5) });
     kit.nine('raised', r.x, r.y, sh * 0.9, r.h);
     kit.icon(icon, r.x + sh * 0.45, r.y + r.h / 2, Math.round(sh * 0.5), c.cyan);
-    if (unit) kit.drawText(unit, r.x + r.w - cc * 3, r.y + r.h - cc * 4, { size: Math.max(8, kit.fs(9)), color: c.steel2, align: 'right' });
+    if (unit) kit.drawText(unit, r.x + r.w - cc * 3, r.y + r.h - cc * 4, { size: Math.max(8, kit.fs(9)), color: M.dim, align: 'right' });
   });
   y += (cards ? ch : sh) + L.gap;
   return y;
@@ -206,6 +229,7 @@ function countStr(val, k) {
 /** Три полоски «факт / допуск» для посадки: скорость, снос, наклон. Красная часть — выход за допуск. */
 function drawTolerances(kit, L, x, y, w, lg) {
   const c = kit.c;
+  const M = reportOf(kit);
   const cc = kit.cell();
   const deg = (r) => `${Math.round((r * 180) / Math.PI)}°`;
   const rows = [
@@ -217,10 +241,10 @@ function drawTolerances(kit, L, x, y, w, lg) {
   rows.forEach(([icon, v, tol, vs], i) => {
     const yy = y + i * rowH;
     const bad = v > tol;
-    kit.icon(icon, x + rowH * 0.45, yy + rowH / 2, Math.round(rowH * 0.7), bad ? c.redDark : c.ink);
+    kit.icon(icon, x + rowH * 0.45, yy + rowH / 2, Math.round(rowH * 0.7), bad ? M.bad : M.ink);
     const bar = { x: x + rowH, y: yy + cc * 2, w: w - rowH - Math.round(66 * U(L)), h: rowH - cc * 4 };
     kit.ledBar(bar, { value: clamp(v / (tol * 2), 0, 1), color: bad ? c.red : c.green, ghost: 0.5, segments: 12 });
-    kit.drawText(vs, x + w, yy + rowH / 2, { size: kit.fs(12), color: bad ? c.redDark : c.ink, align: 'right', maxWidth: 60 * U(L) });
+    kit.drawText(vs, x + w, yy + rowH / 2, { size: kit.fs(12), color: bad ? M.bad : M.ink, align: 'right', maxWidth: 60 * U(L) });
   });
   return rows.length * rowH;
 }
@@ -231,6 +255,7 @@ const CHIP_ICON = { 'results.c.travel': 'altitude', 'results.c.loot': 'coin', 'r
 
 function drawRewardsColumn(app, kit, L, col, top, res, st, elapsed, dt) {
   const c = kit.c;
+  const M = reportOf(kit);
   const cc = kit.cell();
   const { report } = res;
   const { x, w } = col;
@@ -260,8 +285,8 @@ function drawRewardsColumn(app, kit, L, col, top, res, st, elapsed, dt) {
   });
   y += Math.ceil(Math.max(lines.length, 1) / cols) * (chipH + L.gap * 0.6) + L.gap * 0.4;
   if (coin.charged) {
-    kit.icon('warn', x + cc * 6, y + chipH / 2, Math.round(chipH * 0.6), c.redDark);
-    kit.drawText(`−${fmtCompact(coin.charged)}`, x + cc * 12 + chipH * 0.5, y + chipH / 2, { size: kit.fs(13), color: c.redDark });
+    kit.icon('warn', x + cc * 6, y + chipH / 2, Math.round(chipH * 0.6), M.bad);
+    kit.drawText(`−${fmtCompact(coin.charged)}`, x + cc * 12 + chipH * 0.5, y + chipH / 2, { size: kit.fs(13), color: M.bad });
     y += chipH + L.gap * 0.4;
   }
 
@@ -290,15 +315,24 @@ function drawRewardsColumn(app, kit, L, col, top, res, st, elapsed, dt) {
   // что нового: значки с короткой подписью
   const news = collectNews(app, res);
   const rowH = Math.round(26 * U(L));
+  // подписи переносятся по словам (две–три строки), а не обрезаются; место под строку резервируется заранее,
+  // чтобы бланк не «росла» по мере появления наград
+  const newsSize = kit.fs(12);
+  const newsStep = kit.text.lineStep(newsSize, 1.25);
   news.slice(0, 5).forEach((n, i) => {
     const k = easeOutCubic(clamp((elapsed - 1.4 - i * 0.2) / 0.35, 0, 1));
-    if (k <= 0) return;
-    kit.S.ctx.globalAlpha = k;
-    kit.icon(n.icon, x + rowH * 0.5, y + rowH / 2, Math.round(rowH * 0.8), n.color || c.amberDeep);
-    kit.drawText(n.text, x + rowH * 1.1, y + rowH / 2, { size: kit.fs(12), color: c.ink, maxWidth: w - rowH * 1.1 - (n.reward ? Math.round(56 * U(L)) : 0) });
-    if (n.reward) kit.costChip(x + w, y + rowH / 2, { coins: n.reward }, { align: 'right', size: kit.fs(11) });
-    kit.S.ctx.globalAlpha = 1;
-    y += rowH;
+    const rewardW = n.reward ? kit.costWidth({ coins: n.reward }, kit.fs(11)) + L.gap : 0;
+    const lines = kit.text.wrap(n.text, w - rowH * 1.1 - rewardW, newsSize);
+    const itemH = Math.max(rowH, Math.round(lines.length * newsStep + cc * 2));
+    if (k > 0) {
+      kit.S.ctx.globalAlpha = k;
+      const first = y + rowH / 2;
+      kit.icon(n.icon, x + rowH * 0.5, first, Math.round(rowH * 0.8), M[n.tone] || M.amber);
+      lines.forEach((ln, li) => kit.drawText(ln, x + rowH * 1.1, first + li * newsStep, { size: newsSize, color: M.ink }));
+      if (n.reward) kit.costChip(x + w, first, { coins: n.reward }, { align: 'right', size: kit.fs(11), bg: M.bg2 });
+      kit.S.ctx.globalAlpha = 1;
+    }
+    y += itemH;
   });
   void dt;
   return y;
@@ -331,24 +365,24 @@ function drawFlyingCoins(app, kit, st, dt) {
 
 /** Награды, зоны, вехи и открывшиеся действия — по отчёту правил и разнице профилей. */
 function collectNews(app, res) {
-  const c = app.kit.c;
+  // tone — роль цвета на носителе отчёта (skin.report): amber, cyan, good, bad
   const out = [];
   const { report, before, after } = res;
-  for (const a of report.awarded?.achievements || []) out.push({ icon: 'trophy', color: c.amberDeep, text: a.name, reward: a.reward });
-  for (const ct of report.awarded?.contracts || []) out.push({ icon: 'contract', color: c.amberDeep, text: ct.name, reward: ct.reward });
-  for (const z of report.newZones || []) out.push({ icon: 'altitude', color: c.cyanDark, text: z.name });
+  for (const a of report.awarded?.achievements || []) out.push({ icon: 'trophy', tone: 'amber', text: a.name, reward: a.reward });
+  for (const ct of report.awarded?.contracts || []) out.push({ icon: 'contract', tone: 'amber', text: ct.name, reward: ct.reward });
+  for (const z of report.newZones || []) out.push({ icon: 'altitude', tone: 'cyan', text: z.name });
   const ms = report.milestones || {};
-  if (ms.firstSoftLanding) out.push({ icon: 'check', color: c.greenDark, text: t('results.n.firstLanding') });
-  if (ms.firstMoonLanding) out.push({ icon: 'moon', color: c.cyanDark, text: t('results.n.moon') });
-  if (ms.firstMarsLanding) out.push({ icon: 'mars', color: c.redDark, text: t('results.n.mars') });
-  if (ms.newMaxAlt) out.push({ icon: 'up', color: c.greenDark, text: t('results.n.record') });
+  if (ms.firstSoftLanding) out.push({ icon: 'check', tone: 'good', text: t('results.n.firstLanding') });
+  if (ms.firstMoonLanding) out.push({ icon: 'moon', tone: 'cyan', text: t('results.n.moon') });
+  if (ms.firstMarsLanding) out.push({ icon: 'mars', tone: 'bad', text: t('results.n.mars') });
+  if (ms.newMaxAlt) out.push({ icon: 'up', tone: 'good', text: t('results.n.record') });
   try {
     const was = app.rules.getEraState(before);
     const now = app.rules.getEraState(after);
-    if (now.ok && !was.ok) out.push({ icon: 'era', color: c.amberDeep, text: t('results.n.era') });
+    if (now.ok && !was.ok) out.push({ icon: 'era', tone: 'amber', text: t('results.n.era') });
     const open = (p) => app.rules.availableDestinations(p).filter((d) => d.ok).map((d) => d.id);
     const old = open(before);
-    for (const d of open(after)) if (!old.includes(d)) out.push({ icon: d === 'moon' ? 'moon' : 'mars', color: c.cyanDark, text: t('results.n.dest', { name: app.data.DESTINATIONS?.[d]?.name || d }) });
+    for (const d of open(after)) if (!old.includes(d)) out.push({ icon: d === 'moon' ? 'moon' : 'mars', tone: 'cyan', text: t('results.n.dest', { name: app.data.DESTINATIONS?.[d]?.name || d }) });
   } catch {
     /* подсказки необязательны */
   }

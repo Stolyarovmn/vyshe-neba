@@ -139,11 +139,11 @@ export default {
     kit.hit('dock-bar', D.bar, {});
     const first = app.profile.stats.flights === 0 && !st.sel && !st.era;
     const pulse = first && !app.settings.reduceMotion && Math.floor(app.time * 2.5) % 2 === 0;
-    if (kit.button('dock-launch', D.button, { label: t('launch.start'), icon: 'launch', variant: pulse ? 'dangerHover' : 'danger', size: kit.fs(24), iconSize: Math.round(D.button.h * 0.46), lamp: pulse ? c.white : c.amberLight, tip: t('dock.launch.tip') })) app.go('launch', {}, { push: true });
+    if (kit.button('dock-launch', D.button, { label: t('launch.start'), icon: 'launch', variant: pulse ? 'dangerHover' : 'danger', size: kit.fs(24), iconSize: Math.round(D.button.h * 0.46), lamp: pulse ? c.white : c.amberLight, tip: t('dock.launch.tip'), solo: true })) app.go('launch', {}, { push: true });
     for (const n of NAV) {
       const r = D.items[n.id];
       const badge = n.id === 'rocket' && info.canPart ? '!' : n.id === 'base' && info.canBuilding ? '!' : undefined;
-      if (kit.button(`dock-${n.id}`, r, { icon: n.icon, label: t(n.label), stack: true, variant: 'btn', size: kit.fs(9), badge, tip: t(`${n.label}.tip`) })) app.go(n.id, {}, { push: true });
+      if (kit.button(`dock-${n.id}`, r, { icon: n.icon, label: t(n.label), stack: true, variant: 'btn', size: kit.fs(10), fixedScale: true, badge, tip: t(`${n.label}.tip`) })) app.go(n.id, {}, { push: true });
     }
     if (first && !L.portrait) {
       // подсказка первого запуска: указатель над кнопкой «ПУСК»

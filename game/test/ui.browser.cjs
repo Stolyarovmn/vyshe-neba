@@ -849,8 +849,8 @@ const SHEET_SCREENS = [
   ['results', 'итоги'],
 ];
 
-async function captureEraScreens(page, era) {
-  const shots = {};
+/** Профиль «середины игры» в нужной эпохе для снимков. */
+async function setEraProfile(page, era) {
   await page.evaluate((e) => {
     const t = globalThis.__VN_TEST__;
     const p = t.profile();
@@ -866,6 +866,11 @@ async function captureEraScreens(page, era) {
     a.prefs.touchControls = 'on';
     a.skinEra = e;
   }, era);
+}
+
+async function captureEraScreens(page, era) {
+  const shots = {};
+  await setEraProfile(page, era);
   await go(page, 'hub');
   await page.waitForTimeout(700);
   shots.hub = await page.screenshot();
@@ -895,9 +900,55 @@ async function captureEraScreens(page, era) {
   return shots;
 }
 
-async function contactSheets(browser) {
+const SECONDARY_SCREENS = [
+  ['settings', 'настройки'],
+  ['pause', 'пауза'],
+  ['journal', 'доска'],
+  ['shop', 'лавка'],
+  ['card', 'карточка здания'],
+  ['results', 'итоги'],
+];
+
+/** Вторичные экраны эпохи: настройки, пауза, доска, лавка, карточка здания в хабе, итоги. */
+async function captureSecondaryScreens(page, era) {
+  const shots = {};
+  await setEraProfile(page, era);
+  await go(page, 'settings');
+  await page.waitForTimeout(700);
+  shots.settings = await page.screenshot();
+  await go(page, 'journal');
+  await page.waitForTimeout(600);
+  shots.journal = await page.screenshot();
+  await go(page, 'shop');
+  await page.waitForTimeout(400);
+  await setUi(page, () => { globalThis.__VN_APP__.ui.shop.sel = 'item:repair'; });
+  await page.waitForTimeout(600);
+  shots.shop = await page.screenshot();
+  await go(page, 'hub');
+  await page.waitForTimeout(500);
+  await setUi(page, () => { globalThis.__VN_APP__.ui.hub.sel = 'beacons'; });
+  await page.waitForTimeout(700);
+  shots.card = await page.screenshot();
+  await setUi(page, () => { globalThis.__VN_APP__.ui.hub.sel = null; });
+  await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: { chute: true, repair: true } }));
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+  await page.waitForTimeout(900);
+  await page.evaluate(() => globalThis.__VN_APP__.pause());
+  await page.waitForTimeout(500);
+  shots.pause = await page.screenshot();
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.resume(); a.abandon(); });
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
+  await page.waitForTimeout(3000);
+  shots.results = await page.screenshot();
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); a.prefs.touchControls = 'auto'; });
+  return shots;
+}
+
+async function contactSheets(browser, only = '1') {
   const sizes = { portrait: { width: 390, height: 844 }, landscape: { width: 1280, height: 720 } };
   const byEra = Array.from({ length: 6 }, () => ({}));
+  const secondary = Array.from({ length: 6 }, () => ({}));
+  const withPrimary = only !== 'secondary';
   for (const [name, vp] of Object.entries(sizes)) {
     const context = await browser.newContext({ viewport: vp, deviceScaleFactor: 1, hasTouch: name === 'portrait', isMobile: name === 'portrait' });
     const page = await context.newPage();
@@ -907,7 +958,10 @@ async function contactSheets(browser) {
     await page.goto(pathToFileURL(gameFile).href);
     await page.waitForFunction(() => globalThis.__VN_TEST__, null, { timeout: 20000 });
     await page.waitForTimeout(800);
-    for (let era = 0; era <= 5; era++) byEra[era][name] = await captureEraScreens(page, era);
+    for (let era = 0; era <= 5; era++) {
+      if (withPrimary) byEra[era][name] = await captureEraScreens(page, era);
+      secondary[era][name] = await captureSecondaryScreens(page, era);
+    }
     assert(errors.length === 0, `листы ${name}: ошибки: ${errors.join(' | ')}`);
     await context.close();
   }
@@ -916,14 +970,19 @@ async function contactSheets(browser) {
   for (let era = 0; era <= 5; era++) {
     const img = (buf, w) => `<img style="width:${w}px;display:block;border:1px solid #334" src="data:image/png;base64,${buf.toString('base64')}">`;
     const cell = (buf, w, label) => `<div style="display:inline-block;margin:6px;vertical-align:top">${img(buf, w)}<div>${label}</div></div>`;
-    const portrait = SHEET_SCREENS.map(([id, label]) => cell(byEra[era].portrait[id], 355, `E${era} портрет · ${label}`)).join('');
-    const landscape = SHEET_SCREENS.map(([id, label]) => cell(byEra[era].landscape[id], 600, `E${era} ландшафт · ${label}`)).join('');
-    await sheet.setContent(`<body style="margin:0;background:#10131c;color:#c4d0e4;font:13px monospace;width:1900px"><div style="padding:6px">${portrait}</div><div style="padding:6px">${landscape}</div></body>`);
-    await sheet.waitForTimeout(300);
-    await sheet.screenshot({ path: path.join(outDir, `ui-audit-era-${era}.png`), fullPage: true });
+    const page = (set, screens, kind, wp, wl, tag) => {
+      const portrait = screens.map(([id, label]) => cell(set[era].portrait[id], wp, `E${era} портрет · ${label}`)).join('');
+      const landscape = screens.map(([id, label]) => cell(set[era].landscape[id], wl, `E${era} ландшафт · ${label}`)).join('');
+      return sheet.setContent(`<body style="margin:0;background:#10131c;color:#c4d0e4;font:13px monospace;width:1900px"><div style="padding:6px">${portrait}</div><div style="padding:6px">${landscape}</div></body>`).then(async () => {
+        await sheet.waitForTimeout(300);
+        await sheet.screenshot({ path: path.join(outDir, `${tag}-${era}.png`), fullPage: true });
+      });
+    };
+    if (withPrimary) await page(byEra, SHEET_SCREENS, 'primary', 355, 600, 'ui-audit-era');
+    await page(secondary, SECONDARY_SCREENS, 'secondary', 300, 600, 'ui-audit-secondary-era');
   }
   await sheetCtx.close();
-  console.log('OK контактные листы work/ui-audit-era-0..5.png');
+  console.log(withPrimary ? 'OK контактные листы work/ui-audit-era-0..5.png и work/ui-audit-secondary-era-0..5.png' : 'OK контактные листы work/ui-audit-secondary-era-0..5.png');
 }
 
 /** Только страж текста на минимальных размерах окна (320×568 и 568×320). */
@@ -961,7 +1020,7 @@ ${formatIssues(issues)}`);
   const browser = await launch();
   try {
     if (process.env.UI_SHEETS_ONLY) {
-      await contactSheets(browser);
+      await contactSheets(browser, process.env.UI_SHEETS_ONLY);
       return;
     }
     if (process.env.UI_ERA_ONLY) {

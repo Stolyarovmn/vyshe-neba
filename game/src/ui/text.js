@@ -53,8 +53,8 @@ export function createText() {
   const atlases = new Map();
   const unitCache = new Map();
 
-  /** Масштаб шрифта (CSS-пикселей на пиксель глифа) по «размеру» в CSS px: ≤ 9 — крошечный ×1, иначе не меньше ×2. */
-  const scaleFor = (size) => (size <= 9 ? 1 : Math.max(2, Math.round(size / 7)));
+  /** Масштаб шрифта (CSS-пикселей на пиксель глифа) по «размеру» в CSS px: не меньше ×2 — мельче текст не рисуется никогда. */
+  const scaleFor = (size) => Math.max(2, Math.round(size / 7));
 
   /** Пикселей устройства на пиксель глифа и тот же шаг в CSS-пикселях. */
   function stepFor(size) {
@@ -121,16 +121,17 @@ export function createText() {
   const measurer = (size) => (s) => measure(s, size);
   const wrap = (str, maxWidth, size) => wrapWords(str, maxWidth, measurer(size));
 
-  /** Подбор масштаба под ширину: уменьшает шаг до ×2 (до ×1 для крошечных), затем обрезает. size — условный размер результата. */
-  function fit(str, maxWidth, size, _weight, _minScale) {
+  /**
+   * Подбор масштаба под ширину: уменьшает шаг до ×2 (minScale — выше, если нужен единый масштаб в группе кнопок), затем обрезает
+   * многоточием. Мельче ×2 не бывает: слово, не влезающее в ×2, нужно сократить или дать ему больше места.
+   */
+  function fit(str, maxWidth, size, _weight, minScale) {
     const s0 = scaleFor(size);
-    const floor = s0 === 1 ? 1 : 2;
+    const floor = Math.min(s0, Math.max(2, minScale || 2));
     let s = s0;
     while (s > floor && measure(str, s * 7) > maxWidth) s--;
-    const sz = s === 1 ? 7 : s * 7;
+    const sz = s * 7;
     if (measure(str, sz) <= maxWidth) return { str, size: sz };
-    // не влезает даже в ×2: целиком в ×1 читаемее, чем обрезанное многоточием
-    if (s0 > 1 && measure(str, 7) <= maxWidth) return { str, size: 7 };
     return { str: ellipsize(str, maxWidth, measurer(sz)), size: sz };
   }
 
@@ -138,8 +139,8 @@ export function createText() {
   function fitWords(str, maxWidth, size) {
     const words = String(str).split(/\s+/);
     let s = scaleFor(size);
-    while (s > 1 && words.some((w) => measure(w, s * 7) > maxWidth)) s--;
-    return s === 1 ? 7 : s * 7;
+    while (s > 2 && words.some((w) => measure(w, s * 7) > maxWidth)) s--;
+    return s * 7;
   }
 
   /**
@@ -150,7 +151,7 @@ export function createText() {
     let size = o.size ?? 14;
     const { color = '#fff', align = 'left', baseline = 'middle', alpha = 1 } = o;
     let text = normalize(str);
-    if (!text) return { w: 0, h: size };
+    if (!text) return { w: 0, h: size, scale: scaleFor(size) };
     const original = text;
     if (o.maxWidth) {
       const f = fit(text, o.maxWidth, size);
@@ -163,8 +164,10 @@ export function createText() {
     const glyphH = GLYPH_H * css;
     const top = baseline === 'top' ? y + (lineH - glyphH) / 2 : baseline === 'bottom' ? y - (lineH + glyphH) / 2 : y - glyphH / 2;
     let cx = align === 'center' ? x - total / 2 : align === 'right' ? x - total : x;
+    const scale = scaleFor(size);
     if (audit && !o.noAudit) {
-      const rect = { x: cx, y: top, w: total, h: glyphH, str: text, clip };
+      const rect = { x: cx, y: top, w: total, h: glyphH, str: text, clip, scale, color: ctx.globalAlpha * alpha >= 0.99 ? color : null };
+      if (scale < 2) audit.issues.push({ kind: 'tiny', str: text, rect });
       audit.rects.push(rect);
       if (text !== original && !o.allowCut) audit.issues.push({ kind: 'truncated', str: original, shown: text, rect });
       if (o.box) {
@@ -188,7 +191,7 @@ export function createText() {
     }
     ctx.imageSmoothingEnabled = prevSmooth;
     if (alpha !== 1) ctx.globalAlpha = prevAlpha;
-    return { w: total, h: lineH };
+    return { w: total, h: lineH, scale };
   }
 
   /** Абзац с переносом. Возвращает занятую высоту. */

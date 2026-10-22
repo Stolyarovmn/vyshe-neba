@@ -1,5 +1,9 @@
 // Настройки: щиток управления из металлических секций с заклёпками. Громкость — рычажки в пазах со светодиодной шкалой,
 // переключатели — тумблеры с лампами. Звук, управление, доступность, сохранение, язык.
+//
+// Правила разметки (см. UI_LANGUAGE.md, «Отступы и текст»): у всех кнопок одной группы один масштаб шрифта; слово не влезает —
+// подпись переносится на отдельную строку над органом управления, а группа получает всю ширину, шрифт не уменьшается;
+// индикатор-точка в углу кнопки имеет своё место в поле кнопки и не заходит на буквы.
 
 import { t } from '../../i18n/index.js';
 import { settingsLayout } from '../layout.js';
@@ -32,12 +36,22 @@ export default {
     const rowH = L.touch(54);
     const sectionPad = Math.round(L.pad * 0.8);
     const headH = Math.round(30 * L.ui);
+    const labelSize = kit.fs(13);
+    const btnSize = kit.fs(13);
 
-    // секции: заголовок и строки (подпись слева, управление справа)
-    const half = (r, i) => {
-      const w = (r.w - L.gap * 0.5) / 2;
-      return { x: r.x + i * (w + L.gap * 0.5), y: r.y, w, h: r.h };
-    };
+    /** Ряд кнопок-вариантов: общий масштаб шрифта, активная горит лампой. */
+    const options = (id, opts) => ({
+      options: opts.map((o) => ({ ...o })),
+      draw: (r) => {
+        const n = opts.length;
+        const w = (r.w - L.gap * 0.5 * (n - 1)) / n;
+        opts.forEach((o, i) => {
+          if (kit.button(o.id, { x: r.x + i * (w + L.gap * 0.5), y: r.y, w, h: r.h }, { label: o.label, variant: o.active ? 'primary' : 'btn', size: btnSize, fixedScale: true, lamp: o.active ? c.green : false, disabled: o.disabled })) o.onClick?.();
+        });
+      },
+      id,
+    });
+
     const sections = [
       {
         title: t('settings.sound'), icon: 'sound',
@@ -57,20 +71,12 @@ export default {
         rows: [
           {
             label: t('settings.mode'),
-            draw: (r) => {
-              for (const [i, mode] of ['arcade', 'pilot'].entries()) {
-                if (kit.button(`set-mode-${mode}`, half(r, i), { label: t(`mode.${mode}`), variant: s.controlMode === mode ? 'primary' : 'btn', size: kit.fs(13), lamp: s.controlMode === mode ? c.green : false })) app.setSetting('controlMode', mode);
-              }
-            },
+            ...options('mode', ['arcade', 'pilot'].map((m) => ({ id: `set-mode-${m}`, label: t(`mode.${m}`), active: s.controlMode === m, onClick: () => app.setSetting('controlMode', m) }))),
           },
           { note: t(`mode.${s.controlMode}.desc`) },
           {
             label: t('settings.layout'),
-            draw: (r) => {
-              for (const [i, lay] of ['right', 'left'].entries()) {
-                if (kit.button(`set-layout-${lay}`, half(r, i), { label: t(`layout.${lay}`), variant: s.touchLayout === lay ? 'primary' : 'btn', size: kit.fs(13), lamp: s.touchLayout === lay ? c.green : false })) app.setSetting('touchLayout', lay);
-              }
-            },
+            ...options('layout', ['right', 'left'].map((m) => ({ id: `set-layout-${m}`, label: t(`layout.${m}`), active: s.touchLayout === m, onClick: () => app.setSetting('touchLayout', m) }))),
           },
           {
             label: t('settings.sens'),
@@ -86,18 +92,16 @@ export default {
             },
           },
           {
-            label: t('settings.touchControls'), minW: L.touch(48) * 3 + L.gap,
-            draw: (r) => {
-              const w3 = (r.w - L.gap) / 3;
-              ['auto', 'on', 'off'].forEach((o, i) => {
-                if (kit.button(`set-touch-${o}`, { x: r.x + i * (w3 + L.gap * 0.5), y: r.y, w: w3, h: r.h }, { label: t(`touch.${o}`), variant: app.prefs.touchControls === o ? 'primary' : 'btn', size: kit.fs(11), lamp: app.prefs.touchControls === o ? c.green : false })) {
-                  app.prefs.touchControls = o;
-                  savePrefs(app.prefs);
-                }
-              });
-            },
+            label: t('settings.touchControls'),
+            ...options('touch', ['auto', 'on', 'off'].map((m) => ({
+              id: `set-touch-${m}`, label: t(`touch.${m}`), active: app.prefs.touchControls === m,
+              onClick: () => {
+                app.prefs.touchControls = m;
+                savePrefs(app.prefs);
+              },
+            }))),
           },
-          { label: t('settings.help'), draw: (r) => { if (kit.button('set-help', r, { label: t('settings.helpShow'), icon: 'info', variant: 'btn', size: kit.fs(13) })) app.queueCard('help', true); } },
+          { label: t('settings.help'), draw: (r) => { if (kit.button('set-help', r, { label: t('settings.helpShow'), icon: 'info', variant: 'btn', size: btnSize })) app.queueCard('help', true); } },
         ],
       },
       {
@@ -118,9 +122,9 @@ export default {
             label: t('settings.textScale'),
             draw: (r) => {
               const bw = Math.max(L.touch(48), Math.round(r.w * 0.28));
-              if (kit.button('set-text-minus', { x: r.x, y: r.y, w: bw, h: r.h }, { label: 'A-', variant: 'btn', size: kit.fs(14), disabled: s.textScale <= 0.8 })) app.setSetting('textScale', Math.max(0.8, Math.round((s.textScale - 0.1) * 10) / 10));
-              kit.drawText(`${Math.round(s.textScale * 100)}%`, r.x + r.w / 2, r.y + r.h / 2, { size: kit.fs(14), color: c.text, align: 'center' });
-              if (kit.button('set-text-plus', { x: r.x + r.w - bw, y: r.y, w: bw, h: r.h }, { label: 'A+', variant: 'btn', size: kit.fs(14), disabled: s.textScale >= 1.6 })) app.setSetting('textScale', Math.min(1.6, Math.round((s.textScale + 0.1) * 10) / 10));
+              if (kit.button('set-text-minus', { x: r.x, y: r.y, w: bw, h: r.h }, { label: 'A-', variant: 'btn', size: btnSize, fixedScale: true, disabled: s.textScale <= 0.8 })) app.setSetting('textScale', Math.max(0.8, Math.round((s.textScale - 0.1) * 10) / 10));
+              kit.drawText(`${Math.round(s.textScale * 100)}%`, r.x + r.w / 2, r.y + r.h / 2, { size: btnSize, color: c.text, align: 'center' });
+              if (kit.button('set-text-plus', { x: r.x + r.w - bw, y: r.y, w: bw, h: r.h }, { label: 'A+', variant: 'btn', size: btnSize, fixedScale: true, disabled: s.textScale >= 1.6 })) app.setSetting('textScale', Math.min(1.6, Math.round((s.textScale + 0.1) * 10) / 10));
             },
           },
         ],
@@ -132,16 +136,17 @@ export default {
             wide: true,
             draw: (r) => {
               const third = (r.w - L.gap * 2) / 3;
-              if (kit.button('set-export', { x: r.x, y: r.y, w: third, h: r.h }, { label: t('settings.export'), icon: 'export', variant: 'btn', size: kit.fs(12) })) exportSave(app, st);
-              if (kit.button('set-import', { x: r.x + third + L.gap, y: r.y, w: third, h: r.h }, { label: t('settings.import'), icon: 'import', variant: 'btn', size: kit.fs(12) })) importSave(app, st, 'file');
-              if (kit.button('set-paste', { x: r.x + (third + L.gap) * 2, y: r.y, w: third, h: r.h }, { label: t('settings.paste'), icon: 'import', variant: 'btn', size: kit.fs(12) })) importSave(app, st, 'clipboard');
+              const small = kit.fs(12);
+              if (kit.button('set-export', { x: r.x, y: r.y, w: third, h: r.h }, { label: t('settings.export'), icon: 'export', variant: 'btn', size: small, fixedScale: true })) exportSave(app, st);
+              if (kit.button('set-import', { x: r.x + third + L.gap, y: r.y, w: third, h: r.h }, { label: t('settings.import'), icon: 'import', variant: 'btn', size: small, fixedScale: true })) importSave(app, st, 'file');
+              if (kit.button('set-paste', { x: r.x + (third + L.gap) * 2, y: r.y, w: third, h: r.h }, { label: t('settings.paste'), icon: 'import', variant: 'btn', size: small, fixedScale: true })) importSave(app, st, 'clipboard');
             },
           },
           ...(st.note ? [{ note: st.note, color: st.noteKind === 'bad' ? c.red : c.green }] : []),
           {
             wide: true,
             draw: (r) => {
-              if (kit.button('set-reset', r, { label: st.confirmReset ? t('settings.resetConfirm') : t('settings.reset'), icon: 'close', variant: 'danger', size: kit.fs(13) })) {
+              if (kit.button('set-reset', r, { label: st.confirmReset ? t('settings.resetConfirm') : t('settings.reset'), icon: 'close', variant: 'danger', size: btnSize })) {
                 if (st.confirmReset) {
                   app.resetProgress();
                   st.confirmReset = false;
@@ -156,10 +161,10 @@ export default {
         rows: [
           {
             label: t('settings.language.name'),
-            draw: (r) => {
-              kit.button('set-lang-ru', half(r, 0), { label: 'RU', variant: 'primary', size: kit.fs(13), lamp: c.green });
-              kit.button('set-lang-en', half(r, 1), { label: 'EN', variant: 'btn', size: kit.fs(13), disabled: true });
-            },
+            ...options('lang', [
+              { id: 'set-lang-ru', label: 'RU', active: true },
+              { id: 'set-lang-en', label: 'EN', active: false, disabled: true },
+            ]),
           },
         ],
       },
@@ -171,10 +176,27 @@ export default {
       const w = area.w - cc * 8;
       const innerW = w - sectionPad * 2;
       const controlW = Math.round(innerW * (L.portrait ? 0.52 : 0.46));
+      const ctrlH = Math.min(rowH, L.touch(48));
+      const labelH = Math.round(kit.fs(13) * 1.9);
+
+      /** План строки: высота, стоит ли подпись над органом управления, ширина органа управления. */
+      const plan = (row) => {
+        if (row.note) return { h: Math.round(kit.text.blockHeight(row.note, innerW, kit.fs(11), 1.3)) + Math.round(L.gap * 0.5), note: true };
+        if (row.wide) return { h: rowH + Math.round(L.gap * 0.4), wide: true };
+        let cw = Math.min(innerW - L.gap, Math.max(controlW, row.minW || 0));
+        let stacked = kit.text.measure(row.label, labelSize) > innerW - cw - L.gap;
+        if (row.options) {
+          const need = Math.max(...row.options.map((o) => kit.buttonNeed(o.label, btnSize, { lamp: true })));
+          const fits = (ww) => (ww - L.gap * 0.5 * (row.options.length - 1)) / row.options.length >= need;
+          if (!fits(cw)) stacked = true;
+        }
+        if (stacked) cw = innerW;
+        return { h: stacked ? labelH + ctrlH + Math.round(L.gap * 0.8) : rowH + Math.round(L.gap * 0.4), stacked, cw };
+      };
+
       for (const sec of sections) {
-        const noteH = (row) => Math.round(kit.text.blockHeight(row.note, innerW, kit.fs(11), 1.3)) + L.gap * 0.5;
-        const heights = sec.rows.map((row) => (row.note ? noteH(row) : rowH + L.gap * 0.4));
-        const total = headH + cc * 3 + sectionPad * 2 + heights.reduce((a, b) => a + b, 0);
+        const plans = sec.rows.map(plan);
+        const total = headH + cc * 3 + sectionPad * 2 + plans.reduce((a, p) => a + p.h, 0);
         kit.nine('raised', x0, y, w, total);
         // шапка секции: приборное стекло с иконкой и названием
         kit.nine('screen', x0 + cc * 3, y + cc * 3, w - cc * 6, headH);
@@ -183,16 +205,19 @@ export default {
         let ry = y + cc * 3 + headH + sectionPad;
         sec.rows.forEach((row, i) => {
           const rx = x0 + sectionPad;
-          if (row.note) {
+          const p = plans[i];
+          if (p.note) {
             kit.paragraph(row.note, rx, ry, innerW, { size: kit.fs(11), color: row.color || c.textDim, lineHeight: 1.3 });
-          } else if (row.wide) {
-            row.draw({ x: rx, y: ry + (rowH - Math.min(rowH, L.touch(50))) / 2, w: innerW, h: Math.min(rowH, L.touch(50)) });
+          } else if (p.wide) {
+            row.draw({ x: rx, y: ry + (rowH - ctrlH) / 2, w: innerW, h: ctrlH });
+          } else if (p.stacked) {
+            kit.drawText(row.label, rx, ry + labelH / 2, { size: labelSize, color: c.text, maxWidth: innerW });
+            row.draw({ x: rx, y: ry + labelH, w: innerW, h: ctrlH });
           } else {
-            const cw = Math.min(innerW - L.gap, Math.max(controlW, row.minW || 0));
-            kit.drawText(row.label, rx, ry + rowH / 2, { size: kit.fs(13), color: c.text, maxWidth: innerW - cw - L.gap });
-            row.draw({ x: rx + innerW - cw, y: ry + (rowH - Math.min(rowH, L.touch(48))) / 2, w: cw, h: Math.min(rowH, L.touch(48)) });
+            kit.drawText(row.label, rx, ry + rowH / 2, { size: labelSize, color: c.text, maxWidth: innerW - p.cw - L.gap });
+            row.draw({ x: rx + innerW - p.cw, y: ry + (rowH - ctrlH) / 2, w: p.cw, h: ctrlH });
           }
-          ry += heights[i];
+          ry += p.h;
         });
         y += total + L.gap;
       }
