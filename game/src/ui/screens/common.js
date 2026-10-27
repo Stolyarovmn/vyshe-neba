@@ -177,8 +177,32 @@ export function lockRows(app, kit, x, y, w, reasons, o = {}) {
     const mid = cy + rowH / 2;
     const row = { x, y: cy, w, h: rowH };
     if (tappable && kit.button(`goto-${r.building}`, row, { variant: 'inset' })) o.goto(r.building);
-    if (!o.compact) kit.icon('lock', x + size * 1.0, mid, Math.round(size * 1.4), c.amber);
-    let ix = o.compact ? x + size * 0.6 : x + size * 2.2;
+    if (o.compact) {
+      // тесная карточка: значок нужной постройки (или часы эпохи) и короткая метка, блок по центру; замок рисует сама карточка
+      let ic = 'lock';
+      let lab = app.reasonText(r).split(/\s+/)[0] || '';
+      if (r.kind === 'building') {
+        ic = buildingIcon(r.building, 1);
+        lab = t('lvl.short', { n: r.level });
+      } else if (r.kind === 'part') {
+        ic = partIcon(r.part);
+        lab = t('lvl.short', { n: r.level });
+      } else if (r.kind === 'era') {
+        ic = 'era';
+        lab = String(ERA_YEARS[r.era] ?? '');
+      }
+      const isz = Math.round(size * 1.7);
+      const gapI = Math.round(size * 0.4);
+      const lw = kit.text.measure(lab, size);
+      const withIcon = isz + gapI + lw <= w;
+      const sx = x + (w - (withIcon ? isz + gapI : 0) - lw) / 2;
+      if (withIcon) kit.icon(ic, sx + isz / 2, mid, isz, c.text);
+      kit.drawText(lab, sx + (withIcon ? isz + gapI : 0), mid, { size, color: c.red, maxWidth: x + w - sx });
+      cy += rowH + Math.round(L.gap * 0.3);
+      continue;
+    }
+    kit.icon('lock', x + size * 1.0, mid, Math.round(size * 1.4), c.amber);
+    let ix = x + size * 2.2;
     let label;
     if (r.kind === 'building') {
       kit.icon(buildingIcon(r.building, 1), ix + size * 0.9, mid, Math.round(size * 2), c.text);
@@ -245,6 +269,15 @@ export function infoCallout(app, kit, spec) {
   const padOf = (uu) => padOfL(L, uu);
   const rows = (spec.rows || []).slice(0, 3);
   const locks = (spec.locks || []).filter((r) => !isFundsReason(r)).slice(0, 2);
+  const w = Math.min(Math.round(310 * L.ui), 480, L.area.w - L.gap * 2);
+  // подвал: цена и кнопка в одну строку; не помещаются без мелкого шрифта — цена отдельной строкой над кнопкой на всю ширину
+  const hasBuy = !spec.noBuy && spec.next !== false;
+  const buySize = kit.fs(15);
+  const costW = spec.cost ? kit.costWidth(spec.cost, kit.fs(13)) : 0;
+  const powSize = kit.fs(13);
+  const powW = spec.power ? Math.round(powSize * 1.4) + kit.text.measure(spec.power.text, powSize) + L.gap : 0;
+  const buyNeed = hasBuy ? kit.buttonNeed(spec.buyLabel || '', buySize, { lamp: !!spec.canBuy }) : 0;
+  const stackFoot = (uu) => hasBuy && (costW > 0 || powW > 0) && costW + powW + L.gap * 2 + kit.cell() * 4 + buyNeed > w - padOf(uu) * 2;
   const dims = (uu) => {
     const touch = (n) => Math.max(MIN_ROW, Math.round(n * uu));
     // абсолютные минимумы: при сжатии щитка строки не должны слипаться (подпись, зазор, полоска помещаются всегда)
@@ -255,7 +288,10 @@ export function infoCallout(app, kit, spec) {
       rowH: atLeast(36, 30),
       lockH: (spec.goto ? touch(44) : atLeast(28, 26)) + Math.round(L.gap * 0.3),
       lineH: spec.line ? atLeast(24, 20) : 0,
-      footH: spec.next === false || spec.noBuy ? atLeast(32, 28) : touch(52),
+      btnH: touch(52),
+      priceH: atLeast(30, 26),
+      stack: stackFoot(uu),
+      footH: spec.next === false || spec.noBuy ? atLeast(32, 28) : touch(52) + (stackFoot(uu) ? atLeast(30, 26) + Math.round(L.gap * 0.4) : 0),
     };
   };
   const calcH = (uu) => {
@@ -264,9 +300,10 @@ export function infoCallout(app, kit, spec) {
     return padOf(uu) * 2 + d.titleH + (spec.max ? d.segH : 0) + d.lineH + rows.length * (d.rowH + Math.round(L.gap * 0.3)) + locks.length * d.lockH + extra + d.footH + L.gap;
   };
   const { u, bounds } = fitScale(L, spec.bounds, calcH);
-  const w = Math.min(Math.round(310 * L.ui), 420, L.area.w - L.gap * 2);
-  const { titleH, segH, rowH, lockH, lineH, footH } = dims(u);
+  const { titleH, segH, rowH, lockH, lineH, footH, btnH, priceH, stack } = dims(u);
   const h = calcH(u);
+  // только размеры щитка (мастерская освобождает под него место на схеме)
+  if (spec.measureOnly) return { h, w };
   const co = kit.callout(spec.id, spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds, side: spec.side, variant: 'panel', pad: padOf(u) });
   const r = co.inner;
   let y = r.y;
@@ -320,25 +357,25 @@ export function infoCallout(app, kit, spec) {
     }, { opaque: true });
 
     if (hasButton) {
-      // подвал: табло цены (на экране эпохи) и кнопка; кнопка берёт сколько нужно подписи, не хватает места — значок убирается
-      const bsize = kit.fs(15);
-      const costW = spec.cost ? kit.costWidth(spec.cost, kit.fs(13)) : 0;
-      const powSize = kit.fs(13);
-      const powW = spec.power ? Math.round(powSize * 1.4) + kit.text.measure(spec.power.text, powSize) + L.gap : 0;
-      const availBtn = r.w - costW - powW - L.gap * 2 - cc * 4;
-      const want = kit.text.measure(spec.buyLabel, bsize) + Math.round(bsize * 1.9) + cc * 8;
+      // подвал: табло цены (на экране эпохи) и кнопка; кнопка берёт сколько нужно подписи, не хватает места — значок убирается,
+      // а если и подпись не помещается рядом с ценой — цена встаёт отдельной строкой над кнопкой
+      const bsize = buySize;
+      const availBtn = stack ? r.w : r.w - costW - powW - L.gap * 2 - cc * 4;
+      const want = kit.buttonNeed(spec.buyLabel, bsize, { lamp: !!spec.canBuy, icon: true, iconSize: Math.round(bsize * 1.5) });
       const withIcon = want <= availBtn;
-      const btnW = Math.round(Math.max(Math.min(r.w * 0.52, availBtn), Math.min(want, availBtn)));
-      const price = { x: r.x, y: fy + cc, w: Math.max(cc * 12, r.w - btnW - L.gap), h: footH - cc * 2 };
+      const btnW = stack ? r.w : Math.round(Math.min(availBtn, Math.max(r.w * 0.52, withIcon ? want : buyNeed)));
+      const btnY = stack ? fy + footH - btnH : fy;
+      const price = stack ? { x: r.x, y: fy + cc, w: r.w, h: priceH - cc * 2 } : { x: r.x, y: fy + cc, w: Math.max(cc * 12, r.w - btnW - L.gap), h: footH - cc * 2 };
+      const priceMid = price.y + price.h / 2;
       kit.screen(`price-${spec.id}`, price, () => {
-        if (spec.cost) kit.costChip(price.x + cc * 3, fy + footH / 2, spec.cost, { have: { coins: p.coins, data: p.data }, size: kit.fs(13) });
+        if (spec.cost) kit.costChip(price.x + cc * 3, priceMid, spec.cost, { have: { coins: p.coins, data: p.data }, size: kit.fs(13) });
         if (spec.power) {
           const px = price.x + cc * 3 + costW + L.gap;
-          kit.icon('bolt', px + powSize * 0.6, fy + footH / 2, Math.round(powSize * 1.4), spec.power.color);
-          kit.drawText(spec.power.text, px + Math.round(powSize * 1.4), fy + footH / 2, { size: powSize, color: spec.power.color });
+          kit.icon('bolt', px + powSize * 0.6, priceMid, Math.round(powSize * 1.4), spec.power.color);
+          kit.drawText(spec.power.text, px + Math.round(powSize * 1.4), priceMid, { size: powSize, color: spec.power.color });
         }
       }, { opaque: true });
-      if (kit.button(spec.buyId, { x: r.x + r.w - btnW, y: fy, w: btnW, h: footH }, { label: spec.buyLabel, variant: 'primary', disabled: !spec.canBuy, size: bsize, icon: withIcon ? 'plus' : undefined, lamp: spec.canBuy ? kit.c.green : false })) spec.onBuy?.();
+      if (kit.button(spec.buyId, { x: r.x + r.w - btnW, y: btnY, w: btnW, h: stack ? btnH : footH }, { label: spec.buyLabel, variant: 'primary', disabled: !spec.canBuy, size: bsize, icon: withIcon ? 'plus' : undefined, lamp: spec.canBuy ? kit.c.green : false, fixedScale: true })) spec.onBuy?.();
     }
   });
   return co;
@@ -368,17 +405,40 @@ export function eraCallout(app, kit, spec) {
   const es = app.rules.getEraState(p);
   const conds = eraConditions(es);
   const padOf = (uu) => padOfL(L, uu);
-  const calcH = (uu) => padOf(uu) * 2 + Math.round(36 * uu) + Math.round(38 * uu) + (es.final ? 0 : conds.length * Math.round(28 * uu)) + (es.final ? Math.round(32 * uu) : Math.max(MIN_ROW, Math.round(52 * uu))) + L.gap * 1.5;
-  const { u, bounds } = fitScale(L, spec.bounds, calcH);
   const w = Math.min(Math.round(310 * L.ui), 420, L.area.w - L.gap * 2);
+  const condSize = kit.fs(12);
+  const lineStep = kit.text.lineStep(condSize, 1.25);
+  // условия переносятся по словам в несколько строк: длинная веха не обрезается, а занимает две-три строки
+  const condText = (cd) => {
+    if (cd.kind === 'coins' || cd.kind === 'data') return `${fmtCompact(cd.have)} / ${fmtCompact(cd.need)}`;
+    if (cd.kind === 'buildings') return t('era.cond.buildings', { have: cd.have, need: cd.need, level: cd.level });
+    return cd.text || cd.kind;
+  };
+  const condInfo = (cd, uu) => {
+    const textW = w - padOf(uu) * 2 - Math.round(46 * uu);
+    const lines = kit.text.wrap(condText(cd), textW, condSize);
+    return { lines, h: Math.max(Math.round(28 * uu), Math.round(lines.length * lineStep + 6 * uu)) };
+  };
+  const condsH = (uu) => (es.final ? 0 : conds.reduce((sum, cd) => sum + condInfo(cd, uu).h, 0));
+  // колонка ламп эпох: подпись года начинается ниже лампы (с зазором в клетку), даже когда щиток сжат под экран
+  const yearSize = kit.fs(10);
+  const yearPx = 7 * kit.text.scaleFor(yearSize);
+  const lampsOf = (uu) => {
+    const lcc = Math.max(1, Math.round(Math.round(17 * uu) / 5));
+    const lampCy = Math.round(3 * lcc + 1);
+    const textCy = lampCy + 3 * lcc + lcc + Math.ceil(yearPx / 2);
+    return { lampCy, textCy, h: textCy + Math.ceil(yearPx / 2) + Math.round(4 * uu) };
+  };
+  const calcH = (uu) => padOf(uu) * 2 + Math.round(36 * uu) + lampsOf(uu).h + condsH(uu) + (es.final ? Math.round(32 * uu) : Math.max(MIN_ROW, Math.round(52 * uu))) + L.gap * 1.5;
+  const { u, bounds } = fitScale(L, spec.bounds, calcH);
   const titleH = Math.round(36 * u);
-  const lampsH = Math.round(38 * u);
-  const condH = Math.round(28 * u);
+  const lampsK = lampsOf(u);
+  const lampsH = lampsK.h;
   const footH = es.final ? Math.round(32 * u) : Math.max(MIN_ROW, Math.round(52 * u));
   const h = calcH(u);
+  if (spec.measureOnly) return { h, w };
   const co = kit.callout(spec.id || 'era', spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds, side: spec.side, variant: 'panel', pad: padOf(u) });
   const r = co.inner;
-  let y = r.y;
   let advanced = false;
   kit.withLayer(61, () => {
     const cc = kit.cell();
@@ -391,32 +451,27 @@ export function eraCallout(app, kit, spec) {
       let y = r.y;
       kit.icon('era', r.x + Math.round(15 * u), y + titleH / 2, Math.round(30 * u), c.amber);
       kit.drawText(String(ERA_YEARS[p.era]), r.x + Math.round(36 * u), y + titleH / 2, { size: kit.fs(21), color: c.amberLight, shadow: true });
-      const yw = kit.text.measure(String(ERA_YEARS[p.era]), kit.fs(21));
-      kit.drawText(eraName(app, p.era), r.x + Math.round(46 * u) + yw, y + titleH / 2, { size: kit.fs(12), color: c.textDim, maxWidth: r.w - Math.round(46 * u) - yw });
       y += titleH;
-      // лампы эпох
+      // лампы эпох: подпись — две последние цифры года (четыре цифры в масштабе ×2 не помещаются в шестую часть ширины)
       const step = r.w / 6;
       for (let i = 0; i < 6; i++) {
         const cx = r.x + step * (i + 0.5);
         const done = i < p.era;
         const now = i === p.era;
-        kit.lamp(cx, y + Math.round(10 * u), Math.round(17 * u), done ? c.green : now ? c.amber : c.navy2, done || now, now);
-        kit.drawText(String(ERA_YEARS[i]), cx, y + Math.round(30 * u), { size: Math.max(7, kit.fs(8)), color: now ? c.amberLight : done ? c.text : c.textMute, align: 'center' });
+        kit.lamp(cx, y + lampsK.lampCy, Math.round(17 * u), done ? c.green : now ? c.amber : c.navy2, done || now, now);
+        kit.drawText(String(ERA_YEARS[i]).slice(-2), cx, y + lampsK.textCy, { size: yearSize, color: now ? c.amberLight : done ? c.text : c.textMute, align: 'center' });
       }
       y += lampsH;
       if (!es.final) {
         for (const cd of conds) {
-          const mid = y + condH / 2;
-          kit.lamp(r.x + Math.round(8 * u), mid, Math.round(13 * u), cd.ok ? c.green : c.red, true);
+          const info = condInfo(cd, u);
+          const first = y + Math.round(14 * u);
+          kit.lamp(r.x + Math.round(8 * u), first, Math.round(13 * u), cd.ok ? c.green : c.red, true);
           const iconName = cd.kind === 'coins' ? 'coin' : cd.kind === 'data' ? 'data' : cd.kind === 'buildings' ? 'building' : 'target';
-          kit.icon(iconName, r.x + Math.round(30 * u), mid, Math.round(20 * u), cd.ok ? c.text : c.textDim);
+          kit.icon(iconName, r.x + Math.round(30 * u), first, Math.round(20 * u), cd.ok ? c.text : c.textDim);
           const tx = r.x + Math.round(46 * u);
-          let str;
-          if (cd.kind === 'coins' || cd.kind === 'data') str = `${fmtCompact(cd.have)} / ${fmtCompact(cd.need)}`;
-          else if (cd.kind === 'buildings') str = t('era.cond.buildings', { have: cd.have, need: cd.need, level: cd.level });
-          else str = cd.text || cd.kind;
-          kit.drawText(str, tx, mid, { size: kit.fs(12), color: cd.ok ? c.text : c.textDim, maxWidth: r.x + r.w - tx });
-          y += condH;
+          info.lines.forEach((ln, i) => kit.drawText(ln, tx, first + i * lineStep, { size: condSize, color: cd.ok ? c.text : c.textDim }));
+          y += info.h;
         }
       }
       if (es.final) {
@@ -424,7 +479,7 @@ export function eraCallout(app, kit, spec) {
         kit.drawText(t('card.maxed'), r.x + Math.round(26 * u), fy + footH / 2, { size: kit.fs(14), color: c.green });
       }
     }, { opaque: true });
-    if (!es.final && kit.button('era-advance', { x: r.x, y: fy, w: r.w, h: footH }, { label: t('era.advance'), variant: 'primary', disabled: !es.ok, icon: 'era', size: kit.fs(15), lamp: es.ok ? c.green : false })) {
+    if (!es.final && kit.button('era-advance', { x: r.x, y: fy, w: r.w, h: footH }, { label: t('era.advance'), variant: 'primary', disabled: !es.ok, icon: 'era', size: kit.fs(15), lamp: es.ok ? c.green : false, solo: true })) {
       const res = app.advanceEra();
       if (res.ok) {
         advanced = true;
@@ -447,10 +502,11 @@ export function drawEnergyPlate(app, kit, r) {
   kit.hit('base-energy', r, {});
   const dial = { x: r.x + cc * 3, y: r.y + cc * 3, w: Math.round(r.w * 0.58), h: r.h - cc * 6 };
   kit.dial(dial, clamp(pb.ratio, 0, 1), { zones: [{ to: 0.55, color: c.red }, { to: 0.8, color: c.amber }, { to: 1, color: c.green }] });
+  // справа от шкалы — молния цвета состояния и лампа; числа баланса только в щитке постройки (на табличке им нет места)
   const tx = dial.x + dial.w + cc * 2;
-  kit.icon('bolt', tx + (r.x + r.w - tx - cc * 2) / 2, r.y + r.h * 0.32, Math.round(r.h * 0.36), low ? c.red : c.green);
-  kit.drawText(`${Math.round(pb.demand)}/${Math.round(pb.supply)}`, tx + (r.x + r.w - tx - cc * 2) / 2, r.y + r.h * 0.74, { size: Math.max(8, kit.fs(9)), color: low ? c.red : c.textDim, align: 'center', maxWidth: r.x + r.w - tx - cc * 2 });
-  kit.lamp(r.x + r.w - cc * 5, r.y + cc * 5, cc * 4, low ? c.red : c.green, true, low);
+  const rw = r.x + r.w - tx - cc * 2;
+  kit.icon('bolt', tx + rw / 2, r.y + r.h * 0.62, Math.round(Math.min(r.h * 0.42, rw * 0.8)), low ? c.red : c.green);
+  kit.lamp(tx + rw / 2, r.y + r.h * 0.24, cc * 5, low ? c.red : c.green, true, low);
 }
 
 export const coinsText = (n) => fmtInt(n);

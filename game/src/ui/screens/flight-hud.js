@@ -338,6 +338,10 @@ function drawHint(app, kit, L, s, f, hud, tut) {
   const size = kit.fs(L.portrait ? 13 : 14);
   const tw = Math.min(r.w, kit.text.measure(h.text, size) + size * 3);
   const x = r.x + (r.w - tw) / 2;
+  // длинная подсказка в тесной раскладке переносится на вторую строку, а не режется многоточием
+  const lines = kit.text.measure(h.text, size) + size * 2.6 > tw ? kit.text.wrap(h.text, tw - size * 2.6, size).slice(0, 2) : [h.text];
+  const step = lines.length > 1 ? Math.min(Math.round(size * 1.3), Math.floor((r.h - 4) / lines.length)) : 0;
+  const drawLines = (color) => lines.forEach((ln, i) => kit.drawText(ln, x + size * 2.1, r.y + r.h / 2 + (i - (lines.length - 1) / 2) * step, { size, color, maxWidth: tw - size * 2.6 }));
   const variant = h.kind === 'bad' ? 'danger' : h.kind === 'good' ? 'good' : 'hud';
   const blink = h.kind === 'bad' && !app.settings.reduceMotion && Math.floor(app.time * 5) % 2 === 0;
   if (['analog', 'led', 'digital'].includes(kit.S.skin.instr)) {
@@ -348,13 +352,13 @@ function drawHint(app, kit, L, s, f, hud, tut) {
       if (h.kind === 'bad' && blink) kit.rect(box.x, box.y, box.w, box.h, c.red);
       const fg = h.kind === 'bad' && blink ? c.ink : c.text;
       kit.icon(h.icon, x + size * 1.1, r.y + r.h / 2, size * 1.25, h.kind === 'bad' && blink ? c.ink : h.kind === 'bad' ? c.red : c.amber);
-      kit.drawText(h.text, x + size * 2.1, r.y + r.h / 2, { size, color: fg, maxWidth: tw - size * 2.6 });
+      drawLines(fg);
     });
     return;
   }
   kit.nine(blink ? 'warn' : variant, x, r.y, tw, r.h);
   kit.icon(h.icon, x + size * 1.1, r.y + r.h / 2, size * 1.25, h.kind === 'bad' ? c.white : h.kind === 'good' ? c.ink : c.amber);
-  kit.drawText(h.text, x + size * 2.1, r.y + r.h / 2, { size, color: h.kind === 'good' ? c.ink : c.text, maxWidth: tw - size * 2.6 });
+  drawLines(h.kind === 'good' ? c.ink : c.text);
 }
 
 // ---------- управление ----------
@@ -378,8 +382,7 @@ function hudButton(app, kit, L, name, r, o) {
     ctx.globalAlpha = dim ? 0.6 : 1;
     kit.rect(r.x + cc, r.y + r.h - lip, r.w - cc * 2, lip, c.ink);
     kit.nine(dim ? 'disabled' : pressed ? (o.variant === 'primary' ? 'primaryPress' : o.variant === 'good' ? 'goodPress' : 'btnPress') : o.variant || 'hud', r.x, r.y + (pressed ? lip : 0), r.w, r.h - lip);
-    kit.icon(o.icon, r.x + r.w / 2, r.y + (r.h - lip) * (o.label ? 0.42 : 0.5) + (pressed ? lip : 0), Math.round(Math.min(r.w, r.h) * 0.46), dim ? c.textMute : o.iconColor || c.text);
-    if (o.label) kit.drawText(o.label, r.x + r.w / 2, r.y + (r.h - lip) * 0.82 + (pressed ? lip : 0), { size: kit.fs(9), color: c.textDim, align: 'center', maxWidth: r.w - 4 });
+    kit.icon(o.icon, r.x + r.w / 2, r.y + (r.h - lip) * 0.5 + (pressed ? lip : 0), Math.round(Math.min(r.w, r.h) * 0.46), dim ? c.textMute : o.iconColor || c.text);
     ctx.globalAlpha = 1;
   } else if (kit.button(id, r, { icon: o.icon, label: o.wide ? o.label : undefined, variant: dim ? 'disabled' : o.variant === 'hud' ? 'btn' : o.variant || 'btn', disabled: dim, tip: o.label, iconSize: Math.round(Math.min(r.w, r.h) * 0.5), size: kit.fs(13) })) {
     app.input.pulse(name);
@@ -438,7 +441,7 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   kit.icon('back', D.cx - D.r * 0.66, D.cy + D.r * 0.15, Math.round(D.r * 0.3), c.textDim);
   kit.icon('arrow', D.cx + D.r * 0.66, D.cy + D.r * 0.15, Math.round(D.r * 0.3), c.textDim);
   base.knob();
-  kit.drawText(t('hud.tilt'), D.cx, D.cy + D.r * 0.72, { size: kit.fs(9), color: c.textMute, align: 'center' });
+  kit.drawText(t('hud.tilt'), D.cx, D.cy + D.r * 0.72, { size: kit.fs(10), color: c.textMute, align: 'center' });
 
   // рычаг тяги: паз со светодиодной шкалой, рукоятка и фиксатор
   const V = hud.lever;
@@ -448,8 +451,8 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   // фиксатор: в режиме «Пилот» рычаг держит положение — лампа горит; в «Аркаде» отпускание сбрасывает тягу
   const lw = inst.lever(kit, V, { lv, thr: f.throttle, boost: !!f.boost?.active, mode, u: L.ui });
   // подпись на самой рукоятке: «держи» в аркаде, процент в режиме «Пилот»
-  kit.drawText(mode === 'arcade' ? t('hud.hold') : `${Math.round(lv.value * 100)}`, V.x + V.w / 2, lw.thumb.y + lw.thumb.h * 0.72, { size: kit.fs(9), color: lw.label, align: 'center', maxWidth: V.w - cc * 8 });
-  kit.drawText(t('hud.thrust'), V.x + V.w / 2, V.y - kit.fs(8), { size: kit.fs(9), color: c.textMute, align: 'center' });
+  kit.drawText(mode === 'arcade' ? t('hud.hold') : `${Math.round(lv.value * 100)}`, V.x + V.w / 2, lw.thumb.y + lw.thumb.h * 0.72, { size: kit.fs(10), color: lw.label, align: 'center', maxWidth: V.w - cc * 8 });
+  kit.drawText(t('hud.thrust'), V.x + V.w / 2, V.y - kit.fs(8), { size: kit.fs(10), color: c.textMute, align: 'center' });
 }
 
 // ---------- крен и ограничитель наклона ----------

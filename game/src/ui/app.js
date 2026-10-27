@@ -675,12 +675,10 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       return ['bottom', safeBottom - (app.touchUi ? 0 : Math.round(30 * L.ui)), null];
     }
     if (app.screen === 'results') return ['top', L.area.y + L.gap + 24 * L.ui, null];
+    // уведомление — под рядом угловых табличек на всю ширину: между кнопкой «назад» и табличками ему не хватало бы места
     const G = chromeLayout(L, { back: true, era: app.screen === 'base' });
-    // уведомление стоит правее левых табличек первого ряда (во втором ряду на узком экране табличек сверху нет)
-    const firstRow = ['back', 'era', 'gear'].map((k) => G[k]).filter((r) => r && r.y === G.y);
-    const left = Math.max(...firstRow.map((r) => r.x + r.w), L.area.x) + L.gap;
-    const right = G.coins.x - L.gap;
-    return ['top', G.y + G.h / 2, { x: left, y: G.y, w: Math.max(80, right - left), h: G.h }];
+    const toastH = Math.round(kit.fs(13) * 2.6);
+    return ['top', G.row.y + G.row.h + L.gap + toastH / 2, { x: L.area.x, y: G.row.y, w: L.area.w, h: G.row.h }];
   }
 
   app.frame = (dt, nowSec) => {

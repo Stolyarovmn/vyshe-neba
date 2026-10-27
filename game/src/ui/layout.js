@@ -83,7 +83,7 @@ export function chromeLayout(L, o = {}) {
   const left0 = a.x + g;
   const right0 = right(a) - g;
   const want = { back: o.back ? h : 0, era: o.era ? R(96 * L.ui) : 0, gear: o.gear ? h : 0, coins: R(120 * L.ui), data: R(96 * L.ui) };
-  const min = { era: R(96 * L.ui), coins: R(108 * L.ui), data: R(84 * L.ui) };
+  const min = { era: R(96 * L.ui), coins: R(108 * L.ui), data: R(92 * L.ui) };
   const total = () => Object.keys(want).filter((k) => want[k]).reduce((s, k, i, a2) => s + want[k] + (i ? g : 0), 0);
   const shrink = () => {
     let over = total() - (right0 - left0);
@@ -188,8 +188,11 @@ export function dockLayout(L) {
   const lh = dockHeight(L);
   const cc = L.cell;
   const lwMax = R(300 * L.ui);
-  const wide = a.w - g * 2 >= nav * 4 + g * 4 + R(240 * L.ui);
-  const lw = wide ? Math.min(lwMax, R((a.w - g * 2) - nav * 4 - g * 4) , R(a.w * 0.34)) : Math.min(lwMax, a.w - g * 2);
+  // кнопки-иконки шире, чем высота: под значком помещается подпись масштаба ×2 (до пяти букв) с полями в два пикселя шрифта
+  const gapN = R(g * 0.5);
+  const navW = Math.max(nav, Math.min(R(80 * L.ui), Math.floor((a.w - g * 2 - gapN * 3) / 4)));
+  const wide = a.w - g * 2 >= navW * 4 + g * 4 + R(240 * L.ui);
+  const lw = wide ? Math.min(lwMax, R((a.w - g * 2) - navW * 4 - g * 4), R(a.w * 0.34)) : Math.min(lwMax, a.w - g * 2);
   const launch = rect(a.x + (a.w - lw) / 2, bottom(a) - g - lh, lw, lh);
   const items = { launch };
   const btn = Math.max(MIN_TOUCH, lh - cc * 4);
@@ -197,17 +200,17 @@ export function dockLayout(L) {
   let bar;
   if (wide) {
     const y = launch.y + (launch.h - nav) / 2;
-    items.rocket = rect(launch.x - g * 2 - nav * 2 - g, y, nav, nav);
-    items.base = rect(launch.x - g - nav, y, nav, nav);
-    items.journal = rect(right(launch) + g, y, nav, nav);
-    items.shop = rect(right(launch) + g * 2 + nav, y, nav, nav);
-    bar = rect(items.rocket.x, launch.y, items.shop.x + nav - items.rocket.x, launch.h);
+    items.rocket = rect(launch.x - g * 2 - navW * 2 - g, y, navW, nav);
+    items.base = rect(launch.x - g - navW, y, navW, nav);
+    items.journal = rect(right(launch) + g, y, navW, nav);
+    items.shop = rect(right(launch) + g * 2 + navW, y, navW, nav);
+    bar = rect(items.rocket.x, launch.y, items.shop.x + navW - items.rocket.x, launch.h);
   } else {
-    const total = nav * 4 + g * 3;
+    const total = navW * 4 + gapN * 3;
     const y = launch.y - g * 1.5 - nav;
     const x0 = a.x + (a.w - total) / 2;
     NAV_ITEMS.forEach((k, i) => {
-      items[k] = rect(x0 + i * (nav + g), y, nav, nav);
+      items[k] = rect(x0 + i * (navW + gapN), y, navW, nav);
     });
     bar = rect(Math.min(launch.x, x0), y, Math.max(launch.w, total), bottom(launch) - y);
   }
@@ -239,10 +242,14 @@ export const ROCKET_SPOTS = Object.entries(SPOT_SIDE)
   .map(([id, side]) => ({ id, side, t: MODULE_VIEW[id].tAnchor }))
   .sort((p, q) => p.t - q.t);
 
-export function rocketLayout(L) {
+/**
+ * Раскладка мастерской. opts.reserveBottom — высота, которую снизу занимает открытая выноска (портрет): схема ракеты и узлы
+ * сжимаются и сдвигаются вверх, чтобы все восемь модулей остались видны и доступны, а щиток стыковался снизу без перекрытия.
+ */
+export function rocketLayout(L, opts = {}) {
   const { body } = screenFrame(L, { header: true });
   const spot = L.portrait || L.h < 420 ? MIN_TOUCH : R(MIN_TOUCH * Math.min(L.ui, 1.45));
-  const schematic = rect(body.x, body.y, body.w, body.h);
+  const schematic = rect(body.x, body.y, body.w, Math.max(0, body.h - (opts.reserveBottom || 0)));
   const standH = L.touch(46);
   const stripH = standH + L.gap * 2;
   const flameRoom = R(Math.min(schematic.h, schematic.w * 1.05) * 0.1);
@@ -280,6 +287,7 @@ export function rocketLayout(L) {
   const centerGap = rocketW + colGap * 2;
   const standW = Math.max(MIN_TOUCH, Math.min(L.touch(112), centerGap));
   return {
+    body,
     schematic,
     spot,
     rocket: rect(cx - rocketW / 2, top, rocketW, rocketH),
@@ -382,13 +390,25 @@ export function launchLayout(L) {
 
 // --- итоги: бланк ---
 
-export function resultsLayout(L) {
+/**
+ * Лист итогов. opts.inset {x, y} — добавочные поля носителя (перфорация, рамка экрана эпохи); opts.height — нужная высота листа
+ * по содержимому: лист ниже максимума не растягивается и стоит чуть выше середины, а не тянется на весь экран.
+ */
+export function resultsLayout(L, opts = {}) {
   const a = L.area;
   const top = a.y + L.gap * 2 + headerHeight(L);
-  const card = centerCard(L, rect(a.x + L.gap, top, a.w - L.gap * 2, bottom(a) - L.gap - top), 600, 780);
+  const area = rect(a.x + L.gap, top, a.w - L.gap * 2, bottom(a) - L.gap - top);
+  const full = centerCard(L, area, 600, 780);
+  let card = full;
+  if (opts.height && opts.height < full.h) {
+    const h = Math.round(opts.height);
+    card = rect(full.x, Math.round(area.y + (area.h - h) * 0.4), full.w, h);
+  }
+  const px = L.pad + (opts.inset?.x || 0);
+  const py = L.pad + (opts.inset?.y || 0);
   const btnH = L.portrait || L.h >= 460 ? L.touch(56) : MIN_TOUCH;
-  const buttons = rect(card.x + L.pad, bottom(card) - L.pad - btnH, card.w - L.pad * 2, btnH);
-  return { card, buttons, content: rect(card.x + L.pad, card.y + L.pad, card.w - L.pad * 2, buttons.y - L.gap - card.y - L.pad) };
+  const buttons = rect(card.x + px, bottom(card) - py - btnH, card.w - px * 2, btnH);
+  return { card, buttons, content: rect(card.x + px, card.y + py, card.w - px * 2, buttons.y - L.gap - card.y - py), pad: { x: px, y: py } };
 }
 
 // --- HUD полёта ---
@@ -431,7 +451,7 @@ export function hudLayout(L, opts = {}) {
     instruments.fuel = rect(left, barsY, barW, barH);
     instruments.hull = rect(left + barW + g, barsY, span - barW - g, barH);
     const topBlock = bottom(instruments.hull);
-    hint = rect(a.x + R(a.w * 0.12), topBlock + g * 2, R(a.w * 0.76), R(34 * iu));
+    hint = rect(a.x + g, topBlock + g * 2, a.w - g * 2, R(34 * iu));
     // радар под подсказкой справа: длинная подсказка его не перекрывает
     radar = { cx: right(a) - g - R(34 * iu), cy: hint.y + hint.h + g + R(34 * iu), r: R(34 * iu) };
     // кнопки: два столбца между диском и рычагом
@@ -458,7 +478,7 @@ export function hudLayout(L, opts = {}) {
     const barsH = Math.max(R(60 * iu), disc.cy - discR - g * 2 - barsTop);
     instruments.fuel = rect(left, barsTop, barW, barsH);
     instruments.hull = rect(left + barW + g * 2, barsTop, barW, barsH);
-    hint = rect(a.x + R(a.w * 0.3), a.y + g, R(a.w * 0.4), R(34 * iu));
+    hint = rect(a.x + R(a.w * 0.3), a.y + g, R(a.w * 0.4), Math.max(34, R(34 * iu)));
     radar = { cx: right(a) - g - R(16 * iu) - g - R(34 * iu), cy: bottom(pause) + g + R(34 * iu), r: R(34 * iu) };
     strip = rect(right(a) - g - R(16 * iu), bottom(pause) + g, R(16 * iu), Math.max(0, lever.y - g - bottom(pause) - g));
     const bw = Math.min(btn, R((gridRight - (disc.cx + discR + g * 2) - g * 2) / 3));

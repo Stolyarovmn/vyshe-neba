@@ -61,7 +61,9 @@ function drawBoard(app, kit, L, r, st, list, rects) {
   const inner = { x: r.x + L.pad, y: r.y + L.pad, w: r.w - L.pad * 2, h: r.h - L.pad * 2 };
   const slots = Math.max(list.length, app.rules.contractSlots ? app.rules.contractSlots(app.profile) : list.length, 1);
   const gap = L.gap * 1.4;
-  const sw0 = Math.round(132 * L.ui);
+  // лист не уже, чем нужно самому длинному слову названия в масштабе ×2: слово не рвётся и не обрезается
+  const longest = Math.max(0, ...list.flatMap((ct) => String(ct.name).split(/\s+/).map((wd) => kit.text.measure(wd, kit.fs(11)))));
+  const sw0 = Math.max(Math.round(132 * L.ui), Math.ceil(longest + cc * 12));
   const cols = Math.max(1, Math.min(slots, Math.floor((inner.w + gap) / (sw0 + gap))));
   const sw = Math.floor((inner.w - gap * (cols - 1)) / cols);
   const sh = Math.round(Math.min(sw * 1.05, 130 * L.ui));

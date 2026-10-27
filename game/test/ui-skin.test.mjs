@@ -69,3 +69,22 @@ test('у каждой эпохи свои формы приборов, а не �
   // подложка стеклянных эпох не должна быть прозрачнее 0,7: иначе цифры теряются на ярком фоне
   for (const s of ERA_SKINS) assert.ok(s.hud.bgAlpha >= 0.7, `${s.id}: bgAlpha ${s.hud.bgAlpha}`);
 });
+
+test('отчёт о полёте: у каждой эпохи свой носитель (перфобумага, термолента, пластик с ЭЛТ, плоская карточка, проекция, голограмма)', () => {
+  assert.deepEqual(ERA_SKINS.map((s) => s.report.kind), ['perf', 'thermal', 'plastic', 'flat', 'projection', 'holo']);
+  // подложки различимы: нет двух эпох с одним тоном листа
+  assert.equal(new Set(ERA_SKINS.map((s) => `${s.report.bg}/${s.report.bg2}`)).size, ERA_COUNT);
+});
+
+test('текст и значки отчёта читаются на носителе каждой эпохи (≥ 4,5 в худшем случае — подложка поверх белого и обе полосы бумаги)', () => {
+  for (const s of ERA_SKINS) {
+    const M = s.report;
+    const backs = [M.bg, M.bg2].map((b) => mix(b, '#ffffff', 1 - M.alpha));
+    for (const key of ['ink', 'dim', 'good', 'bad', 'amber', 'cyan']) {
+      for (const bg of backs) {
+        const ratio = contrast(M[key], bg);
+        assert.ok(ratio >= 4.5, `${s.id}: ${key} (${M[key]}) на ${bg}: ${ratio.toFixed(2)}`);
+      }
+    }
+  }
+});
