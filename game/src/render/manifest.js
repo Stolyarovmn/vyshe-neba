@@ -24,7 +24,7 @@ const ERA_SPRITE_PLACE = {
   high_fighter: 'aircraft/high-fighter', high_experimental: 'aircraft/high-experimental',
   satellite: 'orbital/satellite', panel: 'orbital/satellite-panel',
   coin: 'pickups/coin', fuel: 'pickups/fuel', repair: 'pickups/repair', ring: 'pickups/ring', magnet: 'pickups/magnet',
-  city: 'environment/city', pad_moon: 'environment/pad-moon', pad_mars: 'environment/pad-mars',
+  pad_moon: 'environment/pad-moon', pad_mars: 'environment/pad-mars',
   outpost_moon: 'environment/outpost-moon', outpost_mars: 'environment/outpost-mars',
 };
 /** Спрайты, нужные не во всех эпохах: площадки E0 и E5 берут early/future, поэтому годовые версии только для E1–E4. */
@@ -38,7 +38,6 @@ const FLAT_PLACE = {
 };
 /** Крайние эпохи: имя -> [индекс эпохи, тема/файл]. */
 const EXTREME_PLACE = {
-  city_early: [0, 'environment/city-early'], city_future: [5, 'environment/city-future'],
   pad_moon_early: [0, 'environment/pad-moon-early'], pad_moon_future: [5, 'environment/pad-moon-future'],
   pad_mars_early: [0, 'environment/pad-mars-early'], pad_mars_future: [5, 'environment/pad-mars-future'],
 };
@@ -65,14 +64,14 @@ export const AIRCRAFT_FX_FILE = `${SHARED}effects/aircraft-effects.json`;
 /** Спрайты, у которых есть вариант на каждую эпоху: имя_ГОД. */
 export const ERA_SPRITES = [
   'core', 'booster', 'capsule', 'canopy', 'pack', 'coin', 'fuel', 'repair', 'ring',
-  'satellite', 'panel', 'pad_moon', 'pad_mars', 'magnet', 'city', 'outpost_moon', 'outpost_mars',
+  'satellite', 'panel', 'pad_moon', 'pad_mars', 'magnet', 'outpost_moon', 'outpost_mars',
   'low_primary', 'low_multiwing', 'medium_passenger', 'medium_cargo', 'high_fighter', 'high_experimental',
 ];
 /** Спрайты природы и фона без эпох. */
 export const FLAT_SPRITES = [
   'cloud_0', 'cloud_1', 'cloud_2', 'cloud_3', 'rock_0', 'rock_1', 'rock_2', 'rock_3',
   'earth', 'moon', 'terrain_moon', 'terrain_mars', 'base_drone_0', 'base_drone_1',
-  'city_early', 'city_future', 'pad_moon_early', 'pad_moon_future', 'pad_mars_early', 'pad_mars_future',
+  'pad_moon_early', 'pad_moon_future', 'pad_mars_early', 'pad_mars_future',
 ];
 /** Шары собираются из двух частей: оболочка и гондола (balloon_ГОД_envelope / balloon_ГОД_pod). */
 export const BALLOON_PARTS = ['envelope', 'pod'];
@@ -210,7 +209,6 @@ export const ERA_SPRITE_SIZES = {
   high_fighter: [[233, 141], [250, 141], [224, 166], [253, 146], [253, 143], [279, 181]],
   high_experimental: [[238, 130], [228, 115], [256, 135], [268, 114], [262, 113], [276, 93]],
   magnet: [[161, 171], [173, 178], [165, 182], [172, 177], [194, 180], [195, 178]],
-  city: [[243, 135], [251, 167], [232, 220], [239, 257], [242, 236], [256, 270]],
   outpost_moon: [[227, 233], [225, 309], [216, 209], [216, 271], [218, 281], [255, 281]],
   outpost_mars: [[232, 214], [222, 304], [207, 223], [224, 278], [233, 288], [250, 285]],
 };
@@ -237,7 +235,6 @@ export const FLAT_SPRITE_SIZES = {
   earth: [320, 321], moon: [310, 311],
   terrain_moon: [729, 174], terrain_mars: [728, 185],
   base_drone_0: [606, 354], base_drone_1: [738, 365],
-  city_early: [720, 151], city_future: [733, 223],
   pad_moon_early: [675, 220], pad_moon_future: [691, 257], pad_mars_early: [667, 218], pad_mars_future: [704, 264],
 };
 
@@ -282,12 +279,6 @@ export function padLandingAnchor(base, era) {
   return PAD_LANDING_ANCHOR_Y[base][e];
 }
 
-/** Дальний план: имена спрайтов города на горизонте Земли (основной силуэт эпохи и широкая панорама крайних эпох). */
-export function citySpriteNames(era) {
-  const e = Math.max(0, Math.min(5, era | 0));
-  return { main: `city_${ERA_YEARS[e]}`, panorama: e <= 1 ? 'city_early' : e >= 4 ? 'city_future' : null };
-}
-
 /** Станция-база на дальнем плане Луны и Марса по эпохе. */
 export function outpostSpriteName(body, era) {
   return `${body === 'mars' ? 'outpost_mars' : 'outpost_moon'}_${eraYear(era)}`;
@@ -305,7 +296,7 @@ export function spriteAnchor(name) {
   if (pad) return [0.5, PAD_LANDING_ANCHOR_Y[pad[1]][ERA_YEARS.indexOf(Number(pad[2]))]];
   const extreme = /^(pad_moon|pad_mars)_(early|future)$/.exec(name);
   if (extreme) return [0.5, PAD_EXTREME_ANCHOR_Y[extreme[1]][extreme[2]]];
-  if (/^(outpost_moon|outpost_mars|city)_/.test(name)) return STAGE_ANCHOR;
+  if (/^(outpost_moon|outpost_mars)_/.test(name)) return STAGE_ANCHOR;
   if (TERRAIN_LANDING_ANCHOR_Y[name] !== undefined) return [0.5, TERRAIN_LANDING_ANCHOR_Y[name]];
   return [0.5, 0.5];
 }
