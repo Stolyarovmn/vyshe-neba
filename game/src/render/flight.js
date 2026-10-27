@@ -6,7 +6,7 @@ import { createCamera, createView } from './camera.js';
 import { applyEvents, createScreenFx } from './events.js';
 import { drawTerrain } from './ground.js';
 import {
-  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundDrop, groundTransform,
+  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundTransform,
 } from './islandmap.js';
 import { drawCloudField, fallbackClouds } from './clouds.js';
 import { drawPlacedBuildings } from './buildings.js';
@@ -14,7 +14,6 @@ import { drawLaunchMount, drawPadRing } from './launchpad.js';
 import { drawObjects, drawObjectsFront, drawRadarMarks, warmRings } from './objects.js';
 import { createRingFx } from './rings.js';
 import { drawMagnetField } from './magnet.js';
-import { FAR_PARALLAX, drawFarCoast, farCoastAlpha } from './horizon.js';
 import {
   drawFlash, drawLandingZone, drawPadPointer, drawPredict, drawSpeedLines, drawTransferWarp, landingZoneAlpha,
 } from './overlays.js';
@@ -55,7 +54,6 @@ export function createFlightRenderer(painter, shared) {
   const camera = createCamera();
   const view = createView();
   const mapView = createMapView();
-  const farView = createMapView();
   const groundTr = { s: 1, ox: 0, oy: 0 };
   const particles = createParticles(900);
   const fx = createScreenFx();
@@ -393,12 +391,6 @@ export function createFlightRenderer(painter, shared) {
     const previous = ctx.globalAlpha;
     ctx.globalAlpha = previous * seaAlpha;
     drawSea(ctx, mapView, time, mood, smoothstep(120, 1400, altitude) * 0.8, HAZE_COLOR);
-    // дальний берег с городом эпохи: тот же масштаб, но смещается вниз медленнее карты
-    const farAlpha = farCoastAlpha(altitude);
-    if (farAlpha > 0.01) {
-      farView.set(groundTr.ox, view.sy(flight.y) + view.S * groundDrop(altitude) * FAR_PARALLAX, groundTr.s, view.devW, view.devH);
-      drawFarCoast(ctx, painter, farView, state.era, altitude, mood, HAZE_COLOR, farAlpha);
-    }
     if (landAlpha > 0.01) {
       ctx.globalAlpha = previous * landAlpha;
       drawIslandHd(ctx, painter, mapView);
