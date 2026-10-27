@@ -363,7 +363,7 @@ export function infoCallout(app, kit, spec) {
       const availBtn = stack ? r.w : r.w - costW - powW - L.gap * 2 - cc * 4;
       const want = kit.buttonNeed(spec.buyLabel, bsize, { lamp: !!spec.canBuy, icon: true, iconSize: Math.round(bsize * 1.5) });
       const withIcon = want <= availBtn;
-      const btnW = stack ? r.w : Math.round(Math.max(Math.min(r.w * 0.52, availBtn), Math.min(kit.buttonNeed(spec.buyLabel, bsize, { lamp: !!spec.canBuy }), availBtn)));
+      const btnW = stack ? r.w : Math.round(Math.min(availBtn, Math.max(r.w * 0.52, withIcon ? want : buyNeed)));
       const btnY = stack ? fy + footH - btnH : fy;
       const price = stack ? { x: r.x, y: fy + cc, w: r.w, h: priceH - cc * 2 } : { x: r.x, y: fy + cc, w: Math.max(cc * 12, r.w - btnW - L.gap), h: footH - cc * 2 };
       const priceMid = price.y + price.h / 2;

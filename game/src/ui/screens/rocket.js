@@ -84,7 +84,10 @@ export default {
     drawNodes(app, kit, L, G, st);
 
     const standOn = st.stand >= 0;
-    if (kit.button('stand', G.stand, { label: t('rocket.stand'), icon: 'stand', stack: true, variant: standOn ? 'good' : 'btn', size: kit.fs(10), tip: t('rocket.stand.tip'), lamp: standOn ? kit.c.amberLight : false }) && !standOn) {
+    // в тесной раскладке подпись под значком не помещается рядом с узлами: остаётся значок с подсказкой
+    const standSize = kit.fs(10);
+    const showStandLabel = G.stand.w >= kit.buttonNeed(t('rocket.stand'), standSize) + (standOn ? kit.cell() * 16 : 0);
+    if (kit.button('stand', G.stand, { label: showStandLabel ? t('rocket.stand') : undefined, icon: 'stand', stack: true, variant: standOn ? 'good' : 'btn', size: standSize, tip: t('rocket.stand.tip'), lamp: standOn ? kit.c.amberLight : false }) && !standOn) {
       st.stand = 0;
       st.selected = null;
     }

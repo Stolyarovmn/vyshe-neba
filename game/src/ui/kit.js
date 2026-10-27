@@ -948,6 +948,8 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       const f = text.fit(label, Math.max(10, labelMax), size, null, o.fixedScale ? text.scaleFor(size) : 2);
       lbl = f.str;
       lblSize = f.size;
+      // подпись кнопки, обрезанная многоточием, — тоже замечание стража (text.draw видит уже готовую строку)
+      if (frameAudit && f.str !== String(label)) frameAudit.issues.push({ kind: 'truncated', str: String(label), shown: f.str, rect: { x: body.x, y: body.y, w: body.w, h: body.h } });
     }
     const labelW = hasLabel ? text.measure(lbl, lblSize) : 0;
     const contentW = labelW + (iconName ? iconSize + (hasLabel ? size * 0.4 : 0) : 0);
@@ -1140,7 +1142,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     nine('screen', sw.x, sw.y, sw.w, sw.h);
     const kw = Math.round(sw.w * 0.45);
     nine(value ? 'good' : 'btn', value ? sw.x + sw.w - kw - cc * 2 : sw.x + cc * 2, sw.y + cc * 2, kw, sw.h - cc * 4);
-    drawText(value ? t('common.on') : t('common.off'), sw.x - cc * 3, r.y + r.h / 2 - cc, { size: fs(12), color: value ? c.green : c.textMute, align: 'right' });
+    drawText(value ? t('common.on') : t('common.off'), sw.x - cc * 3, r.y + r.h / 2 - cc, { size: fs(12), color: readable(value ? c.green : c.textMute, frameMid('card')), align: 'right' });
     return clicked ? !value : value;
   }
 
@@ -1273,8 +1275,10 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       const variant = tt.kind === 'bad' ? 'danger' : tt.kind === 'good' ? 'good' : 'raised';
       nine(variant, x, y, w, h);
       const ic = tt.icon || (tt.kind === 'bad' ? 'warn' : tt.kind === 'good' ? 'check' : 'info');
-      icon(ic, x + size * 1.4, y + h / 2, size * 1.6, tt.kind === 'info' ? c.amberLight : c.white);
-      drawText(tt.message, x + size * 2.6, y + h / 2, { size, color: tt.kind === 'good' ? c.ink : c.white, maxWidth: w - size * 3.2 });
+      // плашка «info» лежит на корпусе эпохи: на светлом материале значок и текст затемняются
+      const plate = frameMid(variant);
+      icon(ic, x + size * 1.4, y + h / 2, size * 1.6, tt.kind === 'info' ? readable(c.amberLight, plate, 3) : c.white);
+      drawText(tt.message, x + size * 2.6, y + h / 2, { size, color: tt.kind === 'good' ? c.ink : tt.kind === 'bad' ? c.white : readable(c.white, plate), maxWidth: w - size * 3.2 });
     });
   }
 
@@ -1426,11 +1430,17 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       S.ctx.fillRect(0, 0, L.w, L.h);
       const w = Math.min(L.area.w - L.gap * 4, Math.round(400 * L.ui));
       const bodyH = text.blockHeight(o.body || '', w - L.pad * 4, fs(14), 1.4);
-      const h = Math.min(L.area.h - L.gap * 4, Math.round(fs(110) + bodyH + L.touch(56) + (o.extraH || 0)));
+      // длинное название переносится на вторую-третью строку, а не обрезается
+      const titleLines = text.wrap(o.title, w - L.pad * 2, fs(20)).slice(0, 3);
+      const titleStep = text.lineStep(fs(20), 1.25);
+      const h = Math.min(L.area.h - L.gap * 4, Math.round(fs(110) + bodyH + L.touch(56) + (o.extraH || 0) + (titleLines.length - 1) * titleStep));
       const x = L.area.x + (L.area.w - w) / 2;
       const y = L.area.y + (L.area.h - h) / 2 + slide;
       const inner = panel({ x, y, w, h }, { variant: 'raised' });
       let cy = inner.y + L.gap;
+      // карточка лежит на корпусе эпохи: на светлом материале подписи затемняются
+      const plate = frameMid('raised');
+      const inkTitle = readable(c.text, plate);
       if (o.icon) {
         const ringS = fs(56);
         nine('screen', x + w / 2 - ringS / 2, cy, ringS, ringS);
@@ -1438,12 +1448,12 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
         cy += ringS + L.gap * 1.2;
       }
       if (o.kicker) {
-        drawText(o.kicker, x + w / 2, cy + fs(6), { size: fs(12), color: c.amber, align: 'center' });
+        drawText(o.kicker, x + w / 2, cy + fs(6), { size: fs(12), color: readable(c.amber, plate), align: 'center' });
         cy += fs(18);
       }
-      drawText(o.title, x + w / 2, cy + fs(10), { size: fs(20), color: c.text, align: 'center', maxWidth: inner.w, shadow: true });
-      cy += fs(30);
-      const used = paragraph(o.body || '', inner.x, cy, inner.w, { size: fs(13), lineHeight: 1.4, align: 'center' });
+      titleLines.forEach((ln, i) => drawText(ln, x + w / 2, cy + fs(10) + i * titleStep, { size: fs(20), color: inkTitle, align: 'center', shadow: inkTitle === c.text }));
+      cy += fs(30) + (titleLines.length - 1) * titleStep;
+      const used = paragraph(o.body || '', inner.x, cy, inner.w, { size: fs(13), lineHeight: 1.4, align: 'center', color: readable(c.textDim, plate) });
       cy += used + L.gap;
       if (o.extra) cy += o.extra({ x: inner.x, y: cy, w: inner.w }) || 0;
       const bh = L.touch(52);

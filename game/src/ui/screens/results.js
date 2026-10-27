@@ -117,8 +117,11 @@ export default {
 
     const half = (G.buttons.w - L.gap) / 2;
     const by = G.buttons.y - drop;
-    if (kit.button('results-again', { x: G.buttons.x, y: by, w: half, h: G.buttons.h }, { label: t('results.again'), icon: 'launch', variant: 'primary', size: kit.fs(16) })) again(app, res);
-    if (kit.button('results-base', { x: G.buttons.x + half + L.gap, y: by, w: half, h: G.buttons.h }, { label: t('results.base'), icon: 'base', variant: 'btn', size: kit.fs(16) })) {
+    // значки на кнопках — пока помещаются при полном шрифте; иначе только подписи
+    const endSize = kit.fs(16);
+    const icons = kit.buttonNeed(t('results.again'), endSize, { icon: true }) <= half && kit.buttonNeed(t('results.base'), endSize, { icon: true }) <= half;
+    if (kit.button('results-again', { x: G.buttons.x, y: by, w: half, h: G.buttons.h }, { label: t('results.again'), icon: icons ? 'launch' : undefined, variant: 'primary', size: endSize, fixedScale: true })) again(app, res);
+    if (kit.button('results-base', { x: G.buttons.x + half + L.gap, y: by, w: half, h: G.buttons.h }, { label: t('results.base'), icon: icons ? 'base' : undefined, variant: 'btn', size: endSize, fixedScale: true })) {
       app.results = null;
       app.history.length = 0;
       app.go('hub');
@@ -161,17 +164,35 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
     if (report.hint.part === 'parachute' || !res.consumables?.chute) chips.push({ id: 'results-goto-shop', label: t('dock.shop'), icon: 'chute', go: () => app.go('shop', {}, { push: true }) });
     if (report.hint.building) chips.push({ id: 'results-goto-building', label: buildingShort(app, report.hint.building), icon: buildingIcon(report.hint.building, 1), go: () => app.go('base', { select: report.hint.building }, { push: true }) });
     if (chips.length) {
-      // в один ряд (с лампой, если хватает места; без неё — если нет); не помещаются и так — по одной в строке
+      // кнопки-переходы раскладываются рядами по ширине листа: сначала со значками, иначе без; шрифт не мельчится
       const csize = kit.fs(12);
-      const fits = (lamp) => chips.reduce((sum, ch) => sum + kit.buttonNeed(ch.label, csize, { lamp, icon: ch.icon }), L.gap * (chips.length - 1)) <= w;
-      const lamp = fits(true) ? c.amberLight : false;
-      const oneRow = fits(true) || fits(false);
-      const rows = oneRow ? [chips] : chips.map((ch) => [ch]);
+      const need = (ch, icon) => kit.buttonNeed(ch.label, csize, { icon: icon ? ch.icon : undefined });
+      const pack = (icon) => {
+        const out = [];
+        let cur = [];
+        let widest = 0;
+        for (const ch of chips) {
+          const nw = Math.max(widest, need(ch, icon));
+          if (cur.length && (cur.length + 1) * nw + L.gap * cur.length > w) {
+            out.push(cur);
+            cur = [];
+            widest = 0;
+          }
+          cur.push(ch);
+          widest = Math.max(widest, need(ch, icon));
+        }
+        if (cur.length) out.push(cur);
+        return out;
+      };
+      const withIcons = pack(true);
+      const plain = pack(false);
+      const showIcons = withIcons.length <= plain.length;
+      const rows = showIcons ? withIcons : plain;
       const bh = L.touch(compact ? 44 : 46);
       for (const row of rows) {
         const bw = (w - L.gap * (row.length - 1)) / row.length;
         row.forEach((ch, i) => {
-          if (kit.button(ch.id, { x: x + i * (bw + L.gap), y, w: bw, h: bh }, { label: ch.label, icon: ch.icon, variant: 'btn', size: csize, lamp, fixedScale: true })) ch.go();
+          if (kit.button(ch.id, { x: x + i * (bw + L.gap), y, w: bw, h: bh }, { label: ch.label, icon: showIcons ? ch.icon : undefined, variant: 'btn', size: csize, fixedScale: true })) ch.go();
         });
         y += bh + L.gap * (compact ? 0.5 : 1);
       }

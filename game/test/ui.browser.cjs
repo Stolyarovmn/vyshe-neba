@@ -224,6 +224,14 @@ async function tourScreens(page, vp, era = null) {
   await setUi(page, () => { const h = globalThis.__VN_APP__.ui.hub; h.era = false; h.sel = 'beacons'; });
   await audit('хаб/маяки');
   await setUi(page, () => { const h = globalThis.__VN_APP__.ui.hub; h.sel = null; });
+  // «Новое»: плашка-уведомление под рядом табличек и модальные карточки (здание, эпоха)
+  await setUi(page, () => { const a = globalThis.__VN_APP__; a.queueCard('building:beacons', true); a.queueCard('era:2', true); });
+  await audit('хаб/«Новое»', 450);
+  for (const id of ['building:beacons', 'building:energy', 'era:1', 'era:5']) {
+    await setUi(page, (cardId) => { const a = globalThis.__VN_APP__; a.cards.length = 0; a.cards.push(cardId); }, id);
+    await audit(`карточка/${id}`, 380);
+  }
+  await setUi(page, () => { const a = globalThis.__VN_APP__; a.cards.length = 0; });
 
   // стройка: все четырнадцать зданий и эпоха
   await go(page, 'base');
@@ -735,6 +743,14 @@ async function tourEra(page, vp, era) {
   await setUi(page, () => { globalThis.__VN_APP__.ui.hub.era = true; });
   await audit('хаб/эпоха', 200);
   await setUi(page, () => { globalThis.__VN_APP__.ui.hub.era = false; });
+  // карточка здания и «Новое» в хабе (плашка под рядом табличек и модальная карточка)
+  await setUi(page, () => { globalThis.__VN_APP__.ui.hub.sel = 'beacons'; });
+  await audit('хаб/маяки', 250);
+  await setUi(page, () => { const a = globalThis.__VN_APP__; a.ui.hub.sel = null; a.queueCard('building:beacons', true); });
+  await audit('хаб/«Новое»', 450);
+  await setUi(page, (e) => { const a = globalThis.__VN_APP__; a.cards.length = 0; a.cards.push(`era:${e}`); }, era);
+  await audit('карточка/эпоха', 380);
+  await setUi(page, () => { globalThis.__VN_APP__.cards.length = 0; });
   await go(page, 'base');
   await setUi(page, () => { globalThis.__VN_APP__.ui.base.sel = 'gantry'; });
   await audit('стройка/башня', 300);
@@ -768,6 +784,16 @@ async function tourEra(page, vp, era) {
   await audit('итоги', 300);
   await checkTargets(page, vp, `E${era}/итоги`);
   await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); a.prefs.touchControls = 'auto'; });
+  // настройки на трёх позициях прокрутки
+  await go(page, 'settings');
+  await page.waitForTimeout(300);
+  for (let i = 0; i < 3; i++) {
+    await audit(`настройки/${i}`, 200);
+    await page.mouse.move(vp.width / 2, vp.height / 2);
+    await page.mouse.wheel(0, Math.round(vp.height * 0.8));
+    await page.waitForTimeout(250);
+  }
+  await go(page, 'hub');
   return found;
 }
 

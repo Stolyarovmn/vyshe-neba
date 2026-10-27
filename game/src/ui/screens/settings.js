@@ -38,6 +38,10 @@ export default {
     const headH = Math.round(30 * L.ui);
     const labelSize = kit.fs(13);
     const btnSize = kit.fs(13);
+    // секции лежат на корпусе эпохи: у светлого материала (слоновая кость, серый пластик, алюминий) подписи тёмные
+    const rawMid = kit.frameMid('raised');
+    const inkText = kit.readable(c.text, rawMid);
+    const inkDim = kit.readable(c.textDim, rawMid);
 
     /** Ряд кнопок-вариантов: общий масштаб шрифта, активная горит лампой. */
     const options = (id, opts) => ({
@@ -123,7 +127,7 @@ export default {
             draw: (r) => {
               const bw = Math.max(L.touch(48), Math.round(r.w * 0.28));
               if (kit.button('set-text-minus', { x: r.x, y: r.y, w: bw, h: r.h }, { label: 'A-', variant: 'btn', size: btnSize, fixedScale: true, disabled: s.textScale <= 0.8 })) app.setSetting('textScale', Math.max(0.8, Math.round((s.textScale - 0.1) * 10) / 10));
-              kit.drawText(`${Math.round(s.textScale * 100)}%`, r.x + r.w / 2, r.y + r.h / 2, { size: btnSize, color: c.text, align: 'center' });
+              kit.drawText(`${Math.round(s.textScale * 100)}%`, r.x + r.w / 2, r.y + r.h / 2, { size: btnSize, color: inkText, align: 'center' });
               if (kit.button('set-text-plus', { x: r.x + r.w - bw, y: r.y, w: bw, h: r.h }, { label: 'A+', variant: 'btn', size: btnSize, fixedScale: true, disabled: s.textScale >= 1.6 })) app.setSetting('textScale', Math.min(1.6, Math.round((s.textScale + 0.1) * 10) / 10));
             },
           },
@@ -133,14 +137,12 @@ export default {
         title: t('settings.save'), icon: 'export',
         rows: [
           {
-            wide: true,
-            draw: (r) => {
-              const third = (r.w - L.gap * 2) / 3;
-              const small = kit.fs(12);
-              if (kit.button('set-export', { x: r.x, y: r.y, w: third, h: r.h }, { label: t('settings.export'), icon: 'export', variant: 'btn', size: small, fixedScale: true })) exportSave(app, st);
-              if (kit.button('set-import', { x: r.x + third + L.gap, y: r.y, w: third, h: r.h }, { label: t('settings.import'), icon: 'import', variant: 'btn', size: small, fixedScale: true })) importSave(app, st, 'file');
-              if (kit.button('set-paste', { x: r.x + (third + L.gap) * 2, y: r.y, w: third, h: r.h }, { label: t('settings.paste'), icon: 'import', variant: 'btn', size: small, fixedScale: true })) importSave(app, st, 'clipboard');
-            },
+            // три действия с сохранением: в ряд со значками; не помещаются — без значков; и так тесно — по одному в строке
+            group: [
+              { id: 'set-export', label: t('settings.export'), icon: 'export', onClick: () => exportSave(app, st) },
+              { id: 'set-import', label: t('settings.import'), icon: 'import', onClick: () => importSave(app, st, 'file') },
+              { id: 'set-paste', label: t('settings.paste'), icon: 'import', onClick: () => importSave(app, st, 'clipboard') },
+            ],
           },
           ...(st.note ? [{ note: st.note, color: st.noteKind === 'bad' ? c.red : c.green }] : []),
           {
@@ -183,6 +185,14 @@ export default {
       const plan = (row) => {
         if (row.note) return { h: Math.round(kit.text.blockHeight(row.note, innerW, kit.fs(11), 1.3)) + Math.round(L.gap * 0.5), note: true };
         if (row.wide) return { h: rowH + Math.round(L.gap * 0.4), wide: true };
+        if (row.group) {
+          const size = kit.fs(12);
+          const sum = (icon) => row.group.reduce((a, b) => a + kit.buttonNeed(b.label, size, { icon: icon ? b.icon : undefined }), L.gap * (row.group.length - 1));
+          const mode = sum(true) <= innerW ? 'icons' : sum(false) <= innerW ? 'plain' : 'column';
+          const n = row.group.length;
+          const h = mode === 'column' ? n * ctrlH + (n - 1) * Math.round(L.gap * 0.5) + Math.round(L.gap * 0.6) : rowH + Math.round(L.gap * 0.4);
+          return { h, group: mode, size };
+        }
         let cw = Math.min(innerW - L.gap, Math.max(controlW, row.minW || 0));
         let stacked = kit.text.measure(row.label, labelSize) > innerW - cw - L.gap;
         if (row.options) {
@@ -207,14 +217,22 @@ export default {
           const rx = x0 + sectionPad;
           const p = plans[i];
           if (p.note) {
-            kit.paragraph(row.note, rx, ry, innerW, { size: kit.fs(11), color: row.color || c.textDim, lineHeight: 1.3 });
+            kit.paragraph(row.note, rx, ry, innerW, { size: kit.fs(11), color: kit.readable(row.color || c.textDim, rawMid), lineHeight: 1.3 });
           } else if (p.wide) {
             row.draw({ x: rx, y: ry + (rowH - ctrlH) / 2, w: innerW, h: ctrlH });
+          } else if (p.group) {
+            const n = row.group.length;
+            const bw = (innerW - L.gap * (n - 1)) / n;
+            const step = ctrlH + Math.round(L.gap * 0.5);
+            row.group.forEach((b, j) => {
+              const rect = p.group === 'column' ? { x: rx, y: ry + j * step, w: innerW, h: ctrlH } : { x: rx + j * (bw + L.gap), y: ry + (rowH - ctrlH) / 2, w: bw, h: ctrlH };
+              if (kit.button(b.id, rect, { label: b.label, icon: p.group === 'plain' ? undefined : b.icon, variant: 'btn', size: p.size, fixedScale: true })) b.onClick();
+            });
           } else if (p.stacked) {
-            kit.drawText(row.label, rx, ry + labelH / 2, { size: labelSize, color: c.text, maxWidth: innerW });
+            kit.drawText(row.label, rx, ry + labelH / 2, { size: labelSize, color: inkText, maxWidth: innerW });
             row.draw({ x: rx, y: ry + labelH, w: innerW, h: ctrlH });
           } else {
-            kit.drawText(row.label, rx, ry + rowH / 2, { size: labelSize, color: c.text, maxWidth: innerW - p.cw - L.gap });
+            kit.drawText(row.label, rx, ry + rowH / 2, { size: labelSize, color: inkText, maxWidth: innerW - p.cw - L.gap });
             row.draw({ x: rx + innerW - p.cw, y: ry + (rowH - ctrlH) / 2, w: p.cw, h: ctrlH });
           }
           ry += p.h;
