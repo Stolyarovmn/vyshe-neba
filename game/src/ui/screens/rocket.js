@@ -43,7 +43,15 @@ export default {
   },
   draw(app, kit, L, dt) {
     const st = state(app);
-    const G = rocketLayout(L);
+    // открытая выноска в портрете занимает низ экрана: схема ракеты уходит вверх, чтобы все восемь узлов остались видны
+    const full = rocketLayout(L);
+    let reserve = 0;
+    if (st.selected && L.portrait) {
+      const m = infoCallout(app, kit, { ...partSpec(app, kit, L, st.selected), bounds: full.body, measureOnly: true });
+      const minScheme = full.spot * 4 + L.gap * 8;
+      reserve = clamp(m.h + L.gap * 3, 0, Math.max(0, full.body.h - minScheme));
+    }
+    const G = reserve ? rocketLayout(L, { reserveBottom: reserve }) : full;
     drawChrome(app, kit, { back: true });
 
     // изменение уровней → вспышка на сборке
@@ -76,14 +84,17 @@ export default {
     drawNodes(app, kit, L, G, st);
 
     const standOn = st.stand >= 0;
-    if (kit.button('stand', G.stand, { label: t('rocket.stand'), icon: 'stand', stack: true, variant: standOn ? 'good' : 'btn', size: kit.fs(10), tip: t('rocket.stand.tip'), lamp: standOn ? kit.c.amberLight : false }) && !standOn) {
+    // в тесной раскладке подпись под значком не помещается рядом с узлами: остаётся значок с подсказкой
+    const standSize = kit.fs(10);
+    const showStandLabel = G.stand.w >= kit.buttonNeed(t('rocket.stand'), standSize) + (standOn ? kit.cell() * 16 : 0);
+    if (kit.button('stand', G.stand, { label: showStandLabel ? t('rocket.stand') : undefined, icon: 'stand', stack: true, variant: standOn ? 'good' : 'btn', size: standSize, tip: t('rocket.stand.tip'), lamp: standOn ? kit.c.amberLight : false }) && !standOn) {
       st.stand = 0;
       st.selected = null;
     }
 
     // тап по миру закрывает щиток
     if (kit.emptyTap && st.selected && !kit.modalOpen) st.selected = null;
-    if (st.selected) drawPartCallout(app, kit, L, G, st);
+    if (st.selected) drawPartCallout(app, kit, L, G, st, reserve);
   },
 };
 
@@ -101,7 +112,7 @@ function drawScene(app, kit, L, G, st, thr) {
   try {
     if (app.backdropOn && app.renderer.workshop?.drawStations) {
       try {
-        stations = app.renderer.workshop.drawStations(ctx, { era: p.era, rect: G.schematic, time: app.time, rocket: r });
+        stations = app.renderer.workshop.drawStations(ctx, { era: p.era, rect: G.body, time: app.time, rocket: r });
       } catch (err) {
         console.warn('[rocket] drawStations:', err);
       }
@@ -172,23 +183,19 @@ function drawNodes(app, kit, L, G, st) {
     const clicked = kit.button(`part-${id}`, r, { variant: on ? 'cardOn' : 'card', iconSize: Math.round(r.w * 0.52), icon: partIcon(id), tip: partShort(app, id), badge: upgradable ? '!' : undefined, iconColor: ps.level ? c.text : c.textMute });
     if (clicked) st.selected = on ? null : id;
     const n = ps.level ? String(ps.level) : '–';
-    kit.drawText(n, r.x + r.w / 2, r.y + r.h - cc * 5, { size: kit.fs(11), color: ps.level ? c.amberLight : c.textMute, align: 'center', shadow: true });
+    kit.drawText(n, r.x + r.w / 2, r.y + r.h - cc * 5, { size: kit.fs(11), color: kit.readable(ps.level ? c.amberLight : c.textMute, kit.frameMid(on ? 'cardOn' : 'card')), align: 'center', shadow: true });
     if (lockedReq) kit.icon('lock', r.x + cc * 5, r.y + cc * 5, Math.round(12 * L.ui), c.amber);
   }
 }
 
 // ---------- щиток модуля ----------
 
-function drawPartCallout(app, kit, L, G, st) {
-  const id = st.selected;
+/** Описание щитка модуля (без положения): по нему же мастерская заранее узнаёт его высоту. */
+function partSpec(app, kit, L, id) {
   const p = app.profile;
   const ps = app.rules.getPartState(p, id);
-  const r = G.spots[id];
-  infoCallout(app, kit, {
+  return {
     id: `part-${id}`,
-    target: r,
-    bounds: G.schematic,
-    side: L.portrait ? undefined : r.side < 0 ? 'left' : 'right',
     name: partShort(app, id),
     iconName: partIcon(id),
     iconAlpha: ps.level ? 1 : 0.7,
@@ -210,7 +217,20 @@ function drawPartCallout(app, kit, L, G, st) {
         return;
       }
       kit.toast(t('rocket.done', { name: partShort(app, id) }), { kind: 'good', icon: partIcon(id) });
-      kit.spawnSparks(r.x + r.w / 2, r.y + r.h / 2, kit.c.amberLight);
+      kit.spawnSparks(L.w / 2, L.h / 2, kit.c.amberLight);
     },
-  });
+  };
+}
+
+function drawPartCallout(app, kit, L, G, st, reserve) {
+  const id = st.selected;
+  const r = G.spots[id];
+  const spec = partSpec(app, kit, L, id);
+  if (reserve) {
+    // щиток стыкуется под схемой: область — от нижней кромки схемы до низа сцены
+    const top = G.schematic.y + G.schematic.h + Math.round(L.gap * 0.5);
+    infoCallout(app, kit, { ...spec, target: r, bounds: { x: G.body.x, y: top, w: G.body.w, h: G.body.y + G.body.h - top }, side: 'below' });
+    return;
+  }
+  infoCallout(app, kit, { ...spec, target: r, bounds: G.schematic, side: L.portrait ? undefined : r.side < 0 ? 'left' : 'right' });
 }

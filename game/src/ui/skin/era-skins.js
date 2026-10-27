@@ -9,7 +9,10 @@
 // crt      — экран: цвет люминофора, кривизна стекла, строки, виньетка, свечение, мерцание, послесвечение;
 // lamp     — форма подсветки кнопок и ламп: bulb | led | bar | line | dot;
 // hud      — цвет цифр приборов (digit), фон под ними (bg) и его непрозрачность (bgAlpha): тест проверяет контраст ≥ 4,5;
-// instr    — вид приборов HUD: analog | led | digital | flat | projection | holo.
+// instr    — вид приборов HUD: analog | led | digital | flat | projection | holo;
+// report   — носитель отчёта о полёте (экран итогов): kind — perf | thermal | plastic | flat | projection | holo;
+//            bg/bg2 — тон подложки (у перфобумаги — две полосы), alpha — её непрозрачность, ink/dim/good/bad/amber/cyan —
+//            цвета текста и значков на этой подложке (тест проверяет контраст >= 4,5 по худшему случаю).
 
 export const ERA_SKINS = [
   {
@@ -36,6 +39,7 @@ export const ERA_SKINS = [
     crt: { kind: 'green', tint: '#6dff8a', curve: 1, scan: 0.42, vignette: 0.6, glow: 0.55, flicker: 0.05, persist: 0.45 },
     lamp: 'bulb',
     instr: 'analog',
+    report: { kind: 'perf', bg: '#dcf0d2', bg2: '#c2e3b9', alpha: 1, ink: '#10241a', dim: '#365a3c', good: '#0e5a26', bad: '#8c1a1a', amber: '#6a4604', cyan: '#0a4a60' },
   },
   {
     id: 'e1',
@@ -58,10 +62,11 @@ export const ERA_SKINS = [
       card: { hi: 'mat1', mid: 'steel1', lo: 'steel0' },
       cardOn: { hi: 'amber2', mid: 'steel1', lo: 'amber0' },
     },
-    labels: { btn: 'ink', btnHover: 'ink', btnPress: 'ink' },
+    labels: { btn: 'ink', btnHover: 'ink', btnPress: 'ink', raised: 'ink', cardOn: 'ink' },
     crt: { kind: 'amber', tint: '#ffbf3a', curve: 0.85, scan: 0.36, vignette: 0.5, glow: 0.5, flicker: 0.03, persist: 0.35 },
     lamp: 'led',
     instr: 'led',
+    report: { kind: 'thermal', bg: '#f0ead7', bg2: '#f0ead7', alpha: 1, ink: '#2a2823', dim: '#575142', good: '#1e5a2a', bad: '#8a2814', amber: '#6a4608', cyan: '#14505e' },
   },
   {
     id: 'e2',
@@ -78,10 +83,11 @@ export const ERA_SKINS = [
       raised: { hi: 'mat2', mid: 'mat1', lo: 'mat0', rivets: 'screw' },
       btn: { hi: 'mat2', mid: 'steel1', lo: 'steel0', rivets: 'screw' },
     },
-    labels: { btn: 'white' },
+    labels: { btn: 'white', raised: 'ink' },
     crt: { kind: 'color', tint: '#ffffff', curve: 0.45, scan: 0.22, vignette: 0.3, glow: 0.25, flicker: 0, persist: 0.15 },
     lamp: 'led',
     instr: 'digital',
+    report: { kind: 'plastic', bg: '#050912', bg2: '#050912', alpha: 1, ink: '#eef3ff', dim: '#a6b4d2', good: '#7dff9a', bad: '#ff8070', amber: '#ffc94a', cyan: '#6ad8ff' },
   },
   {
     id: 'e3',
@@ -98,10 +104,11 @@ export const ERA_SKINS = [
       raised: { hi: 'mat2', mid: 'mat1', lo: 'mat0', rivets: 'none', tex: 'brushed' },
       btn: { hi: 'mat2', mid: 'steel1', lo: 'steel0', rivets: 'none', tex: 'brushed' },
     },
-    labels: { btn: 'ink', btnHover: 'ink' },
+    labels: { btn: 'ink', btnHover: 'ink', raised: 'ink' },
     crt: { kind: 'flat', tint: '#ffffff', curve: 0, scan: 0, vignette: 0.12, glow: 0, flicker: 0, persist: 0 },
     lamp: 'line',
     instr: 'flat',
+    report: { kind: 'flat', bg: '#0b1119', bg2: '#0b1119', alpha: 1, ink: '#f4f8fc', dim: '#b4bec8', good: '#7dffa8', bad: '#ff8a7a', amber: '#ffd060', cyan: '#7ad8ff' },
   },
   {
     id: 'e4',
@@ -127,6 +134,7 @@ export const ERA_SKINS = [
     crt: { kind: 'projection', tint: '#4ae6ff', curve: 0, scan: 0, vignette: 0, glow: 0.7, flicker: 0, persist: 0 },
     lamp: 'bar',
     instr: 'projection',
+    report: { kind: 'projection', bg: '#020308', bg2: '#020308', alpha: 0.92, ink: '#e4f7ff', dim: '#9fb4c8', good: '#7dffb8', bad: '#ff8a80', amber: '#ffd36a', cyan: '#4ae6ff' },
   },
   {
     id: 'e5',
@@ -150,6 +158,7 @@ export const ERA_SKINS = [
     crt: { kind: 'holo', tint: '#7af0ff', curve: 0, scan: 0.12, vignette: 0, glow: 0.8, flicker: 0.02, persist: 0.2 },
     lamp: 'dot',
     instr: 'holo',
+    report: { kind: 'holo', bg: '#050913', bg2: '#050913', alpha: 0.86, ink: '#f6fbff', dim: '#a8c0e0', good: '#8affc0', bad: '#ff9a90', amber: '#ffd88a', cyan: '#7af0ff' },
   },
 ];
 

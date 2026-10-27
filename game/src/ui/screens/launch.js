@@ -74,7 +74,7 @@ export default {
           const crtKind = kit.S.skin.crt.kind;
           kit.rect(r.x + cc, r.y + cc, r.w - cc * 2, r.h - cc * 2, on && !['green', 'amber', 'color'].includes(crtKind) ? mix(c.navy2, c.amber, 0.12) : c.navy1);
           if (on) {
-            const arm = cc * 5;
+            const arm = cc * 4;
             for (const [bx, by, sx, sy] of [[r.x, r.y, 1, 1], [r.x + r.w, r.y, -1, 1], [r.x, r.y + r.h, 1, -1], [r.x + r.w, r.y + r.h, -1, -1]]) {
               kit.rect(sx > 0 ? bx : bx - arm, sy > 0 ? by : by - cc, arm, cc, c.amberLight);
               kit.rect(sx > 0 ? bx : bx - cc, sy > 0 ? by : by - arm, cc, arm, c.amberLight);
@@ -83,7 +83,8 @@ export default {
           const nameSize = kit.fs(L.portrait ? 12 : 14);
           const glyphH = 7 * kit.text.stepFor(nameSize).css;
           const chipH = d.ok ? 0 : Math.round(28 * L.ui);
-          const nameY = r.y + r.h - cc * 4 - chipH - glyphH / 2;
+          // название выше нижней кромки на два пикселя шрифта сверх обычного поля — угловые скобки его не касаются
+          const nameY = r.y + r.h - cc * 4 - kit.text.stepFor(nameSize).css * 2 - chipH - glyphH / 2;
           const room = nameY - glyphH / 2 - cc * 3 - (r.y + cc * 4);
           const pic = Math.max(cc * 8, Math.min(Math.round(r.w * 0.62), Math.round(room)));
           kit.icon(DEST_ICON[d.id], r.x + r.w / 2, r.y + cc * 4 + room / 2, pic, d.id === 'mars' ? '#e8845a' : c.text, d.ok ? 1 : 0.6);
@@ -123,7 +124,7 @@ export default {
       const pad = Math.round(L.gap * 0.5);
       const slot = { x: r.x + pad, y: r.y + pad, w: r.w - pad * 2, h: r.h - pad * 2 };
       const clicked = kit.button(`cons-${id}`, slot, { variant: on ? 'cardOn' : 'card', icon: CONS_ICON[id], iconSize: Math.round(slot.h * 0.56), iconColor: usable ? c.text : c.textMute, tip: t(`cons.${id}`), lamp: on ? c.green : false });
-      kit.drawText(isFree ? t('cons.free') : `×${have}`, slot.x + slot.w - kit.cell() * 3, slot.y + slot.h - kit.cell() * 5, { size: kit.fs(11), color: isFree ? c.green : have ? c.amberLight : c.textMute, align: 'right', shadow: true });
+      kit.drawText(isFree ? t('cons.free') : `×${have}`, slot.x + slot.w - kit.cell() * 3, slot.y + slot.h - kit.cell() * 5, { size: kit.fs(11), color: kit.readable(isFree ? c.green : have ? c.amberLight : c.textMute, kit.frameMid(on ? 'cardOn' : 'card')), align: 'right', shadow: true });
       if (id === 'chute' && usable && st.dest !== 'earth') kit.icon('warn', slot.x + kit.cell() * 5, slot.y + slot.h - kit.cell() * 5, Math.round(14 * L.ui), c.amber);
       if (clicked) {
         if (!usable) {
@@ -139,7 +140,7 @@ export default {
     kit.hazard(G.start);
     for (const [x, y, w, h] of [[G.start.x, G.start.y, G.start.w, cc], [G.start.x, G.start.y + G.start.h - cc, G.start.w, cc], [G.start.x, G.start.y, cc, G.start.h], [G.start.x + G.start.w - cc, G.start.y, cc, G.start.h]]) kit.rect(x, y, w, h, c.ink);
     const btn = { x: G.start.x + cc * 3, y: G.start.y + cc * 3, w: G.start.w - cc * 6, h: G.start.h - cc * 6 };
-    if (kit.button('launch-start', btn, { label: t('launch.start'), icon: 'launch', variant: 'danger', size: kit.fs(24), iconSize: Math.round(btn.h * 0.46), disabled: !sel?.ok, lamp: sel?.ok ? c.amberLight : false })) {
+    if (kit.button('launch-start', btn, { label: t('launch.start'), icon: 'launch', variant: 'danger', size: kit.fs(24), iconSize: Math.round(btn.h * 0.46), disabled: !sel?.ok, lamp: sel?.ok ? c.amberLight : false, solo: true })) {
       const consumables = {};
       for (const id of CONS) consumables[id] = !!(st.cons[id] && (p.inventory[id] || 0) > 0);
       app.startLaunch({ destination: st.dest, consumables });

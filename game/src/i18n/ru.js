@@ -16,7 +16,7 @@ export default {
 
   // хаб и нижняя панель
   'dock.launch': 'Пуск',
-  'dock.rocket': 'Ракета',
+  'dock.rocket': 'Ангар',
   'dock.base': 'База',
   'dock.journal': 'Доска',
   'dock.shop': 'Лавка',
@@ -169,7 +169,7 @@ export default {
   'hud.canister': 'Топливо',
   'hud.repair': 'Ремонт',
   'hud.transfer': 'Перелёт',
-  'hud.hold': 'ДЕРЖИ',
+  'hud.hold': '▲▲',
   'hud.thrust': 'ТЯГА',
   'hud.tilt': 'НАКЛОН',
   'hint.brake': 'Тормози!',

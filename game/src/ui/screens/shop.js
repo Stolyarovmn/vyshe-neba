@@ -116,13 +116,17 @@ function shelfCell(kit, id, cell, plank, o) {
   // ценник
   const th = Math.round(plank.h * 0.68);
   const label = o.price === null ? t('skin.own') : o.full ? t('shop.full') : fmtCompact(o.price);
-  const tw = Math.min(cell.w - cc * 2, kit.text.measure(label, kit.fs(12)) + (o.price === null || o.full ? cc * 6 : th + cc * 4));
+  // ценник: число и значок монеты; в узкой ячейке значок убирается (число золотое), а не сжимается шрифт
+  const textW = kit.text.measure(label, kit.fs(12));
+  const priced = o.price !== null && !o.full;
+  const withCoin = priced && textW + th + cc * 4 <= cell.w - cc * 2;
+  const tw = Math.min(cell.w - cc * 2, textW + (priced ? (withCoin ? th + cc * 4 : cc * 6) : cc * 6));
   const tx = Math.round(cx - tw / 2);
   const ty = Math.round(plank.y + (plank.h - th) / 2);
   kit.nine('screen', tx, ty, tw, th);
-  if (o.price !== null && !o.full) {
-    kit.icon('coin', tx + th * 0.55, ty + th / 2, Math.round(th * 0.7), c.gold);
-    kit.drawText(label, tx + tw - cc * 3, ty + th / 2, { size: kit.fs(12), color: c.gold, align: 'right', maxWidth: tw - th - cc * 2 });
+  if (priced) {
+    if (withCoin) kit.icon('coin', tx + th * 0.55, ty + th / 2, Math.round(th * 0.7), c.gold);
+    kit.drawText(label, tx + tw - cc * 3, ty + th / 2, { size: kit.fs(12), color: c.gold, align: 'right', maxWidth: tw - (withCoin ? th : 0) - cc * 2 });
   } else kit.drawText(label, cx, ty + th / 2, { size: kit.fs(11), color: o.full ? c.textMute : c.green, align: 'center', maxWidth: tw - cc * 2 });
   if (kit.S.focusVisible && kit.S.focusId === id) kit.focusRing(cell);
   if (kit.clicked === id) o.click();

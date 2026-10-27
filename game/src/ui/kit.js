@@ -6,7 +6,7 @@ import { createText } from './text.js';
 import { createCrt } from './skin/crt.js';
 import { drawSegments, segmentWidth } from './font-pixel.js';
 import { createIcons, hasIcon } from './icons.js';
-import { getTheme, mix, luminance } from './theme.js';
+import { getTheme, mix, luminance, contrast } from './theme.js';
 import * as Scroll from './scroll.js';
 import { clamp, damp, easeOutCubic, fmtCompact, fmtStat, fmtInt, fmtTiny } from './format.js';
 import { intersect } from './layout.js';
@@ -112,8 +112,48 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
         if (area > 8 && !covered(a, b)) add(`ov|${a.str}|${b.str}`, { kind: 'overlap', str: a.str, other: b.str, at: `${Math.round(a.x)},${Math.round(a.y)} / ${Math.round(b.x)},${Math.round(b.y)}` });
       }
     }
+    // текст не должен сливаться с подложкой: контраст цвета надписи и последней сплошной заливки под ней не ниже 3
+    const HEX = /^#[0-9a-f]{6}$/i;
+    for (const r of visible) {
+      if (!r.color || !HEX.test(r.color)) continue;
+      const seq = seqOf.get(r);
+      let under = null;
+      for (let i = (fa.fills || []).length - 1; i >= 0; i--) {
+        const f = fa.fills[i];
+        if (f.after > seq || !HEX.test(f.color)) continue;
+        const cx = r.x + r.w / 2;
+        const cy = r.y + r.h / 2;
+        if (cx >= f.x && cx <= f.x + f.w && cy >= f.y && cy <= f.y + f.h) {
+          under = f;
+          break;
+        }
+      }
+      if (!under) continue;
+      const ratio = contrast(r.color, under.color);
+      if (ratio < 3) add(`con|${r.str}|${r.color}|${under.color}`, { kind: 'contrast', str: r.str, at: `текст ${r.color} на ${under.color} = ${ratio.toFixed(2)} (${Math.round(r.x)},${Math.round(r.y)})` });
+    }
+    // индикаторы-точки не должны заходить на текст
+    for (const m of fa.marks || []) {
+      if (m.hidden) continue;
+      for (const r of visible) if (intersectArea(m, r) > 0) add(`lamp|${r.str}|${Math.round(m.x)}`, { kind: 'lamp', str: r.str, at: `точка ${Math.round(m.x)},${Math.round(m.y)} на тексте ${Math.round(r.x)},${Math.round(r.y)}` });
+    }
+    // у кнопок одной группы (один ряд, одна высота, рядом) — единый масштаб шрифта
+    const groups = [];
+    for (const b of [...(fa.buttons || [])].sort((p, q) => p.y - q.y || p.x - q.x)) {
+      const g = groups.find((grp) => {
+        const l = grp[grp.length - 1];
+        const gap = b.x - (l.x + l.w);
+        return Math.abs(b.y - l.y) <= 3 && Math.abs(b.h - l.h) <= 4 && gap >= -1 && gap <= L.gap * 3;
+      });
+      if (g) g.push(b);
+      else groups.push([b]);
+    }
+    for (const g of groups) {
+      if (g.length > 1 && new Set(g.map((b) => b.scale)).size > 1) add(`grp|${g.map((b) => b.label).join('/')}`, { kind: 'scale', str: g.map((b) => `${b.label}×${b.scale}`).join(' · '), at: `ряд на ${Math.round(g[0].x)},${Math.round(g[0].y)}` });
+    }
     for (const it of fa.issues) {
-      if (it.kind === 'truncated') add(`cut|${it.str}`, { kind: 'truncated', str: it.str, shown: it.shown, at: `${Math.round(it.rect.x)},${Math.round(it.rect.y)}` });
+      if (it.kind === 'tiny') add(`tiny|${it.str}`, { kind: 'tiny', str: it.str, at: `${Math.round(it.rect.x)},${Math.round(it.rect.y)}` });
+      else if (it.kind === 'truncated') add(`cut|${it.str}`, { kind: 'truncated', str: it.str, shown: it.shown, at: `${Math.round(it.rect.x)},${Math.round(it.rect.y)}` });
       else if (it.kind === 'margin') add(`mar|${it.str}`, { kind: 'margin', str: it.str, at: `текст ${Math.round(it.rect.x)},${Math.round(it.rect.y)} ${Math.round(it.rect.w)}×${Math.round(it.rect.h)} в рамке ${Math.round(it.box.x)},${Math.round(it.box.y)} ${Math.round(it.box.w)}×${Math.round(it.box.h)}` });
     }
   }
@@ -433,6 +473,8 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
   function rect(x, y, w, h, color) {
     S.ctx.fillStyle = color;
     S.ctx.fillRect(x, y, w, h);
+    // крупная сплошная заливка — подложка для проверки контраста текста стражем
+    if (frameAudit && w * h >= 400 && S.ctx.globalAlpha >= 0.99) (frameAudit.fills ||= []).push({ x, y, w, h, after: frameAudit.rects.length, color });
   }
 
   function drawText(str, x, y, o = {}) {
@@ -485,8 +527,10 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     if (frameAudit && !f.dither) {
       // непрозрачная рамка закрывает всё, что было выведено под ней раньше: такие строки не проверяются на наложение
       for (const r of frameAudit.rects) if (!r.hidden && r.x + r.w / 2 > x && r.x + r.w / 2 < x + w && r.y + r.h / 2 > y && r.y + r.h / 2 < y + h) r.hidden = true;
+      for (const m of frameAudit.marks || []) if (m.x + m.w / 2 > x && m.x + m.w / 2 < x + w && m.y + m.h / 2 > y && m.y + m.h / 2 < y + h) m.hidden = true;
       (frameAudit.frames ||= []).push({ x, y, w, h, after: frameAudit.rects.length });
     }
+    if (frameAudit) (frameAudit.fills ||= []).push({ x, y, w, h, after: frameAudit.rects.length, color: f.mid });
     const cc = Math.max(1, Math.min(cell(), Math.floor(Math.min(w, h) / 8)));
     if (w < cc * 4 || h < cc * 4) {
       rect(x, y, w, h, f.edge);
@@ -624,6 +668,45 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     drawText(s, cx, cy, { size, color: c.white, align: 'center' });
   }
 
+  /** Наименьшая ширина кнопки под подпись при размере size: подпись, поля в два пикселя шрифта, место под индикатор и значок. */
+  function buttonNeed(label, size, o = {}) {
+    const cc = cell();
+    const pad = Math.max(cc * 3, text.stepFor(size).css * 2 + cc);
+    return Math.ceil(text.measure(label, size) + pad * 2 + (o.lamp ? cc * 8 : 0) + (o.icon ? (o.iconSize || Math.round(size * 1.5)) + size * 0.4 : 0));
+  }
+
+  const readableCache = new Map();
+  /**
+   * Цвет надписи, читаемый на подложке bg: если контраст ниже min — цвет затемняется (на светлой подложке) или
+   * осветляется (на тёмной) с сохранением оттенка. Для текста на материале эпохи, цвет которого заранее неизвестен.
+   */
+  function readable(color, bg, min = 4.5) {
+    const key = `${color}|${bg}|${min}`;
+    let v = readableCache.get(key);
+    if (v) return v;
+    v = color;
+    if (contrast(color, bg) < min) {
+      const c = S.th.c;
+      const target = contrast(c.ink, bg) >= contrast(c.white, bg) ? c.ink : c.white;
+      v = target;
+      for (const k of [0.25, 0.45, 0.65, 0.85]) {
+        const m = mix(color, target, k);
+        if (contrast(m, bg) >= min) {
+          v = m;
+          break;
+        }
+      }
+    }
+    if (readableCache.size > 400) readableCache.clear();
+    readableCache.set(key, v);
+    return v;
+  }
+
+  /** Основной тон рамки варианта в теме текущей эпохи (для подбора читаемого цвета надписи). */
+  function frameMid(variant) {
+    return (S.th.variants[variant] || S.th.variants.panel).mid;
+  }
+
   /** Выполнить fn с оформлением другой эпохи (для переоснащения пульта: старые и новые панели рисуются рядом). */
   function withEra(era, fn) {
     const prev = { era: S.era, th: S.th, skin: S.skin };
@@ -659,6 +742,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     const lit = on && (!blink || S.settings.reduceMotion || Math.floor(S.time * 4) % 2 === 0);
     const c = S.th.c;
     const style = S.skin.lamp;
+    if (frameAudit) (frameAudit.marks ||= []).push({ x: Math.round(cx - cc * 3), y: Math.round(cy - cc * 3), w: cc * 6, h: cc * 6 });
     if (style !== 'bulb') {
       // подсветка по эпохе: светодиод, полоска, тонкая линия, плоская точка
       const glass = lit ? color : c.navy2;
@@ -713,6 +797,8 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     const cc = cell();
     const rr = { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.w), h: Math.round(r.h) };
     if (rr.w < cc * 4 || rr.h < cc * 4) return;
+    // экран — тёмная подложка под текстом (для проверки контраста стражем)
+    if (frameAudit) (frameAudit.fills ||= []).push({ ...rr, after: frameAudit.rects.length, color: sk.kind === 'color' ? '#050912' : sk.kind === 'flat' ? c.navy0 : mix(sk.tint, '#000000', 0.94) });
     if (sk.kind === 'green' || sk.kind === 'amber' || sk.kind === 'color') {
       let begun = null;
       exemptRun(() => {
@@ -839,7 +925,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     rect(r.x + cc + shake, r.y + r.h - lip, r.w - cc * 2, lip, c.ink);
     const name = variantName(variant, a, dim);
     nine(name, body.x, body.y, body.w, body.h);
-    const labelColor = dim ? c.textMute : o.color || S.th.labelColor(variant);
+    const labelColor = dim ? c.textMute : o.color || S.th.labelColor(name);
     // значки на светлых кнопках (слоновая кость, алюминий): тёмная подпись делает векторный значок сплошным силуэтом,
     // поэтому значок рисуется тёмно-серым — детали читаются
     const iconBase = o.iconColor || (luminance(labelColor) < 0.12 ? c.steel0 : labelColor);
@@ -850,17 +936,24 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     const hasLabel = !!label;
     // внутреннее поле не меньше двух «пикселей» шрифта
     const pad = Math.max(cc * 3, text.stepFor(size).css * 2 + cc);
-    const labelMax = o.stack ? body.w - pad * 2 : body.w - pad * 2 - (iconName ? iconSize + size * 0.4 : 0) - (locked ? iconSize : 0);
+    // под индикатор-точку в углу кнопки резервируется место, чтобы точка не заходила на буквы; подпись по центру сдвигается
+    // от точки только когда иначе не помещается (значок над подписью центрируется строго — там место с обеих сторон)
+    const lampRes = o.lamp ? (o.stack ? cc * 16 : cc * 8) : 0;
+    const labelMax = (o.stack ? body.w - pad * 2 : body.w - pad * 2 - (iconName ? iconSize + size * 0.4 : 0) - (locked ? iconSize : 0)) - lampRes;
     let lbl = label;
     let lblSize = size;
+    let drawn = null;
     if (hasLabel) {
-      const f = text.fit(label, Math.max(10, labelMax), size);
+      // fixedScale: все кнопки группы держат один масштаб шрифта, слово не влезает — обрезается (и страж это покажет)
+      const f = text.fit(label, Math.max(10, labelMax), size, null, o.fixedScale ? text.scaleFor(size) : 2);
       lbl = f.str;
       lblSize = f.size;
+      // подпись кнопки, обрезанная многоточием, — тоже замечание стража (text.draw видит уже готовую строку)
+      if (frameAudit && f.str !== String(label)) frameAudit.issues.push({ kind: 'truncated', str: String(label), shown: f.str, rect: { x: body.x, y: body.y, w: body.w, h: body.h } });
     }
     const labelW = hasLabel ? text.measure(lbl, lblSize) : 0;
     const contentW = labelW + (iconName ? iconSize + (hasLabel ? size * 0.4 : 0) : 0);
-    const startX = o.align === 'left' ? body.x + pad + cc : cx - contentW / 2;
+    const startX = o.align === 'left' ? body.x + pad + cc : clamp(cx - contentW / 2, body.x + pad, Math.max(body.x + pad, body.x + body.w - pad - lampRes - contentW));
     const midY = sub ? cy - size * 0.42 : cy;
     let x = startX;
     if (o.stack && iconName) {
@@ -871,14 +964,15 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       const areaH = hasLabel ? labelY - glyphH / 2 - step * 2 - body.y : body.h;
       const is = Math.round(Math.min(areaH * 0.9, body.w * 0.62));
       icon(iconName, cx, body.y + (hasLabel ? areaH / 2 + cc : body.h / 2), is, dim ? c.textMute : iconBase, dim ? 0.6 : 1);
-      if (hasLabel) drawText(lbl, cx, labelY, { size: lblSize, color: labelColor, align: 'center', maxWidth: body.w - pad * 2, box: body });
+      if (hasLabel) drawn = drawText(lbl, cx, labelY, { size: lblSize, color: labelColor, align: 'center', maxWidth: body.w - pad * 2, box: body });
     } else {
       if (iconName) {
         icon(iconName, x + iconSize / 2, midY, iconSize, dim ? c.textMute : iconBase, dim ? 0.6 : 1);
         x += iconSize + (hasLabel ? size * 0.4 : 0);
       }
-      if (hasLabel) drawText(lbl, x, midY, { size: lblSize, color: labelColor, box: body });
+      if (hasLabel) drawn = drawText(lbl, x, midY, { size: lblSize, color: labelColor, box: body });
     }
+    if (frameAudit && drawn && !o.solo) (frameAudit.buttons ||= []).push({ id, x: r.x, y: r.y, w: r.w, h: r.h, scale: drawn.scale, label: lbl });
     if (sub) drawText(sub, o.align === 'left' ? startX : cx, cy + size * 0.85, { size: Math.max(9, Math.round(size * 0.7)), color: dim ? c.textMute : labelColor, align: o.align === 'left' ? 'left' : 'center', maxWidth: body.w - pad * 2, box: body });
     if (locked) icon('lock', body.x + body.w - iconSize * 0.75, body.y + iconSize * 0.75, Math.round(iconSize * 0.9), c.amber);
     if (o.lamp) lamp(body.x + body.w - cc * 5, body.y + cc * 5, cc * 5, o.lamp === true ? c.green : o.lamp, !dim);
@@ -1048,7 +1142,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     nine('screen', sw.x, sw.y, sw.w, sw.h);
     const kw = Math.round(sw.w * 0.45);
     nine(value ? 'good' : 'btn', value ? sw.x + sw.w - kw - cc * 2 : sw.x + cc * 2, sw.y + cc * 2, kw, sw.h - cc * 4);
-    drawText(value ? t('common.on') : t('common.off'), sw.x - cc * 3, r.y + r.h / 2 - cc, { size: fs(12), color: value ? c.green : c.textMute, align: 'right' });
+    drawText(value ? t('common.on') : t('common.off'), sw.x - cc * 3, r.y + r.h / 2 - cc, { size: fs(12), color: readable(value ? c.green : c.textMute, frameMid('card')), align: 'right' });
     return clicked ? !value : value;
   }
 
@@ -1122,7 +1216,9 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     for (const it of items) {
       icon(it.icon, cx + size * 0.7, y, size * 1.3, it.color);
       cx += size * 1.6;
-      const wd = drawText(fmtCompact(it.val), cx, y, { size, color: it.ok ? it.color : c.red, shadow: true }).w;
+      // o.bg — тон подложки под числом (бумага отчёта): цвет числа затемняется до читаемого
+      const numColor = it.ok ? it.color : c.red;
+      const wd = drawText(fmtCompact(it.val), cx, y, { size, color: o.bg ? readable(numColor, o.bg) : numColor, shadow: !o.bg }).w;
       cx += wd + size * 0.5;
     }
     return total;
@@ -1179,8 +1275,10 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       const variant = tt.kind === 'bad' ? 'danger' : tt.kind === 'good' ? 'good' : 'raised';
       nine(variant, x, y, w, h);
       const ic = tt.icon || (tt.kind === 'bad' ? 'warn' : tt.kind === 'good' ? 'check' : 'info');
-      icon(ic, x + size * 1.4, y + h / 2, size * 1.6, tt.kind === 'info' ? c.amberLight : c.white);
-      drawText(tt.message, x + size * 2.6, y + h / 2, { size, color: tt.kind === 'good' ? c.ink : c.white, maxWidth: w - size * 3.2 });
+      // плашка «info» лежит на корпусе эпохи: на светлом материале значок и текст затемняются
+      const plate = frameMid(variant);
+      icon(ic, x + size * 1.4, y + h / 2, size * 1.6, tt.kind === 'info' ? readable(c.amberLight, plate, 3) : c.white);
+      drawText(tt.message, x + size * 2.6, y + h / 2, { size, color: tt.kind === 'good' ? c.ink : tt.kind === 'bad' ? c.white : readable(c.white, plate), maxWidth: w - size * 3.2 });
     });
   }
 
@@ -1212,7 +1310,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     const cc = cell();
     const m = L.gap;
     const b = o.bounds || L.area;
-    const tail = cc * 5;
+    const tail = cc * 7;
     const w = Math.min(size.w, b.w - m * 2);
     const h = Math.min(size.h, b.h - m * 2);
     // объект-цель: щиток прикрепляется к середине ближайшей к нему стороны рамки объекта
@@ -1249,12 +1347,15 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       S.ctx.globalAlpha = 1;
       nine(o.variant || 'panel', r.x, r.y, r.w, r.h);
       const f = S.th.variants[o.variant || 'panel'];
-      const rows = 4;
       const horizontal = side === 'above' || side === 'below';
+      // хвостик тянется от щитка до рамки объекта (щиток мог сдвинуться от объекта из-за границ) и острием указывает на неё
+      const gap = side === 'above' ? tip.y - (r.y + r.h) : side === 'below' ? r.y - tip.y : side === 'left' ? tip.x - (r.x + r.w) : r.x - tip.x;
+      const rows = gap < cc * 2 ? 0 : clamp(Math.round(gap / cc), 4, 20);
       const along = horizontal ? clamp(tip.x, r.x + cc * 6, r.x + r.w - cc * 6) : clamp(tip.y, r.y + cc * 6, r.y + r.h - cc * 6);
       for (const [pass, col] of [[1, f.edge], [0, f.mid]]) {
         for (let i = 0; i < rows; i++) {
-          const half = i * cc + (pass ? cc : 0);
+          // у острия — клин в четыре клетки, дальше — ножка постоянной ширины
+          const half = Math.min(i, 4) * cc + (pass ? cc : 0);
           const span = half * 2 + cc;
           const k = rows - 1 - i; // ряд от основания (0) к острию (rows-1)
           if (horizontal) {
@@ -1329,11 +1430,17 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       S.ctx.fillRect(0, 0, L.w, L.h);
       const w = Math.min(L.area.w - L.gap * 4, Math.round(400 * L.ui));
       const bodyH = text.blockHeight(o.body || '', w - L.pad * 4, fs(14), 1.4);
-      const h = Math.min(L.area.h - L.gap * 4, Math.round(fs(110) + bodyH + L.touch(56) + (o.extraH || 0)));
+      // длинное название переносится на вторую-третью строку, а не обрезается
+      const titleLines = text.wrap(o.title, w - L.pad * 2, fs(20)).slice(0, 3);
+      const titleStep = text.lineStep(fs(20), 1.25);
+      const h = Math.min(L.area.h - L.gap * 4, Math.round(fs(110) + bodyH + L.touch(56) + (o.extraH || 0) + (titleLines.length - 1) * titleStep));
       const x = L.area.x + (L.area.w - w) / 2;
       const y = L.area.y + (L.area.h - h) / 2 + slide;
       const inner = panel({ x, y, w, h }, { variant: 'raised' });
       let cy = inner.y + L.gap;
+      // карточка лежит на корпусе эпохи: на светлом материале подписи затемняются
+      const plate = frameMid('raised');
+      const inkTitle = readable(c.text, plate);
       if (o.icon) {
         const ringS = fs(56);
         nine('screen', x + w / 2 - ringS / 2, cy, ringS, ringS);
@@ -1341,12 +1448,12 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
         cy += ringS + L.gap * 1.2;
       }
       if (o.kicker) {
-        drawText(o.kicker, x + w / 2, cy + fs(6), { size: fs(12), color: c.amber, align: 'center' });
+        drawText(o.kicker, x + w / 2, cy + fs(6), { size: fs(12), color: readable(c.amber, plate), align: 'center' });
         cy += fs(18);
       }
-      drawText(o.title, x + w / 2, cy + fs(10), { size: fs(20), color: c.text, align: 'center', maxWidth: inner.w, shadow: true });
-      cy += fs(30);
-      const used = paragraph(o.body || '', inner.x, cy, inner.w, { size: fs(13), lineHeight: 1.4, align: 'center' });
+      titleLines.forEach((ln, i) => drawText(ln, x + w / 2, cy + fs(10) + i * titleStep, { size: fs(20), color: inkTitle, align: 'center', shadow: inkTitle === c.text }));
+      cy += fs(30) + (titleLines.length - 1) * titleStep;
+      const used = paragraph(o.body || '', inner.x, cy, inner.w, { size: fs(13), lineHeight: 1.4, align: 'center', color: readable(c.textDim, plate) });
       cy += used + L.gap;
       if (o.extra) cy += o.extra({ x: inner.x, y: cy, w: inner.w }) || 0;
       const bh = L.touch(52);
@@ -1520,6 +1627,9 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     audit,
     screen,
     withEra,
+    buttonNeed,
+    readable,
+    frameMid,
     begin,
     end,
     hit,

@@ -82,9 +82,10 @@ export function createCrt() {
       for (let y = 0; y < h; y += cc * 2) og.fillRect(0, y + cc, w, cc);
     }
     if (tokens.vignette > 0) {
-      const g = og.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.25, w / 2, h / 2, Math.hypot(w, h) * 0.55);
+      // затемняются только края и углы трубки: заголовки и строки в верхней части экрана остаются яркими
+      const g = og.createRadialGradient(w / 2, h / 2, Math.hypot(w, h) * 0.3, w / 2, h / 2, Math.hypot(w, h) * 0.55);
       g.addColorStop(0, 'rgba(0,0,0,0)');
-      g.addColorStop(1, `rgba(0,0,0,${tokens.vignette})`);
+      g.addColorStop(1, `rgba(0,0,0,${tokens.vignette * 0.6})`);
       og.fillStyle = g;
       og.fillRect(0, 0, w, h);
     }

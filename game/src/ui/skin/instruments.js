@@ -696,7 +696,9 @@ export function readout(kit, r, str, o = {}) {
   if (kind === 'digital') {
     kit.nine('screen', r.x, r.y, r.w, r.h);
     kit.rect(r.x + cc * 2, r.y + cc * 2, r.w - cc * 4, r.h - cc * 4, c.navy1);
-    const pitch = r.h >= 48 ? 3 : 2;
+    // шаг точек — самый крупный из помещающихся: длинное число («0:12») не должно вылезать за экран
+    let pitch = r.h >= 48 ? 3 : 2;
+    while (pitch > 1 && s.length * 6 * pitch * cc - pitch * cc > r.w - cc * 6) pitch--;
     dotMatrix(kit, s, r.x + r.w - cc * 3, r.y + r.h / 2, pitch, c.greenLight, mix(c.navy1, c.steel0, 0.2));
     return;
   }
