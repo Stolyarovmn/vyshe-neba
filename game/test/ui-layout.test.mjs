@@ -164,6 +164,8 @@ test('пульт запуска, итоги, доска, лавка, настр�
     for (const c of l.consSlots) assert.ok(inside(c, L.area) && c.h >= MIN_TOUCH && c.w >= MIN_TOUCH, `${w}x${h}: гнездо расходника`);
     assert.ok(!overlaps(l.start, l.cons) && !overlaps(l.start, l.destArea), `${w}x${h}: ПУСК перекрывает пульт`);
     const r = resultsLayout(L);
+    const rs = resultsLayout(L, { height: Math.round(r.card.h * 0.7), inset: { x: 10, y: 8 } });
+    assert.ok(rs.card.h <= r.card.h * 0.7 + 1 && inside(rs.card, L.area) && rs.buttons.h >= MIN_TOUCH && inside(rs.buttons, rs.card), `${w}x${h}: лист по высоте содержимого`);
     const chrome = chromeLayout(L, {});
     assert.ok(r.buttons.h >= MIN_TOUCH && inside(r.card, L.area), `${w}x${h}: итоги`);
     assert.ok(r.card.y >= chrome.y + chrome.h, `${w}x${h}: бланк итогов не закрывает таблички`);

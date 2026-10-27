@@ -55,7 +55,8 @@ test('масштаб шрифта целый: ширина — целое чис
       assert.ok(Math.abs(w / css - Math.round(w / css)) < 1e-9, 'ширина не кратна шагу');
     }
   }
-  assert.equal(text.scaleFor(9), 1);
+  assert.equal(text.scaleFor(9), 2, 'мельче ×2 текст не рисуется');
+  assert.equal(text.scaleFor(1), 2);
   assert.equal(text.scaleFor(14), 2);
   assert.equal(text.scaleFor(24), 3);
 });

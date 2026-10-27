@@ -6,14 +6,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createPainter } from '../src/render/painter.js';
 import { createView } from '../src/render/camera.js';
-import { createMapView, groundScale } from '../src/render/islandmap.js';
+import { createMapView } from '../src/render/islandmap.js';
 import { CLOUD_SPRITE_BY_KIND, cloudSize, cloudSpriteName, cloudTint, drawCloudField } from '../src/render/clouds.js';
 import {
   SPACE_ALT_UNITS, balloonRig, balloonSwing, drawObjects, rockMaterial,
 } from '../src/render/objects.js';
-import {
-  FAR_COAST_SCREEN, FAR_COAST_Y, FAR_SCALE_DISTANCE, coastY, drawFarCoast, farCityLayout, farCoastAlpha, farTransform,
-} from '../src/render/horizon.js';
 import {
   OUTPOST_DISTANCE, OUTPOST_PARALLAX, drawTerrain, outpostPlacement,
 } from '../src/render/ground.js';
@@ -23,7 +20,7 @@ import {
 import { backdropCell, createBackdrop } from '../src/render/backdrop.js';
 import {
   ASSET_FILES, BACKDROP_ATLAS, BALLOON_FULL_SIZES, BALLOON_PART_BOXES, BALLOON_PART_SIZES, CONSUMABLE_SPRITES, ERA_SPRITES, ERA_YEARS,
-  PAD_EXTREME_ANCHOR_Y, RUNTIME_SPRITE_PATTERN, citySpriteNames, outpostSpriteName, padLandingAnchor, padSpriteName, spriteAnchor,
+  PAD_EXTREME_ANCHOR_Y, RUNTIME_SPRITE_PATTERN, outpostSpriteName, padLandingAnchor, padSpriteName, spriteAnchor,
   spriteName, spriteSize, worldSpriteFile,
 } from '../src/render/manifest.js';
 import { SPACE_ALT } from '../src/sim/bodies.js';
@@ -55,12 +52,12 @@ function recordingPainter(options) {
 
 // --- манифест и файлы -------------------------------------------------------------------------------
 
-test('новые спрайты в каталоге: города, базы, магниты, части шаров, площадки крайних эпох, фон базы', () => {
-  for (const base of ['magnet', 'city', 'outpost_moon', 'outpost_mars']) {
+test('новые спрайты в каталоге: базы, магниты, части шаров, площадки крайних эпох, фон базы', () => {
+  for (const base of ['magnet', 'outpost_moon', 'outpost_mars']) {
     assert.ok(ERA_SPRITES.includes(base), base);
     for (const year of ERA_YEARS) assert.ok(ASSET_FILES[`${base}_${year}`], `${base}_${year}`);
   }
-  for (const name of ['city_early', 'city_future', 'pad_moon_early', 'pad_moon_future', 'pad_mars_early', 'pad_mars_future', 'backdrop_base']) {
+  for (const name of ['pad_moon_early', 'pad_moon_future', 'pad_mars_early', 'pad_mars_future', 'backdrop_base']) {
     assert.ok(ASSET_FILES[name], name);
   }
   for (const year of ERA_YEARS) {
@@ -71,8 +68,8 @@ test('новые спрайты в каталоге: города, базы, м�
 });
 
 test('новые файлы целы, размеры в манифесте равны размерам PNG, части шаров совпадают с art/balloon-parts.json', () => {
-  const names = Object.keys(ASSET_FILES).filter((name) => /^(magnet|city|outpost_moon|outpost_mars|balloon)_/.test(name) || /^pad_(moon|mars)_(early|future)$/.test(name));
-  assert.ok(names.length >= 6 * 4 + 12 + 6);
+  const names = Object.keys(ASSET_FILES).filter((name) => /^(magnet|outpost_moon|outpost_mars|balloon)_/.test(name) || /^pad_(moon|mars)_(early|future)$/.test(name));
+  assert.ok(names.length >= 6 + 12 + 12 + 4);
   for (const name of names) {
     const file = path.join(repoRoot, fileOf(ASSET_FILES[name]));
     assert.equal(pngProblem(file), null, `${name}: повреждён`);
@@ -268,45 +265,6 @@ test('шар рисуется двумя частями и стропами; б�
   assert.ok(fallbackCtx.calls.ellipse >= 1 && fallbackCtx.calls.fillRect >= 1, 'запасной вид: оболочка и гондола кодом');
 });
 
-// --- дальний горизонт ---------------------------------------------------------------------------------
-
-test('город на горизонте: силуэт нужной эпохи, панорама только для крайних эпох', () => {
-  for (let era = 0; era < 6; era++) {
-    const { main, panorama } = citySpriteNames(era);
-    assert.equal(main, `city_${ERA_YEARS[era]}`);
-    assert.equal(panorama, era <= 1 ? 'city_early' : era >= 4 ? 'city_future' : null);
-    const layout = farCityLayout(era, []);
-    assert.ok(layout.some((item) => item.name === main), `era ${era}: основной силуэт`);
-    assert.equal(layout.some((item) => item.name === panorama), !!panorama);
-    assert.ok(layout.every((item) => ASSET_FILES[item.name]), 'все имена в каталоге');
-    assert.ok(layout.some((item) => Math.abs(item.x) < 200 && item.row === 0), `era ${era}: крупный силуэт у оси старта виден в узком портретном кадре`);
-  }
-  const layout = farCityLayout(0, []);
-  assert.equal(layout[0].row, 2, 'панорама позади всех рядов');
-});
-
-test('берег и параллакс: линия берега в разумных пределах, слой растворяется к 9 км, drawFarCoast рисует берег и город', () => {
-  for (let x = -3000; x <= 3000; x += 50) assert.ok(Math.abs(coastY(x) - FAR_COAST_Y) < 40, `x=${x}`);
-  assert.equal(farCoastAlpha(0), 1);
-  assert.equal(farCoastAlpha(300), 1);
-  assert.equal(farCoastAlpha(900), 0);
-  assert.ok(farCoastAlpha(600) > 0 && farCoastAlpha(600) < 1);
-  assert.ok(FAR_COAST_Y < -249.4, 'дальний берег севернее острова');
-  const { painter, names } = recordingPainter();
-  const mv = createMapView().set(200, 1500, 2, 400, 800);
-  const ctx = stubContext(400, 800);
-  drawFarCoast(ctx, painter, mv, 5, 100, { storm: 0, rain: 0 }, [150, 205, 236], 1);
-  assert.ok(ctx.calls.fill >= 1 && ctx.calls.stroke >= 2, 'суша и кромка');
-  assert.ok(names.includes('city_2060') && names.includes('city_future'));
-  const none = stubContext(400, 800);
-  drawFarCoast(none, painter, mv, 5, 100, { storm: 0 }, [150, 205, 236], 0);
-  assert.equal(none.calls.fill || 0, 0, 'прозрачность 0 — ничего не рисуется');
-  const far = createMapView().set(200, 9000, 2, 400, 800);
-  const hidden = stubContext(400, 800);
-  drawFarCoast(hidden, painter, far, 3, 100, {}, [150, 205, 236], 1);
-  assert.equal(hidden.calls.fill || 0, 0, 'берег за кадром не рисуется');
-});
-
 test('база на дальнем плане Луны и Марса: смещается медленнее камеры и исчезает с высотой', () => {
   assert.equal(outpostSpriteName('moon', 2), 'outpost_moon_1998');
   assert.equal(outpostSpriteName('mars', 5), 'outpost_mars_2060');
@@ -372,7 +330,7 @@ test('поле магнита: кольцо и значок рисуются п�
 test('лёгкие runtime-копии: файлы цел, в каталоге вместо тяжёлых оригиналов, размеры и вид близки к подготовленным спрайтам', () => {
   const meta = JSON.parse(fs.readFileSync(path.join(repoRoot, 'art', 'gen', 'runtime', 'runtime-sprites.meta.json'), 'utf8'));
   const names = Object.keys(ASSET_FILES).filter((name) => RUNTIME_SPRITE_PATTERN.test(name));
-  assert.equal(names.length, 42, 'базы 12 + города 8 + магниты 6 + части шаров 12 + площадки 4');
+  assert.equal(names.length, 34, 'базы 12 + магниты 6 + части шаров 12 + площадки 4');
   assert.deepEqual([...names].sort(), Object.keys(meta.sprites).sort(), 'каталог и метаданные совпадают');
   let saved = 0;
   for (const name of names) {
@@ -387,7 +345,7 @@ test('лёгкие runtime-копии: файлы цел, в каталоге в
     assert.ok(entry.bytes_out < entry.bytes_in * 0.5, `${name}: выигрыш по весу`);
     saved += entry.bytes_in - entry.bytes_out;
   }
-  assert.ok(saved > 2 * 1024 * 1024, `сэкономлено ${(saved / 1048576).toFixed(1)} МБ`);
+  assert.ok(saved > 1.5 * 1024 * 1024, `сэкономлено ${(saved / 1048576).toFixed(1)} МБ`);
   // оригиналы подготовленного арта остаются нетронутыми рядом
   assert.ok(fs.existsSync(path.join(repoRoot, 'art', 'gen', 'outpost_moon_2060.png')));
   // целый спрайт шара в сборку не входит, но его размеры нужны для сборки из частей
@@ -395,25 +353,4 @@ test('лёгкие runtime-копии: файлы цел, в каталоге в
   BALLOON_FULL_SIZES.forEach((size, era) => {
     assert.deepEqual(pngSize(path.join(repoRoot, 'outputs', 'rocket', 'dist', 'assets', 'world', `balloon_${ERA_YEARS[era]}.png`)), size);
   });
-});
-
-test('дальний слой: мельчает втрое медленнее острова, береговая линия спускается к месту под горизонтом и остаётся над островом', () => {
-  const S = 3.4;
-  const devH = 2532;
-  const feetY = devH * 0.66;
-  const startY = feetY + FAR_COAST_Y * S;
-  const at0 = farTransform({}, 0, S, devH, 585, 0, startY);
-  assert.equal(at0.s, S);
-  assert.ok(Math.abs(at0.oy + FAR_COAST_Y * at0.s - startY) < 1e-6, 'на земле берег там же, где на карте острова');
-  let previousScale = S + 1;
-  for (const alt of [20, 80, 150, 300, 600]) {
-    const tr = farTransform({}, alt, S, devH, 585, 0, startY);
-    assert.ok(tr.s < previousScale);
-    previousScale = tr.s;
-    assert.ok(tr.s > groundScale(alt) * S, `${alt}: дальний слой крупнее острова`);
-    const coast = tr.oy + FAR_COAST_Y * tr.s;
-    assert.ok(coast > 0 && coast < devH * 0.7, `${alt}: береговая линия у верхней трети (${(coast / devH).toFixed(2)})`);
-    if (alt >= 150) assert.ok(Math.abs(coast - devH * FAR_COAST_SCREEN) < 2, `${alt}: на месте`);
-  }
-  assert.ok(Math.abs(farTransform({}, FAR_SCALE_DISTANCE, S, devH, 0, 0, startY).s - S / 2) < 1e-9);
 });

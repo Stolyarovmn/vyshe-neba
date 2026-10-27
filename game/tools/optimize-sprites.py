@@ -22,7 +22,7 @@ SRC_DIRS = [os.path.join(ROOT, 'outputs', 'rocket', 'dist', 'assets', 'world'), 
 OUT_DIR = os.path.join(ROOT, 'art', 'gen', 'runtime')
 # должен совпадать с RUNTIME_SPRITE_PATTERN в manifest.js
 PATTERN = re.compile(
-    r'^(outpost_(moon|mars)_\d{4}|city_(\d{4}|early|future)|magnet_\d{4}|balloon_\d{4}_(envelope|pod)|pad_(moon|mars)_(early|future))$'
+    r'^(outpost_(moon|mars)_\d{4}|magnet_\d{4}|balloon_\d{4}_(envelope|pod)|pad_(moon|mars)_(early|future))$'
 )
 
 
