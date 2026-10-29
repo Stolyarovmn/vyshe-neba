@@ -4,7 +4,8 @@ import { BODIES, densityAt, gravityAt } from './bodies.js';
 import { clamp, wrapAngle } from './math.js';
 
 // The canopy is a shop item: one fixed canopy that needs dense air and a moment to inflate.
-export const CHUTE = { minDensity: 0.35, terminal: 4.5, openTime: 0.6, decel: 110 };
+// Terminal speed 8 units/s (80 m/s) is inside the legs' tolerance; the braking is strong at first and fades smoothly.
+export const CHUTE = { minDensity: 0.35, terminal: 8, openTime: 0.6, softness: 1.8, maxDecel: 140 };
 const OFF_PAD_FACTOR = 0.7; // rough ground: every tolerance shrinks
 const BEACON_TOLERANCE_GAIN = 0.25; // full beacon coverage widens tolerances by this much on the pad
 const PERFECT = { v: 0.46, h: 0.34, ang: 0.44 }; // share of the tolerance a perfect landing must stay under
@@ -84,14 +85,19 @@ export function deployChute(s, events) {
   events.push({ type: 'parachute', x: s.x, y: s.y });
 }
 
-// Inflation, then braking of the fall down to the terminal speed (strongly, then it holds), with sway and tilt damped.
+// Inflation, then braking of the fall toward the terminal speed. The canopy cancels gravity and adds a pull that is
+// proportional to the excess speed: most of it is shed in the first seconds, with no sudden stop and no overshoot.
 export function applyChute(s, dt) {
   if (!s.chute.open) {
     s.chute.t = Math.min(1, s.chute.t + dt / CHUTE.openTime);
     if (s.chute.t >= 1) s.chute.open = true;
     return;
   }
-  if (s.vy > CHUTE.terminal) s.vy = Math.max(CHUTE.terminal, s.vy - CHUTE.decel * dt);
+  const excess = s.vy - CHUTE.terminal;
+  if (excess > 0) {
+    const brake = Math.min(CHUTE.maxDecel, s.g + CHUTE.softness * excess);
+    s.vy = Math.max(CHUTE.terminal, s.vy - brake * dt);
+  }
   s.vx *= Math.exp(-0.6 * dt);
   s.angle *= Math.exp(-2 * dt);
   s.av = 0;

@@ -4,6 +4,7 @@
 export const DT = 1 / 120;
 export const METERS_PER_UNIT = 10;
 export const SPACE_ALT = 10000; // 100 km: Earth's atmosphere ends and gravity is gone
+export const SHADOW_RANGE = 40; // units: below this height the ground shows a contact/landing mark and the rocket's shadow
 
 export const BODIES = {
   earth: {
