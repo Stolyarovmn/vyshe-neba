@@ -137,7 +137,7 @@ async function checkAssets(page, vp) {
   });
   assert(res.loadErrors.length === 0, `${vp.name}: ассеты не загрузились: ${res.loadErrors.slice(0, 5).join(', ')}`);
   assert(res.empty.length === 0, `${vp.name}: пустые иконки: ${res.empty.join(', ')}`);
-  for (const must of ['coin', 'fuel', 'repair', 'chute', 'capsule', 'booster', 'earth', 'moon', 'bld:gantry:1', 'bld:beacons:1']) {
+  for (const must of ['coin', 'fuel', 'repair', 'chute', 'capsule', 'booster', 'earth', 'moon', 'magnet', 'bld:gantry:1', 'bld:beacons:1']) {
     assert(res.sprites.includes(must), `${vp.name}: у иконки «${must}» нет спрайта (рисуется запасной вектор)`);
   }
   return res;
@@ -590,12 +590,23 @@ async function runViewport(browser, vp) {
     await page.waitForFunction(() => globalThis.__VN_TEST__.flight().throttle > 0.5, null, { timeout: 8000 }).catch(() => {});
     const thr = await hook(page, () => globalThis.__VN_TEST__.flight().throttle);
     assert(thr > 0.5, `${vp.name}: касание рычага не дало тягу (${thr})`);
-    // диск наклона вторым пальцем (мультитач)
-    const disc = await target(page, 'flight-tilt');
-    await touch(cdp, 'touchStart', [{ x: lever.x + lever.w / 2, y: lever.y + lever.h * 0.2, id: 1 }, { x: disc.x + disc.w * 0.9, y: disc.y + disc.h / 2, id: 2 }]);
+    // наклон вторым пальцем (мультитач): перетаскивание в свободном месте экрана, без диска и стрелок
+    const leverPt = { x: lever.x + lever.w / 2, y: lever.y + lever.h * 0.2, id: 1 };
+    const sx = Math.round(vp.width * 0.4);
+    const sy = Math.round(vp.height * 0.45);
+    const dragTo = Math.round(vp.width * 0.18);
+    await touch(cdp, 'touchStart', [leverPt, { x: sx, y: sy, id: 2 }]);
+    for (let i = 1; i <= 6; i++) {
+      await touch(cdp, 'touchMove', [leverPt, { x: sx + Math.round((dragTo * i) / 6), y: sy, id: 2 }]);
+      await page.waitForTimeout(40);
+    }
     await page.waitForTimeout(500);
+    const tilt = await hook(page, () => globalThis.__VN_APP__.session.lastInput.tilt);
     const tilted = await hook(page, () => Math.abs(globalThis.__VN_TEST__.flight().angle));
-    assert(tilted > 0.01, `${vp.name}: диск наклона не наклонил ракету`);
+    assert(tilt > 0.9, `${vp.name}: перетаскивание пальца по экрану не задало наклон (${tilt})`);
+    assert(tilted > 0.01, `${vp.name}: жест наклона не наклонил ракету`);
+    const thrStill = await hook(page, () => globalThis.__VN_APP__.session.lastInput.throttle);
+    assert(thrStill > 0.5, `${vp.name}: тяга на рычаге пропала при жесте наклона (${thrStill})`);
     await shot(page, vp, '13-flight-touch');
     await touch(cdp, 'touchEnd', []);
     await page.waitForTimeout(200);

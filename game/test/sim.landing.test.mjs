@@ -161,17 +161,14 @@ test('the canopy opens after a short delay, sheds the speed quickly but smoothly
   assert.equal(result.outcome, 'landed');
 });
 
-test('a kilometre under the canopy takes about 2 minutes less than it used to: about 14 s at 8 units/s', () => {
+test('a kilometre under the canopy takes about 10-20 seconds, not a crawl of 22 s and more', () => {
   const state = withChute({ alt: 100 }, { fins: { turn: 1, maxTilt: Math.PI } });
   state.objects = [];
-  advance(state, { throttle: 0, parachute: true }, 0.02);
-  advance(state, { parachute: true }, 1);
-  const before = state.alt;
-  const start = state.time;
-  advance(state, { parachute: true }, 60);
+  advance(state, { throttle: 0 }, 0.05);
+  advance(state, { parachute: true }, 120);
   assert.equal(state.phase, 'landed');
-  assert.ok(state.time - start < 20, 'comes down fast enough');
-  assert.ok(before > 0);
+  assert.ok(state.time > 8 && state.time < 20, `${state.time} s from 1 km`);
+  assert.ok(summarize(state).landing.v < 9, 'and the touchdown is safe');
 });
 
 test('the canopy exists only if it was taken along; the parachute module level no longer matters', () => {

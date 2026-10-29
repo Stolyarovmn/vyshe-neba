@@ -1,0 +1,38 @@
+{
+  "asset_id": "B04",
+  "asset": "recovery_complex",
+  "building_key": "recovery",
+  "era": "E0",
+  "year": 1978,
+  "source": {
+    "generator": "ChatGPT image generation via browser (GPT, high quality)",
+    "original_file": "recovery_e0_1978_original.png",
+    "original_size": [
+      1254,
+      1254
+    ],
+    "original_sha256": "c4d230e6ce4596c7e36231b1e2ae7debc988a1d0eeb18c6a4550520ffe882d98",
+    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/B04_recovery_complex/",
+    "generated_on": "2026-10-29"
+  },
+  "prompt": "art/prompts/missing/recovery_complex_e0_1978.txt (compact version used; chroma-key #FF00FF background instead of alpha because the generator does not output transparency)",
+  "processing": {
+    "steps": [
+      "chroma-key magenta #FF00FF to alpha with edge defringe",
+      "crop to alpha bbox + 2 px padding",
+      "LANCZOS downscale to max side 512"
+    ],
+    "tool": "keysprite.py (documented in art/docs/MISSING_ASSETS_PROMPTS.md)"
+  },
+  "runtime": {
+    "file": "art/gen/runtime/bld_recovery_1978.png",
+    "size": [
+      516,
+      349
+    ],
+    "sha256": "ab5eb5f9e76a2ef7469349dbe1d2250b390919c5c762893d0d1ac5cea3a76400",
+    "mode": "RGBA"
+  },
+  "status": "candidate_not_user_approved",
+  "note": "E1-E5 for this family are still procedural placeholders in game; generate by chain from this approved E0."
+}

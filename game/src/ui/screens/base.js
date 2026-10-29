@@ -88,7 +88,7 @@ export default {
       const hard = bs.next && bs.locked.some((x) => !isFundsReason(x));
       const built = bs.level > 0;
       const on = st.sel === key;
-      const clicked = kit.button(`bld-${key}`, r, { variant: on ? 'cardOn' : built ? 'raised' : 'card', icon: buildingIcon(key, built ? bs.level : 1), iconSize: Math.round(r.w * 0.6), iconColor: built ? c.text : c.textMute, badge: avail ? '!' : undefined, tip: buildingShort(app, key) });
+      const clicked = kit.button(`bld-${key}`, r, { variant: on ? 'cardOn' : built ? 'raised' : 'card', icon: buildingIcon(key, built ? bs.level : 1), iconSize: Math.round(r.w * 0.6), iconColor: built ? c.text : c.textMute, badge: avail ? '!' : undefined, badgePulse: true, tip: buildingShort(app, key) });
       if (clicked) {
         st.sel = on ? null : key;
         st.era = false;

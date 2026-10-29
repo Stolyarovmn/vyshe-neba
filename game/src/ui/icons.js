@@ -54,6 +54,8 @@ const FLAME = [P('b', [16, 2, 25, 15, 22, 27, 10, 27, 7, 15, 12, 18]), P('w', [1
 /** Описания иконок. Тона: b (цвет вызова), bl/bd (светлее/темнее), w, k, и фиксированные (gold, cyan, red, amber, green, glass). */
 const ICONS = {
   coin: [C('b', 16, 16, 13), C('bd', 16, 16, 9.2), P('bl', [16, 9.5, 22.5, 16, 16, 22.5, 9.5, 16])],
+  // подкова магнита: красный корпус, серебристые полюса (запасная иконка, пока нет спрайта эпохи magnet_ГОД)
+  magnet: [L('red', 6.5, [8.5, 6, 8.5, 18, 12, 25, 20, 25, 23.5, 18, 23.5, 6]), R('w', 5.3, 3, 6.4, 6.5), R('w', 20.3, 3, 6.4, 6.5)],
   data: [P('b', [6, 11, 12, 4, 20, 4, 26, 11, 16, 28]), P('bl', [6, 11, 12, 4, 16, 11]), P('bl', [12, 4, 20, 4, 16, 11]), P('bd', [26, 11, 20, 4, 16, 11]), P('bd', [16, 11, 26, 11, 16, 28])],
   bolt: BOLT,
   boost: BOLT,
@@ -123,7 +125,7 @@ const ICONS = {
 const SPRITE_FLAT = { earth: 'earth', moon: 'moon' };
 
 const SPRITE_OF = {
-  coin: 'coin', fuel: 'fuel', canister: 'fuel', repair: 'repair',
+  coin: 'coin', fuel: 'fuel', canister: 'fuel', repair: 'repair', magnet: 'magnet',
   chute: 'canopy', parachute: 'canopy', capsule: 'capsule', booster: 'booster',
 };
 

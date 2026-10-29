@@ -1,5 +1,6 @@
 // Полётный HUD как приборная панель: сегментное табло высоты, лента вертикальной скорости, светодиодные шкалы топлива и прочности,
-// предупредительные лампы, шкала маршрута, пиксельный радар, рычаг тяги с фиксатором и диск-штурвал наклона.
+// предупредительные лампы, шкала маршрута, пиксельный радар, значок активного магнита, рычаг тяги с фиксатором и указатель крена;
+// наклоном рулит палец в любом месте экрана (input/touch.js).
 // Геометрия — layout.hudLayout. Минимум подписей: числа, полоски и лампы.
 
 import { t } from '../../i18n/index.js';
@@ -8,6 +9,7 @@ import { centerCard } from '../layout.js';
 import { tutorialHint, drawTutorialPointer } from './onboarding.js';
 import { mix } from '../theme.js';
 import * as inst from '../skin/instruments.js';
+import { magnetActive } from '../../render/magnet.js';
 
 const DANGER_WARNS = ['brake', 'tilt', 'drift', 'hazard', 'chute-air', 'overheat', 'hull'];
 const WARN_KEYS = { brake: 'hint.brake', tilt: 'hint.tilt', drift: 'hint.drift', hazard: 'hint.hazard', 'chute-air': 'hint.chuteAir', overheat: 'hint.overheat', hull: 'hint.hull' };
@@ -46,6 +48,7 @@ export default {
     const hasRadar = f.cfg.base.radar > 0;
     drawStrip(app, kit, L, f, hud, hasRadar ? hud.radar : null);
     if (hasRadar) drawRadar(app, kit, L, f, hud);
+    drawMagnetBadge(app, kit, L, f, hud);
     drawPredict(app, kit, L, f);
     const hint = tutorialHint(app, s);
     drawHint(app, kit, L, s, f, hud, hint);
@@ -418,30 +421,16 @@ function drawControls(app, kit, L, s, f, hud, touch) {
     hudButton(app, kit, L, 'transfer', B.transfer, { icon: 'transfer', variant: blink ? 'good' : 'primary', label: t('hud.transfer'), wide: true });
   }
 
+  // указатель крена на месте диска (небольшой, без стрелок): деления, зона допустимого отклонения fins.maxTilt, стрелка крена
   const lim = tiltLimit(f);
-  if (!touch) {
-    // без сенсорных органов управления на месте диска — указатель крена: стрелка и зона допустимого отклонения
-    const G = { cx: hud.disc.cx, cy: hud.disc.cy, r: Math.round(hud.disc.r * 0.8) };
-    inst.wheel(kit, G, { finger: null, knobX: G.cx, kr: 0, hot: lim !== null && Math.abs(f.angle || 0) >= lim * 0.93 });
-    drawAttitude(app, kit, G, f, lim);
-    return;
-  }
+  const G = { cx: hud.disc.cx, cy: hud.disc.cy, r: hud.disc.r };
+  inst.wheel(kit, G, { finger: null, knobX: G.cx, kr: 0, hot: lim !== null && Math.abs(f.angle || 0) >= lim * 0.93 });
+  drawAttitude(app, kit, G, f, lim);
+  if (!touch) return;
 
-  // диск наклона: штурвал с шкалой и шариковой рукояткой
-  const D = hud.disc;
+  // наклон ведёт палец в любом месте экрана; пока палец ведёт — след жеста: кольцо в точке касания и линия по X
   const tm = app.input.touch;
-  app.hudTargets['flight-tilt'] = { x: D.cx - D.r, y: D.cy - D.r, w: D.r * 2, h: D.r * 2 };
-  let finger = null;
-  for (const p of tm.pointers.values()) if (p.role === 'disc') finger = p;
-  const knobX = D.cx + (finger ? clamp((finger.x - D.cx) / (D.r * 0.78), -1, 1) : 0) * D.r * 0.78;
-  const kr = Math.round(D.r * 0.34);
-  const base = inst.wheel(kit, D, { finger, knobX, kr, hot: lim !== null && Math.abs(f.angle || 0) >= lim * 0.93 });
-  // дуга ограничителя и стрелка крена по верхней дуге диска
-  drawAttitude(app, kit, D, f, lim);
-  kit.icon('back', D.cx - D.r * 0.66, D.cy + D.r * 0.15, Math.round(D.r * 0.3), c.textDim);
-  kit.icon('arrow', D.cx + D.r * 0.66, D.cy + D.r * 0.15, Math.round(D.r * 0.3), c.textDim);
-  base.knob();
-  kit.drawText(t('hud.tilt'), D.cx, D.cy + D.r * 0.72, { size: kit.fs(10), color: c.textMute, align: 'center' });
+  drawSteerTrace(app, kit, L, tm.steerFinger(), hud.steer);
 
   // рычаг тяги: паз со светодиодной шкалой, рукоятка и фиксатор
   const V = hud.lever;
@@ -453,6 +442,43 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   // подпись на самой рукоятке: «держи» в аркаде, процент в режиме «Пилот»
   kit.drawText(mode === 'arcade' ? t('hud.hold') : `${Math.round(lv.value * 100)}`, V.x + V.w / 2, lw.thumb.y + lw.thumb.h * 0.72, { size: kit.fs(10), color: lw.label, align: 'center', maxWidth: V.w - cc * 8 });
   kit.drawText(t('hud.thrust'), V.x + V.w / 2, V.y - kit.fs(8), { size: kit.fs(10), color: c.textMute, align: 'center' });
+}
+
+/** Магнит-расходник действует: маленький значок (спрайт эпохи) с пульсирующей подсветкой; над ракетой магнит не рисуется. */
+function drawMagnetBadge(app, kit, L, f, hud) {
+  if (!magnetActive(f) || f.phase === 'crashed' || f.phase === 'landed' || f.phase === 'transfer') return;
+  const r = hud.magnet;
+  const c = kit.c;
+  const cc = kit.cell();
+  const ctx = kit.S.ctx;
+  const pulse = app.settings.reduceMotion ? 0.6 : 0.5 + 0.5 * Math.sin(app.time * 3.4);
+  kit.nine('hud', r.x, r.y, r.w, r.h);
+  // подсветка: рамка из клеток цвета тревоги-магнита, яркость пульсирует
+  ctx.globalAlpha = 0.35 + 0.55 * pulse;
+  kit.rect(r.x, r.y, r.w, cc, c.red);
+  kit.rect(r.x, r.y + r.h - cc, r.w, cc, c.red);
+  kit.rect(r.x, r.y, cc, r.h, c.red);
+  kit.rect(r.x + r.w - cc, r.y, cc, r.h, c.red);
+  ctx.globalAlpha = 1;
+  kit.icon('magnet', r.x + r.w / 2, r.y + r.h / 2, Math.round(r.w * 0.78), c.red);
+}
+
+/** След жеста наклона: кольцо в точке касания, пунктир и маркер по горизонтали; цвет — по доле от максимума. */
+function drawSteerTrace(app, kit, L, finger, steer) {
+  if (!finger) return;
+  const c = kit.c;
+  const cc = kit.cell();
+  const ctx = kit.S.ctx;
+  const k = clamp(Math.abs(finger.x - finger.startX) / Math.max(1, steer?.range || 80), 0, 1);
+  const color = k > 0.98 ? c.amber : c.amberLight;
+  const r0 = Math.round(18 * L.ui);
+  ctx.globalAlpha = 0.65;
+  kit.ring(finger.startX, finger.startY, r0, cc, c.white);
+  if (k > 0) {
+    kit.line(finger.startX, finger.startY, finger.x, finger.startY, color, { dash: true });
+    kit.ring(finger.x, finger.startY, Math.round(r0 * 0.6), Math.round(r0 * 0.6), color);
+  }
+  ctx.globalAlpha = 1;
 }
 
 // ---------- крен и ограничитель наклона ----------

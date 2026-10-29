@@ -63,11 +63,22 @@ export function unmetRequirements(profile, requires) {
   return out;
 }
 
+// Russian plural: 1 монета, 2 монеты, 5 монет, 21 монета, 12 монет.
+export function plural(n, one, few, many) {
+  const last = n % 10;
+  const lastTwo = n % 100;
+  if (last === 1 && lastTwo !== 11) return one;
+  if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) return few;
+  return many;
+}
+
+export const coinsText = (n) => `${n} ${plural(n, 'монета', 'монеты', 'монет')}`;
+
 export const lockCoins = (profile, need) => ({
   kind: 'coins',
   need,
   have: profile.coins,
-  text: `Нужно ещё ${need - profile.coins} монет`,
+  text: `Нужно ещё ${coinsText(need - profile.coins)}`,
 });
 
 export const lockData = (profile, need) => ({

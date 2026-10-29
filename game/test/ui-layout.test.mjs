@@ -101,6 +101,27 @@ test('HUD: радар не перекрывает полосу рубежей, �
   }
 });
 
+test('HUD: значок магнита внутри безопасной области и не перекрывает радар, подсказку, полосу, приборы, рычаг и кнопки', () => {
+  for (const { w, h, L } of layouts()) {
+    for (const mirror of [false, true]) {
+      const hud = hudLayout(L, { mirror });
+      const m = hud.magnet;
+      assert.ok(m && m.w >= 24 && m.h >= 24, `${w}x${h}: значок магнита мал ${JSON.stringify(m)}`);
+      assert.ok(inside(m, L.area), `${w}x${h}: значок магнита вне безопасной области`);
+      const r = hud.radar;
+      const others = {
+        радар: { x: r.cx - r.r, y: r.cy - r.r, w: r.r * 2, h: r.r * 2 },
+        подсказка: hud.hint,
+        полоса: hud.strip,
+        рычаг: hud.lever,
+        ...Object.fromEntries(Object.entries(hud.instruments).map(([k, v]) => [`прибор ${k}`, v])),
+        ...Object.fromEntries(Object.entries(hud.buttons).map(([k, v]) => [`кнопка ${k}`, v])),
+      };
+      for (const [name, o] of Object.entries(others)) assert.ok(!overlaps(m, o), `${w}x${h}${mirror ? ' mirror' : ''}: магнит перекрывает ${name}`);
+    }
+  }
+});
+
 test('HUD: зеркальная раскладка меняет диск и рычаг местами, пауза остаётся справа', () => {
   const L = computeLayout(844, 390, 2);
   const a = hudLayout(L);

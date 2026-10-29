@@ -4,9 +4,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { SPACE_ALT } from '../src/sim/index.js';
 import {
-  AEROSTATS, AIRCRAFT, AIRCRAFT_FLOOR, aircraftWeight, pickGeneration, spawnHazards,
+  DT, SPACE_ALT, createAutopilot, createFlight, startRocket, step,
+} from '../src/sim/index.js';
+import {
+  AEROSTATS, AIRCRAFT, OBSTACLE_FLOOR, aircraftWeight, pickGeneration, spawnHazards,
 } from '../src/sim/hazards.js';
 import { createRngState, hashSeed } from '../src/sim/rng.js';
 
@@ -68,7 +70,7 @@ test('every balloon and airship band of every era matches the aerostat document'
     assert.equal(def.min[row.era], row.min, `${row.line} era ${row.era} lower edge`);
     assert.equal(def.max[row.era], row.max, `${row.line} era ${row.era} upper edge`);
   }
-  for (const def of Object.values(AEROSTATS)) assert.ok(def.max.every((value) => value <= 5000), 'no balloons above 50 km (the old limit is kept)');
+  for (const def of Object.values(AEROSTATS)) assert.ok(def.max.every((value) => value <= 5300), 'no balloons above 53 km');
 });
 
 test('spawned aircraft respect the era bands, the launch zone and the space line', () => {
@@ -80,7 +82,7 @@ test('spawned aircraft respect the era bands, the launch zone and the space line
     for (const plane of planes) {
       const alt = -plane.oy;
       const row = table.find((r) => r.lineage === plane.lineage && r.era === era);
-      assert.ok(alt >= AIRCRAFT_FLOOR, `no aircraft in the first 800 m (${alt})`);
+      assert.ok(alt >= OBSTACLE_FLOOR, `no aircraft in the first 4 km (${alt})`);
       assert.ok(alt < SPACE_ALT, 'no aircraft in space');
       assert.ok(alt >= row.min - band && alt <= row.max + band, `${plane.lineage} era ${era} at ${alt}, band ${row.min}-${row.max}`);
     }
@@ -111,60 +113,91 @@ test('altitude orders the lineages: light aircraft lowest, then airliners and fr
     at('high_experimental'),
   ];
   for (let i = 1; i < order.length; i++) assert.ok(order[i] > order[i - 1], `median altitudes ${order}`);
-  assert.ok(order[0] < 450 && order[2] < 1500 && order[3] < 2500 && order[4] > 2500);
+  assert.ok(order[0] < 950 && order[2] < 1900 && order[3] < 3100 && order[4] > 3100);
 });
 
-test('the first 800 m are clean: no aircraft, no balloons, no rocks', () => {
-  assert.equal(AIRCRAFT_FLOOR, 80);
-  assert.equal(Math.min(...AIRCRAFT.low_primary.min, ...AIRCRAFT.low_multiwing.min), 80, 'light aircraft start at 800 m');
-  assert.ok(Math.min(...Object.values(AEROSTATS).flatMap((def) => def.min)) >= 80, 'balloons are not closer to the ground than aircraft');
+test('the first 4 km are clean of every obstacle: aircraft, balloons, airships, rocks and debris', () => {
+  assert.equal(OBSTACLE_FLOOR, 400);
+  assert.equal(Math.min(...AIRCRAFT.low_primary.min, ...AIRCRAFT.low_multiwing.min), 450, 'light aircraft start at 4.5 km');
+  assert.ok(Math.min(...Object.values(AEROSTATS).flatMap((def) => def.min)) >= 450, 'balloons are not closer to the ground than aircraft');
   for (let era = 0; era <= 5; era++) {
-    const all = sample(era, 12);
+    const all = sample(era, 40);
     assert.ok(all.length > 20);
-    assert.ok(all.every((h) => -h.oy >= AIRCRAFT_FLOOR), `era ${era} has something below 800 m`);
+    assert.ok(all.every((h) => -h.oy >= OBSTACLE_FLOOR), `era ${era} has something below 4 km`);
+  }
+  for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) {
+    const state = createFlight(startRocket({ seed, start: { body: 'earth', alt: 500 } }));
+    const hazards = state.objects.filter((o) => o.hazard);
+    assert.ok(hazards.every((o) => -o.oy >= OBSTACLE_FLOOR), `seed ${seed}: something low`);
+  }
+});
+
+test('coins, rings and fuel still fill the low sky', () => {
+  const kinds = new Set();
+  for (let seed = 1; seed <= 6; seed++) {
+    for (const o of createFlight(startRocket({ seed })).objects) if (-o.y < OBSTACLE_FLOOR) kinds.add(o.kind);
+  }
+  assert.ok(kinds.has('coin') && kinds.has('ring') && kinds.has('fuel'), `low objects: ${[...kinds]}`);
+  assert.ok(![...kinds].some((kind) => ['plane', 'balloon', 'asteroid', 'debris'].includes(kind)));
+});
+
+test('a rocket that tops out at 3.1 km (the best of era 0) meets no traffic at all and keeps landing', () => {
+  for (let seed = 1; seed <= 24; seed++) {
+    const state = createFlight(startRocket({ seed }));
+    const pilot = createAutopilot({ skill: 1, mission: 'hop', targetAlt: 310, seed });
+    let lowestHazard = Infinity;
+    while (!state.ended && state.time < 120) {
+      step(state, pilot.next(state, DT), DT);
+      for (const o of state.objects) if (o.hazard && o.active) lowestHazard = Math.min(lowestHazard, -o.y);
+    }
+    assert.equal(state.outcome, 'landed', `seed ${seed}: ${state.reason}`);
+    assert.equal(state.hits, 0);
+    assert.ok(lowestHazard >= OBSTACLE_FLOOR - 15, `seed ${seed}: hazard seen at ${lowestHazard}`);
+    assert.ok(state.maxAlt >= 300);
   }
 });
 
 test('class shares follow the document: 70/30 low, cargo over passenger above the low layer, passenger over cargo higher, fighters 70/30 over experimental', () => {
   const ratio = (era, alt, a, b) => aircraftWeight(a, era, alt) / aircraftWeight(b, era, alt);
-  assert.ok(Math.abs(ratio(2, 200, 'low_primary', 'low_multiwing') - 70 / 30) < 1e-9);
-  assert.ok(Math.abs(ratio(2, 600, 'medium_cargo', 'medium_passenger') - 50 / 35) < 1e-9, 'cargo 50%, passenger 35% in the mixed layer');
-  assert.ok(aircraftWeight('low_primary', 5, 620) > 0 && aircraftWeight('low_primary', 5, 620) < aircraftWeight('medium_cargo', 5, 620), 'late light aircraft still reach the mixed layer, but cargo dominates there');
-  assert.ok(Math.abs(ratio(3, 1000, 'medium_passenger', 'medium_cargo') - 60 / 35) < 1e-9, 'passenger 60%, cargo 35% in the airliner layer');
+  assert.ok(Math.abs(ratio(2, 600, 'low_primary', 'low_multiwing') - 70 / 30) < 1e-9);
+  assert.ok(Math.abs(ratio(2, 1000, 'medium_cargo', 'medium_passenger') - 50 / 35) < 1e-9, 'cargo 50%, passenger 35% in the mixed layer');
+  assert.ok(aircraftWeight('low_primary', 5, 930) > 0 && aircraftWeight('low_primary', 5, 930) < aircraftWeight('medium_cargo', 5, 930), 'late light aircraft still reach the mixed layer, but cargo dominates there');
+  assert.ok(Math.abs(ratio(3, 1500, 'medium_passenger', 'medium_cargo') - 60 / 35) < 1e-9, 'passenger 60%, cargo 35% in the airliner layer');
   assert.equal(aircraftWeight('high_fighter', 3, 1000), 0, 'fighters live at their own layer and above');
-  assert.ok(aircraftWeight('high_fighter', 3, 1430) > 0, 'a rare fighter shows in the upper part of the airliner layer');
-  assert.ok(aircraftWeight('high_fighter', 3, 1430) < aircraftWeight('medium_passenger', 3, 1430) / 5);
-  assert.ok(Math.abs(ratio(0, 1900, 'high_fighter', 'high_experimental') - 70 / 30) < 1e-9, 'where both fly, fighters 70% and experimental 30%');
-  assert.equal(aircraftWeight('high_fighter', 3, 2800), 0, 'only experimental craft in the top layer');
-  assert.ok(aircraftWeight('high_experimental', 3, 3500) > 0);
+  assert.ok(aircraftWeight('high_fighter', 3, 1730) > 0, 'a rare fighter shows in the upper part of the airliner layer');
+  assert.ok(aircraftWeight('high_fighter', 3, 1730) < aircraftWeight('medium_passenger', 3, 1730) / 5);
+  assert.ok(Math.abs(ratio(0, 2200, 'high_fighter', 'high_experimental') - 70 / 30) < 1e-9, 'where both fly, fighters 70% and experimental 30%');
+  assert.equal(aircraftWeight('high_fighter', 3, 3200), 0, 'only experimental craft in the top layer');
+  assert.ok(aircraftWeight('high_experimental', 3, 4000) > 0);
 });
 
-test('traffic thins out in the rare layers and the clean sky starts above 800 m', () => {
+test('traffic thins out in the rare layers and starts above the obstacle floor', () => {
   assert.equal(aircraftWeight('low_primary', 0, 10), 0);
-  assert.equal(aircraftWeight('low_primary', 0, 79), 0);
-  assert.equal(aircraftWeight('low_primary', 0, AIRCRAFT_FLOOR), 0);
-  assert.ok(aircraftWeight('low_primary', 0, 150) > 0);
-  assert.ok(aircraftWeight('low_primary', 0, 100) < aircraftWeight('low_primary', 0, 150), 'they fade in above the floor');
-  const dense = aircraftWeight('high_experimental', 5, 3500);
-  const near = aircraftWeight('high_experimental', 5, 6500);
-  const edge = aircraftWeight('high_experimental', 5, 9000);
+  assert.equal(aircraftWeight('low_primary', 0, 399), 0);
+  assert.equal(aircraftWeight('low_primary', 0, OBSTACLE_FLOOR), 0);
+  assert.ok(aircraftWeight('low_primary', 0, 470) > 0);
+  assert.ok(aircraftWeight('low_primary', 0, 430) < aircraftWeight('low_primary', 0, 520), 'they fade in above the floor');
+  const dense = aircraftWeight('high_experimental', 5, 4000);
+  const near = aircraftWeight('high_experimental', 5, 7000);
+  const edge = aircraftWeight('high_experimental', 5, 9200);
   assert.ok(near < dense / 2, 'the near-space layer is rare');
   assert.ok(edge < near / 3 && edge <= 0.05 * 0.9 + 1e-9, 'the last layer: no more than 5% of the traffic');
-  assert.equal(aircraftWeight('high_experimental', 4, 9000), 0, 'only the last era reaches 90 km');
+  assert.equal(aircraftWeight('high_experimental', 4, 9200), 0, 'only the last era reaches 96 km');
+  assert.ok(Math.max(...AIRCRAFT.high_experimental.max) < SPACE_ALT, 'no aircraft band reaches the space line');
 });
 
 test('class boundaries blend instead of switching on a single line', () => {
   const lowAt = (alt) => aircraftWeight('low_primary', 0, alt);
   const cargoAt = (alt) => aircraftWeight('medium_cargo', 0, alt);
-  assert.ok(lowAt(400) > lowAt(440) && lowAt(440) > lowAt(480) && lowAt(480) > 0, 'light aircraft fade out around 4.5 km');
-  assert.ok(cargoAt(500) > cargoAt(460) && cargoAt(460) >= 0, 'freighters fade in around 4.5 km');
+  assert.ok(lowAt(760) > lowAt(800) && lowAt(800) > lowAt(840) && lowAt(840) > 0, 'light aircraft fade out around 8 km');
+  assert.ok(cargoAt(840) > cargoAt(780) && cargoAt(780) >= 0, 'freighters fade in around 8 km');
   const fighterAt = (alt) => aircraftWeight('high_fighter', 3, alt);
-  assert.ok(fighterAt(1420) > 0 && fighterAt(1550) > fighterAt(1420), 'fighters appear gradually across 15 km');
+  assert.ok(fighterAt(1730) > 0 && fighterAt(1830) > fighterAt(1730), 'fighters appear gradually across 18 km');
 });
 
 test('experimental craft only fly as high as the era allows', () => {
   const top = (era) => Math.max(...sample(era, 110).filter((h) => h.lineage === 'high_experimental').map((h) => -h.oy));
-  const ceilings = [2700, 3000, 4000, 5500, 7400, 9600];
+  const ceilings = [3000, 3300, 4300, 5800, 7600, 9650];
   for (let era = 0; era <= 5; era++) {
     const highest = top(era);
     assert.ok(highest <= ceilings[era] + 100, `era ${era}: ${highest} > ${ceilings[era]}`);

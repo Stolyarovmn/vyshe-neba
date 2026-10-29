@@ -18,7 +18,7 @@ test('getPartState explains every lock with a Russian text', () => {
   const texts = state.locked.map((l) => l.text);
   assert.ok(texts.includes('Нужна сервисная команда ур. 1'));
   assert.ok(texts.includes('Нужен производственный цех ур. 1'));
-  assert.ok(texts.some((t) => /^Нужно ещё \d+ монет$/.test(t)));
+  assert.ok(texts.some((t) => /^Нужно ещё \d+ монет[аы]?$/.test(t)));
   assert.ok(state.next.cost > 0 && state.next.stats.thrust > state.current.thrust);
 });
 
@@ -89,11 +89,15 @@ test('buyBuilding: energy node and dependencies (level N needs energy N-1)', () 
   assert.equal(buyBuilding(withEnergy, 'beacons').ok, true);
 });
 
-test('buyBuilding: delayed buildings wait for their era', () => {
+test('buyBuilding: all fourteen buildings can be built at level 1 in the first era; the second level waits', () => {
   const profile = makeProfile({ coins: 1e6, era: 0 });
-  const state = getBuildingState(profile, 'factory');
-  assert.ok(state.locked.some((l) => l.kind === 'era' && l.text === 'Нужна эпоха 1986'));
-  assert.equal(getBuildingState(profile, 'recovery').locked.find((l) => l.kind === 'era').era, 3);
+  for (const key of Object.keys(BUILDINGS)) {
+    assert.equal(getBuildingState(profile, key).canBuy, true, `${key} level 1`);
+  }
+  const built = makeProfile({ coins: 1e6, era: 0, buildings: Object.fromEntries(Object.keys(BUILDINGS).map((k) => [k, 1])) });
+  const state = getBuildingState(built, 'factory');
+  assert.ok(state.locked.some((l) => l.kind === 'era' && l.text === 'Нужна эпоха 1986'), 'level 2 needs the next era');
+  assert.equal(getBuildingState(built, 'recovery').locked.find((l) => l.kind === 'era').era, 1);
 });
 
 test('buyBuilding: immutability and power in the answer', () => {
@@ -157,7 +161,7 @@ function readyForEraZero(patch = {}) {
   return makeProfile({
     coins: ERAS[0].advance.coins,
     data: ERAS[0].advance.data,
-    buildings: { fuel: 1, beacons: 1 },
+    buildings: { fuel: 1, beacons: 1, gantry: 1, deluge: 1, service: 1, rescue: 1, logistics: 1, factory: 1 },
     milestones: { maxAlt: 3000, softLandings: 1 },
     ...patch,
   });
@@ -203,9 +207,9 @@ test('advanceEra: every condition blocks it', () => {
 
 test('advanceEra: later eras ask for their own milestone and building level', () => {
   const need = ERAS[1].advance;
-  const base = makeProfile({ era: 1, coins: need.coins, data: need.data, milestones: { maxAlt: 30000, softLandings: 1 }, buildings: { fuel: 2, beacons: 2, service: 2, energy: 2 } });
+  const base = makeProfile({ era: 1, coins: need.coins, data: need.data, milestones: { maxAlt: 30000, softLandings: 1 }, buildings: { fuel: 2, beacons: 2, service: 2, energy: 2, gantry: 2, deluge: 2, rescue: 2, logistics: 2 } });
   assert.equal(advanceEra(base).ok, true);
-  assert.equal(advanceEra({ ...base, buildings: { ...base.buildings, energy: 1 } }).ok, false, 'four buildings of level 2 are required');
+  assert.equal(advanceEra({ ...base, buildings: { ...base.buildings, energy: 1 } }).ok, false, 'eight buildings of level 2 are required');
   const moon = makeProfile({ era: 3, coins: 1e9, data: 1e9, buildings: Object.fromEntries(Object.keys(BUILDINGS).map((k) => [k, 4])) });
   assert.equal(advanceEra(moon).ok, false, 'needs a Moon landing');
   assert.equal(advanceEra({ ...moon, milestones: { ...moon.milestones, moonLanding: true } }).ok, true);

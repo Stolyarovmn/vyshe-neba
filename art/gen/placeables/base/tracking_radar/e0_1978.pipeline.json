@@ -1,0 +1,38 @@
+{
+  "asset_id": "B02",
+  "asset": "tracking_radar",
+  "building_key": "radar",
+  "era": "E0",
+  "year": 1978,
+  "source": {
+    "generator": "ChatGPT image generation via browser (GPT, high quality)",
+    "original_file": "radar_e0_1978_original.png",
+    "original_size": [
+      1254,
+      1254
+    ],
+    "original_sha256": "34fb2c48284486854e63895e79388b7ede368d90995cfaf88738a6b4317aa11c",
+    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/B02_tracking_radar/",
+    "generated_on": "2026-10-29"
+  },
+  "prompt": "art/prompts/missing/tracking_radar_e0_1978.txt (compact version used; chroma-key #FF00FF background instead of alpha because the generator does not output transparency)",
+  "processing": {
+    "steps": [
+      "chroma-key magenta #FF00FF to alpha with edge defringe",
+      "crop to alpha bbox + 2 px padding",
+      "LANCZOS downscale to max side 512"
+    ],
+    "tool": "keysprite.py (documented in art/docs/MISSING_ASSETS_PROMPTS.md)"
+  },
+  "runtime": {
+    "file": "art/gen/runtime/bld_radar_1978.png",
+    "size": [
+      376,
+      516
+    ],
+    "sha256": "5b6cc9baca8156644a95f543bcbf6b95998d23101d08618aad248f2b5f34a94c",
+    "mode": "RGBA"
+  },
+  "status": "candidate_not_user_approved",
+  "note": "E1-E5 for this family are still procedural placeholders in game; generate by chain from this approved E0."
+}

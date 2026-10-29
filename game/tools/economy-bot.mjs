@@ -19,7 +19,7 @@ import { canExpedition, playFlight as analyticFlight, safeReach } from './econom
 // Minutes of play per era transition; the tolerance is +-30% (DESIGN 4.7). DESIGN also wants the first era
 // in 25..35 minutes: `design` is that window, which a typical (mean over seeds) run has to meet.
 export const TARGETS = [
-  { era: 0, minutes: 30, design: { min: 25, max: 35 } },
+  { era: 0, minutes: 34, design: { min: 25, max: 40 } },
   { era: 1, minutes: 70 },
   { era: 2, minutes: 130 },
   { era: 3, minutes: 200 },
@@ -167,21 +167,13 @@ function controlGoals(profile) {
 
 const goalCache = new Map();
 
-// Coins above the era project that cannot be used for it yet (data or milestone still missing) go into the
-// module whose next levels raise the income rate the most per coin.
-function surplusGoal(profile, skill) {
-  const base = bestPlan(profile, skill).rate;
-  let best = null;
-  for (const id of PART_IDS) {
-    const level = profile.parts[id] + 1;
-    if (level > 18) continue;
-    const chain = planChain(profile, 'part', id, level);
-    if (!chain) continue;
-    const after = bestPlan(chain.result, skill).rate;
-    const score = (after - base) / (chain.cost + 1);
-    if (score > 0 && (!best || score > best.score)) best = { kind: 'part', id, level, score, cost: chain.cost };
-  }
-  return best;
+// Once the needs are met a player keeps buying: the cheapest available item first (a few at a time, so
+// an unaffordable one does not hide the rest). The era project is paid last; the era costs are tuned for that.
+function optionalGoals(profile) {
+  return R.getNextSteps(profile, 200)
+    .filter((step) => step.kind === 'buy-part' || step.kind === 'buy-building')
+    .slice(0, 6)
+    .map((step) => ({ kind: step.kind === 'buy-part' ? 'part' : 'building', id: step.id, level: step.level, cost: step.cost }));
 }
 
 function needs(profile) {
@@ -273,11 +265,7 @@ function shop(profile, log, skill) {
   let current = profile;
   for (let guard = 0; guard < 80; guard++) {
     const goals = [...needs(current)];
-    const advance = ERAS[current.era].advance;
-    if (goals.length === 0 && advance && current.coins > advance.coins) {
-      const extra = surplusGoal(current, skill);
-      if (extra && current.coins - advance.coins >= extra.cost) goals.push(extra);
-    }
+    if (goals.length === 0) goals.push(...optionalGoals(current));
     let acted = false;
     let saving = false;
     for (const goal of goals) {

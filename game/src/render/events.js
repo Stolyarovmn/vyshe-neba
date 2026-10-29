@@ -166,7 +166,7 @@ function applyEvent(e, env) {
       break;
     }
     case 'near-miss':
-      camera.addTrauma(0.1);
+      // тряску даёт слежение за сближением (proximity.js): толчок зависит от дистанции и скорости, а не одна константа
       break;
     case 'hit': {
       const [x, y] = f ? [f.x, f.y - 26] : rocketPoint(env, e);

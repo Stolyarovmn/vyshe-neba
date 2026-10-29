@@ -63,7 +63,7 @@ test('modules and the base feed the config', () => {
   assert.ok(core.thrust > 72 && core.fuel > 175 && core.burnRate < 9);
   assert.ok(config.hull.hp > 100 && config.legs.vTol > 13);
   assert.ok(config.fins.turn > stock.fins.turn && config.fins.maxTilt > stock.fins.maxTilt);
-  assert.deepEqual(config.avionics, { predict: 1, assist: 0 });
+  assert.deepEqual(config.avionics, { predict: 1, assist: 1 });
   assert.ok(config.base.radar > 0 && config.base.beacons > 0 && config.base.weather > 0 && config.base.income > 1);
   assert.ok(config.base.rescueRefund > 0 && config.base.padSafety > 0 && config.base.repairOnLand > 0);
   assert.ok(config.transferCost.moon < stock.transferCost.moon, 'avionics save fuel on the transfer');

@@ -1,0 +1,37 @@
+{
+  "asset_id": "BI-SERVICE",
+  "asset": "service_crew",
+  "building_key": "service",
+  "era": "E0",
+  "year": 1978,
+  "replaces": "low-resolution E0 sprite (35-65 px) from the 2D infrastructure sheet",
+  "source": {
+    "generator": "ChatGPT image generation via browser (GPT, high quality)",
+    "original_file": "service_e0_1978_original.png",
+    "original_size": [
+      1254,
+      1254
+    ],
+    "original_sha256": "f4eb509097b0f16602b3f968d678d58bce4f8aeb499535fc83502b2b49f851b5",
+    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/BI-SERVICE_service_crew/",
+    "generated_on": "2026-10-29"
+  },
+  "processing": {
+    "steps": [
+      "chroma-key magenta #FF00FF to alpha with edge defringe",
+      "crop to alpha bbox + 2 px padding",
+      "LANCZOS downscale to max side 512"
+    ]
+  },
+  "runtime": {
+    "file": "art/gen/runtime/bld_service_1978.png",
+    "size": [
+      516,
+      354
+    ],
+    "sha256": "eee075d50dee4f5d9ee14f883dcbccac0cf0469f033a8104c908fae23e2b2c79",
+    "mode": "RGBA"
+  },
+  "status": "candidate_not_user_approved",
+  "note": "E1-E5 sprites of this family are the old low-resolution set; generate in chain from this E0."
+}

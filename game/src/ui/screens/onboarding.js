@@ -47,14 +47,15 @@ export function drawTutorialPointer(app, kit, L, hint) {
   const hud = L.hud;
   const c = kit.c;
   const bob = app.settings.reduceMotion ? 0 : Math.sin(app.time * 6) * 4;
-  let x;
-  let y;
   if (hint.target === 'thrust') {
-    x = hud.lever.x + hud.lever.w / 2;
-    y = hud.lever.y - L.gap * 2 + bob;
-  } else {
-    x = hud.disc.cx;
-    y = hud.disc.cy - hud.disc.r - L.gap * 2 + bob;
+    kit.icon('down', hud.lever.x + hud.lever.w / 2, hud.lever.y - L.gap * 2 + bob, Math.round(24 * L.ui), c.amber);
+    return;
   }
-  kit.icon('down', x, y, Math.round(24 * L.ui), c.amber);
+  // наклон: палец ведёт по экрану — значок касания плавно ходит вправо-влево над пунктирной дорожкой в свободной середине кадра
+  const span = L.w * 0.14;
+  const sway = app.settings.reduceMotion ? 0 : Math.sin(app.time * 2.4);
+  const cy = L.area.y + L.area.h * 0.58;
+  const cx = L.w / 2;
+  kit.line(cx - span, cy + Math.round(14 * L.ui), cx + span, cy + Math.round(14 * L.ui), c.amberLight, { dash: true });
+  kit.icon('tap', cx + sway * span, cy, Math.round(30 * L.ui), c.amber);
 }

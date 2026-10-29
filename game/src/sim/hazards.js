@@ -11,7 +11,9 @@ import { chance, nextFloat, pickWeighted, randInt, range } from './rng.js';
 
 export const CORRIDOR_HALF = 130; // nothing static spawns this close to the pad column while low
 export const CORRIDOR_ALT = 300;
-export const AIRCRAFT_FLOOR = 80; // the first 800 m are a clean training sky: no aircraft, no balloons
+// Over Earth nothing that can hit the rocket (aircraft, balloons, airships, asteroids, debris, satellites) appears below this
+// height: the first 4 km are a clean sky for learning and take-off. Coins, rings and fuel are not affected.
+export const OBSTACLE_FLOOR = 400;
 export const AIRCRAFT_CEILING = 10000; // no aircraft in space
 const DENSITY = 0.5; // share of spawn attempts that may succeed where the sky is fully populated
 const PLANE_WEIGHT = 0.9;
@@ -21,31 +23,31 @@ const ASTEROID_RADIUS = 28; // the "medium" size
 // --- aircraft: one line of evolution per lineage, six eras each --------------------------------------------------
 
 export const AIRCRAFT = {
-  low_primary: { mix: 'standard', min: [80, 80, 80, 80, 80, 80], max: [450, 450, 500, 550, 550, 600], speed: [36, 46], r: 30 },
-  low_multiwing: { mix: 'standard', min: [80, 80, 80, 80, 80, 80], max: [450, 450, 500, 550, 550, 600], speed: [34, 44], r: 30 },
-  medium_passenger: { mix: 'standard', min: [450, 450, 550, 800, 900, 900], max: [1500, 1500, 1500, 1550, 1600, 1750], speed: [50, 60], r: 36 },
-  medium_cargo: { mix: 'standard', min: [450, 450, 450, 550, 550, 550], max: [1250, 1250, 1250, 1400, 1500, 1600], speed: [42, 52], r: 38 },
-  high_fighter: { mix: 'fighter', min: [1500, 1500, 1500, 1500, 1500, 1500], max: [1900, 2000, 2250, 2500, 2800, 3000], speed: [80, 100], r: 26 },
-  high_experimental: { mix: 'experimental', min: [1900, 2000, 2250, 2500, 2800, 3000], max: [2700, 3000, 4000, 5500, 7400, 9600], speed: [90, 120], r: 30 },
+  low_primary: { mix: 'standard', min: [450, 450, 450, 450, 450, 450], max: [800, 800, 850, 900, 900, 950], speed: [36, 46], r: 30 },
+  low_multiwing: { mix: 'standard', min: [450, 450, 450, 450, 450, 450], max: [800, 800, 850, 900, 900, 950], speed: [34, 44], r: 30 },
+  medium_passenger: { mix: 'standard', min: [800, 800, 900, 1200, 1300, 1300], max: [1800, 1800, 1800, 1850, 1900, 2050], speed: [50, 60], r: 36 },
+  medium_cargo: { mix: 'standard', min: [800, 800, 800, 900, 900, 900], max: [1600, 1600, 1600, 1700, 1800, 1900], speed: [42, 52], r: 38 },
+  high_fighter: { mix: 'fighter', min: [1800, 1800, 1800, 1800, 1800, 1800], max: [2200, 2300, 2550, 2800, 3100, 3300], speed: [80, 100], r: 26 },
+  high_experimental: { mix: 'experimental', min: [2200, 2300, 2550, 2800, 3100, 3300], max: [3000, 3300, 4300, 5800, 7600, 9650], speed: [90, 120], r: 30 },
 };
 
 // Who flies where, as shares of the traffic in each altitude layer. `density` thins the rare high layers.
 export const AIRCRAFT_LAYERS = [
-  { from: 80, to: 450, density: 1, shares: { low_primary: 0.7, low_multiwing: 0.3 } },
-  { from: 450, to: 800, density: 1, shares: { medium_cargo: 0.5, medium_passenger: 0.35, low_primary: 0.105, low_multiwing: 0.045 } },
-  { from: 800, to: 1500, density: 1, shares: { medium_passenger: 0.6, medium_cargo: 0.35, high_fighter: 0.05 } },
-  { from: 1500, to: 2500, density: 1, shares: { high_fighter: 0.7, high_experimental: 0.3 } },
-  { from: 2500, to: 5500, density: 0.9, shares: { high_experimental: 1 } },
-  { from: 5500, to: 8700, density: 0.25, shares: { high_experimental: 1 } },
-  { from: 8700, to: AIRCRAFT_CEILING, density: 0.05, shares: { high_experimental: 1 } },
+  { from: 450, to: 800, density: 1, shares: { low_primary: 0.7, low_multiwing: 0.3 } },
+  { from: 800, to: 1200, density: 1, shares: { medium_cargo: 0.5, medium_passenger: 0.35, low_primary: 0.105, low_multiwing: 0.045 } },
+  { from: 1200, to: 1800, density: 1, shares: { medium_passenger: 0.6, medium_cargo: 0.35, high_fighter: 0.05 } },
+  { from: 1800, to: 2800, density: 1, shares: { high_fighter: 0.7, high_experimental: 0.3 } },
+  { from: 2800, to: 5800, density: 0.9, shares: { high_experimental: 1 } },
+  { from: 5800, to: 8800, density: 0.25, shares: { high_experimental: 1 } },
+  { from: 8800, to: AIRCRAFT_CEILING, density: 0.05, shares: { high_experimental: 1 } },
 ];
 
 // --- balloons and airships: low, mid and high lines -----------------------------------------------------------
 
 export const AEROSTATS = {
-  low: { weight: 0.55, min: [80, 80, 110, 150, 180, 240], max: [240, 400, 500, 600, 750, 900], r: 25 },
-  mid: { weight: 0.45, min: [180, 240, 300, 400, 450, 550], max: [450, 550, 700, 850, 1050, 1250], r: 30 },
-  high: { weight: 0.4, min: [2250, 2500, 2700, 3300, 2500, 3000], max: [3500, 3700, 4000, 4000, 4300, 5000], r: 28 },
+  low: { weight: 0.55, min: [450, 450, 500, 500, 550, 600], max: [600, 750, 850, 950, 1150, 1300], r: 25 },
+  mid: { weight: 0.45, min: [550, 600, 650, 750, 800, 900], max: [800, 900, 1100, 1250, 1400, 1600], r: 30 },
+  high: { weight: 0.4, min: [2550, 2800, 3000, 3600, 2800, 3300], max: [3800, 4000, 4300, 4300, 4600, 5300], r: 28 },
 };
 const AEROSTAT_FADE = 0.15; // first and last 15% of a band fade in and out
 
@@ -57,9 +59,9 @@ export const ASTEROID_SIZES = [
 
 export const DAMAGE_FACTOR = { plane: 1.2, balloon: 0.8, asteroid: 1.3, debris: 1 };
 
-// Transition width around a boundary: +-500 m, or +-1 km at the big changes at 15 km and 25 km.
+// Transition width around a boundary: +-500 m, or +-1 km at the big changes at 18 km and 28 km.
 function transition(at) {
-  return at === 1500 || at === 2500 ? 100 : 50;
+  return at === 1800 || at === 2800 ? 100 : 50;
 }
 
 function ramp(alt, edge) {
@@ -72,15 +74,15 @@ export function aircraftAvailability(lineage, era, alt) {
   const def = AIRCRAFT[lineage];
   const min = def.min[era];
   const max = def.max[era];
-  const rise = min <= AIRCRAFT_FLOOR ? smoothstep(min, min + 100, alt) : ramp(alt, min);
-  return rise * (1 - ramp(alt, max));
+  // The lowest bands start at 4.5 km, so their +-500 m transition begins exactly at the obstacle floor.
+  return alt < OBSTACLE_FLOOR ? 0 : ramp(alt, min) * (1 - ramp(alt, max));
 }
 
 // How much of an altitude layer applies at `alt` (layers blend across their boundaries and sum to 1).
 export function layerWeight(layer, alt) {
-  const rise = layer.from <= AIRCRAFT_FLOOR ? 1 : ramp(alt, layer.from);
+  const rise = layer === AIRCRAFT_LAYERS[0] ? 1 : ramp(alt, layer.from);
   const fall = layer.to >= AIRCRAFT_CEILING ? 1 : 1 - ramp(alt, layer.to);
-  return alt >= AIRCRAFT_FLOOR && alt < AIRCRAFT_CEILING ? rise * fall : 0;
+  return alt >= OBSTACLE_FLOOR && alt < AIRCRAFT_CEILING ? rise * fall : 0;
 }
 
 export function aircraftWeight(lineage, era, alt) {
@@ -194,7 +196,7 @@ export function spawnHazards(rs, ctx) {
   for (let i = 0; i < attempts; i++) {
     const x = ctx.x0 + range(rs, 45, ctx.width - 45);
     const alt = ctx.alt0 + range(rs, 25, ctx.height - 25);
-    if (alt < AIRCRAFT_FLOOR) continue;
+    if (ctx.bodyId === 'earth' && alt < OBSTACLE_FLOOR) continue;
     const options = candidates(ctx.bodyId, ctx.era, alt);
     const total = options.reduce((sum, o) => sum + o.weight, 0);
     const roll = nextFloat(rs);

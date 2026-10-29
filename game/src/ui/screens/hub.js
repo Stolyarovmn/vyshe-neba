@@ -3,8 +3,9 @@
 
 import { t } from '../../i18n/index.js';
 import { dockLayout, sceneArea } from '../layout.js';
-import { drawChrome, eraCallout, BUILDING_KEYS, PART_KEYS } from './common.js';
+import { drawChrome, eraCallout, BUILDING_KEYS } from './common.js';
 import { drawBuildingCallout, worldTarget } from './building.js';
+import { nextSummary } from '../next-steps.js';
 
 const NAV = [
   { id: 'rocket', icon: 'rocket', label: 'dock.rocket' },
@@ -19,20 +20,80 @@ function state(app) {
   return ((app.ui ||= {}).hub ||= { sel: null, era: false, cache: null });
 }
 
-/** Значки «!» на кнопках пересчитываются только при смене профиля. */
+/** Отметки «!» на кнопках, памятнике и подсказка о потолке эпохи пересчитываются только при смене профиля. */
 function derive(app, st) {
   if (st.cache && st.cache.profile === app.profile) return st.cache;
-  const p = app.profile;
-  const canPart = PART_KEYS.some((id) => {
-    const s = app.rules.getPartState(p, id);
-    return s.next && !s.locked.length;
-  });
-  const canBuilding = BUILDING_KEYS.some((k) => {
-    const s = app.rules.getBuildingState(p, k);
-    return s.next && !s.locked.length;
-  });
-  st.cache = { profile: p, canPart, canBuilding };
+  const sum = nextSummary(app);
+  st.cache = { profile: app.profile, canPart: sum.part, canBuilding: sum.building, era: sum.era, capped: sum.capped };
   return st.cache;
+}
+
+/**
+ * Отметка на памятнике эпох: переход доступен — яркая пульсирующая «!» с часами эпохи, переход близок — спокойный значок.
+ * Рисуется над рамкой памятника в мире; пока щиток эпохи открыт, не нужна.
+ */
+function drawMonumentMark(app, kit, L, info, st) {
+  const era = info.era;
+  if (!era || (!era.ok && !era.near) || st.era || st.sel) return;
+  const r = worldTarget(app, 'monument');
+  if (!r) return;
+  const u = L.ui;
+  const cx = Math.round(r.x + r.w / 2);
+  const bob = app.settings.reduceMotion ? 0 : Math.round(Math.sin(app.time * 4) * 3 * u);
+  const cy = Math.round(r.y - 16 * u) + bob;
+  if (cx < L.area.x || cx > L.area.x + L.area.w || cy < L.area.y || cy > L.area.y + L.area.h) return;
+  const c = kit.c;
+  if (era.ok) {
+    kit.icon('era', cx, cy, Math.round(28 * u), c.amberLight);
+    kit.badge(cx + Math.round(15 * u), cy - Math.round(13 * u), '!', true);
+  } else {
+    const ctx = kit.S.ctx;
+    ctx.globalAlpha = app.settings.reduceMotion ? 0.8 : 0.6 + 0.3 * Math.sin(app.time * 2.2);
+    kit.icon('era', cx, cy, Math.round(22 * u), c.amber);
+    ctx.globalAlpha = 1;
+  }
+}
+
+/**
+ * Подсказка, когда всё куплено до потолка эпохи: что нужно для модернизации (или что переход уже доступен).
+ * Стоит у памятника эпох, закрывается тапом по ней и возвращается при следующем входе в хаб.
+ */
+function drawEraHint(app, kit, L, info, st, bounds) {
+  const era = info.era;
+  if (!info.capped || !era || st.hintOff || st.sel || st.era || kit.modalOpen || app.cards.length) return;
+  const c = kit.c;
+  const u = L.ui;
+  const w = Math.min(Math.round(300 * u), 400, L.area.w - L.gap * 2);
+  const pad = L.pad;
+  const size = kit.fs(12);
+  const titleSize = kit.fs(13);
+  const step = kit.text.lineStep(size, 1.3);
+  const isz = Math.round(24 * u);
+  const textW = w - pad * 2 - isz - L.gap;
+  const title = era.ok ? t('hub.eraHint.ready', { year: era.year }) : t('hub.eraHint.title', { year: era.year });
+  const items = era.ok ? [t('hub.eraHint.tap')] : era.missing.slice(0, 4);
+  const titleLines = kit.text.wrap(title, textW, titleSize).slice(0, 2);
+  const lines = items.flatMap((it) => kit.text.wrap(it, textW - Math.round(size * 1.2), size).slice(0, 2).map((ln, i) => ({ ln, first: i === 0 })));
+  const titleStep = kit.text.lineStep(titleSize, 1.3);
+  const h = pad * 2 + titleLines.length * titleStep + Math.round(L.gap * 0.5) + lines.length * step;
+  const target = worldTarget(app, 'monument');
+  const co = kit.callout('era-hint', { x: L.w / 2, y: bounds.y + bounds.h * 0.35 }, { w, h }, { target, bounds, variant: 'panel', pad });
+  kit.withLayer(61, () => {
+    const r = co.inner;
+    kit.icon('era', r.x + isz / 2, r.y + isz / 2, isz, c.amberLight);
+    let y = r.y + titleStep / 2;
+    for (const ln of titleLines) {
+      kit.drawText(ln, r.x + isz + L.gap, y, { size: titleSize, color: c.amberLight, shadow: true });
+      y += titleStep;
+    }
+    y += Math.round(L.gap * 0.5) - titleStep / 2 + step / 2;
+    for (const { ln, first } of lines) {
+      if (first) kit.rect(r.x + isz + L.gap, Math.round(y - 1), Math.round(size * 0.5), Math.round(size * 0.5), era.ok ? c.green : c.red);
+      kit.drawText(ln, r.x + isz + L.gap + Math.round(size * 1.2), y, { size, color: c.text });
+      y += step;
+    }
+  });
+  if (kit.clicked === 'callout-era-hint') st.hintOff = true;
 }
 
 function worldHit(app, x, y) {
@@ -51,6 +112,7 @@ export default {
   enter(app, params) {
     const st = state(app);
     st.era = false;
+    st.hintOff = false;
     if (params?.select) st.sel = params.select;
     if (params?.era) {
       st.era = true;
@@ -109,7 +171,7 @@ export default {
       if (sel && sel !== 'monument') hub.focus?.(sel);
     }
 
-    const ch = drawChrome(app, kit, { era: true, gear: true, back: false, eraOpen: st.era });
+    const ch = drawChrome(app, kit, { era: true, gear: true, back: false, eraOpen: st.era, eraBadge: !!info.era?.ok });
     if (ch.gear) app.go('settings', {}, { push: true });
     if (ch.era) {
       st.era = !st.era;
@@ -128,6 +190,8 @@ export default {
     } else if (st.era) {
       eraCallout(app, kit, { id: 'era', target: worldTarget(app, 'monument'), bounds });
     }
+    drawMonumentMark(app, kit, L, info, st);
+    drawEraHint(app, kit, L, info, st, bounds);
 
     // нижняя панель: ПУСК под защитной планкой и кнопки-иконки
     const D = dockLayout(L);
@@ -142,8 +206,9 @@ export default {
     if (kit.button('dock-launch', D.button, { label: t('launch.start'), icon: 'launch', variant: pulse ? 'dangerHover' : 'danger', size: kit.fs(24), iconSize: Math.round(D.button.h * 0.46), lamp: pulse ? c.white : c.amberLight, tip: t('dock.launch.tip'), solo: true })) app.go('launch', {}, { push: true });
     for (const n of NAV) {
       const r = D.items[n.id];
+      // «!» пульсирует, когда в этом разделе есть покупка, доступная прямо сейчас
       const badge = n.id === 'rocket' && info.canPart ? '!' : n.id === 'base' && info.canBuilding ? '!' : undefined;
-      if (kit.button(`dock-${n.id}`, r, { icon: n.icon, label: t(n.label), stack: true, variant: 'btn', size: kit.fs(10), fixedScale: true, badge, tip: t(`${n.label}.tip`) })) app.go(n.id, {}, { push: true });
+      if (kit.button(`dock-${n.id}`, r, { icon: n.icon, label: t(n.label), stack: true, variant: 'btn', size: kit.fs(10), fixedScale: true, badge, badgePulse: true, tip: t(`${n.label}.tip`) })) app.go(n.id, {}, { push: true });
     }
     if (first && !L.portrait) {
       // подсказка первого запуска: указатель над кнопкой «ПУСК»

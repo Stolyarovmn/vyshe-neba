@@ -1,4 +1,5 @@
 import { MODULE_VIEW, ASSEMBLY_WIDTH, ASSEMBLY_HEIGHT } from '../render/rocket-view.js';
+import { STEER_DEAD, STEER_RANGE_SHARE } from '../input/mapping.js';
 
 // Раскладки экранов: портрет и ландшафт, безопасные зоны, цели нажатия ≥ 48 CSS px.
 // Чистые функции без DOM. Все размеры — в CSS-пикселях; масштаб интерфейса ui = clamp(min(w,h)/420, 1, 3).
@@ -425,11 +426,14 @@ export function hudLayout(L, opts = {}) {
   const iu = clamp(Math.min(L.w, L.h) / 420, 0.88, 1.55);
   const btn = R(Math.max(52, 54 * u));
   const pause = rect(right(a) - g - L.touch(48), a.y + g, L.touch(48), L.touch(48));
-  const discR = R(Math.max(52, 62 * u));
+  // слот под указатель крена остаётся прежним (от него считаются приборы и кнопки), сам указатель — небольшой:
+  // это не орган управления, наклоном рулит палец в любом месте экрана (hud.steer)
+  const slotR = R(Math.max(52, 62 * u));
+  const discR = R(Math.max(44, 50 * u));
   const leverW = R(Math.max(56, 60 * u));
   const leverH = R(clamp(L.h * (L.portrait ? 0.24 : 0.46), 150, 190 * u));
   const lever = rect(right(a) - g - leverW, bottom(a) - g - leverH, leverW, leverH);
-  const disc = { cx: a.x + g + discR, cy: bottom(a) - g - discR, r: discR };
+  const disc = { cx: a.x + g + slotR, cy: bottom(a) - g - slotR, r: discR };
 
   const buttons = { pause };
   const instruments = {};
@@ -455,7 +459,7 @@ export function hudLayout(L, opts = {}) {
     // радар под подсказкой справа: длинная подсказка его не перекрывает
     radar = { cx: right(a) - g - R(34 * iu), cy: hint.y + hint.h + g + R(34 * iu), r: R(34 * iu) };
     // кнопки: два столбца между диском и рычагом
-    const colX = [disc.cx + discR + g, 0];
+    const colX = [disc.cx + slotR + g, 0];
     const free = gridRight - colX[0];
     const bw = Math.min(btn, R((free - g) / 2));
     colX[1] = colX[0] + bw + g;
@@ -465,7 +469,7 @@ export function hudLayout(L, opts = {}) {
     buttons.canister = rect(colX[0], rowY[1], bw, bw);
     buttons.repair = rect(colX[1], rowY[1], bw, bw);
     buttons.transfer = rect(colX[0], rowY[0] - g - bw, bw * 2 + g, bw);
-    const controlsTop = Math.min(lever.y, disc.cy - discR, buttons.transfer.y);
+    const controlsTop = Math.min(lever.y, disc.cy - slotR, buttons.transfer.y);
     strip = rect(a.x + g, hint.y + hint.h + g, R(16 * iu), Math.max(0, controlsTop - g - (hint.y + hint.h + g)));
   } else {
     const rowH = R(40 * iu);
@@ -475,13 +479,13 @@ export function hudLayout(L, opts = {}) {
     instruments.coins = rect(pause.x - g - R(104 * iu), a.y + g, R(104 * iu), rowH);
     const barW = R(18 * iu);
     const barsTop = bottom(instruments.vspeed) + g * 2;
-    const barsH = Math.max(R(60 * iu), disc.cy - discR - g * 2 - barsTop);
+    const barsH = Math.max(R(60 * iu), disc.cy - slotR - g * 2 - barsTop);
     instruments.fuel = rect(left, barsTop, barW, barsH);
     instruments.hull = rect(left + barW + g * 2, barsTop, barW, barsH);
     hint = rect(a.x + R(a.w * 0.3), a.y + g, R(a.w * 0.4), Math.max(34, R(34 * iu)));
     radar = { cx: right(a) - g - R(16 * iu) - g - R(34 * iu), cy: bottom(pause) + g + R(34 * iu), r: R(34 * iu) };
     strip = rect(right(a) - g - R(16 * iu), bottom(pause) + g, R(16 * iu), Math.max(0, lever.y - g - bottom(pause) - g));
-    const bw = Math.min(btn, R((gridRight - (disc.cx + discR + g * 2) - g * 2) / 3));
+    const bw = Math.min(btn, R((gridRight - (disc.cx + slotR + g * 2) - g * 2) / 3));
     const startX = gridRight - bw * 3 - g * 2;
     const rowY = [bottom(a) - g - bw * 2 - g, bottom(a) - g - bw];
     buttons.boost = rect(startX + (bw + g) * 2, rowY[1], bw, bw);
@@ -494,12 +498,17 @@ export function hudLayout(L, opts = {}) {
   if (opts.mirror) mirrorControls({ a, buttons, disc, lever, pause });
 
   const instrumentArea = Object.values(instruments).reduce((sum, r) => sum + r.w * r.h, 0) + strip.w * strip.h + Math.PI * radar.r ** 2;
-  return { instruments, buttons, disc, lever, strip, radar, hint, instrumentArea, instrumentShare: instrumentArea / (L.w * L.h) };
+  // жест наклона: мёртвая зона и смещение пальца по X, при котором наклон максимален (доля ширины экрана)
+  const steer = { dead: STEER_DEAD, range: Math.round(L.w * STEER_RANGE_SHARE) };
+  // значок активного магнита — слева от радара (и в портрете, и в ландшафте); показывается, только пока магнит действует
+  const msize = R(30 * iu);
+  const magnet = rect(radar.cx - radar.r - g - msize, radar.cy - msize / 2, msize, msize);
+  return { instruments, buttons, disc, lever, steer, magnet, strip, radar, hint, instrumentArea, instrumentShare: instrumentArea / (L.w * L.h) };
 }
 
-/** Все интерактивные прямоугольники HUD (для проверки размера целей нажатия). */
+/** Все интерактивные прямоугольники HUD (для проверки размера целей нажатия). Наклон жестом — весь экран, отдельной цели нет. */
 export function hudTouchTargets(hud) {
-  const out = { lever: hud.lever, disc: { x: hud.disc.cx - hud.disc.r, y: hud.disc.cy - hud.disc.r, w: hud.disc.r * 2, h: hud.disc.r * 2 } };
+  const out = { lever: hud.lever };
   for (const [k, r] of Object.entries(hud.buttons)) out[k] = r;
   return out;
 }

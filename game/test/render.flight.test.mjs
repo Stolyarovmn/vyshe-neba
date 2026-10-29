@@ -153,6 +153,41 @@ test('маркер посадочной зоны и линия прогноза 
   assert.equal(landingZoneAlpha({ ...base, phase: 'ascent', alt: 4 }), 0);
   assert.equal(landingZoneAlpha({ ...base, phase: 'landed', alt: 0 }), 0);
   assert.equal(landingZoneAlpha({ ...base, phase: 'crashed', alt: 0 }), 0);
-  assert.equal(landingZoneAlpha({ ...base, alt: 200 }), 1);
-  assert.ok(landingZoneAlpha({ ...base, alt: 40 }) > 0 && landingZoneAlpha({ ...base, alt: 40 }) < 1);
+  // на спуске маркер подчиняется правилу тени: виден ниже 400 м (40 ед.) и гаснет к этой высоте
+  assert.equal(landingZoneAlpha({ ...base, alt: 200 }), 0);
+  assert.equal(landingZoneAlpha({ ...base, alt: 40 }), 0);
+  assert.ok(landingZoneAlpha({ ...base, alt: 20 }) > 0.3 && landingZoneAlpha({ ...base, alt: 20 }) < 0.7);
+  assert.ok(landingZoneAlpha({ ...base, alt: 2 }) > 0.95);
+  assert.equal(landingZoneAlpha({ ...base, alt: 20, phase: 'space' }) > 0, true);
+  // sim кладёт высоту над землёй и дальность в state: рендер берёт их, а не высоту над стартом
+  assert.equal(landingZoneAlpha({ ...base, alt: 5, heightAboveGround: 60 }), 0);
+  assert.ok(landingZoneAlpha({ ...base, alt: 5, heightAboveGround: 10, shadowRange: 80 }) > 0.8);
+});
+
+test('дальний луч над площадкой растёт после отрыва и не зависит от дальности тени', async () => {
+  const { landingBeamAlpha } = await import('../src/render/overlays.js');
+  assert.equal(landingBeamAlpha({ liftedOff: false, phase: 'pad', alt: 0 }), 0);
+  assert.equal(landingBeamAlpha({ liftedOff: true, phase: 'landed', alt: 0 }), 0);
+  assert.equal(landingBeamAlpha({ liftedOff: true, phase: 'descent', alt: 400 }), 1);
+  assert.ok(landingBeamAlpha({ liftedOff: true, phase: 'ascent', alt: 40 }) > 0);
+});
+
+test('тень и маркер: общая формула alpha = 0,42 * (1 - smoothstep(0, 40, высота)), размер и смещение растут с высотой 1:1', async () => {
+  const { SHADOW_RANGE, groundMarkAlpha, shadowGeometry, heightAboveGround } = await import('../src/render/overlays.js');
+  assert.equal(SHADOW_RANGE, 40);
+  assert.ok(Math.abs(groundMarkAlpha(0, 40, 0.42) - 0.42) < 1e-9);
+  assert.equal(groundMarkAlpha(40, 40, 0.42), 0);
+  assert.equal(groundMarkAlpha(400, 40, 0.42), 0);
+  let previous = 1;
+  for (let h = 0; h <= 40; h += 2) {
+    const a = groundMarkAlpha(h);
+    assert.ok(a <= previous + 1e-9, 'тень не светлеет обратно');
+    previous = a;
+  }
+  const low = shadowGeometry(0, {});
+  const high = shadowGeometry(40, {});
+  assert.ok(high.dx > low.dx && high.dy > low.dy && high.rx > low.rx && high.ry > low.ry, 'выше — больше и дальше от ракеты');
+  assert.equal(heightAboveGround({ heightAboveGround: 12, alt: 50 }), 12);
+  assert.equal(heightAboveGround({ alt: 50 }), 50);
+  assert.equal(heightAboveGround({ y: -70 }), 70);
 });

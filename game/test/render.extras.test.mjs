@@ -15,7 +15,8 @@ import {
   OUTPOST_DISTANCE, OUTPOST_PARALLAX, drawTerrain, outpostPlacement,
 } from '../src/render/ground.js';
 import {
-  MAGNET_CENTER_OFFSET, MAGNET_RADIUS, drawMagnetField, magnetActive, magnetCenter,
+  FIELD_ALPHA, FIELD_LOOPS, FIELD_PERIOD, FIELD_PULSE, FIELD_SEGMENTS, MAGNET_CENTER_OFFSET, MAGNET_RADIUS, drawMagnetField, fieldAlpha,
+  fieldColor, fieldPoint, fieldPulse, magnetActive, magnetCenter, magnetRadius,
 } from '../src/render/magnet.js';
 import { backdropCell, createBackdrop } from '../src/render/backdrop.js';
 import {
@@ -306,25 +307,119 @@ test('магнит: радиус и центр совпадают с sim, акт
   assert.ok(Math.abs(tilted.x - ROCKET_AXIS_OFFSET) < 1e-9 && Math.abs(tilted.y) < 1e-9);
 });
 
-test('поле магнита: кольцо и значок рисуются при включённом магните, не рисуются без него и после аварии', () => {
+test('радиус магнита: из state.magnetRadius или cfg.magnetRadius, иначе по sim', () => {
+  assert.equal(magnetRadius({}), MAGNET_RADIUS);
+  assert.equal(magnetRadius({ magnetRadius: 150 }), 150);
+  assert.equal(magnetRadius({ cfg: { magnetRadius: 140 } }), 140);
+  assert.equal(magnetRadius({ magnetRadius: 150, cfg: { magnetRadius: 140 } }), 150);
+  assert.equal(magnetRadius({ magnetRadius: -5 }), MAGNET_RADIUS);
+  assert.equal(magnetRadius(null), MAGNET_RADIUS);
+});
+
+test('поле магнита: линии диполя идут от полюса к полюсу, симметричны, вложены и не выходят за радиус', () => {
+  const pole = 20;
+  for (const loop of FIELD_LOOPS) {
+    const equator = 118 * loop;
+    const start = fieldPoint(equator, 1, 0, pole, {});
+    const end = fieldPoint(equator, 1, 1, pole, {});
+    assert.ok(Math.abs(start.x) < 1e-9 && Math.abs(start.y - pole) < 1e-9, 'начало в северном полюсе');
+    assert.ok(Math.abs(end.x) < 1e-9 && Math.abs(end.y + pole) < 1e-9, 'конец в южном полюсе');
+    let maxX = 0;
+    for (let i = 0; i <= FIELD_SEGMENTS; i++) {
+      const u = i / FIELD_SEGMENTS;
+      const right = fieldPoint(equator, 1, u, pole, {});
+      const left = fieldPoint(equator, -1, u, pole, {});
+      assert.ok(Math.abs(right.x + left.x) < 1e-9 && Math.abs(right.y - left.y) < 1e-9, 'зеркальны');
+      assert.ok(right.x >= 0 && Math.abs(right.y) <= pole + equator, 'дуга в пределах радиуса');
+      maxX = Math.max(maxX, right.x);
+    }
+    assert.ok(Math.abs(maxX - equator) < equator * 0.04, `экватор ${maxX} при ${equator}`);
+  }
+  const mid = (loop) => fieldPoint(118 * loop, 1, 0.5, pole, {}).x;
+  for (let i = 1; i < FIELD_LOOPS.length; i++) assert.ok(mid(FIELD_LOOPS[i]) > mid(FIELD_LOOPS[i - 1]), 'внешние дуги шире');
+});
+
+test('поле магнита: прозрачность 0,08..0,18, линии текут, цвет тёплый у полюсов и холодный у экватора, радиус дышит +-6 % за 2,4 с', () => {
+  let min = 1;
+  let max = 0;
+  for (let loop = 0; loop < FIELD_LOOPS.length; loop++) {
+    for (let t = 0; t < 12; t += 0.25) {
+      for (let u = 0; u <= 1; u += 0.05) {
+        const a = fieldAlpha(u, loop, t, false);
+        min = Math.min(min, a);
+        max = Math.max(max, a);
+      }
+    }
+  }
+  assert.ok(min >= FIELD_ALPHA.min - 1e-9 && max <= FIELD_ALPHA.max + 1e-9, `${min}..${max}`);
+  assert.ok(max > 0.13 && min < 0.1, 'есть и яркие, и тусклые участки');
+  // поток: в одной точке прозрачность меняется со временем, при reduceMotion — нет
+  const flowing = new Set();
+  const still = new Set();
+  for (let t = 0; t < 6; t += 0.5) {
+    flowing.add(fieldAlpha(0.5, 1, t, false).toFixed(4));
+    still.add(fieldAlpha(0.5, 1, t, true).toFixed(4));
+  }
+  assert.ok(flowing.size > 4 && still.size === 1);
+  assert.ok(Math.abs(FIELD_PERIOD - 2.4) < 1e-9 && Math.abs(FIELD_PULSE - 0.06) < 1e-9);
+  assert.ok(Math.abs(fieldPulse(0, false) - 1) < 1e-9);
+  assert.ok(Math.abs(fieldPulse(FIELD_PERIOD / 4, false) - 1.06) < 1e-9);
+  assert.ok(Math.abs(fieldPulse((3 * FIELD_PERIOD) / 4, false) - 0.94) < 1e-9);
+  assert.ok(Math.abs(fieldPulse(FIELD_PERIOD, false) - 1) < 1e-9);
+  assert.equal(fieldPulse(0.6, true), 1);
+  const pole = fieldColor(0.02, []);
+  const equator = fieldColor(0.5, []);
+  assert.ok(pole[0] > 230 && pole[2] < 110, 'у полюса оранжевый');
+  assert.ok(equator[2] > 230 && equator[0] < 140, 'у экватора голубой');
+});
+
+test('поле магнита: рисуется линиями при включённом магните (без спрайта и без контура), не рисуется без него и после аварии', () => {
   const flight = { x: 0, y: -500, angle: 0, phase: 'ascent', cfg: { consumables: { magnet: 1 } } };
-  const { painter, names } = recordingPainter();
   const view = createView().setStatic(0, -500, 200, 300, 2, 400, 600);
   const ctx = stubContext(400, 600);
-  drawMagnetField(ctx, painter, view, flight, 4, 1, false);
-  assert.ok(ctx.calls.arc >= 2 && ctx.calls.stroke >= 1 && ctx.calls.fill >= 1);
-  assert.deepEqual(names, ['magnet_2035']);
+  drawMagnetField(ctx, view, flight, 1, false);
+  assert.equal(ctx.calls.stroke, FIELD_LOOPS.length * 2 * FIELD_SEGMENTS, 'тонкие отрезки линий поля');
+  assert.ok(ctx.calls.fill >= 1, 'лёгкая аура');
+  assert.equal(ctx.calls.drawImage || 0, 0, 'значка магнита над ракетой нет — он в HUD');
+  assert.equal(ctx.calls.setLineDash || 0, 0, 'жёсткого пунктирного контура нет');
   for (const variant of [{ cfg: { consumables: { magnet: 0 } } }, { phase: 'crashed' }, { phase: 'landed' }, { phase: 'transfer' }]) {
     const quiet = stubContext(400, 600);
-    const record = recordingPainter();
-    drawMagnetField(quiet, record.painter, view, { ...flight, ...variant }, 4, 1, false);
-    assert.equal(quiet.calls.arc || 0, 0);
-    assert.equal(record.names.length, 0);
+    drawMagnetField(quiet, view, { ...flight, ...variant }, 1, false);
+    assert.equal(quiet.calls.stroke || 0, 0);
   }
-  // reduceMotion: кольцо не бежит (смещение штриха фиксировано)
-  const calm = stubContext(400, 600);
-  drawMagnetField(calm, painter, view, flight, 4, 7.3, true);
-  assert.equal(calm.lineDashOffset, 0);
+});
+
+test('поле магнита анимировано: стили линий меняются со временем, при reduceMotion поле неподвижно; радиус из state', () => {
+  const flight = { x: 0, y: -500, angle: 0.3, phase: 'ascent', cfg: { consumables: { magnet: 1 } } };
+  const view = createView().setStatic(0, -500, 200, 300, 2, 400, 600);
+  const record = (time, reduce, extra = {}) => {
+    const styles = [];
+    const ctx = new Proxy(stubContext(400, 600), {
+      set(target, prop, value) {
+        if (prop === 'strokeStyle') styles.push(value);
+        target[prop] = value;
+        return true;
+      },
+    });
+    drawMagnetField(ctx, view, { ...flight, ...extra }, time, reduce);
+    return styles.join('|');
+  };
+  assert.notEqual(record(0.4, false), record(1.9, false), 'линии текут и пульсируют');
+  assert.equal(record(0.4, true), record(1.9, true), 'при reduceMotion поле неподвижно');
+  assert.equal(record(0.4, false), record(0.4, false), 'детерминировано');
+  // радиус из state: линии шире
+  const spread = (extra) => {
+    const xs = [];
+    const ctx = stubContext(400, 600);
+    const move = ctx.moveTo;
+    ctx.moveTo = (x) => {
+      xs.push(x);
+      return move(x);
+    };
+    drawMagnetField(ctx, view, { ...flight, angle: 0, ...extra }, 0, true);
+    return Math.max(...xs) - Math.min(...xs);
+  };
+  assert.ok(spread({ magnetRadius: 200 }) > spread({}) * 1.4);
 });
 
 test('лёгкие runtime-копии: файлы цел, в каталоге вместо тяжёлых оригиналов, размеры и вид близки к подготовленным спрайтам', () => {

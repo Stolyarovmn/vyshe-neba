@@ -1,0 +1,38 @@
+{
+  "asset_id": "OB01",
+  "asset": "observatory",
+  "building_key": "observation",
+  "era": "E0",
+  "year": 1978,
+  "source": {
+    "generator": "ChatGPT image generation via browser (GPT, high quality)",
+    "original_file": "observation_e0_1978_original.png",
+    "original_size": [
+      1254,
+      1254
+    ],
+    "original_sha256": "95a52f3b091a35ffb50d929d5b3383a80aa69913ff2b507ac5a37807dcd27614",
+    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/OB01_observatory/",
+    "generated_on": "2026-10-29"
+  },
+  "prompt": "art/prompts/missing/observatory_e0_1978.txt (compact version used; chroma-key #FF00FF background instead of alpha because the generator does not output transparency)",
+  "processing": {
+    "steps": [
+      "chroma-key magenta #FF00FF to alpha with edge defringe",
+      "crop to alpha bbox + 2 px padding",
+      "LANCZOS downscale to max side 512"
+    ],
+    "tool": "keysprite.py (documented in art/docs/MISSING_ASSETS_PROMPTS.md)"
+  },
+  "runtime": {
+    "file": "art/gen/runtime/bld_observation_1978.png",
+    "size": [
+      473,
+      516
+    ],
+    "sha256": "7b135ac1d032be3dd8600b084efd2b60b2b730d0dcd27418e809481180d5b9b0",
+    "mode": "RGBA"
+  },
+  "status": "candidate_not_user_approved",
+  "note": "E1-E5 for this family are still procedural placeholders in game; generate by chain from this approved E0."
+}

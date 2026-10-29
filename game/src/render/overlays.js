@@ -5,31 +5,86 @@ import { drawPadLights } from './launchpad.js';
 import { fillWorldRect } from './painter.js';
 import { clamp, hash2, smoothstep, TAU } from './util.js';
 
+/** Дальность тени и контактного маркера посадки (ед. мира, 400 м): sim кладёт её в state.shadowRange. */
+export const SHADOW_RANGE = 40;
+
+/** Высота над землёй для картинки: state.heightAboveGround (sim), иначе высота над стартом. */
+export function heightAboveGround(flight) {
+  return Math.max(0, flight.heightAboveGround ?? flight.alt ?? -(flight.y || 0));
+}
+
 /**
- * Видимость маркера посадочной зоны (0..1): нет на старте и пока ракета стоит (площадка, посадка, авария),
- * после отрыва плавно растёт с высотой.
+ * Общее правило тени и посадочного маркера: видны только ниже shadowRange (по умолчанию 40 ед. = 400 м) и плавно гаснут к
+ * этой высоте. strength — прозрачность у самой земли (тень 0,42, маркер 1).
+ */
+export function groundMarkAlpha(height, range = SHADOW_RANGE, strength = 1) {
+  return strength * (1 - smoothstep(0, Math.max(1, range), Math.max(0, height)));
+}
+
+/** Тень ракеты на земле: смещение и размер растут с высотой 1:1 (солнце сбоку-сверху), пока ракета ниже range. */
+export function shadowGeometry(height, out = { dx: 0, dy: 0, rx: 0, ry: 0 }) {
+  const h = Math.max(0, height);
+  out.dx = 7 + h * 0.25;
+  out.dy = 6 + h * 0.18;
+  out.rx = 17 + h * 0.3;
+  out.ry = 9 + h * 0.17;
+  return out;
+}
+
+/**
+ * Видимость маркера посадочной зоны (0..1): нет на старте, в наборе высоты и пока ракета стоит (площадка, посадка, авария),
+ * на спуске — по общему правилу тени: у земли виден, к высоте shadowRange гаснет. Дальний луч над площадкой на Луне и Марсе управляется
+ * отдельно (landingBeamAlpha): он нужен, чтобы найти площадку с высоты.
  */
 export function landingZoneAlpha(flight) {
+  if (!flight.liftedOff || flight.phase === 'landed' || flight.phase === 'crashed' || flight.phase === 'pad' || flight.phase === 'ascent') return 0;
+  return groundMarkAlpha(heightAboveGround(flight), flight.shadowRange ?? SHADOW_RANGE);
+}
+
+/** Видимость дальнего луча над площадкой: растёт после отрыва и остаётся, пока ракета высоко. */
+export function landingBeamAlpha(flight) {
   if (!flight.liftedOff || flight.phase === 'landed' || flight.phase === 'crashed' || flight.phase === 'pad') return 0;
   return smoothstep(12, 70, flight.alt ?? 0);
+}
+
+const flatShadowGeometry = { dx: 0, dy: 0, rx: 0, ry: 0 };
+
+/**
+ * Тень ракеты на ровной поверхности Луны и Марса (y = 0): тот же размер, смещение и прозрачность, что у острова на Земле.
+ * Рисуется только ниже shadowRange — по ней видна высота при посадке.
+ */
+export function drawFlatShadow(ctx, view, flight) {
+  const height = heightAboveGround(flight);
+  const alpha = groundMarkAlpha(height, flight.shadowRange ?? SHADOW_RANGE, 0.42);
+  if (alpha <= 0.01 || flight.phase === 'crashed') return;
+  const g = shadowGeometry(height, flatShadowGeometry);
+  ctx.save();
+  ctx.fillStyle = `rgba(6,12,20,${alpha.toFixed(3)})`;
+  ctx.beginPath();
+  ctx.ellipse(view.sx(flight.x + g.dx), view.sy(g.dy * 0.2), Math.max(1, g.rx * view.S), Math.max(1, g.ry * 0.35 * view.S), 0, 0, TAU);
+  ctx.fill();
+  ctx.restore();
 }
 
 /**
  * Зона посадки: огни по краям площадки, полоса на грунте и тонкий световой луч сверху.
  * pad = { x, half, lit }; ok — текущее состояние допустимо для посадки и ракета над площадкой.
  */
-export function drawLandingZone(ctx, view, pad, lit, ok, time, alt, alpha) {
-  if (!pad || pad.visible === false || alpha <= 0.01) return;
+export function drawLandingZone(ctx, view, pad, lit, ok, time, alt, alpha, beamAlpha = alpha) {
+  if (!pad || pad.visible === false || (alpha <= 0.01 && beamAlpha <= 0.01)) return;
   const half = pad.half;
   const left = pad.x - half;
   const right = pad.x + half;
   if (right < view.left - 30 || left > view.right + 30) return;
   const color = ok ? 'rgba(150,240,170,0.9)' : 'rgba(255,214,120,0.85)';
   const previous = ctx.globalAlpha;
-  ctx.globalAlpha = previous * alpha;
-  fillWorldRect(ctx, view, left, -2, half * 2, 2, color);
-  drawPadLights(ctx, view, pad.x, half, lit, time, ok);
-  if (alt > 30 && alt < 2400) {
+  if (alpha > 0.01) {
+    ctx.globalAlpha = previous * alpha;
+    fillWorldRect(ctx, view, left, -2, half * 2, 2, color);
+    drawPadLights(ctx, view, pad.x, half, lit, time, ok);
+  }
+  ctx.globalAlpha = previous * beamAlpha;
+  if (beamAlpha > 0.01 && alt > 30 && alt < 2400) {
     // Луч над площадкой: помогает найти её при подлёте. Три слоя разной ширины дают мягкие края.
     const sy1 = view.sy(0);
     const sy0 = Math.max(0, view.sy(-700));

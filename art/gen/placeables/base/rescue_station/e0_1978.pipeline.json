@@ -1,0 +1,37 @@
+{
+  "asset_id": "BI-RESCUE",
+  "asset": "rescue_station",
+  "building_key": "rescue",
+  "era": "E0",
+  "year": 1978,
+  "replaces": "low-resolution E0 sprite (35-65 px) from the 2D infrastructure sheet",
+  "source": {
+    "generator": "ChatGPT image generation via browser (GPT, high quality)",
+    "original_file": "rescue_e0_1978_original.png",
+    "original_size": [
+      1254,
+      1254
+    ],
+    "original_sha256": "abf90c81157c6aec5db3cf3a2b386ee537c8bc8624fa9b2f7e10bd30944d7914",
+    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/BI-RESCUE_rescue_station/",
+    "generated_on": "2026-10-29"
+  },
+  "processing": {
+    "steps": [
+      "chroma-key magenta #FF00FF to alpha with edge defringe",
+      "crop to alpha bbox + 2 px padding",
+      "LANCZOS downscale to max side 512"
+    ]
+  },
+  "runtime": {
+    "file": "art/gen/runtime/bld_rescue_1978.png",
+    "size": [
+      516,
+      312
+    ],
+    "sha256": "cb9c8f72a60206b989bbaa65beb6ef7a171783e6b1f67e9b1a392141ee3b1a48",
+    "mode": "RGBA"
+  },
+  "status": "candidate_not_user_approved",
+  "note": "E1-E5 sprites of this family are the old low-resolution set; generate in chain from this E0."
+}

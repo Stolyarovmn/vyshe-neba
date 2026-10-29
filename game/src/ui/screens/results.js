@@ -7,6 +7,7 @@ import { clamp, easeOutCubic, fmtAlt, fmtClock, fmtCompact, fmtInt, fmtSpeed } f
 import * as inst from '../skin/instruments.js';
 import { drawSheet, drawRule, sheetInset, reportOf } from '../skin/report.js';
 import { drawChrome, partShort, buildingShort, partIcon, buildingIcon } from './common.js';
+import { nextSummary } from '../next-steps.js';
 
 const FLY_COINS = 7;
 /** Масштаб размеров бланка: на больших окнах строки компактнее, чтобы отчёт помещался целиком. */
@@ -356,6 +357,31 @@ function drawRewardsColumn(app, kit, L, col, top, res, st, elapsed, dt) {
     y += itemH;
   });
   void dt;
+
+  // «Что дальше»: один-два ближайших шага прогресса (rules.getNextSteps), чтобы игрок не упирался в потолок вслепую
+  const steps = nextSummary(app, 2).steps.slice(0, 2);
+  if (steps.length) {
+    const nk = easeOutCubic(clamp((elapsed - 1.6 - Math.min(news.length, 5) * 0.2) / 0.4, 0, 1));
+    const ssize = kit.fs(12);
+    const sstep = kit.text.lineStep(ssize, 1.25);
+    const icon = Math.round(rowH * 0.8);
+    y += Math.round(L.gap * 0.5);
+    kit.S.ctx.globalAlpha = nk;
+    kit.drawText(t('next.title'), x, y + Math.round(kit.fs(11) * 0.7), { size: kit.fs(11), color: M.dim });
+    y += Math.round(kit.fs(11) * 1.6);
+    for (const step of steps) {
+      const lines = kit.text.wrap(step.text, w - rowH * 1.1, ssize).slice(0, 3);
+      const itemH = Math.max(rowH, Math.round(lines.length * sstep + cc * 2));
+      const first = y + rowH / 2;
+      // значок по виду шага: покупка модуля/постройки, переход в эпоху, нужный полёт, «всё сделано»
+      const name = { 'buy-building': buildingIcon(step.id, 1), 'buy-part': partIcon(step.id), era: 'era', fly: 'launch', wait: 'check' }[step.kind] || 'target';
+      const ready = step.affordable && step.kind !== 'fly';
+      kit.icon(name, x + rowH * 0.5, first, icon, ready ? M.good : step.kind === 'fly' ? M.cyan : M.amber);
+      lines.forEach((ln, li) => kit.drawText(ln, x + rowH * 1.1, first + li * sstep, { size: ssize, color: ready ? M.good : M.ink }));
+      y += itemH;
+    }
+    kit.S.ctx.globalAlpha = 1;
+  }
   return y;
 }
 

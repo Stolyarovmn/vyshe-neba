@@ -1,19 +1,38 @@
 {
-  "asset": "B03 landing_guidance",
+  "asset_id": "B03",
+  "asset": "landing_guidance",
+  "building_key": "beacons",
   "era": "E0",
   "year": 1978,
-  "source_gen_id": "7b0172e8-a316-4f42-bf91-7355d46037d3",
-  "source_original_sha256": "1c9ecd76cdd455f97fe9f1d25c7acd6d94523b64a6120438fd360e3112599b11",
-  "text_transport_format": "indexed-zlib-b85-v1",
-  "transport_pixel_sha256": "de25aa533ed0b029b1647219c087d127890edf4d0e68f0b21c58da947960645d",
-  "transport_canvas": [138, 246],
-  "transport_to_presnap": "nearest-neighbor x4",
-  "spritefusion_pixel_snapper_rev": "ae20461f60fb39e75d15f184bab1ebec1219511c",
-  "pixel_size": 14,
-  "colors": 32,
-  "aseprite": "1.3.18.6",
-  "aseprite_dithering": "none",
-  "target_canvas": [46, 82],
-  "registration_target": [23, 78],
-  "mechanism_pivots": "pending_measured_rig_pass"
+  "replaces": "low-resolution E0 sprite (35-65 px) from the 2D infrastructure sheet",
+  "source": {
+    "generator": "ChatGPT image generation via browser (GPT, high quality)",
+    "original_file": "beacons_e0_1978_original.png",
+    "original_size": [
+      1254,
+      1254
+    ],
+    "original_sha256": "6feb692cb2faa48683361dfa6bb039aa6198dc6e7d4adbdae8b6c67ffc11f1f7",
+    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/B03_landing_guidance/",
+    "generated_on": "2026-10-29"
+  },
+  "processing": {
+    "steps": [
+      "chroma-key magenta #FF00FF to alpha with edge defringe",
+      "crop to alpha bbox + 2 px padding",
+      "LANCZOS downscale to max side 512",
+      "crop a single post from the generated pair (the game draws one sprite per anchor, two anchors)"
+    ]
+  },
+  "runtime": {
+    "file": "art/gen/runtime/bld_beacons_1978.png",
+    "size": [
+      236,
+      462
+    ],
+    "sha256": "4d1a79d0f619aa173b66653023ee6c248bfe9129d74409f9e3607bec9be546f5",
+    "mode": "RGBA"
+  },
+  "status": "candidate_not_user_approved",
+  "note": "E1-E5 sprites of this family are the old low-resolution set; generate in chain from this E0."
 }

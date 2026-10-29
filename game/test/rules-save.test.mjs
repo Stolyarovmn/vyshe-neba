@@ -199,11 +199,13 @@ test('legacy: the converted base satisfies every imported module and its power',
   }
 });
 
-test('legacy: engine upgrades of an era-0 garage are refunded, not lost', () => {
+test('legacy: engine upgrades of an era-0 garage come with the buildings they need', () => {
   const old = legacySave({ base: 0, coins: 100, upgrades: { fuel: 2, engine: 3, legs: 1, reserve: 0, hull: 3, magnet: 0, fins: 1, parachute: 0, booster: 0 } });
   const { profile } = importLegacySave(old);
-  assert.equal(profile.parts.engine, 0, 'the new engine needs a factory, which starts in 1986');
-  assert.ok(profile.coins > 100, 'the price of the removed levels comes back as coins');
+  assert.equal(profile.parts.engine, 3, 'the engine can be bought in 1978 now');
+  assert.equal(profile.parts.hull, 3);
+  assert.ok(profile.buildings.factory >= 1 && profile.buildings.service >= 1, 'the service team and the factory are granted');
+  assert.equal(profile.coins, 100, 'nothing to refund');
 });
 
 test('storage: save and load through the memory adapter', () => {

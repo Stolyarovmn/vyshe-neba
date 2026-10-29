@@ -18,8 +18,9 @@ export const START_DATA = 0;
 // The launch table brings its own small generator, so the first buildings work without an energy node.
 export const BASE_POWER_SUPPLY = 12;
 
-// Every module and building price is multiplied by this before rounding.
-export const PRICE_SCALE = 1.15;
+// Base prices of modules and buildings are multiplied by these before rounding.
+export const PART_PRICE_SCALE = 0.5;
+export const BUILDING_PRICE_SCALE = 0.58;
 
 // The sum of all discounts (era, factory, service) never exceeds this share of the price.
 export const MAX_DISCOUNT = 0.5;
@@ -36,8 +37,8 @@ export const PAYOUT = {
   eraScale: 0.2, // every era adds this share to landing bonuses
   body: {
     earth: { mult: 1, expedition: 0 },
-    moon: { mult: 1.25, expedition: 900 },
-    mars: { mult: 1.6, expedition: 1500 },
+    moon: { mult: 1.25, expedition: 600 },
+    mars: { mult: 1.6, expedition: 1000 },
   },
 };
 

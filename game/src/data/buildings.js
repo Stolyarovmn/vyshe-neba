@@ -1,12 +1,13 @@
 // Fourteen base buildings, six levels each. levels[i] describes level i + 1.
 // Island anchors live in art/placeables/BASE_ISLAND_LAYOUT.json under the same keys.
 //
-// Level N of a building requires: an era (N - 1, or its first era if later), the energy node at level N - 1
+// Every building can be built at level 1 from the first era (E0); the era only caps the level (era + 1).
+// Level N of a building requires: an era (N - 1, or its first era `minEra`), the energy node at level N - 1
 // (from level 2 on) and the dependency building at level N - 1. The dependency graph is a DAG on purpose.
 // Effects are plain numbers: fractions, multipliers' bonus parts or counts. A power deficit scales the
 // continuous ones down; `discrete` ones (slots, free consumables) switch off below half power.
 
-import { MAX_BUILDING_LEVEL, PRICE_SCALE } from './economy.js';
+import { MAX_BUILDING_LEVEL, BUILDING_PRICE_SCALE } from './economy.js';
 
 const LEVELS = Array.from({ length: MAX_BUILDING_LEVEL }, (_, i) => i + 1);
 
@@ -22,10 +23,10 @@ function nice(value) {
 const POWER_CURVE = [2, 4, 7, 11, 16, 22];
 // Data needed from level 5 on, multiplied by the building weight.
 const DATA_CURVE = [0, 0, 0, 0, 6, 20];
-const COST_GROWTH = 2.5;
+const COST_GROWTH = 2.85;
 
 // Supply of the energy node per level; the launch table adds BASE_POWER_SUPPLY on top.
-const ENERGY_SUPPLY = [14, 28, 78, 162, 236, 330];
+const ENERGY_SUPPLY = [17, 48, 96, 162, 236, 330];
 
 const fx = (key, label, unit, digits = 2, discrete = false) => ({ key, label, unit, digits, discrete });
 
@@ -102,7 +103,7 @@ const SPEC = {
     name: 'Логистический терминал',
     need: 'Нужен логистический терминал',
     desc: 'Открывает слоты контрактов и поднимает награду за грузовые рейсы на Луну и Марс.',
-    cost: 120, weight: 1.1, minEra: 1, dataWeight: 0.8, dependsOn: 'fuel',
+    cost: 70, weight: 1.1, minEra: 0, dataWeight: 0.8, dependsOn: 'fuel',
     effects: {
       contractSlots: [1, 2, 2, 2, 2, 2],
       cargoReward: [0.1, 0.2, 0.3, 0.45, 0.6, 0.8],
@@ -113,7 +114,7 @@ const SPEC = {
     name: 'Производственный цех',
     need: 'Нужен производственный цех',
     desc: 'Снижает цену модулей ракеты и открывает дорогие узлы поздних эпох.',
-    cost: 140, weight: 1.5, minEra: 1, dataWeight: 1, dependsOn: 'service',
+    cost: 60, weight: 1.5, minEra: 0, dataWeight: 1, dependsOn: 'service',
     effects: {
       partDiscount: [0.03, 0.06, 0.1, 0.14, 0.18, 0.22],
     },
@@ -123,7 +124,7 @@ const SPEC = {
     name: 'Метеостанция',
     need: 'Нужна метеостанция',
     desc: 'Показывает прогноз погоды в меню и на HUD, награждает за полёт сквозь шторм.',
-    cost: 90, weight: 0.6, minEra: 1, dataWeight: 0.7, dependsOn: null,
+    cost: 100, weight: 0.6, minEra: 0, dataWeight: 0.7, dependsOn: null,
     effects: {
       forecast: [0.2, 0.4, 0.6, 0.75, 0.9, 1],
       stormBonus: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
@@ -134,7 +135,7 @@ const SPEC = {
     name: 'Центр управления',
     need: 'Нужен центр управления',
     desc: 'Телеметрия и линия прогноза, прибавка к доходу полёта. Открывает Луну вместе с радаром.',
-    cost: 160, weight: 1.4, minEra: 2, dataWeight: 1.2, dependsOn: 'radar',
+    cost: 130, weight: 1.4, minEra: 0, dataWeight: 1.2, dependsOn: 'radar',
     effects: {
       telemetry: [0.2, 0.4, 0.6, 0.8, 0.9, 1],
       flightIncome: [0.02, 0.04, 0.07, 0.1, 0.14, 0.18],
@@ -145,7 +146,7 @@ const SPEC = {
     name: 'Радар слежения',
     need: 'Нужен радар слежения',
     desc: 'Подсвечивает самолёты и обломки заранее и снижает число столкновений.',
-    cost: 150, weight: 1.4, minEra: 2, dataWeight: 1.1, dependsOn: 'weather',
+    cost: 200, weight: 1.4, minEra: 0, dataWeight: 1.1, dependsOn: 'weather',
     effects: {
       radar01: [0.2, 0.4, 0.6, 0.75, 0.9, 1],
       collisionCut: [0.1, 0.2, 0.3, 0.42, 0.55, 0.7],
@@ -156,7 +157,7 @@ const SPEC = {
     name: 'Энергетический узел',
     need: 'Нужен энергетический узел',
     desc: 'Мощность для всех построек. При дефиците эффекты построек пропорционально слабеют.',
-    cost: 130, weight: 0.2, minEra: 1, dataWeight: 0.8, dependsOn: null, lead: 1,
+    cost: 220, weight: 0.2, minEra: 0, dataWeight: 0.8, dependsOn: null, lead: 1,
     effects: {},
     info: [],
   },
@@ -164,7 +165,7 @@ const SPEC = {
     name: 'Наблюдательный комплекс',
     need: 'Нужен наблюдательный комплекс',
     desc: 'Увеличивает прирост данных и раскрывает высотные зоны.',
-    cost: 300, weight: 1.3, minEra: 3, dataWeight: 1.3, dependsOn: 'control',
+    cost: 320, weight: 1.3, minEra: 0, dataWeight: 1.3, dependsOn: 'control',
     effects: {
       dataMult: [0.15, 0.3, 0.5, 0.75, 1.05, 1.4],
       zoneReveal: [0.2, 0.4, 0.6, 0.8, 0.9, 1],
@@ -175,7 +176,7 @@ const SPEC = {
     name: 'Система возврата',
     need: 'Нужна система возврата',
     desc: 'Возвращает капсулу с Луны и Марса и выплачивает за экспедицию.',
-    cost: 300, weight: 1.6, minEra: 3, dataWeight: 1.4, dependsOn: 'logistics', alsoDependsOn: 'rescue',
+    cost: 380, weight: 1.6, minEra: 0, dataWeight: 1.4, dependsOn: 'logistics', alsoDependsOn: 'rescue',
     effects: {
       expeditionPay: [0.1, 0.25, 0.45, 0.7, 1, 1.4],
       salvage: [0.1, 0.2, 0.3, 0.45, 0.6, 0.8],
@@ -200,7 +201,7 @@ function levelRequirements(key, spec, level) {
 function buildBuilding(key, spec) {
   let previous = 0;
   const levels = LEVELS.map((level) => {
-    const raw = nice(PRICE_SCALE * spec.cost * COST_GROWTH ** (level - 1));
+    const raw = nice(BUILDING_PRICE_SCALE * spec.cost * COST_GROWTH ** (level - 1));
     const cost = raw <= previous ? previous + 5 : raw;
     previous = cost;
     const use = key === 'energy'

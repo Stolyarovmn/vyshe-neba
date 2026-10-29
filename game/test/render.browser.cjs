@@ -249,11 +249,11 @@ async function checkArt(browser, base, vp) {
     for (let i = 0; i < 4; i++) add({ id: 910 + i, kind: 'coin', r: 9, x: f.x + 70 + i * 16, y: f.y - 40 - i * 12 });
     p.advance(30);
     return { assets: p.assets.size, errors: p.assets.errors.length, rings: p.renderer.flight.ringFx.ghosts.length }; })()`;
-  const info = await run('mode=flight&scenario=static&alt=520&era=4&objs=0&weather=clear', scene, 'horizon-rings', 40);
+  const info = await run('mode=flight&scenario=static&alt=40&era=4&objs=0&weather=clear', scene, 'horizon-rings', 40);
   assert(info.errors === 0 && info.assets > 230, `${vp.name}: ассеты ${JSON.stringify(info)}`);
 
   // пролёт кольца: событие sim запускает вспышку, она гаснет сама
-  const pass = await run('mode=flight&scenario=static&alt=520&era=2&objs=0&weather=clear', `(() => { const p = window.__preview; const f = p.state().flight; const fx = p.renderer.flight.ringFx;
+  const pass = await run('mode=flight&scenario=static&alt=40&era=2&objs=0&weather=clear', `(() => { const p = window.__preview; const f = p.state().flight; const fx = p.renderer.flight.ringFx;
     p.events([{ type: 'ring', x: f.x, y: f.y - 60, halfWidth: 70, offset: 0.1, quality: 'center', dir: 'up' }]);
     p.advance(12);
     const during = fx.ghosts.length;
