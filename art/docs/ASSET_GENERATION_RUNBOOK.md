@@ -18,7 +18,7 @@ Before **every** production image generation:
 
 Ground art uses camera family `island_top_3_4` and must match the actually approved HD island reference.
 
-The current HD island is approved by the user and bound to exact SHA-256 `2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997`. The approval record is `art/gen/environment/start_island_hd.approval.json`; metadata is `art/gen/environment/start_island_hd.meta.json`. At runtime `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e`, `game/assets/shared/island/start-island.png` has Git blob SHA-1 `382ab3fb2906152e2bc2a2616d794192904e7d68`; the user-supplied approved PNG recomputes to the same Git blob SHA-1, proving an exact byte match.
+The current HD island is approved by the user and bound to exact SHA-256 `2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997`. The approval record is `art/gen/environment/start_island_hd.approval.json`; metadata is `art/gen/environment/start_island_hd.meta.json`. The original runtime byte-identity evidence was recorded on `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e`: `game/assets/shared/island/start-island.png` had Git blob SHA-1 `382ab3fb2906152e2bc2a2616d794192904e7d68`, and the user-supplied approved PNG recomputed to the same Git blob SHA-1. The exact approved PNG is now also canonical production history at `game-production:art/gen/environment/start_island_hd.png`, with the same Git blob SHA-1 `382ab3fb2906152e2bc2a2616d794192904e7d68` and byte count `722995`. Current runtime `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721` still resolves the island through `game/assets/shared/island/start-island.png`; its post-merge runtime build gate is green.
 
 ### Measured generation projection preset
 
@@ -78,16 +78,20 @@ World sprites keep the separate ref2game flow (`prepare → imagegen → import 
 
 ## 6. First safe restart target
 
-The first configured Batch-A repair target is `B03 landing_guidance`: its existing E0–E5 originals are archived but the lineage is explicitly rejected by gameplay-size QA. The recorded E0 visible bbox is `36×42`, while the configured target is `38–42×70–76`; therefore a **replacement E0** is required before E1–E5 are rebuilt. B03 already has pinned `pixel_size=12`, canvas `46×82`, registration `(23,78)`, and a Drive archive folder.
+The first configured Batch-A repair target is `B03 landing_guidance`: its existing E0–E5 originals are archived but the lineage is explicitly rejected by gameplay-size QA. The recorded E0 visible bbox is `36×42`, while the configured target is `38–42×70–76`; therefore a **replacement E0** is required before E1–E5 are rebuilt. B03 has pinned `pixel_size=12`, canvas `46×82`, registration `(23,78)`, and a verified Drive archive folder.
 
-The HD island reference and measured generation projection preset are now available for B03. B03 can proceed through generation, processing, automatic QA, exact-SHA review and scene QA. After those gates pass, its approved art may be promoted into `game-production` even if runtime integration is still pending.
+The HD island reference and measured generation projection preset are available for B03, so it can proceed through generation, immutable-original archival, processing, automatic QA, exact-SHA review and scene QA. After those gates pass, approved B03 art may be promoted into `game-production` even while runtime publication remains blocked.
 
-B03 **runtime publication remains BLOCKED** because the checked runtime still has `logical name / consumer / canonical target = UNKNOWN / integration_pending`. A separate runtime integration PR must establish those facts before `publish_runtime` can open. This blocker must not prevent preserving approved B03 art in production history.
+B03 runtime **mapping is verified** on current `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721`: runtime key `beacons`, logical-name pattern `bld_beacons_<year>`, canonical target pattern `game/assets/eras/e<era>-<year>/base/beacons.png`, and rendering via `buildingSpriteName(...)` / `drawBuilding(...)`. All manifest entries resolve in the green runtime build gate.
+
+B03 **runtime publication remains BLOCKED by a semantics/rig mismatch**, not by path discovery. Current `game/src/sim/landing.js` widens landing tolerances using `s.cfg.base.beacons`; the production manifest instead targets touchdown/corridor prediction plus a physically tracking `head` and state `lamp`. Resolve that behavior/rig contract in a separate runtime integration PR before `publish_runtime`.
 
 ## 7. Current cross-branch limitations
 
-`game-production` is a production/history tree while current runtime/build is in `main`. The current `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e` tree contains `game/src/render/manifest.js` but no `game/test` directory; production-only branches contain tests that are not present in that runtime tree. Do not claim same-commit runtime regression from a test path that does not exist on `main`.
+`game-production` is the production/history tree; `main` is the clean runtime/build tree. Canonical production is currently `game-production@f9f3b102ec2d5d10962f80b0f7ed250e08092384`; canonical runtime is `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721`.
 
-The approved HD island already exists in runtime `main`, but its exact approved PNG binary is not currently committed at expected production path `art/gen/environment/start_island_hd.png`. Therefore the runtime-export entry must remain fail-closed/BLOCKED until that production-source gap is resolved. Do not reconstruct or substitute bytes merely to satisfy the mapping.
+The exact approved HD island binary is now present at the expected production path `art/gen/environment/start_island_hd.png` and matches Git blob SHA-1 `382ab3fb2906152e2bc2a2616d794192904e7d68`; the former production-source gap is resolved.
 
-Recent GitHub Actions runs have also failed before runner assignment (`runner_id=0`, no steps), so workflow presence is not evidence of a passing CI run.
+Runtime CI is intentionally separate from production CI. `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721` passed post-merge `Game runtime build` run `41110329403`. Canonical production `game-production@f9f3b102ec2d5d10962f80b0f7ed250e08092384` passed post-merge `Asset production readiness` run `41110520764` and `Production contract docs smoke` run `41110520841`. These are build/readiness gates, not B03 runtime integration regression.
+
+The old production-side runtime `game-ci.yml` has been removed from `game-production`. Do not reintroduce runtime-build assumptions into the production/history tree.
