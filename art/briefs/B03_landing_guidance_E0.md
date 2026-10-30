@@ -1,13 +1,13 @@
 # B03 / landing_guidance — E0 replacement production brief
 
-Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally preserved as `UNKNOWN`; blocked stages are explicit.
+Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally preserved as `UNKNOWN`; blocked stages are explicit. Branch/publication semantics follow `art/docs/RUNTIME_BRANCH_CONTRACT.md`.
 
 ## A. Identity и gameplay
 
 - Asset ID / slug / family / zone: `B03 / landing_guidance / base / launch_core`
 - Type: `base`
 - Owner / reviewer / branch / commit SHA: `owner UNKNOWN / reviewer user for island reference, B03 reviewer pending / art/production-readiness-v2-20261030 / commit pinned by PR`
-- Status: `design` — replacement E0 required; isolated candidate generation and later scene QA are allowed; runtime integration/promotion remain blocked as noted below.
+- Status: `design` — replacement E0 required; isolated candidate generation and later scene QA are allowed. Production promotion becomes available only after candidate/QA/approval gates. Runtime publication remains separately blocked until runtime mapping is verified.
 - Gameplay role / видимый результат: design target from `PRODUCTION_MANIFEST.md` — predict touchdown point, safe corridor and approach state; it must not steer the rocket.
 - Почему существует; почему здесь; почему в этой эпохе: landing-guidance information beside the launch pad; E0 is the 1978 root of the family. Runtime implementation of the design target is `UNKNOWN`.
 - Реализовано в runtime? `UNKNOWN / integration_pending`; `main:game/src/render/manifest.js` at `1a9362aceff825f99cf0b0481351bff0e5c6e04e` contains no `landing_guidance` logical name.
@@ -59,18 +59,20 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally pre
 - Что рисует AI, что анимирует/подсвечивает код: AI draws the complete physical beacon parts; code owns head motion, lamp state, guidance corridor, predicted touchdown marker, beams/light cones, HUD and other FX.
 - Rest reconstruction / motion sheet / event integration evidence: `pending`.
 
-## F. Source, QA, promotion
+## F. Source, QA, production promotion, runtime publication
 
 - Prompt path + verbatim style bible check: `art/prompts/b03_landing_guidance.md`; production request must be built with `tools/art_pipeline/build_generation_request.py`, which appends `art/style_bible.txt` verbatim and injects the measured island projection proxy.
 - Source gen ID / exact original SHA / dimensions / Drive ID: replacement source `pending`. Existing E0 `7b0172e8-a316-4f42-bf91-7355d46037d3`, SHA-256 `1c9ecd76cdd455f97fe9f1d25c7acd6d94523b64a6120438fd360e3112599b11`, dimensions `1167×1347`, Drive ID `1yYEphiPqV0bK4P71sNG-u5Gm3iLyfTu7` is archived but rejected by gameplay-size QA.
 - Previous-era + E0 reference IDs: replacement E0 must become the new root; old E1–E5 remain archived provenance only.
-- Pipeline config / tool revisions / candidate SHA: `PIPELINE_CONFIG.json` v2; Pixel Snapper revision `ae20461f60fb39e75d15f184bab1ebec1219511c`; Aseprite `1.3.18.6`; candidate SHA `pending`.
+- Pipeline config / tool revisions / candidate SHA: target migration `PIPELINE_CONFIG.json` v3; Pixel Snapper revision `ae20461f60fb39e75d15f184bab1ebec1219511c`; Aseprite `1.3.18.6`; candidate SHA `pending`.
 - Auto QA: `pending`.
 - Visual SHA-bound QA: `pending`.
 - Projection/scene QA: `pending`; approved island + measured generation proxy are available, but scene approval still requires an actual replacement candidate composited at real scale/zoom/occlusion.
+- Production promotion (`promote`): `pending`, not blocked by missing runtime integration. It may open after the exact replacement candidate passes archive/processing/auto-QA/visual/scene gates and stores approved art only in `game-production`.
+- Runtime publication (`publish_runtime`): `BLOCKED`; runtime logical name/consumer/existing canonical target are not verified on the checked `main`.
 - Rig/event QA: `BLOCKED` until runtime event/state consumer is identified.
-- Runtime contract / game regression: `BLOCKED`; runtime logical name/consumer not verified. At checked `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e`, `game/test` is absent, so no same-commit runtime test is claimed.
-- Open blockers / reason / owner / next action: (1) replacement E0 source not generated; generate one isolated tall/narrow beacon and archive untouched original; (2) runtime integration contract `UNKNOWN`; resolve in separate runtime/CI work before promotion; (3) GitHub Actions currently fails before runner assignment, tracked in issue #29.
-- Rollback (previous approved version): no production-approved B03 lineage is recorded; old E0–E5 originals remain archived provenance and must not be promoted.
+- Game regression: `BLOCKED` until a runtime publication/integration PR exists. At checked `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e`, `game/test` is absent, so no same-commit runtime test is claimed.
+- Open blockers / reason / owner / next action: (1) replacement E0 source not generated; generate one isolated tall/narrow beacon and archive untouched original; (2) runtime integration contract `UNKNOWN`; resolve separately before `publish_runtime`, not before preserving approved art in production; (3) GitHub Actions currently fails before runner assignment, tracked in issue #29.
+- Rollback (previous approved version): no production-approved B03 lineage is recorded; old E0–E5 originals remain archived provenance and must not be promoted as current production art.
 
-**Generation target:** one isolated B03 E0 beacon only. **Scene QA target:** open after candidate creation. **Promotion target:** BLOCKED until runtime/event/integration gates pass.
+**Generation target:** one isolated B03 E0 beacon only. **Scene QA target:** open after candidate creation. **Production promotion target:** pending until candidate gates pass. **Runtime publication target:** BLOCKED until runtime mapping/integration is verified.
