@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 import shutil
+import subprocess
 from pathlib import Path, PurePosixPath
 
 
@@ -20,6 +21,12 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: f.read(1024 * 1024), b""):
             h.update(block)
     return h.hexdigest()
+
+
+def git_head(root: Path) -> str:
+    return subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=root, text=True
+    ).strip()
 
 
 def safe_rel(value: str, prefix: str) -> PurePosixPath:
@@ -76,8 +83,12 @@ def main() -> int:
     entry = cfg.get("assets", {}).get(args.asset)
     if not entry:
         raise SystemExit(f"asset {args.asset} has no explicit runtime export mapping")
-    if entry.get("status") != "integrated":
-        raise SystemExit(f"asset {args.asset} runtime mapping is not integrated")
+    if entry.get("status") != "ready":
+        raise SystemExit(
+            f"asset {args.asset} runtime export status must be ready, got {entry.get('status')!r}"
+        )
+    if entry.get("runtime_contract_status") != "verified_existing_target":
+        raise SystemExit(f"asset {args.asset} runtime target contract is not verified")
 
     approval_file = entry.get("approval_file")
     approval_values: set[str] = set()
@@ -142,7 +153,9 @@ def main() -> int:
     report = {
         "asset_id": args.asset,
         "production_branch": cfg["production_branch"],
+        "production_commit": git_head(prod),
         "runtime_branch": cfg["runtime_branch"],
+        "runtime_base_commit": git_head(runtime),
         "mode": "replace_in_place",
         "files": report_files,
     }
