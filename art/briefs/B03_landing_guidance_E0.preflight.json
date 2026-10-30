@@ -49,9 +49,21 @@
     "current_hd_reference_approved_on": "2026-10-30T14:33:35Z"
   },
   "runtime_contract": {
-    "logical_name": "UNKNOWN",
-    "consumer": "UNKNOWN",
-    "status": "integration_pending",
+    "asset_key": "beacons",
+    "logical_name_pattern": "bld_beacons_<year>",
+    "consumer": "game/src/render/buildings.js::drawPlacedBuildings -> drawBuilding -> buildingSpriteName",
+    "profile_level_source": "profile.buildings.beacons",
+    "manifest_file": "game/src/render/manifest.js",
+    "gameplay_data_file": "game/src/data/buildings.js",
+    "landing_consumer_file": "game/src/sim/landing.js",
+    "runtime_target_pattern": "game/assets/eras/e<era>-<year>/base/beacons.png",
+    "existing_e0_target": "game/assets/eras/e0-1978/base/beacons.png",
+    "existing_e0_git_blob_sha1": "2a528e56d50a20af1e19ef2c197d01f34794ccf4",
+    "mapping_status": "verified_existing_targets_and_consumer",
+    "gameplay_semantics_status": "CONFLICT_WITH_PRODUCTION_MANIFEST",
+    "current_runtime_semantics": "beacons widen landing tolerances through s.cfg.base.beacons; building data also defines beacon illumination/perfect-landing effects",
+    "production_manifest_target": "predict touchdown point, safe corridor and approach state with a physically tracking head/lamp",
+    "status": "verified_mapping_semantics_conflict",
     "verified_against_main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e"
   },
   "replacement_reason": {
@@ -73,7 +85,7 @@
   },
   "blocked_stages": [
     "production_promotion_until_replacement_candidate_passes_auto_qa_exact_sha_visual_review_and_scene_qa",
-    "runtime_publication_until_logical_name_consumer_and_existing_canonical_target_are_verified",
-    "rig_event_qa_until_runtime_event_consumer_is_verified"
+    "runtime_publication_until_design_target_vs_current_runtime_semantics_and_rig_event_contract_are_resolved",
+    "rig_event_qa_until_tracking_head_lamp_state_machine_is_implemented_and_verified"
   ]
 }
