@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "asset_id": "ENV_START_ISLAND_HD",
+  "reference_path": "art/gen/environment/start_island_hd.png",
+  "reference_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "runtime_main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e",
+  "runtime_path": "game/assets/shared/island/start-island.png",
+  "runtime_git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
+  "camera_family": "island_top_3_4",
+  "measurement": {
+    "date": "2026-10-30",
+    "feature": "yellow dashed circular launch-pad marking",
+    "assumption_for_proxy_only": "the marking represents a horizontal physical circle on the ground plane",
+    "method": "OpenCV fitEllipse on color-thresholded ring pixels inside a constrained annulus around the launch pad",
+    "roi_px": [270, 285, 500, 490],
+    "color_filter_rgb": {
+      "r_min_exclusive": 145,
+      "g_min_exclusive": 110,
+      "b_max_exclusive": 145,
+      "r_minus_b_min_exclusive": 45,
+      "g_minus_b_min_exclusive": 15
+    },
+    "annulus_seed": {
+      "center_px": [388, 390],
+      "radius_x_px": 88,
+      "radius_y_px": 90,
+      "normalized_q_range": [0.82, 1.18]
+    },
+    "fit_points": 865,
+    "ellipse_fit": {
+      "center_px": [388.2483, 389.4688],
+      "diameter_minor_px": 175.6885,
+      "diameter_major_px": 183.2924,
+      "minor_major_ratio": 0.958515,
+      "opencv_axis_rotation_deg": 4.7954
+    }
+  },
+  "derived_projection_proxy": {
+    "model": "orthographic projection of a true horizontal circle",
+    "equivalent_elevation_above_ground_deg": 73.4386,
+    "equivalent_tilt_from_top_down_deg": 16.5614,
+    "derivation": "elevation = asin(minor_diameter / major_diameter)",
+    "status": "PROXY_ONLY_NOT_ACTUAL_CAMERA_ANGLE"
+  },
+  "actual_camera": {
+    "projection_angle_deg": "UNKNOWN",
+    "reason": "A single painterly 2D reference does not uniquely determine the original 3D camera; the painted circle may itself be artistically deprojected."
+  },
+  "generation_contract": {
+    "use_exact_sha_bound_reference": true,
+    "ground_plane_compression_target": 0.958515,
+    "generation_elevation_proxy_deg": 73.44,
+    "generation_tilt_from_top_down_proxy_deg": 16.56,
+    "numeric_proxy_is_secondary_to_reference_match": true,
+    "do_not_claim_47_deg": true,
+    "do_not_claim_proxy_as_actual_camera_angle": true,
+    "scene_qa_required": true
+  }
+}
