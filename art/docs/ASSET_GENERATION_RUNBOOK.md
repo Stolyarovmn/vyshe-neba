@@ -1,12 +1,12 @@
 # Production asset generation runbook
 
-This runbook is the execution layer for `PRODUCTION_CONTRACT_V2.md`. It does not replace the existing tracker or machine pipeline.
+This runbook is the execution layer for `PRODUCTION_CONTRACT_V2.md`. It does not replace the existing tracker or machine pipeline. Branch/storage/publication semantics are governed by `RUNTIME_BRANCH_CONTRACT.md`.
 
 ## 0. Non-negotiable preflight
 
 Before **every** production image generation:
 
-1. Read `AGENTS.md`, `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `art/docs/PRODUCTION_CONTRACT_V2.md`, `art/docs/ASSET_TASK_TRACKER.md`, `art/docs/EXECUTION_TIMEOUT_POLICY.md`, `art/style_bible.txt`, `art/placeables/PRODUCTION_MANIFEST.md`, `art/placeables/PIPELINE_CONFIG.json`, and the current `studioigor/ref2game/codex/SKILL.md`. For island/placeables also read `art/placeables/BASE_ISLAND_LAYOUT.json`.
+1. Read `AGENTS.md`, `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `art/docs/PRODUCTION_CONTRACT_V2.md`, `art/docs/RUNTIME_BRANCH_CONTRACT.md`, `art/docs/ASSET_TASK_TRACKER.md`, `art/docs/EXECUTION_TIMEOUT_POLICY.md`, `art/style_bible.txt`, `art/placeables/PRODUCTION_MANIFEST.md`, `art/placeables/PIPELINE_CONFIG.json`, and the current `studioigor/ref2game/codex/SKILL.md`. For island/placeables also read `art/placeables/BASE_ISLAND_LAYOUT.json`.
 2. Pin the production branch SHA and the current runtime `main` SHA. Read `main:game/src/render/manifest.js` at that SHA. Do not infer runtime logical names from design docs.
 3. Recover the durable tracker/checkpoint. Never restart a successful step unless its fingerprint/output SHA proves reuse is invalid.
 4. Create/update the asset brief from `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts remain `UNKNOWN`; critical missing facts become `BLOCKED`.
@@ -50,7 +50,11 @@ A source rejection is not a processing failure. Do not try to repair a wrong sil
 
 For W/B placeables only:
 
-`source_prepare → Pixel Snapper → normalize → Aseprite indexed/no-dither → automatic QA → immutable candidate manifest → exact-SHA visual review → promotion PR → game tests`
+`source_prepare → Pixel Snapper → normalize → Aseprite indexed/no-dither → automatic QA → immutable candidate manifest → exact-SHA visual review`
+
+After visual/scene approval the publication path is deliberately split:
+
+`promote (production PR → game-production) → publish_runtime (replacement PR → main) → game_tests`
 
 Tool pins come from `PIPELINE_CONFIG.json`. Never guess `pixel_size`, canvas, registration, transport scale, or pivots. If an asset is absent from machine config, stop before candidate processing and measure/approve the missing values in a separate change.
 
@@ -60,20 +64,30 @@ AI draws physical parts. Code owns joints/rig motion, state transitions, lights,
 
 World sprites keep the separate ref2game flow (`prepare → imagegen → import → slice/prep → game QA`). Do not route them through the W/B placeable candidate pipeline unless an explicit migration is approved.
 
-## 5. Approval and promotion
+## 5. Approval and two-stage publication
 
 - Visual approval is bound to the exact candidate SHA; “looks approved” without SHA is not an approval.
 - Measured pivots are recorded only from exact approved art.
 - Scene QA must use real scale, normal/reduced zoom, contact/occlusion/land mask and the approved reference.
-- Runtime QA must verify logical names, era paths, fallbacks, duplicate/conflicting targets and actual consumers at the pinned runtime commit.
-- Promotion happens by PR; never push directly to `main`, overwrite an approved asset, or auto-merge.
+- Production promotion (`promote`) may proceed once production gates pass even when runtime integration is still unknown; it stores approved art/history in `game-production` only.
+- Runtime publication (`publish_runtime`) requires verified logical name/consumer/canonical target and exact mapping in `art/runtime/RUNTIME_EXPORTS.json`. It replaces an **existing** `main:game/assets/...` file at the same path through a separate PR.
+- `main` must not receive production history, candidates, raw sources, QA evidence, `art/gen` mirrors or `outputs/rocket` mirrors.
+- Old runtime images are not kept as `_old`, `backup`, `v2` or parallel paths. Rollback uses Git history/revert.
+- Creating a runtime PR is not the same as publishing it; final `publish_runtime=success` requires merge/resulting runtime SHA confirmation.
+- Never push directly to `main` or auto-merge.
 
 ## 6. First safe restart target
 
 The first configured Batch-A repair target is `B03 landing_guidance`: its existing E0–E5 originals are archived but the lineage is explicitly rejected by gameplay-size QA. The recorded E0 visible bbox is `36×42`, while the configured target is `38–42×70–76`; therefore a **replacement E0** is required before E1–E5 are rebuilt. B03 already has pinned `pixel_size=12`, canvas `46×82`, registration `(23,78)`, and a Drive archive folder.
 
-The HD island reference and measured generation projection preset are now available for B03. This does **not** mean B03 is ready to promote: the replacement E0 source must still be generated, archived, processed, auto-QA'd, exact-SHA visually approved and composited against the island; runtime logical name/event consumer remain `UNKNOWN / integration_pending`, so runtime integration/promotion stay blocked until a separate runtime/CI change resolves them.
+The HD island reference and measured generation projection preset are now available for B03. B03 can proceed through generation, processing, automatic QA, exact-SHA review and scene QA. After those gates pass, its approved art may be promoted into `game-production` even if runtime integration is still pending.
 
-## 7. Current cross-branch CI limitation
+B03 **runtime publication remains BLOCKED** because the checked runtime still has `logical name / consumer / canonical target = UNKNOWN / integration_pending`. A separate runtime integration PR must establish those facts before `publish_runtime` can open. This blocker must not prevent preserving approved B03 art in production history.
 
-`game-production` is a production-only tree while current runtime is in `main`. The current `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e` tree contains `game/src/render/manifest.js` but no `game/test` directory; production-only branches contain tests that are not present in that runtime tree. Do not claim same-commit runtime regression from a test path that does not exist on `main`. Runtime/CI assembly must be repaired in a separate migration PR with rollback instructions.
+## 7. Current cross-branch limitations
+
+`game-production` is a production/history tree while current runtime/build is in `main`. The current `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e` tree contains `game/src/render/manifest.js` but no `game/test` directory; production-only branches contain tests that are not present in that runtime tree. Do not claim same-commit runtime regression from a test path that does not exist on `main`.
+
+The approved HD island already exists in runtime `main`, but its exact approved PNG binary is not currently committed at expected production path `art/gen/environment/start_island_hd.png`. Therefore the runtime-export entry must remain fail-closed/BLOCKED until that production-source gap is resolved. Do not reconstruct or substitute bytes merely to satisfy the mapping.
+
+Recent GitHub Actions runs have also failed before runner assignment (`runner_id=0`, no steps), so workflow presence is not evidence of a passing CI run.
