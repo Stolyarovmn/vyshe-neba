@@ -45,22 +45,29 @@ jobs:
             --asset '${{ inputs.asset }}' \
             --report "$RUNNER_TEMP/runtime-export.json"
           cat "$RUNNER_TEMP/runtime-export.json"
+          echo "PRODUCTION_SHA=$(jq -r '.production_commit' "$RUNNER_TEMP/runtime-export.json")" >> "$GITHUB_ENV"
+          echo "RUNTIME_BASE_SHA=$(jq -r '.runtime_base_commit' "$RUNNER_TEMP/runtime-export.json")" >> "$GITHUB_ENV"
 
       - name: Enforce runtime diff boundary
         shell: bash
         run: |
           set -euo pipefail
           cd runtime
-          mapfile -t allowed < <(jq -r '.files[].target' "$RUNNER_TEMP/runtime-export.json" | sort -u)
+          mapfile -t allowed_changed < <(jq -r '.files[] | select(.changed == true) | .target' "$RUNNER_TEMP/runtime-export.json" | sort -u)
           mapfile -t changed < <(git diff --name-only | sort -u)
-          if [ "${#changed[@]}" -eq 0 ]; then
-            echo 'Approved bytes already match runtime; no PR is needed.'
+          if [ "${#allowed_changed[@]}" -eq 0 ]; then
+            if [ "${#changed[@]}" -ne 0 ]; then
+              echo 'Runtime changed even though approved bytes already matched all targets.' >&2
+              printf '%s\n' "${changed[@]}" >&2
+              exit 1
+            fi
+            echo 'Approved bytes already match runtime; no runtime replacement PR is needed.'
             exit 0
           fi
+          printf '%s\n' "${allowed_changed[@]}" > "$RUNNER_TEMP/allowed-changed.txt"
           printf '%s\n' "${changed[@]}" > "$RUNNER_TEMP/changed.txt"
-          printf '%s\n' "${allowed[@]}" > "$RUNNER_TEMP/allowed.txt"
-          if ! diff -u "$RUNNER_TEMP/allowed.txt" "$RUNNER_TEMP/changed.txt"; then
-            echo 'Runtime publish changed paths outside the explicit export mapping.' >&2
+          if ! diff -u "$RUNNER_TEMP/allowed-changed.txt" "$RUNNER_TEMP/changed.txt"; then
+            echo 'Runtime publish changed paths outside the explicit changed export targets.' >&2
             exit 1
           fi
           if grep -E '(^|/)(old|previous|backup|bak|archive|v[0-9]+)(/|$)|(_old|_previous|_backup|\.bak)(\.|$)' "$RUNNER_TEMP/changed.txt"; then
@@ -73,15 +80,24 @@ jobs:
         run: |
           set -euo pipefail
           cd runtime
-          npm install --no-audit --no-fund
+          npm install --no-package-lock --no-audit --no-fund
           npm run build
+          mapfile -t allowed_changed < <(jq -r '.files[] | select(.changed == true) | .target' "$RUNNER_TEMP/runtime-export.json" | sort -u)
+          mapfile -t changed < <(git diff --name-only | sort -u)
+          if [ "${#allowed_changed[@]}" -eq 0 ] && [ "${#changed[@]}" -eq 0 ]; then
+            exit 0
+          fi
+          printf '%s\n' "${allowed_changed[@]}" > "$RUNNER_TEMP/allowed-after-build.txt"
+          printf '%s\n' "${changed[@]}" > "$RUNNER_TEMP/changed-after-build.txt"
+          diff -u "$RUNNER_TEMP/allowed-after-build.txt" "$RUNNER_TEMP/changed-after-build.txt"
 
       - name: Create runtime replacement PR
         shell: bash
         run: |
           set -euo pipefail
           cd runtime
-          if git diff --quiet; then
+          mapfile -t targets < <(jq -r '.files[] | select(.changed == true) | .target' "$RUNNER_TEMP/runtime-export.json" | sort -u)
+          if [ "${#targets[@]}" -eq 0 ]; then
             echo 'Runtime already contains the exact approved bytes; nothing to publish.'
             exit 0
           fi
@@ -90,18 +106,30 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git switch -c "$branch"
-          while IFS= read -r target; do git add -- "$target"; done < <(jq -r '.files[].target' "$RUNNER_TEMP/runtime-export.json")
-          staged="$(git diff --cached --name-only | sort -u)"
-          allowed="$(jq -r '.files[].target' "$RUNNER_TEMP/runtime-export.json" | sort -u)"
-          if [ "$staged" != "$allowed" ]; then
-            echo 'Staged runtime paths do not exactly equal export mapping.' >&2
-            printf 'staged:\n%s\nallowed:\n%s\n' "$staged" "$allowed" >&2
+          for target in "${targets[@]}"; do git add -- "$target"; done
+          mapfile -t staged < <(git diff --cached --name-only | sort -u)
+          if [ "${staged[*]}" != "${targets[*]}" ]; then
+            echo 'Staged runtime paths do not exactly equal changed export targets.' >&2
+            printf 'staged:\n'; printf '%s\n' "${staged[@]}" >&2
+            printf 'targets:\n'; printf '%s\n' "${targets[@]}" >&2
             exit 1
           fi
           git commit -m "Runtime: replace ${asset} with approved production art"
           git push origin "$branch"
+          {
+            echo 'Boundary B only: exact approved bytes from game-production replace existing canonical game/assets paths in main.'
+            echo
+            echo "Production source commit: ${PRODUCTION_SHA}"
+            echo "Runtime base commit: ${RUNTIME_BASE_SHA}"
+            echo
+            echo 'Changed runtime files:'
+            jq -r '.files[] | select(.changed == true) | "- `\(.target)` <= `\(.source)` SHA-256 `\(.sha256)`"' "$RUNNER_TEMP/runtime-export.json"
+            echo
+            echo 'No production history, backup copy, art/gen mirror or legacy outputs mirror is included. Rollback is by Git revert/history.'
+            echo 'Build executed before PR creation: `npm run build`.'
+          } > "$RUNNER_TEMP/pr-body.md"
           gh pr create \
             --base main \
             --head "$branch" \
             --title "Runtime: replace ${asset} approved asset" \
-            --body "Boundary B only: exact approved bytes from game-production replace existing canonical game/assets paths in main. No production history, backup copy, art/gen mirror or legacy outputs mirror is included. Rollback is by Git revert/history. Build command executed in this workflow: npm run build."
+            --body-file "$RUNNER_TEMP/pr-body.md"
