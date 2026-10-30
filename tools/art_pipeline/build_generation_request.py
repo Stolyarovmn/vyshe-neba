@@ -2,8 +2,9 @@
 """Build one deterministic production imagegen request.
 
 The canonical asset prompt is followed by art/style_bible.txt byte-for-text
-(as decoded UTF-8) without paraphrasing. This tool does not generate art and
-does not claim that scene/runtime/promotion gates are open.
+(as decoded UTF-8) without paraphrasing. Ground/placeable requests also bind to
+the measured SHA-bound island projection proxy. The proxy is a generation
+control, not a claim about the unknown original 3D camera.
 """
 from __future__ import annotations
 
@@ -27,17 +28,20 @@ def read_text(rel: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def read_json(rel: str) -> dict:
+    try:
+        return json.loads(read_text(rel))
+    except json.JSONDecodeError as exc:
+        fail(f"invalid JSON {rel}: {exc}")
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--receipt", required=True, help="repo-relative generation preflight JSON")
     p.add_argument("--output", help="optional repo-relative or absolute output path; stdout when omitted")
     args = p.parse_args()
 
-    receipt_path = ROOT / args.receipt
-    if not receipt_path.is_file():
-        fail(f"missing receipt: {args.receipt}")
-    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-
+    receipt = read_json(args.receipt)
     asset_id = receipt.get("asset_id")
     slug = receipt.get("slug")
     era = receipt.get("era")
@@ -67,9 +71,25 @@ def main() -> int:
         fail("style bible is empty")
 
     camera = receipt.get("camera", {})
-    projection_angle = camera.get("projection_angle")
-    if projection_angle != "UNKNOWN":
-        fail("projection_angle must remain UNKNOWN until measured evidence exists")
+    if camera.get("projection_angle") != "UNKNOWN":
+        fail("actual source camera projection_angle must remain UNKNOWN unless independently proven")
+
+    calibration_rel = camera.get("projection_calibration_file")
+    if not isinstance(calibration_rel, str) or not calibration_rel:
+        fail("ground asset projection_calibration_file missing")
+    calibration = read_json(calibration_rel)
+    proxy = calibration.get("derived_projection_proxy", {})
+    generation = calibration.get("generation_contract", {})
+    if proxy.get("status") != "PROXY_ONLY_NOT_ACTUAL_CAMERA_ANGLE":
+        fail("projection calibration is not marked as proxy-only")
+    if generation.get("numeric_proxy_is_secondary_to_reference_match") is not True:
+        fail("projection proxy must be secondary to exact reference match")
+    if calibration.get("reference_sha256") != camera.get("current_hd_reference_sha256"):
+        fail("projection calibration reference SHA does not match receipt HD reference SHA")
+
+    elevation = float(generation.get("generation_elevation_proxy_deg"))
+    from_top = float(generation.get("generation_tilt_from_top_down_proxy_deg"))
+    compression = float(generation.get("ground_plane_compression_target"))
 
     scope = (
         "PRODUCTION GENERATION REQUEST\n"
@@ -77,7 +97,12 @@ def main() -> int:
         f"Era: {era} / {year}\n"
         "Scope: exactly ONE complete isolated asset in this call; no era board, alternatives, detached spare parts, or extra objects.\n"
         f"Camera family: {camera.get('family', 'UNKNOWN')}\n"
-        "Projection angle: UNKNOWN. Do not invent or state 47 degrees.\n"
+        "Actual source camera angle: UNKNOWN. Do not invent or state 47 degrees as fact.\n"
+        f"Measured ground-projection generation proxy: {elevation:.2f} degrees elevation above the ground plane "
+        f"({from_top:.2f} degrees from straight top-down), ground-circle compression {compression:.6f}.\n"
+        "This numeric value is an orthographic-equivalent control derived from the approved island reference, NOT a claim about its original 3D camera. "
+        "Match the exact approved island reference visually; if the numeric proxy and the reference appearance differ, the reference wins.\n"
+        f"Projection calibration: {calibration_rel}; reference SHA-256: {calibration.get('reference_sha256')}\n"
         f"Projection review: {camera.get('projection_review', 'UNKNOWN')}\n"
         "This call creates source art only. Scene approval, runtime integration, rig/FX and promotion are separate gates.\n"
     )
@@ -90,7 +115,6 @@ def main() -> int:
         + style
     )
 
-    # Strong invariant: the exact style text is present once and unmodified.
     if request.count(style) != 1:
         fail("style bible was not embedded exactly once")
 
