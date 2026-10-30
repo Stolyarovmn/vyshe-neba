@@ -1,0 +1,91 @@
+name: Game runtime build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'game/**'
+      - 'package.json'
+      - '.gitignore'
+      - '.github/workflows/game-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'game/**'
+      - 'package.json'
+      - '.gitignore'
+      - '.github/workflows/game-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  game:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify clean runtime tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e art
+          test ! -e outputs
+          test ! -e work
+          if find game/assets -type f \( -iname '*_old.*' -o -iname '*_previous.*' -o -iname '*_backup.*' \) -print -quit | grep -q .; then
+            echo 'Runtime assets contain a forbidden historical/backup copy.' >&2
+            exit 1
+          fi
+          node --check game/src/render/manifest.js
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { ASSET_FILES } from './game/src/render/manifest.js';
+
+          const missing = [];
+          for (const [logicalName, entry] of Object.entries(ASSET_FILES)) {
+            const file = typeof entry === 'string' ? entry : entry?.file;
+            if (typeof file !== 'string' || !fs.existsSync(file)) {
+              missing.push(`${logicalName}: ${String(file)}`);
+            }
+          }
+          if (missing.length) {
+            console.error('Missing runtime assets from manifest:\n' + missing.join('\n'));
+            process.exit(1);
+          }
+          console.log(`PASS: ${Object.keys(ASSET_FILES).length} manifest entries resolve to existing runtime files`);
+          NODE
+
+      - name: Install runtime build dependency
+        run: npm install --no-package-lock --ignore-scripts --no-audit --no-fund
+
+      - name: Build standalone runtime
+        run: npm run build
+
+      - name: Verify standalone checksum and clean tracked tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/dist/vyshe-neba.html
+          test -s game/dist/vyshe-neba.html.sha256
+          (cd game/dist && sha256sum -c vyshe-neba.html.sha256)
+          if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+            echo 'Runtime build modified tracked files:' >&2
+            git status --short >&2
+            exit 1
+          fi
+
+      - name: Upload standalone runtime
+        uses: actions/upload-artifact@v4
+        with:
+          name: vyshe-neba-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            game/dist/vyshe-neba.html
+            game/dist/vyshe-neba.html.sha256
