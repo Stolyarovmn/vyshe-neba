@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "production_branch": "game-production",
+  "runtime_branch": "main",
+  "policy": {
+    "allowed_source_prefix": "art/gen/",
+    "allowed_target_prefix": "game/assets/",
+    "mode": "replace_in_place",
+    "require_existing_target": true,
+    "forbid_runtime_history_copies": true,
+    "rollback": "git_history_or_revert_pr"
+  },
+  "assets": {
+    "ENV_START_ISLAND_HD": {
+      "status": "integrated",
+      "runtime_main_verified_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e",
+      "approval_file": "art/gen/environment/start_island_hd.approval.json",
+      "files": [
+        {
+          "source": "art/gen/environment/start_island_hd.png",
+          "sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+          "target": "game/assets/shared/island/start-island.png"
+        }
+      ]
+    }
+  },
+  "blocked_assets": {
+    "B03": "runtime logical name/consumer/target are not verified on pinned main; add mapping only after separate runtime integration PR",
+    "W04": "runtime mapping not verified against current main",
+    "R_BODY": "modular rocket body runtime mapping not verified against current main",
+    "R_FINS": "modular rocket fins runtime mapping not verified against current main"
+  }
+}
