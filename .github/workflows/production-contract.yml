@@ -1,0 +1,32 @@
+name: Production contract docs smoke
+
+on:
+  pull_request:
+    branches: [game-production]
+    paths:
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'art/**'
+      - 'tools/art_pipeline/validate_production_contract.py'
+      - '.github/workflows/production-contract.yml'
+  push:
+    branches: [game-production]
+    paths:
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'art/**'
+      - 'tools/art_pipeline/validate_production_contract.py'
+      - '.github/workflows/production-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate local production docs and config only
+        run: python3 tools/art_pipeline/validate_production_contract.py
