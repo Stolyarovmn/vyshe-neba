@@ -15,15 +15,22 @@ ROOT = Path(__file__).resolve().parents[2]
 YEARS = {f"E{i}": year for i, year in enumerate((1978, 1986, 1998, 2015, 2035, 2060))}
 
 
+def load_json(rel: str) -> tuple[dict | None, str | None]:
+    path = ROOT / rel
+    if not path.is_file():
+        return None, f"missing JSON file: {rel}"
+    try:
+        return json.loads(path.read_text(encoding="utf-8")), None
+    except (OSError, json.JSONDecodeError) as exc:
+        return None, f"cannot read JSON {rel}: {exc}"
+
+
 def validate(receipt_rel: str) -> list[str]:
     errors: list[str] = []
-    path = ROOT / receipt_rel
-    if not path.is_file():
-        return [f"missing receipt: {receipt_rel}"]
-    try:
-        r = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        return [f"cannot read receipt: {exc}"]
+    r, error = load_json(receipt_rel)
+    if error:
+        return [error]
+    assert r is not None
 
     if r.get("schema_version") != 1:
         errors.append("unsupported schema_version")
@@ -64,7 +71,35 @@ def validate(receipt_rel: str) -> list[str]:
     if camera.get("family") != "island_top_3_4":
         errors.append("B/W ground asset camera family must be island_top_3_4")
     if camera.get("projection_angle") != "UNKNOWN":
-        errors.append("projection_angle must remain UNKNOWN until measured evidence is approved")
+        errors.append("actual source camera projection_angle must remain UNKNOWN unless independently proven")
+
+    calibration_rel = camera.get("projection_calibration_file")
+    if not isinstance(calibration_rel, str) or not calibration_rel:
+        errors.append("projection_calibration_file missing")
+    else:
+        calibration, calibration_error = load_json(calibration_rel)
+        if calibration_error:
+            errors.append(calibration_error)
+        else:
+            assert calibration is not None
+            if calibration.get("reference_sha256") != camera.get("current_hd_reference_sha256"):
+                errors.append("projection calibration SHA does not match approved HD reference SHA")
+            if calibration.get("actual_camera", {}).get("projection_angle_deg") != "UNKNOWN":
+                errors.append("projection calibration must not claim an unproven actual camera angle")
+            proxy = calibration.get("derived_projection_proxy", {})
+            generation = calibration.get("generation_contract", {})
+            if proxy.get("status") != "PROXY_ONLY_NOT_ACTUAL_CAMERA_ANGLE":
+                errors.append("projection equivalent must be explicitly marked proxy-only")
+            if generation.get("numeric_proxy_is_secondary_to_reference_match") is not True:
+                errors.append("numeric projection proxy must be secondary to exact reference")
+            expected = {
+                "generation_elevation_proxy_deg": camera.get("generation_elevation_proxy_deg"),
+                "generation_tilt_from_top_down_proxy_deg": camera.get("generation_tilt_from_top_down_proxy_deg"),
+                "ground_plane_compression_target": camera.get("ground_plane_compression_target"),
+            }
+            for key, value in expected.items():
+                if generation.get(key) != value:
+                    errors.append(f"camera.{key} does not match projection calibration")
 
     gate = r.get("generation_gate", {})
     for key in ("one_asset_per_call", "one_era_per_call", "transparent_background", "style_bible_verbatim"):
@@ -98,6 +133,7 @@ def main() -> int:
             print(f"ERROR: {error}")
         return 1
     print("PASS: isolated generation preflight is internally consistent")
+    print("NOTE: numeric island elevation is a measured generation proxy, not a proven original 3D camera angle")
     print("NOTE: scene/runtime/promotion/game gates may still be BLOCKED by the receipt")
     return 0
 
