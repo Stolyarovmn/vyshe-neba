@@ -18,6 +18,7 @@ on:
     branches:
       - game-production
       - 'art/production-readiness-v2-*'
+      - 'ci/runtime-asset-promotion-*'
     paths:
       - 'art/briefs/**'
       - 'art/docs/ASSET_GENERATION_RUNBOOK.md'
@@ -46,7 +47,9 @@ jobs:
         run: |
           python3 -m py_compile \
             tools/art_pipeline/build_generation_request.py \
-            tools/art_pipeline/validate_generation_preflight.py
+            tools/art_pipeline/validate_generation_preflight.py \
+            tools/art_pipeline/task_tracker.py \
+            tools/art_pipeline/publish_runtime_asset.py
 
       - name: Validate B03 isolated generation preflight
         run: |
@@ -59,7 +62,7 @@ jobs:
             --receipt art/briefs/B03_landing_guidance_E0.preflight.json \
             --output "$RUNNER_TEMP/B03_E0_generation_request.txt"
 
-      - name: Verify request, measured projection proxy and gate separation
+      - name: Verify request, measured projection proxy and split publication gates
         run: |
           python3 - "$RUNNER_TEMP/B03_E0_generation_request.txt" <<'PY'
           import json, sys
@@ -69,6 +72,7 @@ jobs:
           style = Path('art/style_bible.txt').read_text(encoding='utf-8')
           receipt = json.loads(Path('art/briefs/B03_landing_guidance_E0.preflight.json').read_text(encoding='utf-8'))
           calibration = json.loads(Path('art/gen/environment/start_island_hd.projection.json').read_text(encoding='utf-8'))
+          pipeline = json.loads(Path('art/placeables/PIPELINE_CONFIG.json').read_text(encoding='utf-8'))
 
           assert request.count(style) == 1, 'style bible must be embedded exactly once'
           assert 'Asset: B03 / landing_guidance' in request
@@ -78,13 +82,18 @@ jobs:
           assert '73.44 degrees elevation above the ground plane' in request
           assert '16.56 degrees from straight top-down' in request
           assert 'ground-circle compression 0.958515' in request
+          assert 'production promotion, runtime publication' in request
           assert calibration['actual_camera']['projection_angle_deg'] == 'UNKNOWN'
           assert calibration['derived_projection_proxy']['status'] == 'PROXY_ONLY_NOT_ACTUAL_CAMERA_ANGLE'
+          assert pipeline['version'] == 3
+          assert pipeline['tracker']['steps'][-3:] == ['promote', 'publish_runtime', 'game_tests']
+          assert receipt['machine_pipeline']['pipeline_config_version'] == 3
           assert receipt['generation_gate']['can_generate_isolated_candidate'] is True
           assert receipt['generation_gate']['can_scene_approve'] is True
-          assert receipt['generation_gate']['can_promote'] is False
+          assert receipt['generation_gate']['can_promote_to_production'] is False
+          assert receipt['generation_gate']['can_publish_runtime'] is False
           assert receipt['runtime_contract']['status'] == 'integration_pending'
-          print('PASS: B03 request is single-asset/single-era, uses measured projection proxy, and promotion remains closed')
+          print('PASS: B03 request is single-asset/single-era; production promotion and runtime publication are separate gates')
           PY
 
       - name: Verify SHA-bound HD island approval against pinned main runtime
@@ -123,8 +132,22 @@ jobs:
           print(f'PASS: approved HD island and projection preset bind to exact runtime bytes sha256={sha256} git_blob={blob}')
           PY
 
+      - name: Verify runtime export cannot silently publish missing production bytes
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          exports=json.loads(Path('art/runtime/RUNTIME_EXPORTS.json').read_text(encoding='utf-8'))
+          island=exports['assets']['ENV_START_ISLAND_HD']
+          assert island['status'] == 'blocked_source_missing'
+          assert 'ENV_START_ISLAND_HD' in exports['blocked_assets']
+          assert not Path(island['files'][0]['source']).is_file(), 'remove blocker only after exact approved binary is committed in production'
+          print('PASS: runtime export is fail-closed while production source bytes are missing')
+          PY
+
       - name: Readiness boundary
         run: |
           echo 'PASS: isolated B03 E0 production imagegen request is ready with measured projection proxy.'
           echo 'NOTE: 73.44 degrees is a reference-equivalent generation proxy, not a proven original 3D camera angle.'
-          echo 'NOTE: this is NOT full runtime/game regression; promotion remains blocked until runtime integration is verified.'
+          echo 'NOTE: production promotion may become available after candidate QA/approval even while runtime publication remains BLOCKED.'
+          echo 'NOTE: this is NOT full runtime/game regression.'
