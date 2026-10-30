@@ -25,14 +25,20 @@
   ],
   "output_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
   "output_bytes": 722995,
+  "runtime_main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e",
+  "runtime_path": "game/assets/shared/island/start-island.png",
+  "runtime_git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
   "pad_center_px": [
     388,
     375
   ],
   "contains_rocket": false,
   "contains_starter_tower": false,
-  "status": "pending",
-  "approved_by_user": false,
+  "status": "approved_by_user",
+  "approved_by_user": true,
+  "approved_by_user_on": "2026-10-30T14:33:35Z",
+  "approval_record": "art/gen/environment/start_island_hd.approval.json",
+  "projection_angle": "UNKNOWN",
   "supersedes": "art/gen/environment/start_island_e0.png (384x166, approved 2026-10-19)",
-  "note": "Ждёт утверждения пользователя; до этого рантайм может использовать его, а start_island_e0.png остаётся резервом."
+  "note": "Утверждён пользователем как SHA-bound HD reference для наземных placeables. Числовой угол проекции не измерен и остаётся UNKNOWN; 47° не является подтверждённым фактом."
 }
