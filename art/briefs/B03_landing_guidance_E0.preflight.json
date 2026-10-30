@@ -57,8 +57,14 @@
     "gameplay_data_file": "game/src/data/buildings.js",
     "landing_consumer_file": "game/src/sim/landing.js",
     "runtime_target_pattern": "game/assets/eras/e<era>-<year>/base/beacons.png",
-    "existing_e0_target": "game/assets/eras/e0-1978/base/beacons.png",
-    "existing_e0_git_blob_sha1": "2a528e56d50a20af1e19ef2c197d01f34794ccf4",
+    "existing_targets": [
+      {"era":"E0","year":1978,"path":"game/assets/eras/e0-1978/base/beacons.png","git_blob_sha1":"2a528e56d50a20af1e19ef2c197d01f34794ccf4"},
+      {"era":"E1","year":1986,"path":"game/assets/eras/e1-1986/base/beacons.png","git_blob_sha1":"303e65df682ae03e4c9a568ea36ca66c17c95f62"},
+      {"era":"E2","year":1998,"path":"game/assets/eras/e2-1998/base/beacons.png","git_blob_sha1":"40b8bd23762ceb1b551f425139d63e1663681c9a"},
+      {"era":"E3","year":2015,"path":"game/assets/eras/e3-2015/base/beacons.png","git_blob_sha1":"500f8cd59de01323f07de68997ffe3607c60044b"},
+      {"era":"E4","year":2035,"path":"game/assets/eras/e4-2035/base/beacons.png","git_blob_sha1":"592a77f79387a6fb439a2618dda62aeeb271c32d"},
+      {"era":"E5","year":2060,"path":"game/assets/eras/e5-2060/base/beacons.png","git_blob_sha1":"ccdc544dd2ebaa29b562e1c1c0eb7af3b15f6d25"}
+    ],
     "mapping_status": "verified_existing_targets_and_consumer",
     "gameplay_semantics_status": "CONFLICT_WITH_PRODUCTION_MANIFEST",
     "current_runtime_semantics": "beacons widen landing tolerances through s.cfg.base.beacons; building data also defines beacon illumination/perfect-landing effects",
