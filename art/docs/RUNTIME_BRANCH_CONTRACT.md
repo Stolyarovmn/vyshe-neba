@@ -134,15 +134,38 @@ The runtime workflow must record both exact production source commit and exact r
 
 Runtime/manifest/code changes remain separate from pure asset replacement PRs. A replacement of an already-integrated asset should normally modify only its canonical `game/assets/...` file(s).
 
+### Trigger contract while `main` is the default branch
+
+The repository default branch is currently `main`. Production-only workflows must **not** be copied into `main` merely to make `workflow_dispatch` visible. Instead, the paired tooling migration uses ephemeral command branches that are based on the exact current `game-production` SHA:
+
+- `asset-promote/**` with exactly one changed file: `.asset-command/promote.json`;
+- `asset-publish-runtime/**` with exactly one changed file: `.asset-command/publish-runtime.json`.
+
+Command JSON contains at minimum:
+
+```json
+{
+  "asset": "B03",
+  "production_base_sha": "<exact current game-production SHA>"
+}
+```
+
+The workflow MUST fetch current `game-production`, require `production_base_sha` to match it exactly, require the command branch to descend from that commit, reject every diff except the single command JSON, then reset its worktree back to the pinned production commit before touching candidate/production/runtime files. The command commit itself is never included in a production or runtime PR.
+
+This makes the production workflows runnable from their own branch content while leaving default/runtime `main` clean. Command branches are control-plane refs only and may be deleted after their run/PR handoff; they are not production history or runtime history.
+
+If the default branch is intentionally changed in the future, this trigger model may be revisited only in a separate migration that updates this contract and both workflows together.
+
 ## Migration plan
 
 1. Keep current `main` as the clean runtime/build branch; do not mass-copy production history into it.
 2. Change candidate promotion so its PR targets `game-production` and stages only production art/provenance.
 3. Add a separate runtime-publish workflow that reads an exact approved source from `game-production` and replaces only declared `main:game/assets/...` files.
 4. Add `publish_runtime` to tracker/config/tooling as a forward-compatible step migration.
-5. Add explicit runtime mappings only after verifying the target path and consumer against the pinned `main` manifest/code and confirming the exact production source bytes exist.
-6. Existing runtime files in `main` remain in place until individually replaced by approved assets; no duplicate backup copies are created.
-7. New assets without an existing runtime target remain `integration_pending/BLOCKED` until a separate runtime integration PR exists.
+5. Use verified command branches for production-only workflow triggers while `main` remains default.
+6. Add explicit runtime mappings only after verifying the target path and consumer against the pinned `main` manifest/code and confirming the exact production source bytes exist.
+7. Existing runtime files in `main` remain in place until individually replaced by approved assets; no duplicate backup copies are created.
+8. New assets without an existing runtime target remain `integration_pending/BLOCKED` until a separate runtime integration PR exists.
 
 ## Rollback
 
@@ -154,9 +177,14 @@ Revert the production PR or restore the prior production commit; provenance/Driv
 
 Revert the runtime asset PR (or create a new PR restoring the previous Git blob). Do not add backup copies to `main`.
 
+### Workflow-trigger rollback
+
+Revert the paired workflow migration. Do not solve a production workflow trigger problem by copying production/history trees or production-only workflow logic into `main` without a reviewed contract change.
+
 ## Current blockers
 
 - `game-production` at the currently checked SHA does not yet contain the pending v2 contract/`AGENTS.md`; this contract is being introduced through the current draft PR chain and is not canonical until merged.
 - The current `main` branch has build code and runtime assets but no `game/test` directory at the checked SHA, so full same-commit game regression cannot be claimed there yet.
 - B03 `landing_guidance` has no verified runtime logical name/consumer/target on the checked `main`; its runtime publication remains blocked even after art approval until runtime integration is added separately.
-- The approved HD island runtime target and SHA are verified, but the exact approved `start_island_hd.png` binary is not currently committed at its expected production `art/gen/...` source path; therefore it is not publishable through Boundary B until that production-source gap is resolved.
+- The approved HD island runtime target and SHA are verified. Draft PR #32 imports the exact existing runtime Git blob into the expected production `art/gen/environment/start_island_hd.png` path without re-encoding; until that PR is merged into the production chain, Boundary B must still treat the production source as unavailable.
+- Current GitHub Actions jobs fail before runner assignment (`runner_id=0`, `steps=[]`), so no workflow in this migration is claimed green until an actual runner executes it.
