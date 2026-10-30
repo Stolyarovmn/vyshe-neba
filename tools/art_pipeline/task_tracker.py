@@ -33,6 +33,7 @@ DEFAULT_STEPS = [
     "candidate_manifest",
     "visual_review",
     "promote",
+    "publish_runtime",
     "game_tests",
 ]
 
@@ -139,8 +140,6 @@ class Tracker:
                 f"unsupported tracker schema {schema!r}; expected {SCHEMA_VERSION}"
             )
 
-        # Identity checks stop a copied/mis-restored checkpoint from being reused
-        # for a different asset or era.
         if data.get("asset_id") not in (None, self.asset_id):
             raise RuntimeError(
                 f"tracker asset mismatch: {data.get('asset_id')!r} != {self.asset_id!r}"
@@ -213,7 +212,6 @@ class Tracker:
             state["current_step"] = None
             return
 
-        # Defensive fallback for malformed-but-loadable state.
         state["status"] = "pending"
         state["current_step"] = pending
 
