@@ -6,8 +6,8 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally pre
 
 - Asset ID / slug / family / zone: `B03 / landing_guidance / base / launch_core`
 - Type: `base`
-- Owner / reviewer / branch / commit SHA: `owner UNKNOWN / reviewer UNKNOWN / art/production-readiness-v2-20261030 / commit pinned by PR`
-- Status: `design` — replacement E0 required; isolated candidate generation allowed, scene/integration/promotion blocked as noted below.
+- Owner / reviewer / branch / commit SHA: `owner UNKNOWN / reviewer user for island reference, B03 reviewer pending / art/production-readiness-v2-20261030 / commit pinned by PR`
+- Status: `design` — replacement E0 required; isolated candidate generation and later scene QA are allowed; runtime integration/promotion remain blocked as noted below.
 - Gameplay role / видимый результат: design target from `PRODUCTION_MANIFEST.md` — predict touchdown point, safe corridor and approach state; it must not steer the rocket.
 - Почему существует; почему здесь; почему в этой эпохе: landing-guidance information beside the launch pad; E0 is the 1978 root of the family. Runtime implementation of the design target is `UNKNOWN`.
 - Реализовано в runtime? `UNKNOWN / integration_pending`; `main:game/src/render/manifest.js` at `1a9362aceff825f99cf0b0481351bff0e5c6e04e` contains no `landing_guidance` logical name.
@@ -25,15 +25,15 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally pre
 
 ## C. Camera, scene и runtime
 
-- Reference asset URL / SHA-256 / approval status: legacy island meta `art/gen/environment/start_island_e0.meta.json`, output SHA-256 `686762324a0b9244317fa0ff0327135f9039ad61c19c7510a88fdd18983e1ab3`, `approved_by_user` on 2026-10-19. Current HD island meta `art/gen/environment/start_island_hd.meta.json` is `pending` / `approved_by_user:false`.
+- Reference asset URL / SHA-256 / approval status: current HD reference is `art/gen/environment/start_island_hd.meta.json` plus `art/gen/environment/start_island_hd.approval.json`; exact approved SHA-256 `2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997`, approved by user on `2026-10-30T14:33:35Z`. The user-supplied PNG recomputed to Git blob SHA-1 `382ab3fb2906152e2bc2a2616d794192904e7d68`, exactly matching `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e:game/assets/shared/island/start-island.png`.
 - Camera family: `island_top_3_4`
-- Projection angle: `UNKNOWN`; 47° is not approved evidence.
+- Projection angle: `UNKNOWN`; 47° is not approved evidence. Scene QA must compare visually/measurably to the approved island rather than invent a numeric angle.
 - World space / LP / px conversion: `BASE_ISLAND_LAYOUT.json` v3 says island size `1916×821`, launch origin `[388,375]`, `units_per_px=0.665`, and approximate `1 LP ≈ 1.45 island px` for sprite scale.
 - Layout key, anchor, footprint, visible bbox, sprite_px, layers, occlusion: purchase `beacons`; anchors `[283,395]` and `[493,395]`; layout sprite target `[100,77]`, footprint `[90,26]`; production canvas for one beacon `46×82 LP`; configured visible bbox target `38–42 × 70–76 LP`. Layer/occlusion details beyond layout: `UNKNOWN`.
 - Gameplay-size, reduced zoom, portrait scene screenshots: `pending`; must be produced after a replacement candidate exists.
 - Runtime logical name / path / consumer / fallback: `UNKNOWN / integration_pending`; do not invent a manifest entry.
 - E0–E5 mapping и размер/registration: configured E0–E5 years `[1978,1986,1998,2015,2035,2060]`; one-beacon canvas `46×82`, registration `(23,78)`, family `pixel_size=12`, <=32 colors.
-- Отклонения от утверждённого reference: current replacement E0 not generated yet. HD island projection calibration remains pending.
+- Отклонения от утверждённого reference: current replacement E0 not generated yet. Numeric projection calibration remains `UNKNOWN`, but the approved HD image itself is now the visual scene reference.
 
 ## D. Эпохи: непрерывная lineage
 
@@ -65,10 +65,10 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally pre
 - Pipeline config / tool revisions / candidate SHA: `PIPELINE_CONFIG.json` v2; Pixel Snapper revision `ae20461f60fb39e75d15f184bab1ebec1219511c`; Aseprite `1.3.18.6`; candidate SHA `pending`.
 - Auto QA: `pending`.
 - Visual SHA-bound QA: `pending`.
-- Projection/scene QA: `BLOCKED` for scene approval while current HD island remains pending; isolated candidate may carry `projection_review=pending` under Contract v2.
+- Projection/scene QA: `pending`; the HD island reference gate is now open, but scene approval still requires an actual replacement candidate composited at real scale/zoom/occlusion.
 - Rig/event QA: `BLOCKED` until runtime event/state consumer is identified.
 - Runtime contract / game regression: `BLOCKED`; runtime logical name/consumer not verified, and current cross-branch legacy game CI is not a valid green signal.
-- Open blockers / reason / owner / next action: (1) replacement E0 source not generated; generate one isolated tall/narrow beacon and archive untouched original; (2) HD island approval pending; user/reviewer approval required before scene approval; (3) runtime integration contract `UNKNOWN`; resolve in separate runtime/CI work.
+- Open blockers / reason / owner / next action: (1) replacement E0 source not generated; generate one isolated tall/narrow beacon and archive untouched original; (2) runtime integration contract `UNKNOWN`; resolve in separate runtime/CI work before promotion. Numeric projection angle may remain `UNKNOWN`; no 47° assumption is allowed.
 - Rollback (previous approved version): no production-approved B03 lineage is recorded; old E0–E5 originals remain archived provenance and must not be promoted.
 
-**Generation target:** one isolated B03 E0 beacon only. **Promotion target:** BLOCKED until the later gates above pass.
+**Generation target:** one isolated B03 E0 beacon only. **Scene QA target:** open after candidate creation. **Promotion target:** BLOCKED until runtime/event/integration gates pass.
