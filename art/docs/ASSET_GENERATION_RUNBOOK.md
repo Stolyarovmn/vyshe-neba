@@ -1,20 +1,21 @@
 # Production asset generation runbook
 
-This runbook is the execution layer for `PRODUCTION_CONTRACT_V2.md`. Branch/storage/publication semantics are governed by `RUNTIME_BRANCH_CONTRACT.md`; tracker order is governed by `PIPELINE_CONFIG.json` + `ASSET_TASK_TRACKER.md`; era visual/engineering language is governed by `ERA_DESIGN_MATRIX.md`.
+This runbook is the execution layer for `PRODUCTION_CONTRACT_V2.md`. Branch/storage/publication semantics are governed by `RUNTIME_BRANCH_CONTRACT.md`; tracker order is governed by `PIPELINE_CONFIG.json` + `ASSET_TASK_TRACKER.md`; era visual/engineering language is governed by `ERA_DESIGN_MATRIX.md`; approved era visual evidence is indexed under `art/references/eras/`.
 
 ## 0. Non-negotiable preflight
 
 Before **every** production image generation:
 
-1. Read `AGENTS.md`, `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `art/docs/PRODUCTION_CONTRACT_V2.md`, `art/docs/RUNTIME_BRANCH_CONTRACT.md`, this runbook, `art/docs/ASSET_TASK_TRACKER.md`, `art/docs/EXECUTION_TIMEOUT_POLICY.md`, `art/docs/ERA_DESIGN_MATRIX.md`, `art/style_bible.txt`, `art/placeables/PRODUCTION_MANIFEST.md`, `art/placeables/PIPELINE_CONFIG.json`, and the current `studioigor/ref2game/codex/SKILL.md`. For island/placeables also read `art/placeables/BASE_ISLAND_LAYOUT.json`.
+1. Read `AGENTS.md`, `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `art/docs/PRODUCTION_CONTRACT_V2.md`, `art/docs/RUNTIME_BRANCH_CONTRACT.md`, this runbook, `art/docs/ASSET_TASK_TRACKER.md`, `art/docs/EXECUTION_TIMEOUT_POLICY.md`, `art/docs/ERA_DESIGN_MATRIX.md`, `art/references/eras/README.md`, `art/style_bible.txt`, `art/placeables/PRODUCTION_MANIFEST.md`, `art/placeables/PIPELINE_CONFIG.json`, and the current `studioigor/ref2game/codex/SKILL.md`. For island/placeables also read `art/placeables/BASE_ISLAND_LAYOUT.json`.
 2. Pin the **current** production `game-production` SHA and current runtime `main` SHA. Read `main:game/src/render/manifest.js` at the pinned runtime SHA. Never treat a dated SHA in a document as a permanent branch pointer.
 3. Recover the durable tracker/checkpoint first. Never restart a successful step unless its fingerprint/output SHA proves reuse is invalid.
 4. Create/update the asset brief from `ASSET_BRIEF_TEMPLATE.md`. Unknown facts remain `UNKNOWN`; critical missing facts become `BLOCKED`.
 5. Resolve the selected era through `ERA_DESIGN_MATRIX.md`. Record all applicable axes: manufacturing, materials, drive, interface, lighting, infrastructure, autonomy/service, silhouette/architecture. For E1–E5 record the transition from the previous approved era: at least 3 changed axes and at least 2 preserved family traits when physically possible.
-6. Confirm exactly one asset **or** one part sheet per imagegen call and exactly one era per anchor-generation call.
-7. Confirm the Drive archive destination exists before generation. The untouched raw generation must be archived there before destructive processing.
-8. When a preflight receipt exists, run `validate_generation_preflight.py`, then build the actual request with `build_generation_request.py`. The builder appends `art/style_bible.txt` verbatim exactly once and binds ground assets to the approved island projection evidence. Do not manually paraphrase or re-order the canonical request.
-9. Confirm the canonical asset prompt contains enough era-specific evidence to enforce the matrix. A prompt that only says `more modern`, `more futuristic`, `add cyan`, `add hologram` or similar is insufficient and blocks generation.
+6. If `art/references/eras/<era>/reference-set.json` exists with approved status, read it before generation, verify the listed SHA-256/Drive provenance, and use all applicable sheets by their declared roles together with the era matrix and asset-specific brief. Generated lettering/pseudo-text inside a reference sheet is non-authoritative. Transfer era language, not literal object identity.
+7. Confirm exactly one asset **or** one part sheet per imagegen call and exactly one era per anchor-generation call.
+8. Confirm the Drive archive destination exists before generation. The untouched raw generation must be archived there before destructive processing.
+9. When a preflight receipt exists, run `validate_generation_preflight.py`, then build the actual request with `build_generation_request.py`. The builder appends `art/style_bible.txt` verbatim exactly once and binds ground assets to the approved island projection evidence. Do not manually paraphrase or re-order the canonical request.
+10. Confirm the canonical asset prompt contains enough era-specific evidence to enforce the matrix. A prompt that only says `more modern`, `more futuristic`, `add cyan`, `add hologram` or similar is insufficient and blocks generation.
 
 PASS of generation preflight authorizes only the isolated generation stage. It does not approve source geometry, era distinctness, scene projection, production promotion, runtime publication, rig behavior or game regression.
 
@@ -25,6 +26,7 @@ Before each imagegen call verify:
 - selected era/year is explicit;
 - object gameplay role and physical parts come from `PRODUCTION_MANIFEST.md`/brief;
 - era language comes from `ERA_DESIGN_MATRIX.md`;
+- an approved era reference set, when present, is included as SHA-bound visual evidence and its relevant sheets are used by role;
 - era-specific materials, mechanics/drive, UI, lighting, infrastructure, autonomy and silhouette are named where applicable;
 - E1–E5 use the previous exact-approved era as primary lineage reference when available; E0 remains the family anchor reference when useful;
 - decorative futurism does not substitute for physical function.
@@ -115,12 +117,13 @@ AI draws physical parts. Code owns joints/rig motion, state transitions, lights,
 
 ## 5. World sprites
 
-World sprites keep the separate ref2game flow (`prepare → imagegen → import → slice/prep → game QA`). Do not route them through the W/B placeable processing pipeline without an explicit migration. Era visual/engineering language still follows `ERA_DESIGN_MATRIX.md` when a world-sprite family has E0–E5 variants.
+World sprites keep the separate ref2game flow (`prepare → imagegen → import → slice/prep → game QA`). Do not route them through the W/B placeable processing pipeline without an explicit migration. Era visual/engineering language still follows `ERA_DESIGN_MATRIX.md` when a world-sprite family has E0–E5 variants, and any approved era reference set remains applicable visual evidence.
 
 ## 6. Approval and publication
 
 - Visual approval is bound to the exact candidate SHA.
 - Era approval is bound to the exact candidate(s) being compared; do not approve lineage from thumbnails that differ from production bytes.
+- Approved era reference sheets are visual evidence only; they do not approve a production asset or bypass any asset gate.
 - Pivots are measured only from exact approved art.
 - Production `promote` stores approved art/history in `game-production` only.
 - Runtime `publish_runtime` requires `art/runtime/RUNTIME_EXPORTS.json`, verified target/consumer/semantics and existing `main:game/assets/...` target.
@@ -154,17 +157,16 @@ Three production attempts were archived untouched and rejected at source gate be
 
 All three are provenance only. No Pixel Snapper/normalize/Aseprite/candidate processing was performed on them.
 
-PR #37 (`prompt/b03-e0-source-gate-20261030`, head `37ca1d996a2478dba9296cc845237546b96c06ce`) tightens the E0 structural/projection source gate. Exact-head readiness `41121187447` and docs smoke `41121187439` passed; the PR remains separate/unmerged at this dated checkpoint.
-
-The next B03 generation must additionally apply `ERA_DESIGN_MATRIX.md` E0 profile: hand-built/repairable construction, exposed mechanically justified hardware, analog/physical signal logic and period-appropriate materials; no modern/future visual shortcuts.
+PR #37 has been merged after combined-tree readiness/docs checks passed. The next B03 generation must apply both its compact-yoke source gate and the canonical E0 profile/reference set: hand-built/repairable construction, exposed mechanically justified hardware, analog/physical signal logic and period-appropriate materials; no modern/future visual shortcuts.
 
 ## 8. Verified branch/check evidence
 
-Always re-pin current branch heads before acting. The following is dated evidence, not a permanent branch pointer:
+Always re-pin current branch heads before acting. Dated evidence below is not a permanent branch pointer.
 
-- current canonical production at this checkpoint: `game-production@f04ffcef5bb651275ee53da7ecb0ae7119124d11`;
-- runtime `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721` `Game runtime build` run `41110329403` — PASS;
-- `art/runtime/RUNTIME_EXPORTS.json` now has the approved HD island entry `status=ready` with exact SHA-256 `2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997`;
+- era matrix PR #38 merged into `game-production` as `cba5aac1963917351e5957dea40d3686a4601c06` after exact-head docs/readiness PASS;
+- B03 prompt PR #37 merged as `49bea6f900895c461e7c5b0e55b48667185ce04a` after combined-tree `Asset production readiness` run `41129760722` PASS and `Production contract docs smoke` run `41129760401` PASS;
+- runtime `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721` remains the clean runtime/build branch;
+- `art/runtime/RUNTIME_EXPORTS.json` has the approved HD island entry `status=ready` with exact SHA-256 `2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997`;
 - current `main` has no `game/test` directory, so runtime workflow is a manifest/build/checksum gate, not a full B03 gameplay regression suite.
 
 The old production-side runtime `game-ci.yml` is not part of `game-production`. Runtime build assumptions must stay in the clean `main` tree.
