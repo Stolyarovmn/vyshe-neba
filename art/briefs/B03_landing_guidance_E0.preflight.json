@@ -7,7 +7,7 @@
   "year": 1978,
   "generation_kind": "isolated_anchor_replacement",
   "contract_base_sha": "857b1de67e02793f6d45f088d5f3fc70ca0ab4ba",
-  "runtime_main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e",
+  "runtime_main_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
   "brief_file": "art/briefs/B03_landing_guidance_E0.md",
   "prompt_file": "art/prompts/b03_landing_guidance.md",
   "style_bible_file": "art/style_bible.txt",
@@ -51,7 +51,7 @@
   "runtime_contract": {
     "asset_key": "beacons",
     "logical_name_pattern": "bld_beacons_<year>",
-    "consumer": "game/src/render/buildings.js::drawPlacedBuildings -> drawBuilding -> buildingSpriteName",
+    "consumer": "game/src/render/buildings.js::drawBuilding -> buildingSpriteName",
     "profile_level_source": "profile.buildings.beacons",
     "manifest_file": "game/src/render/manifest.js",
     "gameplay_data_file": "game/src/data/buildings.js",
@@ -67,10 +67,12 @@
     ],
     "mapping_status": "verified_existing_targets_and_consumer",
     "gameplay_semantics_status": "CONFLICT_WITH_PRODUCTION_MANIFEST",
-    "current_runtime_semantics": "beacons widen landing tolerances through s.cfg.base.beacons; building data also defines beacon illumination/perfect-landing effects",
+    "current_runtime_semantics": "beacons widen landing tolerances through s.cfg.base.beacons",
     "production_manifest_target": "predict touchdown point, safe corridor and approach state with a physically tracking head/lamp",
     "status": "verified_mapping_semantics_conflict",
-    "verified_against_main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e"
+    "verified_against_main_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
+    "runtime_build_run_id": 41110329403,
+    "reverified_on": "2026-10-30"
   },
   "replacement_reason": {
     "previous_e0_sha256": "1c9ecd76cdd455f97fe9f1d25c7acd6d94523b64a6120438fd360e3112599b11",
