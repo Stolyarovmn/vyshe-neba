@@ -56,14 +56,15 @@ Runtime publication is a separate operation after Boundary A is complete:
 1. pin the exact `game-production` commit containing the approved asset;
 2. verify the approved source SHA-256 against its production manifest/review;
 3. resolve an explicit, verified runtime mapping `production source -> main:game/assets/...`;
-4. check out exact `main` base as the runtime tree;
-5. copy the approved bytes to the **existing canonical runtime path**, replacing the old file in place;
-6. verify the copied bytes have the approved SHA-256;
-7. verify the runtime diff contains only explicitly declared changed targets;
-8. run the available build/runtime checks on that exact tree;
-9. create a runtime PR targeting `main` containing only those declared runtime asset replacements.
+4. verify that the production design semantics are compatible with the actual runtime consumer/state contract; a known path alone is not enough;
+5. check out exact `main` base as the runtime tree;
+6. copy the approved bytes to the **existing canonical runtime path**, replacing the old file in place;
+7. verify the copied bytes have the approved SHA-256;
+8. verify the runtime diff contains only explicitly declared changed targets;
+9. run the available build/runtime checks on that exact tree;
+10. create a runtime PR targeting `main` containing only those declared runtime asset replacements.
 
-If the canonical runtime path does not yet exist, publication is **BLOCKED**. A new asset needs a separate runtime-integration PR first (logical name/path/consumer/fallback/tests). Art promotion must not invent a new runtime path.
+If the canonical runtime path does not yet exist, publication is **BLOCKED**. A new asset needs a separate runtime-integration PR first (logical name/path/consumer/fallback/tests). Likewise, if the path and consumer exist but the current runtime mechanic materially differs from the production design target, publication is **BLOCKED** until the design/runtime contract is deliberately reconciled. Art promotion must not invent or silently imply a mechanic.
 
 Creating the runtime PR does not itself prove that the new bytes are already in `main`; publication is final only after the PR is merged/verified at the resulting runtime commit. Automatic merge is forbidden.
 
@@ -90,11 +91,12 @@ Each publishable entry must contain:
 - exact approved SHA-256;
 - explicit canonical `target` under `game/assets/`;
 - verified existing-target runtime contract;
+- compatible verified gameplay/rig/state semantics for the asset being published, or an explicit reviewed decision that the change is art-only and does not claim a new mechanic;
 - publication `status=ready` only when source bytes actually exist in the production tree and approval evidence contains that SHA.
 
 Default mode is `replace_in_place`; target must already exist on the pinned `main` commit.
 
-A missing mapping, missing production source, missing target, SHA mismatch, target outside `game/assets/`, unapproved source, or non-ready status is a blocking error.
+A missing mapping, missing production source, missing target, SHA mismatch, target outside `game/assets/`, unapproved source, unresolved design-vs-runtime semantic conflict, or non-ready status is a blocking error.
 
 ## Tracker semantics
 
@@ -156,6 +158,19 @@ This makes the production workflows runnable from their own branch content while
 
 If the default branch is intentionally changed in the future, this trigger model may be revisited only in a separate migration that updates this contract and both workflows together.
 
+## Verified B03 runtime mapping and semantic conflict
+
+At checked runtime `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e`:
+
+- production family `B03 / landing_guidance` corresponds to runtime building key `beacons`;
+- logical names are `bld_beacons_<year>` through `buildingSpriteName`;
+- canonical targets already exist at `game/assets/eras/e<era>-<year>/base/beacons.png`;
+- E0 target `game/assets/eras/e0-1978/base/beacons.png` has Git blob SHA-1 `2a528e56d50a20af1e19ef2c197d01f34794ccf4`;
+- `hub.js -> drawPlacedBuildings -> drawBuilding` consumes the building, driven by `profile.buildings.beacons`;
+- current simulation widens landing tolerances using `s.cfg.base.beacons`, while data also exposes beacon illumination/perfect-landing effects.
+
+Therefore the B03 runtime path/consumer are **verified**, but the current runtime gameplay contract materially differs from `PRODUCTION_MANIFEST.md`, which targets touchdown/corridor prediction and a physically tracking head/lamp. `publish_runtime` stays BLOCKED until a separate reviewed runtime integration implements/verifies that state/rig behavior, or the production design target is deliberately revised to the current mechanic. This conflict does not by itself block preserving an exact approved B03 art lineage in `game-production` after its production gates pass.
+
 ## Migration plan
 
 1. Keep current `main` as the clean runtime/build branch; do not mass-copy production history into it.
@@ -163,9 +178,10 @@ If the default branch is intentionally changed in the future, this trigger model
 3. Add a separate runtime-publish workflow that reads an exact approved source from `game-production` and replaces only declared `main:game/assets/...` files.
 4. Add `publish_runtime` to tracker/config/tooling as a forward-compatible step migration.
 5. Use verified command branches for production-only workflow triggers while `main` remains default.
-6. Add explicit runtime mappings only after verifying the target path and consumer against the pinned `main` manifest/code and confirming the exact production source bytes exist.
+6. Add explicit runtime mappings only after verifying target path, consumer and semantic compatibility against the pinned `main` code and confirming the exact production source bytes exist.
 7. Existing runtime files in `main` remain in place until individually replaced by approved assets; no duplicate backup copies are created.
 8. New assets without an existing runtime target remain `integration_pending/BLOCKED` until a separate runtime integration PR exists.
+9. Existing assets whose paths are known but whose runtime mechanic conflicts with the production design remain `publish_runtime=BLOCKED` until that conflict is explicitly resolved.
 
 ## Rollback
 
@@ -183,8 +199,8 @@ Revert the paired workflow migration. Do not solve a production workflow trigger
 
 ## Current blockers
 
-- `game-production` at the currently checked SHA does not yet contain the pending v2 contract/`AGENTS.md`; this contract is being introduced through the current draft PR chain and is not canonical until merged.
-- The current `main` branch has build code and runtime assets but no `game/test` directory at the checked SHA, so full same-commit game regression cannot be claimed there yet.
-- B03 `landing_guidance` has no verified runtime logical name/consumer/target on the checked `main`; its runtime publication remains blocked even after art approval until runtime integration is added separately.
+- Canonical `game-production@638be80dfb4b2e2b3e19281015748fa0249ce847` does not yet contain the pending v2 contract/`AGENTS.md`; this draft PR chain is not canonical until merged.
+- The checked `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e` has runtime/build code and assets but no `game/test` directory, so full same-commit game regression cannot be claimed there yet.
+- B03 mapping/consumer/targets are verified, but its current landing-tolerance gameplay behavior conflicts with the production-manifest touchdown/corridor tracking + head/lamp target; runtime publication remains blocked on semantic/rig integration, not on path discovery.
 - The approved HD island runtime target and SHA are verified. Draft PR #32 imports the exact existing runtime Git blob into the expected production `art/gen/environment/start_island_hd.png` path without re-encoding; until that PR is merged into the production chain, Boundary B must still treat the production source as unavailable.
 - Current GitHub Actions jobs fail before runner assignment (`runner_id=0`, `steps=[]`), so no workflow in this migration is claimed green until an actual runner executes it.
