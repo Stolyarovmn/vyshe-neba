@@ -4,7 +4,7 @@
 
 1. `art/docs/ASSET_PRODUCTION_PIPELINE.md` — существующая производственная цепочка, approval, CI.
 2. `art/docs/PRODUCTION_CONTRACT_V2.md` — обязательные preflight, engineering/era/projection/runtime gates; совместимое расширение.
-3. `art/docs/RUNTIME_BRANCH_CONTRACT.md` — обязательное разделение production/history и чистой runtime/build ветки, правила двухступенчатого promotion и rollback.
+3. `art/docs/RUNTIME_BRANCH_CONTRACT.md` — обязательное разделение production/history и чистой runtime/build ветки, правила двухступенчатого promotion и rollback. **Для branch/storage/promotion semantics этот документ имеет приоритет над более старым текстом pipeline/tracker.**
 4. `art/docs/ASSET_GENERATION_RUNBOOK.md` — исполнимый порядок каждого production imagegen: preflight → deterministic request → immutable raw archive → source gate → processing/approval.
 5. `art/docs/ASSET_TASK_TRACKER.md`, `art/docs/EXECUTION_TIMEOUT_POLICY.md` — resume и лимиты.
 6. `art/style_bible.txt`, `art/placeables/PRODUCTION_MANIFEST.md`, `art/placeables/PIPELINE_CONFIG.json`, `art/placeables/BASE_ISLAND_LAYOUT.json` по типу задачи.
@@ -16,6 +16,8 @@
 Для production imagegen, когда существует receipt, сначала запускать `tools/art_pipeline/validate_generation_preflight.py`, затем собирать фактический generation request через `tools/art_pipeline/build_generation_request.py`. Ручное перефразирование `art/style_bible.txt` вместо deterministic append запрещено. PASS этого preflight означает только разрешение на указанную стадию generation; он не открывает scene/runtime/promotion gates.
 
 **Promotion разделён на две границы.** Candidate с exact-SHA visual approval сначала попадает только в `game-production` (`art/gen` + provenance/QA) через production PR. Затем отдельный runtime-publish берёт exact approved bytes и создаёт отдельный PR в `main`, заменяя уже существующий канонический `game/assets/...` файл **на том же пути**. В `main` запрещены production history/candidates/raw/QA и backup-копии старых картинок (`*_old`, `backup`, parallel mirrors). Rollback runtime — через Git history/revert. Если runtime target/consumer не подтверждён или target ещё не существует, runtime publication `BLOCKED` до отдельного integration PR.
+
+После tracker migration канонические финальные шаги: `visual_review → promote → publish_runtime → game_tests`. `promote` не означает, что арт уже находится в игре; `publish_runtime` не считается завершённым только из-за создания PR — нужно подтверждение merge/resulting runtime SHA.
 
 **Нельзя:** обходить SHA-bound approval, менять originals, считать candidate production, угадывать pivots/проекцию (47° не подтверждено), генерировать E0–E5 одной доской, анимировать механизм целым PNG, добавлять eventless FX, делать direct push в `main`, смешивать production files с runtime PR или заявлять о непроверенном CI. Новые правила и исправления — через ветку/PR с QA и rollback. При отсутствии данных — `UNKNOWN/BLOCKED` с конкретной причиной.
 
