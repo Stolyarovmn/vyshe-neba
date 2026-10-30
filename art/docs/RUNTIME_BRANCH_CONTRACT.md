@@ -1,0 +1,206 @@
+# Runtime / production branch contract
+
+## Purpose
+
+This contract separates art production history from the clean game build/runtime tree.
+
+**Normative precedence:** this document supersedes older branch/storage/publication wording in `ASSET_PRODUCTION_PIPELINE.md` and `ASSET_TASK_TRACKER.md` wherever those older texts describe direct promotion into `main`, build-time runtime mirroring from production `art/gen`, or a single undivided `promote -> game_tests` boundary. Processing, QA, SHA-bound approval, tool pins and ref2game rules remain unchanged unless explicitly migrated elsewhere.
+
+## Canonical branch roles
+
+### `game-production`
+
+`game-production` is the production/history branch. It may contain:
+
+- production docs, briefs, prompts and toolchain configuration;
+- source provenance and Google Drive references;
+- raw/source transport metadata;
+- generated/processed approved art under `art/gen/`;
+- QA evidence, candidate manifests and approval records;
+- production-only workflows and tools.
+
+Production history belongs here. Old approved versions may remain reachable through Git history and production provenance when required for audit/reproducibility.
+
+### `main`
+
+`main` is the clean build/runtime branch.
+
+It contains the game code, build files, runtime tests when present, and only the **currently active runtime assets** needed by the game. Runtime raster assets live at canonical `game/assets/...` paths consumed by `main:game/src/render/manifest.js`.
+
+`main` MUST NOT receive production-only trees such as `art/`, `work/`, candidates, raw originals, QA history, production manifests, or `outputs/rocket` mirrors as part of an art promotion.
+
+The current repository layout supports this role: `main` root contains `.gitattributes`, `.gitignore`, `game/` and `package.json`; production files are not part of that tree.
+
+### `clean-src`
+
+`clean-src` is not the canonical runtime/build branch under this contract. It currently has a separate history, includes production/legacy material, and has no `game/assets/` tree. It may be retained as a historical/experimental branch, but promotion MUST NOT target it unless a separate migration explicitly redefines the branch model.
+
+## Two publication boundaries
+
+### Boundary A — candidate → production
+
+A visually approved candidate is promoted only into `game-production`:
+
+1. verify automatic QA and exact-SHA visual approval;
+2. write the approved PNG/metadata to the canonical production path under `art/gen/...`;
+3. write/update production provenance and promotion manifest;
+4. create a PR targeting `game-production`;
+5. do not write runtime files to `main` in this step.
+
+This boundary preserves production history and reproducibility.
+
+### Boundary B — approved production → runtime
+
+Runtime publication is a separate operation after Boundary A is complete:
+
+1. pin the exact `game-production` commit containing the approved asset;
+2. verify the approved source SHA-256 against its production manifest/review;
+3. resolve an explicit, verified runtime mapping `production source -> main:game/assets/...`;
+4. verify that the production design semantics are compatible with the actual runtime consumer/state contract; a known path alone is not enough;
+5. check out exact `main` base as the runtime tree;
+6. copy the approved bytes to the **existing canonical runtime path**, replacing the old file in place;
+7. verify the copied bytes have the approved SHA-256;
+8. verify the runtime diff contains only explicitly declared changed targets;
+9. run the available build/runtime checks on that exact tree;
+10. create a runtime PR targeting `main` containing only those declared runtime asset replacements.
+
+If the canonical runtime path does not yet exist, publication is **BLOCKED**. A new asset needs a separate runtime-integration PR first (logical name/path/consumer/fallback/tests). Likewise, if the path and consumer exist but the current runtime mechanic materially differs from the production design target, publication is **BLOCKED** until the design/runtime contract is deliberately reconciled. Art promotion must not invent or silently imply a mechanic.
+
+Creating the runtime PR does not itself prove that the new bytes are already in `main`; publication is final only after the PR is merged/verified at the resulting runtime commit. Automatic merge is forbidden.
+
+## No duplicate historical copies in runtime
+
+For an asset replacement, `main` stores exactly one active file at its canonical runtime path.
+
+Forbidden during runtime publication:
+
+- `*_old.png`, `*_previous.png`, `*_backup.png`;
+- `v1/`, `v2/`, dated backup directories or parallel legacy mirrors created only to preserve the previous picture;
+- a second copy of the same runtime asset under `art/gen`, `outputs/rocket/dist/assets`, or another mirror inside `main`;
+- keeping the superseded file under a different runtime name merely for rollback.
+
+Rollback uses Git history (`git revert`, previous commit/blob, or a revert PR), not duplicate files in the runtime tree.
+
+## Runtime mapping
+
+Machine publication uses `art/runtime/RUNTIME_EXPORTS.json` on `game-production`.
+
+Each publishable entry must contain:
+
+- explicit production `source` under `art/gen/`;
+- exact approved SHA-256;
+- explicit canonical `target` under `game/assets/`;
+- verified existing-target runtime contract;
+- compatible verified gameplay/rig/state semantics for the asset being published, or an explicit reviewed decision that the change is art-only and does not claim a new mechanic;
+- publication `status=ready` only when source bytes actually exist in the production tree and approval evidence contains that SHA.
+
+Default mode is `replace_in_place`; target must already exist on the pinned `main` commit.
+
+A missing mapping, missing production source, missing target, SHA mismatch, target outside `game/assets/`, unapproved source, unresolved design-vs-runtime semantic conflict, or non-ready status is a blocking error.
+
+## Tracker semantics
+
+Paired CI/tool migration PR #31 introduces a new forward-compatible machine step. After that migration is merged, canonical tracker order is:
+
+```text
+generate
+→ edit
+→ archive_original
+→ source_prepare
+→ pixel_snap
+→ normalize
+→ aseprite_index
+→ qa_auto
+→ candidate_manifest
+→ visual_review
+→ promote
+→ publish_runtime
+→ game_tests
+```
+
+- `promote` means approved candidate has crossed Boundary A into production history.
+- `publish_runtime` means exact approved bytes have crossed Boundary B into the clean runtime branch. A merely opened PR is not sufficient to claim final publication; merge/resulting runtime SHA must be confirmed.
+- `game_tests` applies only to the runtime/build tree and must not be inferred from production-only checks.
+
+Tracker schema remains forward-compatible: existing checkpoint states gain missing canonical steps as `pending` without losing earlier attempts/status/output hashes. `PIPELINE_CONFIG.json` is bumped as part of the paired tool migration because the canonical step list changes.
+
+Until the paired tool migration is actually merged, this docs branch describes the target contract but does not pretend the canonical `game-production` machine tracker already implements it.
+
+## CI / workflow separation
+
+Production workflows run from `game-production` and may inspect/prepare candidates.
+
+Runtime publication workflow must use a separate checkout/worktree of `main` and must reject changes outside declared changed runtime targets. It must never stage `art/gen`, production metadata, candidates, raw sources, QA history or legacy `outputs/rocket` mirrors into the runtime PR.
+
+The runtime workflow must record both exact production source commit and exact runtime base commit. Build/install steps must not introduce extra tracked files such as lockfiles into the runtime PR.
+
+Runtime/manifest/code changes remain separate from pure asset replacement PRs. A replacement of an already-integrated asset should normally modify only its canonical `game/assets/...` file(s).
+
+### Trigger contract while `main` is the default branch
+
+The repository default branch is currently `main`. Production-only workflows must **not** be copied into `main` merely to make `workflow_dispatch` visible. Instead, the paired tooling migration uses ephemeral command branches that are based on the exact current `game-production` SHA:
+
+- `asset-promote/**` with exactly one changed file: `.asset-command/promote.json`;
+- `asset-publish-runtime/**` with exactly one changed file: `.asset-command/publish-runtime.json`.
+
+Command JSON contains at minimum:
+
+```json
+{
+  "asset": "B03",
+  "production_base_sha": "<exact current game-production SHA>"
+}
+```
+
+The workflow MUST fetch current `game-production`, require `production_base_sha` to match it exactly, require the command branch to descend from that commit, reject every diff except the single command JSON, then reset its worktree back to the pinned production commit before touching candidate/production/runtime files. The command commit itself is never included in a production or runtime PR.
+
+This makes the production workflows runnable from their own branch content while leaving default/runtime `main` clean. Command branches are control-plane refs only and may be deleted after their run/PR handoff; they are not production history or runtime history.
+
+If the default branch is intentionally changed in the future, this trigger model may be revisited only in a separate migration that updates this contract and both workflows together.
+
+## Verified B03 runtime mapping and semantic conflict
+
+At checked runtime `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e`:
+
+- production family `B03 / landing_guidance` corresponds to runtime building key `beacons`;
+- logical names are `bld_beacons_<year>` through `buildingSpriteName`;
+- canonical targets already exist at `game/assets/eras/e<era>-<year>/base/beacons.png`;
+- E0 target `game/assets/eras/e0-1978/base/beacons.png` has Git blob SHA-1 `2a528e56d50a20af1e19ef2c197d01f34794ccf4`;
+- `hub.js -> drawPlacedBuildings -> drawBuilding` consumes the building, driven by `profile.buildings.beacons`;
+- current simulation widens landing tolerances using `s.cfg.base.beacons`, while data also exposes beacon illumination/perfect-landing effects.
+
+Therefore the B03 runtime path/consumer are **verified**, but the current runtime gameplay contract materially differs from `PRODUCTION_MANIFEST.md`, which targets touchdown/corridor prediction and a physically tracking head/lamp. `publish_runtime` stays BLOCKED until a separate reviewed runtime integration implements/verifies that state/rig behavior, or the production design target is deliberately revised to the current mechanic. This conflict does not by itself block preserving an exact approved B03 art lineage in `game-production` after its production gates pass.
+
+## Migration plan
+
+1. Keep current `main` as the clean runtime/build branch; do not mass-copy production history into it.
+2. Change candidate promotion so its PR targets `game-production` and stages only production art/provenance.
+3. Add a separate runtime-publish workflow that reads an exact approved source from `game-production` and replaces only declared `main:game/assets/...` files.
+4. Add `publish_runtime` to tracker/config/tooling as a forward-compatible step migration.
+5. Use verified command branches for production-only workflow triggers while `main` remains default.
+6. Add explicit runtime mappings only after verifying target path, consumer and semantic compatibility against the pinned `main` code and confirming the exact production source bytes exist.
+7. Existing runtime files in `main` remain in place until individually replaced by approved assets; no duplicate backup copies are created.
+8. New assets without an existing runtime target remain `integration_pending/BLOCKED` until a separate runtime integration PR exists.
+9. Existing assets whose paths are known but whose runtime mechanic conflicts with the production design remain `publish_runtime=BLOCKED` until that conflict is explicitly resolved.
+
+## Rollback
+
+### Production rollback
+
+Revert the production PR or restore the prior production commit; provenance/Drive originals remain immutable.
+
+### Runtime rollback
+
+Revert the runtime asset PR (or create a new PR restoring the previous Git blob). Do not add backup copies to `main`.
+
+### Workflow-trigger rollback
+
+Revert the paired workflow migration. Do not solve a production workflow trigger problem by copying production/history trees or production-only workflow logic into `main` without a reviewed contract change.
+
+## Current blockers
+
+- Canonical `game-production@638be80dfb4b2e2b3e19281015748fa0249ce847` does not yet contain the pending v2 contract/`AGENTS.md`; this draft PR chain is not canonical until merged.
+- The checked `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e` has runtime/build code and assets but no `game/test` directory, so full same-commit game regression cannot be claimed there yet.
+- B03 mapping/consumer/targets are verified, but its current landing-tolerance gameplay behavior conflicts with the production-manifest touchdown/corridor tracking + head/lamp target; runtime publication remains blocked on semantic/rig integration, not on path discovery.
+- The approved HD island runtime target and SHA are verified. Draft PR #32 imports the exact existing runtime Git blob into the expected production `art/gen/environment/start_island_hd.png` path without re-encoding; until that PR is merged into the production chain, Boundary B must still treat the production source as unavailable.
+- Current GitHub Actions jobs fail before runner assignment (`runner_id=0`, `steps=[]`), so no workflow in this migration is claimed green until an actual runner executes it.

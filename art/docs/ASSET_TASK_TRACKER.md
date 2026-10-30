@@ -1,6 +1,6 @@
 # Asset Pipeline Task Tracker / Resume Contract
 
-Этот документ является обязательным дополнением к `ASSET_PRODUCTION_PIPELINE.md` и `ref2game` production flow. Его задача — не начинать дорогую генерацию/обработку ассета заново после обрыва чата, CI job или новой сессии.
+Этот документ является обязательным дополнением к `ASSET_PRODUCTION_PIPELINE.md`, `RUNTIME_BRANCH_CONTRACT.md` и ref2game production flow. Его задача — не начинать дорогую генерацию/обработку ассета заново после обрыва чата, CI job или новой сессии и отдельно фиксировать production approval и runtime publication.
 
 ## Durable state
 
@@ -35,7 +35,7 @@ Issue является человекочитаемым task tracker: current st
 
 ## Канонические шаги
 
-Порядок задаётся `art/placeables/PIPELINE_CONFIG.json -> tracker.steps`:
+После миграции разделения production/runtime порядок задаётся `art/placeables/PIPELINE_CONFIG.json -> tracker.steps`:
 
 ```text
 generate
@@ -49,8 +49,17 @@ generate
 → candidate_manifest
 → visual_review
 → promote
+→ publish_runtime
 → game_tests
 ```
+
+Значение последних стадий:
+
+- `promote` — exact-SHA approved candidate подготовлен/опубликован в production history (`game-production`, canonical `art/gen` + provenance/QA). Это **не означает**, что картинка уже попала в игру.
+- `publish_runtime` — exact approved bytes прошли отдельную Boundary B: replacement PR в чистую runtime/build ветку `main`, только по подтверждённым canonical `game/assets/...` путям. До merge/подтверждения runtime PR шаг не должен считаться окончательно опубликованным.
+- `game_tests` — проверки чистого runtime/build дерева на том commit, который реально содержит заменённый runtime asset. Production docs/config smoke не заменяет этот шаг.
+
+Старые checkpoint автоматически мигрируются вперёд: новый `publish_runtime` появляется как `pending`; предыдущие успешные шаги сохраняются, если их fingerprint/output SHA-256 всё ещё совпадают.
 
 Статусы:
 
@@ -58,7 +67,7 @@ generate
 pending | running | success | failed | blocked | skipped
 ```
 
-`running` записывается до начала шага. `success`, `failed` или `blocked` записывается сразу после результата. Поэтому после аварийной остановки видна точная стадия, на которой работа оборвалась.
+`running` записывается до начала шага. `success`, `failed` или `blocked` записывается сразу после подтверждённого результата. Поэтому после аварийной остановки видна точная стадия, на которой работа оборвалась.
 
 ## Resume contract
 
@@ -78,7 +87,9 @@ pending | running | success | failed | blocked | skipped
 - изменился normalizer, canvas или registration → с `normalize`;
 - изменились QA thresholds → только с `qa_auto`;
 - изменился visual review → Pixel Snapper/Aseprite не повторяются;
-- упал `game_tests` → art generation/processing не повторяются.
+- production PR изменил approved bytes → `promote` и downstream инвалидируются;
+- runtime export mapping/target/base commit изменился → инвалидируется `publish_runtime` и `game_tests`, но art processing не повторяется;
+- упал `game_tests` → generation/processing/promotion/runtime replacement не повторяются без изменения их fingerprints.
 
 ## Image generation / edit / archive
 
@@ -107,7 +118,7 @@ python3 tools/art_pipeline/task_tracker.py \
 
 Для ремонта/редактирования используется `edit`; после загрузки untouched original в Google Drive — `archive_original`.
 
-Если source уже существовал до внедрения tracker, processor восстанавливает `generate`/`archive_original` из provenance. Отсутствующий Google Drive provenance отмечается как `blocked`, но automatic processing может продолжаться; promotion остаётся запрещённым production gate.
+Если source уже существовал до внедрения tracker, processor восстанавливает `generate`/`archive_original` из provenance. Отсутствующий Google Drive provenance отмечается как `blocked`; automatic processing может продолжаться, но production promotion остаётся запрещённым gate.
 
 ## Technical processing
 
@@ -162,24 +173,40 @@ python3 tools/art_pipeline/task_tracker.py \
 
 Tracker использует lock на `asset/era`; GitHub Actions дополнительно использует `concurrency` по asset id, поэтому два writer'а не должны одновременно менять один candidate.
 
-## Promotion and game regression
+## Boundary A — production promotion
 
-`asset-promote.yml`:
+`asset-promote.yml` должен:
 
-1. восстанавливает последний checkpoint;
-2. повторно вызывает processor с `--resume`;
-3. проверяет hash-bound visual approval;
-4. отмечает `promote` после staging canonical `art/gen` + runtime manifest;
-5. создаёт promotion PR вместо прямого push в `main`;
-6. сохраняет новый checkpoint и обновляет tracker issue.
+1. работать из `game-production`, а не из `main`;
+2. восстановить последний checkpoint;
+3. повторно вызвать processor с `--resume`;
+4. проверить hash-bound visual approval;
+5. stage только canonical production art/provenance (`art/gen/...`);
+6. отметить `promote` после подтверждённого production staging;
+7. создать PR **в `game-production`**, без runtime-файлов;
+8. сохранить checkpoint и обновить tracker issue.
 
-`game-ci.yml` на `2d_promote-*` PR записывает результат полного `npm test` как:
+Production promotion не имеет права коммитить `game/assets`, `outputs/rocket` runtime mirrors или менять `main`.
 
-```text
-game_tests = success | failed
-```
+## Boundary B — runtime publication
 
-в тот же checkpoint и issue.
+Отдельный runtime-publish должен:
+
+1. pin exact production commit и exact runtime `main` base commit;
+2. прочитать SHA-bound `art/runtime/RUNTIME_EXPORTS.json`;
+3. проверить source SHA/approval;
+4. разрешить target только под `game/assets/...` и только если он уже существует на pinned `main`;
+5. заменить файл **на том же canonical runtime path**;
+6. запретить backup/history copies (`*_old`, `backup`, `v2`, parallel mirrors);
+7. проверить, что runtime diff содержит только явно разрешённые replacement targets;
+8. выполнить доступный build/runtime gate;
+9. создать отдельный PR в `main`.
+
+`publish_runtime=success` допускается только после подтверждения фактической runtime публикации/merge exact approved bytes. Само создание PR не равно merge и не должно ложно закрывать шаг. Rollback выполняется Git revert/history, а не второй копией PNG в runtime tree.
+
+## Game regression
+
+`game_tests` относится к чистой runtime/build ветке. Результат production-only smoke workflow не может переводить `game_tests` в success.
 
 Таким образом tracker покрывает цепочку целиком:
 
@@ -189,10 +216,11 @@ image generation/edit
 → processing
 → automatic QA
 → visual QA
-→ promotion
-→ full game regression
+→ production promotion
+→ runtime replacement publication
+→ runtime/game regression
 ```
 
 ## Важное ограничение
 
-Tracker фиксирует состояние и воспроизводимость процесса, но не заменяет художественную проверку. `ref2game`, automatic QA, hash-bound visual review, measured rig QA и full game regression остаются обязательными production gates.
+Tracker фиксирует состояние и воспроизводимость процесса, но не заменяет художественную проверку. `ref2game`, automatic QA, hash-bound visual review, measured rig QA, runtime mapping verification и full game regression остаются обязательными production gates.
