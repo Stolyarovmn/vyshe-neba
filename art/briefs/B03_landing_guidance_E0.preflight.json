@@ -28,15 +28,16 @@
     "colors": 32,
     "pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
     "aseprite_version": "1.3.18.6",
-    "visible_bbox_target": {
-      "width": [38, 42],
-      "height": [70, 76]
-    }
+    "visible_bbox_target": {"width": [38, 42], "height": [70, 76]}
   },
   "camera": {
     "family": "island_top_3_4",
     "projection_angle": "UNKNOWN",
     "projection_review": "pending_candidate_scene_qa",
+    "projection_calibration_file": "art/gen/environment/start_island_hd.projection.json",
+    "generation_elevation_proxy_deg": 73.44,
+    "generation_tilt_from_top_down_proxy_deg": 16.56,
+    "ground_plane_compression_target": 0.958515,
     "legacy_approved_reference_meta": "art/gen/environment/start_island_e0.meta.json",
     "legacy_approved_reference_sha256": "686762324a0b9244317fa0ff0327135f9039ad61c19c7510a88fdd18983e1ab3",
     "current_hd_reference_meta": "art/gen/environment/start_island_hd.meta.json",
