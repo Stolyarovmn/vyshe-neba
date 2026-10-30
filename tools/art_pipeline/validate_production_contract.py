@@ -29,7 +29,7 @@ EXPECTED_YEARS = [1978, 1986, 1998, 2015, 2035, 2060]
 EXPECTED_STEPS = [
     "generate", "edit", "archive_original", "source_prepare", "pixel_snap",
     "normalize", "aseprite_index", "qa_auto", "candidate_manifest",
-    "visual_review", "promote", "game_tests",
+    "visual_review", "promote", "publish_runtime", "game_tests",
 ]
 
 
@@ -43,10 +43,10 @@ def validate() -> list[str]:
 
     cfg = json.loads((ROOT / "art/placeables/PIPELINE_CONFIG.json").read_text(encoding="utf-8"))
     layout = json.loads((ROOT / "art/placeables/BASE_ISLAND_LAYOUT.json").read_text(encoding="utf-8"))
-    if cfg.get("version") != 2:
-        errors.append("PIPELINE_CONFIG version changed: review migration before changing this smoke gate")
+    if cfg.get("version") != 3:
+        errors.append("PIPELINE_CONFIG version must be 3 after production/runtime publication split")
     if cfg.get("tracker", {}).get("steps") != EXPECTED_STEPS:
-        errors.append("tracker steps changed: existing resume/promotion contract must be migrated explicitly")
+        errors.append("tracker steps must keep promote and publish_runtime as separate boundaries")
     if not isinstance(layout.get("world", {}).get("launch_origin_px"), list):
         errors.append("island launch_origin_px missing")
     if not isinstance(layout.get("purchases"), dict):

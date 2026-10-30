@@ -104,7 +104,7 @@ def main() -> int:
         "Match the exact approved island reference visually; if the numeric proxy and the reference appearance differ, the reference wins.\n"
         f"Projection calibration: {calibration_rel}; reference SHA-256: {calibration.get('reference_sha256')}\n"
         f"Projection review: {camera.get('projection_review', 'UNKNOWN')}\n"
-        "This call creates source art only. Scene approval, runtime integration, rig/FX and promotion are separate gates.\n"
+        "This call creates source art only. Scene approval, production promotion, runtime publication, runtime integration, rig/FX and game tests are separate gates.\n"
     )
 
     request = (

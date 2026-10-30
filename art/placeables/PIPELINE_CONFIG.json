@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "toolchain": {
     "aseprite_version": "1.3.18.6",
     "pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c"
@@ -10,7 +10,7 @@
     "checkpoint_artifact_prefix": "asset-checkpoint-",
     "issue_title_prefix": "[asset-pipeline]",
     "resume_policy": "reuse only when step fingerprint and every recorded output SHA-256 match",
-    "steps": ["generate","edit","archive_original","source_prepare","pixel_snap","normalize","aseprite_index","qa_auto","candidate_manifest","visual_review","promote","game_tests"]
+    "steps": ["generate","edit","archive_original","source_prepare","pixel_snap","normalize","aseprite_index","qa_auto","candidate_manifest","visual_review","promote","publish_runtime","game_tests"]
   },
   "assets": {
     "W04": {

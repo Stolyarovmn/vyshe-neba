@@ -21,7 +21,7 @@
   },
   "machine_pipeline": {
     "configured": true,
-    "pipeline_config_version": 2,
+    "pipeline_config_version": 3,
     "canvas": [46, 82],
     "registration": [23, 78],
     "pixel_size": 12,
@@ -49,9 +49,27 @@
     "current_hd_reference_approved_on": "2026-10-30T14:33:35Z"
   },
   "runtime_contract": {
-    "logical_name": "UNKNOWN",
-    "consumer": "UNKNOWN",
-    "status": "integration_pending",
+    "asset_key": "beacons",
+    "logical_name_pattern": "bld_beacons_<year>",
+    "consumer": "game/src/render/buildings.js::drawPlacedBuildings -> drawBuilding -> buildingSpriteName",
+    "profile_level_source": "profile.buildings.beacons",
+    "manifest_file": "game/src/render/manifest.js",
+    "gameplay_data_file": "game/src/data/buildings.js",
+    "landing_consumer_file": "game/src/sim/landing.js",
+    "runtime_target_pattern": "game/assets/eras/e<era>-<year>/base/beacons.png",
+    "existing_targets": [
+      {"era":"E0","year":1978,"path":"game/assets/eras/e0-1978/base/beacons.png","git_blob_sha1":"2a528e56d50a20af1e19ef2c197d01f34794ccf4"},
+      {"era":"E1","year":1986,"path":"game/assets/eras/e1-1986/base/beacons.png","git_blob_sha1":"303e65df682ae03e4c9a568ea36ca66c17c95f62"},
+      {"era":"E2","year":1998,"path":"game/assets/eras/e2-1998/base/beacons.png","git_blob_sha1":"40b8bd23762ceb1b551f425139d63e1663681c9a"},
+      {"era":"E3","year":2015,"path":"game/assets/eras/e3-2015/base/beacons.png","git_blob_sha1":"500f8cd59de01323f07de68997ffe3607c60044b"},
+      {"era":"E4","year":2035,"path":"game/assets/eras/e4-2035/base/beacons.png","git_blob_sha1":"592a77f79387a6fb439a2618dda62aeeb271c32d"},
+      {"era":"E5","year":2060,"path":"game/assets/eras/e5-2060/base/beacons.png","git_blob_sha1":"ccdc544dd2ebaa29b562e1c1c0eb7af3b15f6d25"}
+    ],
+    "mapping_status": "verified_existing_targets_and_consumer",
+    "gameplay_semantics_status": "CONFLICT_WITH_PRODUCTION_MANIFEST",
+    "current_runtime_semantics": "beacons widen landing tolerances through s.cfg.base.beacons; building data also defines beacon illumination/perfect-landing effects",
+    "production_manifest_target": "predict touchdown point, safe corridor and approach state with a physically tracking head/lamp",
+    "status": "verified_mapping_semantics_conflict",
     "verified_against_main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e"
   },
   "replacement_reason": {
@@ -68,11 +86,12 @@
     "style_bible_verbatim": true,
     "can_generate_isolated_candidate": true,
     "can_scene_approve": true,
-    "can_promote": false
+    "can_promote_to_production": false,
+    "can_publish_runtime": false
   },
   "blocked_stages": [
-    "rig_event_qa_until_runtime_event_consumer_is_verified",
-    "runtime_integration_until_logical_name_and_consumer_are_verified",
-    "promotion_until_all_applicable_gates_pass"
+    "production_promotion_until_replacement_candidate_passes_auto_qa_exact_sha_visual_review_and_scene_qa",
+    "runtime_publication_until_design_target_vs_current_runtime_semantics_and_rig_event_contract_are_resolved",
+    "rig_event_qa_until_tracking_head_lamp_state_machine_is_implemented_and_verified"
   ]
 }

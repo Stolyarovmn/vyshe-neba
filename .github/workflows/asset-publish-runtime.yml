@@ -1,0 +1,182 @@
+name: Publish approved production asset to clean runtime
+
+on:
+  push:
+    branches:
+      - 'asset-publish-runtime/**'
+    paths:
+      - '.asset-command/publish-runtime.json'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  publish-runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: runtime-asset-command-${{ github.ref_name }}
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout production command branch
+        uses: actions/checkout@v4
+        with:
+          path: production
+          fetch-depth: 0
+
+      - name: Verify command branch and pin production source
+        id: command
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd production
+          git fetch --no-tags origin game-production
+          base="$(git rev-parse origin/game-production)"
+          command='.asset-command/publish-runtime.json'
+          test -f "$command"
+          asset="$(jq -er '.asset | strings | select(length > 0)' "$command")"
+          requested_base="$(jq -er '.production_base_sha | strings | select(length == 40)' "$command")"
+          if [ "$requested_base" != "$base" ]; then
+            echo "Stale/incorrect production base: command=$requested_base current=$base" >&2
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$base" HEAD; then
+            echo 'Runtime-publication command branch is not based on current game-production.' >&2
+            exit 1
+          fi
+          mapfile -t changed < <(git diff --name-only "$base...HEAD" | sort -u)
+          if [ "${#changed[@]}" -ne 1 ] || [ "${changed[0]}" != "$command" ]; then
+            echo 'Runtime-publication command branch may change only .asset-command/publish-runtime.json.' >&2
+            printf '%s\n' "${changed[@]}" >&2
+            exit 1
+          fi
+          python3 - "$asset" <<'PY'
+          import json, sys
+          from pathlib import Path
+          asset=sys.argv[1]
+          exports=json.loads(Path('art/runtime/RUNTIME_EXPORTS.json').read_text(encoding='utf-8'))
+          if asset not in exports.get('assets', {}):
+              raise SystemExit(f'asset has no runtime export mapping: {asset}')
+          if asset in exports.get('blocked_assets', {}):
+              raise SystemExit(f"asset is runtime BLOCKED: {exports['blocked_assets'][asset]}")
+          if exports['assets'][asset].get('status') != 'ready':
+              raise SystemExit(f"asset export is not ready: {exports['assets'][asset].get('status')!r}")
+          PY
+          echo "asset=$asset" >> "$GITHUB_OUTPUT"
+          echo "production_base_sha=$base" >> "$GITHUB_OUTPUT"
+          echo "ASSET=$asset" >> "$GITHUB_ENV"
+          echo "PRODUCTION_COMMAND_BASE_SHA=$base" >> "$GITHUB_ENV"
+          # Drop the command-only commit; publication reads only canonical game-production bytes.
+          git reset --hard "$base"
+
+      - name: Checkout clean runtime branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: runtime
+          fetch-depth: 0
+
+      - name: Replace canonical runtime files from exact approved production bytes
+        run: |
+          python3 production/tools/art_pipeline/publish_runtime_asset.py \
+            --repo-root production \
+            --runtime-root runtime \
+            --asset "$ASSET" \
+            --report "$RUNNER_TEMP/runtime-export.json"
+          cat "$RUNNER_TEMP/runtime-export.json"
+          echo "PRODUCTION_SHA=$(jq -r '.production_commit' "$RUNNER_TEMP/runtime-export.json")" >> "$GITHUB_ENV"
+          echo "RUNTIME_BASE_SHA=$(jq -r '.runtime_base_commit' "$RUNNER_TEMP/runtime-export.json")" >> "$GITHUB_ENV"
+          if [ "$(jq -r '.production_commit' "$RUNNER_TEMP/runtime-export.json")" != "$PRODUCTION_COMMAND_BASE_SHA" ]; then
+            echo 'Production checkout moved after command validation.' >&2
+            exit 1
+          fi
+
+      - name: Enforce runtime diff boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runtime
+          mapfile -t allowed_changed < <(jq -r '.files[] | select(.changed == true) | .target' "$RUNNER_TEMP/runtime-export.json" | sort -u)
+          mapfile -t changed < <(git diff --name-only | sort -u)
+          if [ "${#allowed_changed[@]}" -eq 0 ]; then
+            if [ "${#changed[@]}" -ne 0 ]; then
+              echo 'Runtime changed even though approved bytes already matched all targets.' >&2
+              printf '%s\n' "${changed[@]}" >&2
+              exit 1
+            fi
+            echo 'Approved bytes already match runtime; no runtime replacement PR is needed.'
+            exit 0
+          fi
+          printf '%s\n' "${allowed_changed[@]}" > "$RUNNER_TEMP/allowed-changed.txt"
+          printf '%s\n' "${changed[@]}" > "$RUNNER_TEMP/changed.txt"
+          if ! diff -u "$RUNNER_TEMP/allowed-changed.txt" "$RUNNER_TEMP/changed.txt"; then
+            echo 'Runtime publish changed paths outside the explicit changed export targets.' >&2
+            exit 1
+          fi
+          if grep -E '(^|/)(old|previous|backup|bak|archive|v[0-9]+)(/|$)|(_old|_previous|_backup|\.bak)(\.|$)' "$RUNNER_TEMP/changed.txt"; then
+            echo 'Historical/backup runtime copy detected; runtime must contain only the active canonical file.' >&2
+            exit 1
+          fi
+
+      - name: Build exact runtime tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runtime
+          npm install --no-package-lock --no-audit --no-fund
+          npm run build
+          mapfile -t allowed_changed < <(jq -r '.files[] | select(.changed == true) | .target' "$RUNNER_TEMP/runtime-export.json" | sort -u)
+          mapfile -t changed < <(git diff --name-only | sort -u)
+          if [ "${#allowed_changed[@]}" -eq 0 ] && [ "${#changed[@]}" -eq 0 ]; then
+            exit 0
+          fi
+          printf '%s\n' "${allowed_changed[@]}" > "$RUNNER_TEMP/allowed-after-build.txt"
+          printf '%s\n' "${changed[@]}" > "$RUNNER_TEMP/changed-after-build.txt"
+          diff -u "$RUNNER_TEMP/allowed-after-build.txt" "$RUNNER_TEMP/changed-after-build.txt"
+
+      - name: Create runtime replacement PR
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runtime
+          mapfile -t targets < <(jq -r '.files[] | select(.changed == true) | .target' "$RUNNER_TEMP/runtime-export.json" | sort -u)
+          if [ "${#targets[@]}" -eq 0 ]; then
+            echo 'Runtime already contains the exact approved bytes; nothing to publish.'
+            exit 0
+          fi
+          branch="runtime_asset-${ASSET,,}-${GITHUB_RUN_ID}"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
+          for target in "${targets[@]}"; do git add -- "$target"; done
+          mapfile -t staged < <(git diff --cached --name-only | sort -u)
+          if [ "${staged[*]}" != "${targets[*]}" ]; then
+            echo 'Staged runtime paths do not exactly equal changed export targets.' >&2
+            printf 'staged:\n'; printf '%s\n' "${staged[@]}" >&2
+            printf 'targets:\n'; printf '%s\n' "${targets[@]}" >&2
+            exit 1
+          fi
+          git commit -m "Runtime: replace ${ASSET} with approved production art"
+          git push origin "$branch"
+          {
+            echo 'Boundary B only: exact approved bytes from game-production replace existing canonical game/assets paths in main.'
+            echo
+            echo "Production source commit: ${PRODUCTION_SHA}"
+            echo "Runtime base commit: ${RUNTIME_BASE_SHA}"
+            echo
+            echo 'Changed runtime files:'
+            jq -r '.files[] | select(.changed == true) | "- `\(.target)` <= `\(.source)` SHA-256 `\(.sha256)`"' "$RUNNER_TEMP/runtime-export.json"
+            echo
+            echo 'No production history, backup copy, art/gen mirror or legacy outputs mirror is included. Rollback is by Git revert/history.'
+            echo 'Build executed before PR creation: `npm run build`.'
+            echo 'Opening this PR does not mark publish_runtime complete; merge/resulting runtime SHA must be verified separately.'
+          } > "$RUNNER_TEMP/pr-body.md"
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "Runtime: replace ${ASSET} approved asset" \
+            --body-file "$RUNNER_TEMP/pr-body.md"
