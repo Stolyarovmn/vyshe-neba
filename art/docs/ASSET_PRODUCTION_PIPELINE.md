@@ -2,7 +2,9 @@
 
 Этот документ фиксирует production-процесс 2D-ассетов проекта и правила, которые дали наиболее качественный и воспроизводимый результат. Он обязателен для workshop/base placeables и используется вместе с `ref2game` при каждом запросе по игре и ассетам.
 
-**Совместимое нормативное расширение:** [`PRODUCTION_CONTRACT_V2.md`](PRODUCTION_CONTRACT_V2.md) добавляет design/era/projection/runtime preflight и QA gates, **не изменяя** текущие tracker steps, Pixel Snapper/Aseprite, candidate, exact-SHA approval и promotion PR. Шаблон паспорта: [`ASSET_BRIEF_TEMPLATE.md`](ASSET_BRIEF_TEMPLATE.md); инструкции для ChatGPT Project «Games»: [`GAMES_PROJECT_INSTRUCTIONS.md`](GAMES_PROJECT_INSTRUCTIONS.md).
+**Текущий нормативный слой после migration production/runtime:** branch/storage/publication semantics определяет [`RUNTIME_BRANCH_CONTRACT.md`](RUNTIME_BRANCH_CONTRACT.md), tracker order — `art/placeables/PIPELINE_CONFIG.json` version 3, а исполнимый imagegen порядок — [`ASSET_GENERATION_RUNBOOK.md`](ASSET_GENERATION_RUNBOOK.md). Поэтому более старые примеры ниже, где `art/gen` называется runtime-геометрией, упоминаются build-time `outputs/rocket` mirror, production-side `game-ci.yml`, обновление `runtime-assets.json` внутри `promote` или единая граница `promotion → game-ci`, являются **historical pre-split notes**, а не текущей публикационной схемой. Канонически: `promote` создаёт production PR только в `game-production`; отдельный `publish_runtime` заменяет exact approved bytes в существующем `main:game/assets/...` path; rollback runtime идёт через Git history/revert, без backup-копий. Для receipt-based generation фактический request собирает `build_generation_request.py`; его порядок `scope → canonical asset prompt → art/style_bible.txt verbatim` имеет приоритет над иллюстративным prompt formatting в старых секциях. Перед каждым действием branch SHA и runtime paths проверяются заново.
+
+**Совместимое нормативное расширение:** [`PRODUCTION_CONTRACT_V2.md`](PRODUCTION_CONTRACT_V2.md) добавляет design/era/projection/runtime preflight и QA gates. Шаблон паспорта: [`ASSET_BRIEF_TEMPLATE.md`](ASSET_BRIEF_TEMPLATE.md); инструкции для ChatGPT Project «Games»: [`GAMES_PROJECT_INSTRUCTIONS.md`](GAMES_PROJECT_INSTRUCTIONS.md).
 
 ## 1. Источники истины и порядок приоритета
 
@@ -10,7 +12,7 @@
 2. **`art/style_bible.txt`** — канонический визуальный язык. Он добавляется к каждому production generation prompt без пересказа.
 3. **`art/placeables/PRODUCTION_MANIFEST.md`** — gameplay role, footprint, sockets, parts, motion contract и era lineage.
 4. **Google Drive `vyshe-neba/art-originals/`** — канонический архив нетронутых полноразмерных image-generation originals.
-5. **Утверждённый art в `art/gen/`** — фактическая runtime-геометрия после production processing.
+5. **Утверждённый art в `art/gen/`** — канонический production art/history; active runtime bytes публикуются отдельно в `main:game/assets/...` через Boundary B.
 6. **Runtime metadata** — только измеренные по утверждённому art anchor/pivot. Координаты не угадываются заранее.
 
 При конфликте технического шаблона и явно более сильного художественного решения допускается осознанное отклонение, но artistic freedom нельзя использовать для маскировки технических дефектов, случайной механики, плохой читаемости или нарушения lineage.
@@ -19,17 +21,17 @@
 
 Главное правило `ref2game`: **один generation call = один самостоятельный asset или один part sheet**. Не просить генератор одновременно делать «6 эпох + части + анимации + подписи + UI».
 
-**Перед первым production generation** выполняется G0 из `PRODUCTION_CONTRACT_V2.md`: паспорт объекта, назначение и инженерная причинность, референс и его статус, камера/проекция, epoch lineage, runtime target и blockers. Это preflight, **не новый шаг** в `PIPELINE_CONFIG.json -> tracker.steps`. После rig/scene integration выполняется G6 (проекция, посадка, события, motion QA), затем существующий game gate. При неизвестном угле острова запрещено подставлять 47°; незавершённая калибровка блокирует scene approval, но не отменяет создание isolated candidate.
+**Перед первым production generation** выполняется G0 из `PRODUCTION_CONTRACT_V2.md`: паспорт объекта, назначение и инженерная причинность, референс и его статус, камера/проекция, epoch lineage, runtime target и blockers. При receipt-based generation сначала выполняются `validate_generation_preflight.py` и `build_generation_request.py`. PASS generation-preflight разрешает только isolated generation stage и не означает scene/promotion/runtime approval.
 
-Канонический поток:
+Канонический поток после migration:
 
 ```text
-ref2game
-→ style bible + production manifest
+ref2game + contracts/checkpoint
+→ deterministic request
 → E0: one isolated asset
 → save untouched high-quality original to Google Drive
 → write source provenance in GitHub
-→ review E0
+→ source review / E0 review
 → E0 part sheet when needed
 → E1 from approved E0
 → archive E1 original
@@ -44,31 +46,31 @@ ref2game
 → automatic QA
 → candidate artifact
 → visual QA bound to exact candidate SHA-256
-→ promotion PR
-→ canonical approved files in art/gen
+→ scene/projection QA
+→ promote: production PR → game-production/art/gen
 → measure real pivots on approved parts
 → pack era atlases from approved files
 → rig in code
 → motion sheet
 → event/state integration
-→ game build from canonical runtime manifest
-→ final game QA
+→ publish_runtime: exact approved bytes → replacement PR → main/game/assets
+→ applicable runtime build/tests
 ```
 
 Финальный era-atlas **собирается нами** из утверждённых E0–E5. Image generator не должен рисовать production atlas целиком.
 
-Candidate и production — разные состояния. Успешная техническая обработка не означает публикацию: до hash-bound visual approval candidate не может попасть в runtime.
+Candidate и production — разные состояния. Production и runtime publication тоже разные состояния: успешный `promote` не означает, что asset уже опубликован в `main`.
 
 ## 3. Generation / prompt contract
 
-Каждый prompt начинается с конкретного объекта и эпохи, например:
+Для receipt-based generation фактический request строит `tools/art_pipeline/build_generation_request.py`; ручное перефразирование/перестановка canonical request запрещены. Иллюстративный asset prompt начинается с конкретного объекта и эпохи, например:
 
 ```text
 W04 / flight_simulator / E0 1978
 Create ONE isolated workshop flight simulator, and nothing else.
 ```
 
-Production prompt обязательно фиксирует:
+Production request обязательно фиксирует:
 
 - одну функциональную сущность;
 - конкретную эпоху и инженерную логику из manifest;
@@ -78,7 +80,7 @@ Production prompt обязательно фиксирует:
 - отсутствие людей, текста, логотипов, UI и pseudo-writing;
 - отсутствие baked FX;
 - одну согласованную projection/camera внутри asset family;
-- `art/style_bible.txt`, добавленный дословно.
+- `art/style_bible.txt`, добавленный дословно ровно один раз.
 
 Обязательная lighting sentence:
 
@@ -134,7 +136,7 @@ vyshe-neba/
 3. Если генератор вернул PNG, original остаётся PNG; не перекодировать в JPEG.
 4. Original не перезаписывается производной версией.
 5. Имя содержит asset id, era/year и source generation id.
-6. Перед upload вычисляется SHA-256 exact original bytes.
+6. Перед destructive processing вычисляется SHA-256 exact original bytes и original загружается в Drive.
 7. Drive file id/URL, SHA-256, original size и source generation id записываются в GitHub provenance.
 8. Любой original, который использовался как reference для следующей эпохи, архивируется обязательно.
 9. Значимые rejected candidates могут храниться в `_rejected/` с причиной отклонения; approved и rejected не смешиваются.
@@ -150,7 +152,12 @@ W03 и W05 high-quality originals уже архивированы. Для W04 у
 
 ## 6. GitHub: что хранится в репозитории
 
-GitHub является источником production-инструкций, reproducibility metadata, QA и **канонического approved art**. Derived runtime mirror для мигрированных asset families в репозиторий не коммитится: игра получает те же logical runtime paths при build-time packaging из `art/gen`.
+Текущая branch model определена `RUNTIME_BRANCH_CONTRACT.md`:
+
+- `game-production` хранит production instructions, reproducibility metadata, QA и canonical approved production art под `art/gen/...`;
+- `main` хранит clean runtime/build tree и active runtime assets только по canonical `game/assets/...` paths;
+- `art/runtime/RUNTIME_EXPORTS.json` описывает явное production source → runtime target mapping для Boundary B;
+- `outputs/rocket/*` ниже является **legacy pre-split example** и не должно приниматься за текущий `main` runtime без отдельной проверки.
 
 ```text
 art/docs/ASSET_PRODUCTION_PIPELINE.md
@@ -162,12 +169,12 @@ art/raw/placeables/<zone>/<asset>/eN_YEAR_presnap.json
 art/gen/placeables/<zone>/<asset>/eN_YEAR.png
 art/gen/placeables/<zone>/<asset>/eN_YEAR.qa.json
 art/gen/placeables/<zone>/<asset>/eN_YEAR.pipeline.json
-outputs/rocket/runtime-assets.json
+art/runtime/RUNTIME_EXPORTS.json
 ```
 
 High-quality raw PNG может дополнительно храниться в `art/raw/`, если размер позволяет, но это optional. Канонический source binary находится в Google Drive.
 
-`outputs/rocket/runtime-assets.json` задаёт только mapping `canonical source → logical runtime target`. `outputs/rocket/build.cjs` собирает runtime package в памяти/standalone build. Для migrated family запрещено одновременно держать вторую committed PNG-копию в `outputs/rocket/dist/assets/...`. Запрет относится к PNG-зеркалам ассетов; автономный `outputs/Выше неба.html` — generated-артефакт, он не коммитится (`.gitignore`) и публикуется только артефактом CI.
+Runtime publication **не** делает build-time mirror из `art/gen` в том же production tree. Отдельный `publish_runtime` берёт exact approved production bytes и заменяет существующий canonical `main:game/assets/...` target. Старый runtime file не сохраняется второй копией; rollback — Git history/revert.
 
 Минимальный provenance JSON:
 
@@ -329,7 +336,7 @@ OFF → IDLE → NOTICE → WORK → FINISH → COOLDOWN → IDLE
 
 ## 11. QA gates
 
-Ассет не получает статус `ready`, пока не пройдены automatic, visual и rig checks.
+Ассет не получает статус `ready`, пока не пройдены automatic, visual и применимые scene/rig checks.
 
 ### Automatic
 
@@ -354,7 +361,7 @@ OFF → IDLE → NOTICE → WORK → FINISH → COOLDOWN → IDLE
 - moving parts конструктивно возможны;
 - future era не сводится к «cyan + hologram»;
 - нет бессмысленного micro-detail;
-- materials/light/projection соответствуют style bible.
+- materials/light/projection соответствуют style bible и approved camera family.
 
 Visual verdict обязан быть **hash-bound**: `visual_qa.json` должен содержать approval exact SHA-256 каждого production candidate. Изменение PNG после review автоматически инвалидирует approval.
 
@@ -368,7 +375,7 @@ Visual verdict обязан быть **hash-bound**: `visual_qa.json` долже
 
 ## 12. GitHub CI
 
-Canonical automation разделена на три ответственности:
+Canonical automation после production/runtime split разделена минимум на четыре ответственности:
 
 ```text
 Candidate (read-only)
@@ -376,65 +383,53 @@ Candidate (read-only)
 art/placeables/PIPELINE_CONFIG.json
 tools/art_pipeline/process_asset.py
 
-Promotion (write only through branch/PR)
+Production promotion / Boundary A
 .github/workflows/asset-promote.yml
 tools/art_pipeline/verify_visual_gate.py
 tools/art_pipeline/promote_asset.py
 
-Game gate
-.github/workflows/game-ci.yml
-outputs/rocket/runtime-assets.json
-outputs/rocket/build.cjs
-outputs/rocket/verify.cjs
+Runtime publication / Boundary B
+.github/workflows/asset-publish-runtime.yml
+art/runtime/RUNTIME_EXPORTS.json
+tools/art_pipeline/publish_runtime_asset.py
+
+Runtime build gate (clean main)
+main:.github/workflows/game-ci.yml
 ```
 
-`art-pipeline.yml` (W04) и `b03-art-pipeline.yml` (B03) — тонкие asset-specific trigger wrappers, а не отдельные реализации processing logic.
-
-Остальные workflow:
-
-| Workflow | Назначение | Запуск |
-| --- | --- | --- |
-| `art-tools-bootstrap.yml` | сборка и проверка канонического toolchain (`setup_art_tools.sh`) | push/PR по путям скрипта, вручную |
-| `b01-atlas-repair.yml` | детерминированная пересборка part-атласов B01 | push в `main` по путям, вручную |
-| `b01-motion-qa.yml` | проверка motion sheet B01 | push в `main` по путям, вручную |
-| `b01-rig-qa.yml` | проверка рига B01 | push в `main` по путям, вручную |
-| `b01-runtime-qa.yml` | проверка погодного runtime B01 | push в `main` по путям, вручную |
-
-Все jobs имеют `timeout-minutes: 30` (раздел 16). B01 QA workflows запускаются только после push в `main`; на pull request обязательный gate — `game-ci.yml`.
+`art-pipeline.yml` (W04) и asset-specific trigger wrappers остаются trigger wrappers, а не отдельными processing implementations.
 
 Candidate workflow:
 
 - использует pinned canonical toolchain;
 - создаёт PNG + `*.qa.json` + `*.pipeline.json` + `candidate-manifest.json`;
 - имеет `contents: read`;
-- не пишет `art/gen`, runtime и `main`;
-- публикует только Actions artifact для QA/review.
+- не пишет production/runtime;
+- публикует Actions artifact для QA/review.
 
-Promotion workflow:
+Production promotion:
 
-- rebuild exact candidate из canonical sources;
-- требует `overall_status=approved`;
-- требует `status=approved` для каждой era;
-- требует exact SHA-256 match review ↔ candidate PNG;
-- только после этого переносит файлы в canonical `art/gen`;
-- обновляет `runtime-assets.json`;
-- создаёт `2d_*` branch/PR;
-- **никогда не push'ит production output прямо в `main`**.
+- rebuild/verify exact candidate;
+- требует hash-bound approval;
+- переносит approved files только в canonical `game-production:art/gen` + allowed provenance/QA;
+- создаёт PR targeting `game-production`;
+- не обновляет `main` runtime paths.
+
+Runtime publication:
+
+- pins exact production commit + exact runtime base;
+- requires explicit `RUNTIME_EXPORTS.json` mapping, approved SHA and semantics compatibility;
+- replaces only declared existing `main:game/assets/...` targets;
+- rejects unrelated files/history copies;
+- runs available runtime build/checks;
+- creates separate PR targeting `main`;
+- is not final until merge/resulting runtime SHA is confirmed.
 
 `pipeline.json` фиксирует source gen id/SHA, Drive source reference, Pixel Snapper revision, Aseprite version, pixel size, palette limit, canvas, registration target, output SHA и reproducibility hashes.
 
-Failed candidate никогда не становится runtime asset только потому, что pipeline технически смог его обработать. B03 с `fail_regenerate` и W04 с rejected visual review остаются blocked до нового exact approval.
+Failed candidate никогда не становится runtime asset только потому, что pipeline технически смог его обработать.
 
-После merge production PR общий `game-ci.yml` обязан пройти:
-
-```text
-static pipeline validation
-→ verify no migrated runtime mirrors
-→ standalone build
-→ full npm test / verify.cjs
-→ standalone HTML SHA-256
-→ QA/build artifact upload
-```
+На проверенном текущем `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721` каталога `game/test` нет. `Game runtime build` проверяет clean-tree policy, manifest resolution, standalone build/checksum и отсутствие tracked mutation; это не full B03 gameplay regression.
 
 ## 13. W04 / flight_simulator reference lineage
 
@@ -455,24 +450,34 @@ Manifest parts: `base`, `pod`, `actuator_left`, `actuator_right`, `canopy`.
 
 ## 14. Definition of Done
 
-Placeable/era считается завершённым только когда:
+Production-approved placeable/era считается завершённым только когда:
 
 ```text
-prompt saved
+prompt/preflight saved and valid
 + untouched high-quality original archived to Google Drive
 + source generation id recorded
 + source SHA-256 recorded
 + Drive file id/URL recorded in GitHub provenance
++ source gate passed
 + Pixel Snapper completed
 + normalized to canonical LP canvas
 + Aseprite indexed/no-dither export completed
 + automatic QA passed
 + candidate artifact produced
-+ visual QA passed for exact candidate SHA-256
-+ promotion PR merged
-+ canonical approved PNG lives in art/gen
-+ runtime-assets mapping registered when the family is migrated
-+ full game-ci passes
++ visual/scene QA passed for exact candidate SHA-256
++ promotion PR merged into game-production
++ canonical approved PNG lives in game-production:art/gen
+```
+
+Это **не означает runtime publication**. Для integrated/runtime completion дополнительно:
+
+```text
+verified runtime logical name / consumer / semantics
++ explicit RUNTIME_EXPORTS mapping
++ existing canonical main:game/assets target
++ publish_runtime replacement PR merged to main
++ resulting runtime SHA confirmed
++ applicable runtime build/tests passed
 ```
 
 Rigged object дополнительно требует:
@@ -488,60 +493,45 @@ part sheet approved
 
 ## 15. Обязательное правило для всех следующих ассетов
 
-Любой новый workshop/base asset начинается с `ref2game`, `art/style_bible.txt` и `art/placeables/PRODUCTION_MANIFEST.md`, генерируется по одной эпохе/одному asset за call, **сразу сохраняет нетронутый high-quality original в Google Drive**, затем проходит SpriteFusion Pixel Snapper → normalize → Aseprite → automatic QA → candidate → hash-bound visual QA → promotion PR → measured rig → game QA.
+Любой новый workshop/base asset начинается с `ref2game`, contracts/checkpoint, `art/style_bible.txt` и `PRODUCTION_MANIFEST.md`, генерируется по одной эпохе/одному asset за call, **сразу сохраняет нетронутый high-quality original в Google Drive**, затем проходит SpriteFusion Pixel Snapper → normalize → Aseprite → automatic QA → candidate → hash-bound visual/scene QA → production promotion → measured rig when applicable → separate runtime publication/integration.
 
 Нельзя:
 
 - объявлять raw AI image готовым runtime sprite;
-- удалять original после получения runtime derivative;
+- удалять original после получения derivative;
 - заменять original обработанной копией;
 - угадывать pivots;
 - симулировать сложную механику движением целого PNG;
 - генерировать production E0–E5 atlas одним AI board;
-- публиковать candidate в runtime до hash-bound visual approval;
-- push'ить generated production output из CI прямо в `main`;
-- держать committed runtime mirror для asset family, уже переведённой на canonical `art/gen` + `runtime-assets.json`.
+- публиковать candidate до hash-bound visual approval;
+- push'ить generated production output прямо в `main`;
+- хранить old/backup runtime copies вместо Git rollback;
+- считать `promote` эквивалентом `publish_runtime`.
 
 ## 16. Interactive execution timeout / anti-hang contract
 
-Эти правила обязательны для **каждого интерактивного хода** по игре и ассетам. Подробности также зафиксированы в `art/docs/EXECUTION_TIMEOUT_POLICY.md`, но этот раздел является частью канонического production pipeline и не может считаться необязательной рекомендацией.
+Эти правила обязательны для **каждого интерактивного хода** по игре и ассетам. Подробности также зафиксированы в `art/docs/EXECUTION_TIMEOUT_POLICY.md`.
 
 ### Hard wall-clock deadline
 
 - Максимум одного непрерывного interactive attempt: **20 минут wall-clock**.
-- Это ограничение относится не только к shell/CI-командам, но и к самому conversation/tool-loop: нельзя держать ответ открытым дольше только потому, что выполняется polling GitHub Actions, ожидание imagegen или повторные tool calls.
+- Это ограничение относится не только к shell/CI-командам, но и к conversation/tool-loop.
 - На **15-й минуте** запрещено запускать новую дорогую генерацию, полный rebuild или новый длинный CI run.
 - На **18-й минуте** прекращаются необязательные polish/critic/retry действия.
-- На **20-й минуте** текущий ход обязан завершиться сообщением пользователю с checkpoint, даже если CI ещё работает.
+- На **20-й минуте** текущий ход обязан завершиться checkpoint/status.
 
 ### No-progress watchdog
 
-- **5 минут без проверяемого прогресса** (новый файл/commit, смена CI state, QA result, imported asset и т.п.) означают, что текущий способ завис.
-- После этого ожидание прекращается; допускается **одна** смена технического пути.
-- Если альтернативный путь тоже не дал прогресса — сохранить checkpoint и вернуть управление пользователю, не ждать 20 минут молча.
-- **Две одинаковые ошибки подряд** одного API/tool/method запрещают третий идентичный retry.
+- **5 минут без проверяемого прогресса** означают, что текущий способ завис.
+- После этого ожидание прекращается; допускается одна смена технического пути.
+- Две одинаковые ошибки подряд одного API/tool/method запрещают третий идентичный retry.
+- Для одного asset в одном интерактивном ходе максимум **2 production-generation attempts**.
 
-### CI / GitHub Actions: запрет polling-loop
+### CI / GitHub Actions
 
-После запуска CI:
-
-1. выполнить максимум один немедленный status check, если он нужен для подтверждения старта;
-2. если run всё ещё `queued`/`in_progress`, **не держать текущий ответ открытым в цикле ожидания**;
-3. сохранить `branch`, `commit SHA`, `run id` и текущий job/state как checkpoint;
-4. завершить интерактивный ход;
-5. следующий ход сначала проверяет **тот же run**, а не запускает новый без причины.
-
-Разрешён повторный status check в том же ходе только если между проверками произошло другое реальное полезное действие и общий wall-clock deadline всё равно соблюдается. Частый polling ради ожидания запрещён.
-
-### Script / workflow timeouts
-
-- Для локальных долгих команд, где это возможно, использовать явный `timeout`/эквивалент вместо бесконечного ожидания.
-- Для GitHub Actions jobs/steps с потенциально долгим выполнением задавать разумный `timeout-minutes`.
-- Repo-level timeout **не заменяет** 20-минутный conversation-level deadline: даже если внешний job имеет timeout 30–60 минут, интерактивный ход всё равно заканчивается с checkpoint не позднее 20 минут.
+Не держать текущий ответ открытым в polling-loop. После запуска/проверки значимой смены состояния сохранять branch/SHA/run/job как checkpoint. Следующий ход проверяет тот же run, а не запускает новый без причины.
 
 ### Checkpoint before return
-
-Перед timeout/ранним возвратом сохранить всё доступное:
 
 ```text
 branch
@@ -553,22 +543,11 @@ CI run id + job/state
 точный следующий шаг
 ```
 
-Следующий ход обязан сначала восстановить этот checkpoint/`ASSET_TASK_TRACKER.md`, а не повторять уже выполненную генерацию, импорт или build.
-
-### User-visible progress
-
-- Не писать десятки сообщений после каждой внутренней операции.
-- Прогресс группируется как `asset/source → runtime/code → QA → build/delivery`.
-- Нельзя писать «ещё подожду CI» и продолжать скрытый polling-loop.
-- Если внешний процесс ещё идёт, корректный результат хода — **checkpoint + текущий статус**, а не зависший ответ.
-
-**Главное правило:** пользователь не должен снова вручную нажимать Stop из-за того, что инструментальная цепочка или CI удерживают один ответ дольше 20 минут.
-
-
 ## 17. Governance, совместимость веток и ChatGPT Project «Games»
 
-- Для всех новых и изменяемых ассетов применяются дополнительные **G0/G1/G6/G7** критерии из [`PRODUCTION_CONTRACT_V2.md`](PRODUCTION_CONTRACT_V2.md). Никакой из них не отменяет hash-bound approval, Drive original, измеренные pivots, CI и PR из разделов 1–16.
-- Паспорт из [`ASSET_BRIEF_TEMPLATE.md`](ASSET_BRIEF_TEMPLATE.md) фиксирует назначение, технические зависимости, E0–E5 delta, camera family, scene placement, события/FX, runtime logical path и проверяемый статус. `UNKNOWN` не заменяется догадкой.
-- Ветки разделены: `game-production` хранит production-инструкции/метаданные, `main` — актуальный `game/src/render/manifest.js`. Старые ссылки на `game-build` и `outputs/rocket/*` проверяются, а не предполагаются существующими. Сборку/тесты проводить только в подтверждённом полном дереве; отдельно отмечать отсутствующие файлы и CI blockers.
-- Настройки ChatGPT Project нельзя изменить коммитом: пользователь вручную копирует текст из [`GAMES_PROJECT_INSTRUCTIONS.md`](GAMES_PROJECT_INSTRUCTIONS.md) в Project instructions. Для repo-aware агентов действует корневой `AGENTS.md`.
-- Этот v2 release меняет **документы и добавляет только изолированный smoke-check документации/JSON** (`production-contract.yml`); существующие asset processing, promotion, game CI, runtime и сборка не меняются. Полные CI/runtime интеграции — отдельные PR с совместимым миграционным планом и проверкой. До такого PR новые design/scene gates считаются **manual review**, не «автоматически проверенными».
+- Для новых/изменяемых ассетов применяются G0/G1/G6/G7 criteria из `PRODUCTION_CONTRACT_V2.md`.
+- `RUNTIME_BRANCH_CONTRACT.md` имеет приоритет для branch/storage/publication semantics.
+- `game-production` хранит production/history, `main` — clean runtime/build и canonical `game/assets/...`.
+- Старые ссылки на `game-build`, `clean-src` или `outputs/rocket/*` проверяются, а не предполагаются текущим runtime.
+- Настройки ChatGPT Project нельзя изменить коммитом: пользователь вручную копирует `GAMES_PROJECT_INSTRUCTIONS.md` в Project instructions.
+- Изменения docs/art rules, CI/tooling и runtime integration делаются отдельными reviewable PR, если смешивание затрудняет диагностику/rollback.

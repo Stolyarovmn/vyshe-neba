@@ -1,131 +1,154 @@
-# «Выше неба» — Production Contract v2 (совместимое расширение)
+# «Выше неба» — Production Contract v2
 
-**Статус:** нормативное дополнение к `ASSET_PRODUCTION_PIPELINE.md` после слияния PR. **Не заменяет** существующие команды, конфигурацию, трекер, статусы, утверждения и workflow. Новые требования действуют для новых и изменяемых ассетов; уже утверждённые файлы не переделываются без конкретного дефекта и отдельного решения.
+**Статус:** нормативное дополнение к `ASSET_PRODUCTION_PIPELINE.md` для новых/изменяемых ассетов. Branch/storage/publication semantics задаёт `RUNTIME_BRANCH_CONTRACT.md`; tracker order и tool pins задаёт `PIPELINE_CONFIG.json`. Этот документ не отменяет exact-SHA approval, immutable originals, measured pivots или ref2game.
 
-Термины: **MUST / ОБЯЗАТЕЛЬНО** — блокирующее требование; **SHOULD / ЖЕЛАТЕЛЬНО** — отклонение допустимо только с записанной причиной; **UNKNOWN** — данных нет, запрещено подставлять догадку. Наличие текста в design manifest не доказывает, что механика реализована в игре.
+Термины: **MUST / ОБЯЗАТЕЛЬНО** — блокирующее требование; **SHOULD / ЖЕЛАТЕЛЬНО** — отклонение допустимо только с записанной причиной; **UNKNOWN** — данных нет, запрещено подставлять догадку.
 
-## 1. Область применения и границы
+## 1. Scope
 
-- `ref2game` обязателен как метод для каждого запроса по 2D-игре. Для **world sprites** сохраняется маршрут `tools/ref2game` (prepare → imagegen → import → slice/prep → game QA); для **W/B placeables** — существующий `tools/art_pipeline` (source archive → Pixel Snapper → normalize → Aseprite → candidate → hash-bound review → promotion PR). Нельзя навязывать обработку W/B всем видам арта без миграционного решения.
-- Источник визуального языка — `art/style_bible.txt`, включаемый в production prompt **дословно**. Условия прозрачности, одного объекта на вызов, отсутствия baked FX и неизменности originals сохраняются.
-- Этот документ добавляет **G0 design/runtime preflight**, **G1 projection/era review**, **G6 scene/interaction review**; он не переименовывает существующие tracker steps и не меняет `PIPELINE_CONFIG.json`, tool revisions, SHA-гейты или CI без отдельного PR.
-- Любой asset может оставаться в `design`, `candidate`, `blocked`, `approved`, `integrated`. Статус `approved` означает одобрение **конкретного** изображения; `integrated` — отдельно проверенное подключение к runtime. Это **поясняющие метки** в design-отчёте, не новые значения машинного tracker (его статусы остаются `pending|running|success|failed|blocked|skipped`).
+- `ref2game` обязателен для всех 2D game-art запросов.
+- World sprites сохраняют отдельный ref2game route.
+- W/B placeables используют `tools/art_pipeline`: raw archive → Pixel Snapper → normalize → Aseprite → auto QA → immutable candidate → exact-SHA review.
+- `art/style_bible.txt` включается в production request **дословно**; canonical request для receipt-based generation строит `build_generation_request.py`.
+- G0/G1/G6 добавляют design/projection/runtime checks. Позднейшая runtime-separation migration уже добавила tracker-step `publish_runtime`; это отражено в `PIPELINE_CONFIG.json` v3 и `RUNTIME_BRANCH_CONTRACT.md`.
+- `approved` означает approval конкретного exact image; `integrated`/runtime publication доказывается отдельно.
 
-## 2. Источники и разрешение конфликтов
+## 2. Sources of truth
 
 | Что проверяем | Канонический источник |
 | --- | --- |
-| Процесс, approval, provenance, timeouts | `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `ASSET_TASK_TRACKER.md`, `EXECUTION_TIMEOUT_POLICY.md` |
-| Способ работы с референсами/артом | `ref2game/codex/SKILL.md` (проверять актуальную версию) |
-| Цвет, пиксельный язык, свет, запреты | `art/style_bible.txt` |
-| Функция, parts, lineage, design intent | `art/placeables/PRODUCTION_MANIFEST.md` |
-| Параметры обработки и tracker steps | `art/placeables/PIPELINE_CONFIG.json` |
-| Остров, зоны, footprint, якоря | `art/placeables/BASE_ISLAND_LAYOUT.json`; пояснения в `art/docs/BASE_ISLAND_LAYOUT.md` |
-| Реальные имена/пути/эпохи/размеры/подмены в игре | `main:game/src/render/manifest.js` и соответствующий код/тесты **на фактическом commit SHA** |
-| Геометрия деталей и approval | Утверждённый exact PNG + SHA-256 + measured metadata + hash-bound visual QA |
-| Неизменённый источник генерации | Google Drive original + SHA-256 + provenance в GitHub |
+| Process / approval / provenance / timeouts | `ASSET_PRODUCTION_PIPELINE.md`, `ASSET_TASK_TRACKER.md`, `EXECUTION_TIMEOUT_POLICY.md` |
+| Branch/storage/publication | `RUNTIME_BRANCH_CONTRACT.md` |
+| Ref workflow | current `studioigor/ref2game/codex/SKILL.md` |
+| Visual language | `art/style_bible.txt` |
+| Gameplay design / parts / lineage | `art/placeables/PRODUCTION_MANIFEST.md` |
+| Tool pins / tracker order | `art/placeables/PIPELINE_CONFIG.json` |
+| Island layout / anchors / footprint | `art/placeables/BASE_ISLAND_LAYOUT.json` |
+| Current runtime names/paths/consumers | pinned `main:game/src/render/manifest.js` + corresponding code/checks |
+| Approved geometry | exact approved PNG + SHA-256 + measured metadata |
+| Immutable generation source | Google Drive original + SHA-256 + provenance |
 
-**ОБЯЗАТЕЛЬНО:** при расхождении не выбирать произвольно «более удобный» источник. Указать обе версии, SHA/ref, владельца решения и блокирующее последствие; обновить контракт/код в согласованном PR. Для runtime-поведения код и тесты на выбранном commit описывают **текущее состояние**, а production manifest — **цель**, пока интеграция не доказана. Художественное исключение не отменяет проверку физических частей, источников и runtime.
+При конфликте нельзя выбирать удобный источник. Зафиксировать обе версии, pinned refs/SHA, owner решения и blocker. Runtime code describes current implementation; production manifest remains a design target until integration is proven.
 
-### Проверка веток перед работой
+## 3. G0 — design/runtime preflight
 
-На момент ревизии 2026-10-30 обнаружены `main` (runtime `game/src/render/`) и `game-production` (документы, метаданные, тесты, pipeline scripts); ссылка на `game-build` в старом README устарела. В `game-production` нет `game/src/render/manifest.js` и части legacy `outputs/rocket/*`; в `main` нет `art/docs/ASSET_PRODUCTION_PIPELINE.md`. **Нельзя запускать «полный CI» на неполном дереве и объявлять его успешным.** Для интеграции нужен проверенный собранный workspace/контракт переноса, а не слепой merge деревьев. Перед каждым выпуском повторно проверить наличие файлов, refs и SHA: сведения здесь — датированный снимок, не вечная истина.
+Для каждой новой/изменяемой family заполнить brief по `ASSET_BRIEF_TEMPLATE.md` и явно указать:
 
-## 3. G0 — обязательный preflight до первой генерации
+1. asset id/slug/type/era/status/gameplay role;
+2. why/where/when and dependencies;
+3. physical construction, supports, joints, service logic;
+4. approved visual reference, camera family, coordinate space, footprint/registration;
+5. runtime logical name/path/consumer/fallback or `UNKNOWN/integration_pending`;
+6. immutable source archive, prompt, provenance, toolchain and QA plan.
 
-Для каждого нового asset family создать/обновить паспорт по `art/docs/ASSET_BRIEF_TEMPLATE.md` (можно хранить рядом с prompt или manifest; до автоматизации путь фиксируется в tracker/PR). Заполнить или явно пометить `UNKNOWN`:
+Missing gameplay reason, mandatory reference/size/socket or required runtime contract blocks the corresponding stage. Research concepts may exist as `not production`, never as silently ready assets.
 
-1. ID, slug, тип (`world` / `base` / `workshop` / `UI` / `environment`), 6 эпох или обоснованное исключение, текущий статус, gameplay-функция и игроку видимый результат.
-2. Почему объект нужен **здесь и сейчас**; зависимость от покупки/прогресса; реальные события, с которыми он связан. Не добавлять новую механику из эстетических соображений.
-3. Физическая конструкция: нагрузка, опора, источник энергии/данных/топлива при необходимости, крепления, подвижные узлы, обслуживание, безопасная зона. Не нужно рисовать все скрытые коммуникации; видимые обязаны иметь причину и маршрут.
-4. Конкретный reference и статус его approval; camera family; исходная единица координат; footprint, registration, видимая область, слои, sockets и возможные коллизии.
-5. Предполагаемое runtime logical name/asset path, E0–E5 mapping, fallback и код, который потребляет asset. **Не придумывать имя**, если манифест не подтверждает его: пометить `integration_pending`.
-6. Неизменённый source, место архивации, prompt, provenance, версия toolchain, план проверки и критерии готовности.
+## 4. Era lineage
 
-Если отсутствуют gameplay role, опорный референс, обязательный размер/сокет или подтверждённый способ runtime-интеграции — **BLOCK** соответствующую стадию; допускается исследовательский концепт с явным `not production`, но не публикация.
-
-## 4. Эпохи: инженерная причинность вместо косметического перекраса
-
-Для каждого перехода `E(n) → E(n+1)` паспорт фиксирует **сохранено / заменено / добавлено / почему / игровой сигнал**. Разрешено развитие альтернативного мира; нельзя представлять выдуманную историческую норму как факт. Действующая шкала из manifest:
-
-| Эпоха | Проверяемый характер конструкции |
+| Era | Engineering character |
 | --- | --- |
-| E0 / 1978 | ручная сборка, открытые механизмы, сварные опоры, аналоговые приборы |
-| E1 / 1986 | промышленная сборка, гидравлика, защищённые шкафы, ранняя электроника |
-| E2 / 1998 | моторизация, CRT/стойки, кабельные трассы и диагностика |
-| E3 / 2015 | модульность, композиты, плоские экраны, закрытые сервоприводы |
-| E4 / 2035 | роботизация, автономные модули, физические манипуляторы |
-| E5 / 2060 | интегрированные материалы/системы с **читаемой функцией**, без обязательных «голограмм» |
+| E0 / 1978 | hand-built, exposed mechanics, welded supports, analog instruments |
+| E1 / 1986 | industrial assembly, hydraulics, protected cabinets, early electronics |
+| E2 / 1998 | motorization, CRT/racks, cable routing and diagnostics |
+| E3 / 2015 | modular construction, composites, flat displays, enclosed servos |
+| E4 / 2035 | robotics, autonomous modules, physical manipulators |
+| E5 / 2060 | integrated materials/systems with readable physical function |
 
-**ОБЯЗАТЕЛЬНО:** непрерывность силуэта, опоры и принципа работы либо документированная инженерная причина изменения; соответствие эпохе органов управления, крепежа, материалов, подсветки и энергообеспечения. Сигналы, панели и приборы должны объяснять функцию, а не добавлять бессмысленные пиксели. Декоративные кабели, псевдописьмо, лишние антенны, невозможные шарниры и случайные мигающие лампы запрещены. Результат каждого перехода сравнивается с E0 anchor **и** предыдущей утверждённой эпохой.
+Each E(n)→E(n+1) records preserved/replaced/added/why/player signal. Cosmetic recolor is not engineering evolution. Future eras do not default to cyan/holograms.
 
-## 5. Проекция, масштаб и посадка в сцену
+## 5. Projection, scale and scene placement
 
-**Разные camera families не смешивать:**
-- остров/наземные покупки: `top/3-4` **по фактическому утверждённому острову**;
-- мастерская: камера утверждённого interior reference;
-- самолёты/опасности: side/slight-3/4 side согласно style bible.
+Camera families are separate:
 
-Число **47° не подтверждено**. Его нельзя писать в prompt, конфиг или QA как факт. На момент ревизии метаданные `art/gen/environment/start_island_hd.meta.json` помечают HD-остров `status=pending`, `approved_by_user=false`: поэтому формальная калибровка **не утверждена**.
+- island/ground purchases: `island_top_3_4` from the exact approved island reference;
+- workshop: approved interior family;
+- aircraft/hazards: side/slight-3/4 side per style bible.
 
-Для новых наземных объектов:
-1. Выбрать утверждённый reference island, зафиксировать file SHA, экранный масштаб и 2–3 проверяемых направления/плоскости (крыша, фундамент, дорога, площадка); если опорная геометрия не позволяет вычислить угол — хранить `projection_angle: UNKNOWN`, не вычислять «на глаз».
-2. Сопоставить видимость крыши и боковых граней, наклон линий, сокращение глубины, свет, уровень горизонта и перспективную деформацию. Проверять **по композиции**, а не по названию «изометрия».
-3. Сверить `BASE_ISLAND_LAYOUT.json` (version 3 на дату ревизии): `anchors`, `footprint_px`, `sprite_px`, маску суши, стартовую площадку, траншею, дороги, порядок передних/задних слоёв и окклюзию. LP и пиксели острова — разные пространства, запрещено переносить координаты без преобразования.
-4. Сделать in-scene composite на реальном масштабе и уменьшенном/портретном зуме. Проверить контакт с грунтом, перекрытие, читаемость, пропорции и отсутствие эффекта «наклейки». Не рисовать baked cast shadow: контактную/динамическую тень создаёт код.
-5. Пока эталон не утверждён, допускается изолированный candidate с `projection_review=pending`; **scene approval/integrated блокируется**, но уже принятые assets не аннулируются автоматически.
+### Current approved island evidence
 
-## 6. Физика, анимация и причинные сигналы
+`start_island_hd` is **approved**, not pending:
 
-- **AI рисует** физические полные детали, включая скрываемые при повороте участки; **код** задаёт rig, переходы, динамический свет, тень, экранные данные, FX и звук. Шарниры/направляющие/тросы должны соединять реальные детали; pivots измеряются после approval.
-- Для каждого `WORK`: `trigger`, `precondition`, `state transition`, `affected parts`, `duration/termination`, `cancel/reset`, `cooldown`, `gameplay result`. Переходы по действующему контракту `OFF → IDLE → NOTICE → WORK → FINISH → COOLDOWN → IDLE`; отсутствующие состояния отмечаются явно, а не маскируются циклом.
-- `IDLE` — редкая вторичная жизнь, не непрерывная демонстрация работы. Движение зависит от данных: флюгер — от ветра, уровень топлива — от объёма, лампа безопасности — от состояния, погрузчик — от груза. Нет события — нет ложного выполнения работы.
-- Визуальный сигнал имеет семантику (`normal/warning/error/active/complete`), источник данных и понятный паттерн; критическое состояние не кодируется **только** цветом. Для режима сниженной анимации сохранять информацию без бесконечного мигания.
-- День/ночь, погода, ветер, перекрытие, масштаб и пауза проверяются **если поддерживаются сценой**; не вводить новые погодные/временные механики ради ассета. Эффекты ограничиваются функцией и реальной читаемостью.
-- У объектов с подвижными деталями проверять rest reconstruction, непрерывность креплений, отсутствие clipping/растяжения, покадровый motion sheet и возвращение в устойчивое состояние.
+- production reference: `art/gen/environment/start_island_hd.png`;
+- SHA-256 `2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997`;
+- Git blob SHA-1 `382ab3fb2906152e2bc2a2616d794192904e7d68`;
+- dimensions `1916×821`;
+- approval record `art/gen/environment/start_island_hd.approval.json`;
+- projection record `art/gen/environment/start_island_hd.projection.json`.
 
-## 7. Runtime и cross-branch compatibility gate
+Actual original 3D camera angle remains `UNKNOWN`. **47° is unsupported.**
 
-Перед promotion и после интеграции сопоставить:
-- `asset_id / family / era` ↔ конкретный logical name и path в актуальном runtime `ASSET_FILES` / asset resolver;
-- `ERA_YEARS` (в проверенном `main`: 1978/1986/1998/2015/2035/2060), canvas, source pixels, sprite size, measured registration, world scale;
-- слои, `spriteAnchor`, `BUILDING_ANCHORS`, `WORLD_ENTRIES`, `STATION_DIRS`, `PLACEABLE_BUILDINGS`, `PROCEDURAL_BUILDINGS` и фактический потребитель; не считать design family автоматически готовым runtime slot;
-- явные временные замены `BROKEN_PLACEABLE_ERAS` / procedural fallback: фиксировать причину, owner, заменяемый путь и условие удаления fallback. **Нельзя считать fallback завершённым production asset**;
-- отсутствие дублирующих бинарных копий в assembled build, корректный import, отсутствие silent missing assets.
+Measured ground-circle proxy:
 
-Проверки `game/test/render.manifest.test.mjs` и `game/test/render.island.test.mjs` применимы **только** в полном дереве с соответствующим кодом и PNG. Нельзя утверждать, что тест пройден, если он не запускался. Отдельно проверять конфликт имён, дубли, исчезнувшие файлы и статус ассета во всех используемых ветках.
+- compression `0.958515`;
+- orthographic-equivalent elevation `73.4386°` (`73.44°` production control);
+- tilt from top-down `16.5614°` (`16.56°` production control).
 
-## 8. QA и release gates — совместимо с существующим pipeline
+This is generation control only. Exact reference appearance wins. A generated source must still pass visual projection review; a low/front-side result is rejected even if the request contained the proxy.
 
-| Gate | Что требуется | Блокирующее условие |
+For every ground candidate: verify `BASE_ISLAND_LAYOUT.json`, scale conversion, anchor, footprint, contact, occlusion, land mask and real-scale/reduced-zoom composite. Do not bake cast shadow.
+
+## 6. Physics, animation and causal signals
+
+- AI draws complete physical parts; code owns rig/state/light/data/FX.
+- Do not fake a mechanism by bobbing/rotating/scaling the whole sprite when real moving parts exist.
+- `WORK` needs trigger, precondition, state transition, affected parts, termination/cancel/cooldown and gameplay result.
+- Default causal sequence: `OFF → IDLE → NOTICE → WORK → FINISH → COOLDOWN → IDLE` unless documented otherwise.
+- No eventless perpetual WORK.
+- Critical state cannot be encoded by color alone.
+- Measured pivots come only from exact approved art.
+
+## 7. Runtime compatibility gate
+
+Before production promotion, document the expected runtime target; before runtime publication, verify it against pinned `main`:
+
+- asset/family/era ↔ logical name/path;
+- `ERA_YEARS` and actual asset resolver;
+- consumer, layers, anchor/registration, fallback;
+- `BROKEN_PLACEABLE_ERAS`/procedural fallback when present;
+- duplicate/missing files and clean runtime tree.
+
+Current `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721` has no `game/test` directory. Therefore old references to `game/test/render.manifest.test.mjs` or `game/test/render.island.test.mjs` are **not current executable gates**. Current `Game runtime build` checks clean-tree policy, manifest resolution and standalone build/checksum. Asset-specific regression must be claimed only when such a test/QA path actually exists and runs on the relevant runtime commit.
+
+## 8. QA / release gates
+
+| Gate | Required | Blocking example |
 | --- | --- | --- |
-| G0 / design | паспорт, gameplay reason, source/target, scope, ветки, unknowns | нет функции, контракта или подтверждённого reference |
-| G1 / anchor | E0 silhouette, стиль, физическая логика, camera family, approval | несогласованная проекция или невозможная механика |
-| G2 / lineage/source | E1–E5 delta ledger, exact originals в Drive, provenance SHA | source потерян или эпоха без объяснения |
-| G3 / processing | существующий pinned Pixel Snapper → normalize → Aseprite; automatic QA | неверный canvas/alpha/palette/registration |
-| G4 / candidate | immutable candidate, exact SHA-256 visual approval | review относится к другому PNG |
-| G5 / promotion | существующий `asset-promote` PR, no direct `main` write | approval отсутствует, CI не проверен |
-| G6 / rig/scene | измеренные pivots, motion sheet, события, projection/scale/occlusion | fake whole-sprite motion, наклейка, false signal |
-| G7 / game | runtime names/paths/era/anchor/fallback, тесты и visual regression в полном дереве | missing/duplicate runtime asset, сломанная сборка |
+| G0 / design | brief, gameplay reason, source/target, unknowns | no function/reference/contract |
+| G1 / anchor | E0 silhouette, physical logic, camera family | wrong projection/impossible mechanism |
+| G2 / lineage/source | E1–E5 ledger + exact Drive originals/provenance | source lost / unexplained era |
+| G3 / processing | pinned Pixel Snapper → normalize → Aseprite + auto QA | wrong canvas/alpha/palette/registration |
+| G4 / candidate | immutable candidate + exact-SHA visual/scene approval | review bound to different PNG |
+| G5 / production | `promote` PR → `game-production` only | missing approval/evidence |
+| G6 / rig/scene | measured pivots, motion/event/projection/occlusion QA | fake motion / false signal / sticker effect |
+| G6b / runtime publication | exact approved bytes + verified mapping/semantics → PR to `main` | missing target, semantic conflict, SHA mismatch |
+| G7 / game | applicable runtime build/tests on resulting runtime tree | missing/duplicate asset / broken build |
 
-**Никаких новых выдуманных числовых порогов.** Palette/canvas/pixel-size — из `PIPELINE_CONFIG.json`; screen-size, FPS, память и LOD — по измеренному baseline и согласованному бюджету. Если baseline нет, `performance: UNKNOWN` и задача измерения, а не «60 fps гарантировано». Visual QA на gameplay size, при уменьшенном масштабе, в дневной/ночной/погодной сцене только когда такие состояния реально есть. Любая правка PNG инвалидирует SHA-bound approval; изменения rig/runtime требуют соответствующего повторного теста, но не автоматической регенерации originals.
+No invented thresholds. Canvas/palette/pixel-size come from `PIPELINE_CONFIG.json`; performance claims need measured baselines.
 
-## 9. Change control и защита существующей цепочки
+## 9. Change control
 
-1. **ОБЯЗАТЕЛЬНО:** перед действием восстановить tracker/checkpoint (`ASSET_TASK_TRACKER.md`) и проверить существующие результаты. Не перегенерировать одобренное без причины.
-2. Для новых правил — сначала PR с документацией и изолированным локальным smoke-check, затем отдельный совместимый CI/runtime contract PR, затем при необходимости runtime integration PR. Не менять всё одной недиагностируемой операцией.
-3. Не редактировать generated/approved PNG или source в обход promotion; не переписывать чужие ветки, не удалять старые paths без migration map.
-4. CI проверяет не только happy path, но и отрицательные случаи: отсутствующий original, неправильный hash, отсутствующий runtime path, duplicate mapping, устаревший pivot, конфликт эпох, неверная проекция, eventless WORK.
-5. У каждой новой проверки: fixture, команда запуска, ожидаемое поведение и критерий отказа. До внедрения автоматизации её статус — `manual gate`, не «CI enforced».
-6. Интерактивная работа подчиняется `EXECUTION_TIMEOUT_POLICY.md`: checkpoint вместо бесконечного ожидания; не заявлять о завершении до подтверждения.
-7. Итог каждого PR: затронутые семьи/эпохи, что изменилось, SHA/refs, какие проверки **реально** выполнены, какие не выполнены, blockers, rollback и следующий шаг.
+1. Restore tracker/checkpoint before work; do not regenerate approved art without cause.
+2. Docs/art-rule changes, CI/tooling changes and runtime integration changes stay reviewable and separable.
+3. Do not edit approved/source bytes outside the production flow.
+4. Negative cases matter: missing original, wrong SHA, missing target, duplicate mapping, stale pivot, projection mismatch, eventless WORK.
+5. A check is `CI enforced` only when the actual workflow ran successfully.
+6. Interactive work follows `EXECUTION_TIMEOUT_POLICY.md`.
+7. Every PR reports files/families, refs, checks actually run, blockers, rollback and next step.
 
-## 10. Известные integration gaps (снимок 2026-10-30, не автоматический диагноз всех веток)
+## 10. Current verified state — 2026-10-30
 
-- README `game-production` ссылался на `game-build`, но в перечне веток обнаружены `main`, `game-production`, `archive`, `clean-src`, `2d_ui-fit-fixes`. Текущий runtime `game/src/render/manifest.js` проверен в `main`.
-- `game-production` — production-only дерево: в нём отсутствуют runtime `game/src/render/manifest.js`, `outputs/rocket/runtime-assets.json` и `outputs/rocket/build.cjs`, на которые ссылается старый `game-ci.yml`. Это **предсуществующий blocker для запуска этого workflow в одной production-ветке**, не следствие v2.
-- Старые ссылки на `outputs/rocket/dist` в art-документах — legacy paths. До миграции нельзя считать их текущим `main` runtime.
-- HD-остров в metadata пока `pending`; угол камеры неизвестен. Для строгого scene gate требуется approval reference + измерительная карточка проекции.
-- Полный cross-branch merge/build, проверка всех бинарных файлов и CI run в рамках этого изменения документации и локального smoke-check **не проводились**. Не объявлять production chain «зелёной» на основании одних документов.
+Dated evidence below is a checkpoint, not a permanent branch pointer. Re-pin refs before every operation.
 
-**Следующий инженерный PR:** согласовать reproducible assembled-workspace из `main` + `game-production` + проверенных originals, восстановить актуальные CI paths и включить автоматические runtime/asset contract checks. Делать отдельно, чтобы не сломать текущую генерацию и promotion.
+- Production reconciliation is canonical through `game-production@62cf089b565a2c082d0f8de6fd70086082e6b6ce`.
+- PR #34 exact-head checks: readiness `41111497781` PASS; docs smoke `41111497937` PASS.
+- Clean runtime is `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721`; `Game runtime build` `41110329403` PASS.
+- `main@af80ce...` differs from the earlier runtime asset evidence baseline `1a9362...` only by `.github/workflows/game-ci.yml`; no game code/runtime asset changed.
+- Approved HD island source exists in production; the old `pending/unapproved` statement is obsolete.
+- B03 runtime mapping is verified (`beacons`, `bld_beacons_<year>`, `game/assets/eras/e<era>-<year>/base/beacons.png`), but production tracking/corridor + moving-head/lamp semantics conflict with current landing-tolerance behavior. `publish_runtime` remains BLOCKED on semantics/rig integration.
+- B03 currently has no accepted replacement E0 source: two 2026-10-30 generations were archived untouched and source-rejected before processing.
+- GitHub Actions runner assignment succeeded for the cited runs; the earlier `runner_id=0/steps=[]` infrastructure blocker is no longer a current blocker for those checks.
+- `art/runtime/RUNTIME_EXPORTS.json` at `62cf...` still contains stale island `blocked_source_missing` machine metadata even though the source exists. Correct it separately from docs before declaring that export entry canonical-ready.
+
+## 11. Non-negotiable publication rule
+
+Production approval and runtime publication are different facts. `promote` never means “already in game”; `publish_runtime` never becomes success merely because a PR was opened. Exact bytes, exact target, verified semantics, merge/resulting SHA and applicable runtime checks are required.
