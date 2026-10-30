@@ -113,7 +113,7 @@
 ## 9. Change control и защита существующей цепочки
 
 1. **ОБЯЗАТЕЛЬНО:** перед действием восстановить tracker/checkpoint (`ASSET_TASK_TRACKER.md`) и проверить существующие результаты. Не перегенерировать одобренное без причины.
-2. Для новых правил — сначала docs-only PR, затем отдельный совместимый CI/validator PR, затем при необходимости runtime integration PR. Не менять всё одной недиагностируемой операцией.
+2. Для новых правил — сначала PR с документацией и изолированным локальным smoke-check, затем отдельный совместимый CI/runtime contract PR, затем при необходимости runtime integration PR. Не менять всё одной недиагностируемой операцией.
 3. Не редактировать generated/approved PNG или source в обход promotion; не переписывать чужие ветки, не удалять старые paths без migration map.
 4. CI проверяет не только happy path, но и отрицательные случаи: отсутствующий original, неправильный hash, отсутствующий runtime path, duplicate mapping, устаревший pivot, конфликт эпох, неверная проекция, eventless WORK.
 5. У каждой новой проверки: fixture, команда запуска, ожидаемое поведение и критерий отказа. До внедрения автоматизации её статус — `manual gate`, не «CI enforced».
@@ -126,6 +126,6 @@
 - `game-production` — production-only дерево: в нём отсутствуют runtime `game/src/render/manifest.js`, `outputs/rocket/runtime-assets.json` и `outputs/rocket/build.cjs`, на которые ссылается старый `game-ci.yml`. Это **предсуществующий blocker для запуска этого workflow в одной production-ветке**, не следствие v2.
 - Старые ссылки на `outputs/rocket/dist` в art-документах — legacy paths. До миграции нельзя считать их текущим `main` runtime.
 - HD-остров в metadata пока `pending`; угол камеры неизвестен. Для строгого scene gate требуется approval reference + измерительная карточка проекции.
-- Полный cross-branch merge/build, проверка всех бинарных файлов и CI run в рамках этого docs-only изменения **не проводились**. Не объявлять production chain «зелёной» на основании одних документов.
+- Полный cross-branch merge/build, проверка всех бинарных файлов и CI run в рамках этого изменения документации и локального smoke-check **не проводились**. Не объявлять production chain «зелёной» на основании одних документов.
 
 **Следующий инженерный PR:** согласовать reproducible assembled-workspace из `main` + `game-production` + проверенных originals, восстановить актуальные CI paths и включить автоматические runtime/asset contract checks. Делать отдельно, чтобы не сломать текущую генерацию и promotion.
