@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "asset_id": "B03",
+  "slug": "landing_guidance",
+  "asset_type": "base",
+  "era": "E0",
+  "year": 1978,
+  "generation_kind": "isolated_anchor_replacement",
+  "contract_base_sha": "857b1de67e02793f6d45f088d5f3fc70ca0ab4ba",
+  "runtime_main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e",
+  "brief_file": "art/briefs/B03_landing_guidance_E0.md",
+  "prompt_file": "art/prompts/b03_landing_guidance.md",
+  "style_bible_file": "art/style_bible.txt",
+  "source_archive": {
+    "provider": "google_drive",
+    "folder_id": "1_mxVuKoZsktUqmxR3TcJzkpO6n-qax79",
+    "verified_present": true,
+    "verified_on": "2026-10-30",
+    "original_must_be_immutable": true,
+    "sha256_required_before_processing": true
+  },
+  "machine_pipeline": {
+    "configured": true,
+    "pipeline_config_version": 2,
+    "canvas": [46, 82],
+    "registration": [23, 78],
+    "pixel_size": 12,
+    "colors": 32,
+    "pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+    "aseprite_version": "1.3.18.6",
+    "visible_bbox_target": {"width": [38, 42], "height": [70, 76]}
+  },
+  "camera": {
+    "family": "island_top_3_4",
+    "projection_angle": "UNKNOWN",
+    "projection_review": "pending_candidate_scene_qa",
+    "projection_calibration_file": "art/gen/environment/start_island_hd.projection.json",
+    "generation_elevation_proxy_deg": 73.44,
+    "generation_tilt_from_top_down_proxy_deg": 16.56,
+    "ground_plane_compression_target": 0.958515,
+    "legacy_approved_reference_meta": "art/gen/environment/start_island_e0.meta.json",
+    "legacy_approved_reference_sha256": "686762324a0b9244317fa0ff0327135f9039ad61c19c7510a88fdd18983e1ab3",
+    "current_hd_reference_meta": "art/gen/environment/start_island_hd.meta.json",
+    "current_hd_approval_record": "art/gen/environment/start_island_hd.approval.json",
+    "current_hd_reference_status": "approved_by_user",
+    "current_hd_approved_by_user": true,
+    "current_hd_reference_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+    "current_hd_reference_runtime_git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
+    "current_hd_reference_approved_on": "2026-10-30T14:33:35Z"
+  },
+  "runtime_contract": {
+    "logical_name": "UNKNOWN",
+    "consumer": "UNKNOWN",
+    "status": "integration_pending",
+    "verified_against_main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e"
+  },
+  "replacement_reason": {
+    "previous_e0_sha256": "1c9ecd76cdd455f97fe9f1d25c7acd6d94523b64a6120438fd360e3112599b11",
+    "previous_e0_visible_bbox": [36, 42],
+    "qa_result": "fail",
+    "failure_class": "source_geometry_not_processing",
+    "action": "regenerate E0 with a taller mast/yoke and narrower stance before rebuilding E1-E5"
+  },
+  "generation_gate": {
+    "one_asset_per_call": true,
+    "one_era_per_call": true,
+    "transparent_background": true,
+    "style_bible_verbatim": true,
+    "can_generate_isolated_candidate": true,
+    "can_scene_approve": true,
+    "can_promote": false
+  },
+  "blocked_stages": [
+    "rig_event_qa_until_runtime_event_consumer_is_verified",
+    "runtime_integration_until_logical_name_and_consumer_are_verified",
+    "promotion_until_all_applicable_gates_pass"
+  ]
+}

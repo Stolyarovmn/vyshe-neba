@@ -4,10 +4,7 @@
   "source": {
     "file": "work/island-src/start_island_E0_original.png",
     "sha256": "0fc1d53e1cca7fe190c0268e7622f15deb4a3a4dd2361209555ac705479259c6",
-    "size": [
-      1916,
-      821
-    ],
+    "size": [1916, 821],
     "drive_id": "109IFUuj4paHf6Chdbj-5ABRoyLmDj8mw",
     "drive_path": "art-originals/environment/start_island",
     "role": "оригинал в высоком разрешении (вид сверху-3/4), прозрачный фон"
@@ -19,20 +16,24 @@
     "PNG-8, палитра 255 цветов + прозрачность, без дизеринга"
   ],
   "tool": "game/tools/prepare-island-hd.py",
-  "size": [
-    1916,
-    821
-  ],
+  "size": [1916, 821],
   "output_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
   "output_bytes": 722995,
-  "pad_center_px": [
-    388,
-    375
-  ],
+  "runtime_main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e",
+  "runtime_path": "game/assets/shared/island/start-island.png",
+  "runtime_git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
+  "pad_center_px": [388, 375],
   "contains_rocket": false,
   "contains_starter_tower": false,
-  "status": "pending",
-  "approved_by_user": false,
+  "status": "approved_by_user",
+  "approved_by_user": true,
+  "approved_by_user_on": "2026-10-30T14:33:35Z",
+  "approval_record": "art/gen/environment/start_island_hd.approval.json",
+  "projection_calibration": "art/gen/environment/start_island_hd.projection.json",
+  "projection_angle": "UNKNOWN",
+  "generation_elevation_proxy_deg": 73.44,
+  "generation_tilt_from_top_down_proxy_deg": 16.56,
+  "ground_plane_compression_target": 0.958515,
   "supersedes": "art/gen/environment/start_island_e0.png (384x166, approved 2026-10-19)",
-  "note": "Ждёт утверждения пользователя; до этого рантайм может использовать его, а start_island_e0.png остаётся резервом."
+  "note": "Утверждён пользователем как SHA-bound HD reference для наземных placeables. Измеренный production preset хранит screen-space compression и ортографический эквивалент 73.44° над плоскостью / 16.56° от top-down только как generation proxy. Реальный исходный 3D camera angle остаётся UNKNOWN; 47° не является подтверждённым фактом."
 }

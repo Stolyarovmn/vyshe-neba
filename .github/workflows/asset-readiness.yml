@@ -1,0 +1,130 @@
+name: Asset production readiness
+
+on:
+  pull_request:
+    paths:
+      - 'AGENTS.md'
+      - 'art/briefs/**'
+      - 'art/docs/ASSET_GENERATION_RUNBOOK.md'
+      - 'art/docs/GAMES_PROJECT_INSTRUCTIONS.md'
+      - 'art/gen/environment/start_island_hd.*'
+      - 'art/prompts/**'
+      - 'art/style_bible.txt'
+      - 'art/placeables/**'
+      - 'tools/art_pipeline/build_generation_request.py'
+      - 'tools/art_pipeline/validate_generation_preflight.py'
+      - '.github/workflows/asset-readiness.yml'
+  push:
+    branches:
+      - game-production
+      - 'art/production-readiness-v2-*'
+    paths:
+      - 'art/briefs/**'
+      - 'art/docs/ASSET_GENERATION_RUNBOOK.md'
+      - 'art/gen/environment/start_island_hd.*'
+      - 'art/prompts/**'
+      - 'art/style_bible.txt'
+      - 'art/placeables/**'
+      - 'tools/art_pipeline/build_generation_request.py'
+      - 'tools/art_pipeline/validate_generation_preflight.py'
+      - '.github/workflows/asset-readiness.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Compile readiness tools
+        run: |
+          python3 -m py_compile \
+            tools/art_pipeline/build_generation_request.py \
+            tools/art_pipeline/validate_generation_preflight.py
+
+      - name: Validate B03 isolated generation preflight
+        run: |
+          python3 tools/art_pipeline/validate_generation_preflight.py \
+            art/briefs/B03_landing_guidance_E0.preflight.json
+
+      - name: Build deterministic B03 E0 request
+        run: |
+          python3 tools/art_pipeline/build_generation_request.py \
+            --receipt art/briefs/B03_landing_guidance_E0.preflight.json \
+            --output "$RUNNER_TEMP/B03_E0_generation_request.txt"
+
+      - name: Verify request, measured projection proxy and gate separation
+        run: |
+          python3 - "$RUNNER_TEMP/B03_E0_generation_request.txt" <<'PY'
+          import json, sys
+          from pathlib import Path
+
+          request = Path(sys.argv[1]).read_text(encoding='utf-8')
+          style = Path('art/style_bible.txt').read_text(encoding='utf-8')
+          receipt = json.loads(Path('art/briefs/B03_landing_guidance_E0.preflight.json').read_text(encoding='utf-8'))
+          calibration = json.loads(Path('art/gen/environment/start_island_hd.projection.json').read_text(encoding='utf-8'))
+
+          assert request.count(style) == 1, 'style bible must be embedded exactly once'
+          assert 'Asset: B03 / landing_guidance' in request
+          assert 'Era: E0 / 1978' in request
+          assert 'Scope: exactly ONE complete isolated asset in this call' in request
+          assert 'Actual source camera angle: UNKNOWN.' in request
+          assert '73.44 degrees elevation above the ground plane' in request
+          assert '16.56 degrees from straight top-down' in request
+          assert 'ground-circle compression 0.958515' in request
+          assert calibration['actual_camera']['projection_angle_deg'] == 'UNKNOWN'
+          assert calibration['derived_projection_proxy']['status'] == 'PROXY_ONLY_NOT_ACTUAL_CAMERA_ANGLE'
+          assert receipt['generation_gate']['can_generate_isolated_candidate'] is True
+          assert receipt['generation_gate']['can_scene_approve'] is True
+          assert receipt['generation_gate']['can_promote'] is False
+          assert receipt['runtime_contract']['status'] == 'integration_pending'
+          print('PASS: B03 request is single-asset/single-era, uses measured projection proxy, and promotion remains closed')
+          PY
+
+      - name: Verify SHA-bound HD island approval against pinned main runtime
+        run: |
+          set -euo pipefail
+          MAIN_SHA="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('art/briefs/B03_landing_guidance_E0.preflight.json').read_text(encoding='utf-8'))
+          print(r['runtime_main_sha'])
+          PY
+          )"
+          git fetch --no-tags --depth=1 origin "$MAIN_SHA"
+          git show "$MAIN_SHA:game/assets/shared/island/start-island.png" > "$RUNNER_TEMP/start-island.png"
+          python3 - "$RUNNER_TEMP/start-island.png" <<'PY'
+          import hashlib, json, subprocess, sys
+          from pathlib import Path
+
+          p=Path(sys.argv[1])
+          approval=json.loads(Path('art/gen/environment/start_island_hd.approval.json').read_text(encoding='utf-8'))
+          meta=json.loads(Path('art/gen/environment/start_island_hd.meta.json').read_text(encoding='utf-8'))
+          calibration=json.loads(Path('art/gen/environment/start_island_hd.projection.json').read_text(encoding='utf-8'))
+          data=p.read_bytes()
+          sha256=hashlib.sha256(data).hexdigest()
+          blob=subprocess.check_output(['git','hash-object',str(p)], text=True).strip()
+          assert approval['approved'] is True
+          assert approval['approved_sha256'] == sha256
+          assert meta['output_sha256'] == sha256
+          assert calibration['reference_sha256'] == sha256
+          assert approval['approved_git_blob_sha1'] == blob
+          assert meta['runtime_git_blob_sha1'] == blob
+          assert calibration['runtime_git_blob_sha1'] == blob
+          assert approval['projection_angle'] == 'UNKNOWN'
+          assert meta['projection_angle'] == 'UNKNOWN'
+          assert calibration['actual_camera']['projection_angle_deg'] == 'UNKNOWN'
+          print(f'PASS: approved HD island and projection preset bind to exact runtime bytes sha256={sha256} git_blob={blob}')
+          PY
+
+      - name: Readiness boundary
+        run: |
+          echo 'PASS: isolated B03 E0 production imagegen request is ready with measured projection proxy.'
+          echo 'NOTE: 73.44 degrees is a reference-equivalent generation proxy, not a proven original 3D camera angle.'
+          echo 'NOTE: this is NOT full runtime/game regression; promotion remains blocked until runtime integration is verified.'

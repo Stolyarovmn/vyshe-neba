@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "asset_id": "ENV_START_ISLAND_HD",
+  "asset": "start_island_hd",
+  "approval_type": "user_visual_reference_approval",
+  "approved": true,
+  "approved_by": "user",
+  "approved_on": "2026-10-30T14:33:35Z",
+  "approved_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "approved_git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
+  "approved_bytes": 722995,
+  "approved_dimensions": [1916, 821],
+  "runtime_evidence": {
+    "main_sha": "1a9362aceff825f99cf0b0481351bff0e5c6e04e",
+    "path": "game/assets/shared/island/start-island.png",
+    "git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
+    "exact_byte_match_to_user_supplied_reference": true,
+    "verification_method": "Git blob SHA-1 recomputed from the user-supplied PNG bytes and matched to the blob SHA recorded by GitHub at the pinned main commit"
+  },
+  "source_provenance": {
+    "provider": "google_drive",
+    "drive_file_id": "109IFUuj4paHf6Chdbj-5ABRoyLmDj8mw",
+    "drive_path": "art-originals/environment/start_island",
+    "source_sha256": "0fc1d53e1cca7fe190c0268e7622f15deb4a3a4dd2361209555ac705479259c6"
+  },
+  "camera_family": "island_top_3_4",
+  "projection_angle": "UNKNOWN",
+  "scope": "Approved as the visual reference for ground/placeable projection, scale, footprint, anchor, occlusion and land-mask scene QA. This approval does not assert a numeric projection angle.",
+  "invalidated_by": "Any byte change to the approved PNG requires a new SHA-bound approval record."
+}
