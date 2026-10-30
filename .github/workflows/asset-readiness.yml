@@ -97,12 +97,24 @@ jobs:
           assert receipt['generation_gate']['can_publish_runtime'] is False
           assert runtime['asset_key'] == 'beacons'
           assert runtime['logical_name_pattern'] == 'bld_beacons_<year>'
-          assert runtime['existing_e0_target'] == 'game/assets/eras/e0-1978/base/beacons.png'
-          assert runtime['existing_e0_git_blob_sha1'] == '2a528e56d50a20af1e19ef2c197d01f34794ccf4'
           assert runtime['mapping_status'] == 'verified_existing_targets_and_consumer'
           assert runtime['gameplay_semantics_status'] == 'CONFLICT_WITH_PRODUCTION_MANIFEST'
           assert runtime['status'] == 'verified_mapping_semantics_conflict'
-          print('PASS: B03 mapping is verified; production and runtime gates remain separated by the explicit semantics/rig blocker')
+          targets = runtime['existing_targets']
+          assert [(x['era'], x['year']) for x in targets] == [
+              ('E0', 1978), ('E1', 1986), ('E2', 1998),
+              ('E3', 2015), ('E4', 2035), ('E5', 2060),
+          ]
+          expected_blobs = [
+              '2a528e56d50a20af1e19ef2c197d01f34794ccf4',
+              '303e65df682ae03e4c9a568ea36ca66c17c95f62',
+              '40b8bd23762ceb1b551f425139d63e1663681c9a',
+              '500f8cd59de01323f07de68997ffe3607c60044b',
+              '592a77f79387a6fb439a2618dda62aeeb271c32d',
+              'ccdc544dd2ebaa29b562e1c1c0eb7af3b15f6d25',
+          ]
+          assert [x['git_blob_sha1'] for x in targets] == expected_blobs
+          print('PASS: B03 all-era runtime targets/consumer are verified; runtime publication remains blocked by the explicit semantics/rig conflict')
           PY
 
       - name: Verify SHA-bound HD island approval against pinned main runtime
@@ -144,24 +156,32 @@ jobs:
       - name: Verify runtime export blockers are precise and fail closed
         run: |
           python3 - <<'PY'
-          import json
+          import hashlib, json
           from pathlib import Path
+
           exports=json.loads(Path('art/runtime/RUNTIME_EXPORTS.json').read_text(encoding='utf-8'))
           island=exports['assets']['ENV_START_ISLAND_HD']
           assert island['status'] == 'blocked_source_missing'
           assert 'ENV_START_ISLAND_HD' in exports['blocked_assets']
-          assert not Path(island['files'][0]['source']).is_file(), 'remove island blocker only after exact approved binary is committed in production'
+          source=Path(island['files'][0]['source'])
+          expected=island['files'][0]['sha256']
+          if source.is_file():
+              actual=hashlib.sha256(source.read_bytes()).hexdigest()
+              assert actual == expected, f'island production source exists with wrong SHA: {actual}'
+              print('PASS: exact island source is now present, but export remains safely blocked until a dedicated follow-up flips status to ready')
+          else:
+              print('PASS: island runtime export is fail-closed while exact production source bytes are absent')
           b03=exports['blocked_assets']['B03']
           assert 'bld_beacons_<year>' in b03
           assert 'base/beacons.png' in b03
           assert 'current runtime semantics widen landing tolerances' in b03
-          print('PASS: runtime exports fail closed for missing island source and B03 semantic integration')
+          print('PASS: B03 runtime export remains fail-closed for semantic/rig integration')
           PY
 
       - name: Readiness boundary
         run: |
           echo 'PASS: isolated B03 E0 production imagegen request is ready with measured projection proxy.'
-          echo 'NOTE: B03 runtime logical names/consumer/targets are verified; runtime publication is blocked by a semantics/rig integration mismatch, not by an unknown path.'
+          echo 'NOTE: B03 all six runtime targets/consumer are verified; runtime publication is blocked by a semantics/rig integration mismatch, not by unknown paths.'
           echo 'NOTE: 73.44 degrees is a reference-equivalent generation proxy, not a proven original 3D camera angle.'
           echo 'NOTE: production promotion may become available after candidate QA/approval even while runtime publication remains BLOCKED.'
           echo 'NOTE: this is NOT full runtime/game regression.'
