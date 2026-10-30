@@ -7,7 +7,7 @@
 | **ref2game: world sprites** | самолёты, дроны, природа, небо, фон, посадочные площадки, монеты | этот файл и `art/PROGRESS.md` | `tools/ref2game/{gen,slice,prep}.py`, `ref2game.json` |
 | **Placeables pipeline** | покупаемые и размещаемые объекты базы и мастерской W/B (эпохи E0–E5) | `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `art/docs/ASSET_TASK_TRACKER.md`, `art/placeables/PRODUCTION_MANIFEST.md` | `tools/art_pipeline/*`, workflows `asset-candidate` / `asset-promote` |
 
-Общее для обоих потоков: `art/style_bible.txt` вставляется дословно в каждый запрос на генерацию; интерактивные ходы подчиняются `art/docs/EXECUTION_TIMEOUT_POLICY.md`.
+Общее для обоих потоков: `art/style_bible.txt` вставляется дословно в каждый запрос на генерацию; интерактивные ходы подчиняются `art/docs/EXECUTION_TIMEOUT_POLICY.md`. Перед созданием нового/изменяемого ассета выполняется совместимый G0/G1 design+era+projection preflight по `art/docs/PRODUCTION_CONTRACT_V2.md` и заполняется `art/docs/ASSET_BRIEF_TEMPLATE.md`. Новые gates не заменяют различающиеся world/placeables processing flows. Старые пути `outputs/rocket/dist` ниже — исторические, их нельзя считать текущим runtime без проверки выбранной ветки.
 
 Хранение оригиналов: для placeables канонический архив нетронутых генераций находится на Google Drive (`vyshe-neba/art-originals/`), а `art/raw/` необязателен. Для world sprites оригиналы листов дополнительно лежат в `art/raw` и `art/gen`.
 

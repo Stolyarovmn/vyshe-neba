@@ -2,6 +2,8 @@
 
 Этот документ фиксирует production-процесс 2D-ассетов проекта и правила, которые дали наиболее качественный и воспроизводимый результат. Он обязателен для workshop/base placeables и используется вместе с `ref2game` при каждом запросе по игре и ассетам.
 
+**Совместимое нормативное расширение:** [`PRODUCTION_CONTRACT_V2.md`](PRODUCTION_CONTRACT_V2.md) добавляет design/era/projection/runtime preflight и QA gates, **не изменяя** текущие tracker steps, Pixel Snapper/Aseprite, candidate, exact-SHA approval и promotion PR. Шаблон паспорта: [`ASSET_BRIEF_TEMPLATE.md`](ASSET_BRIEF_TEMPLATE.md); инструкции для ChatGPT Project «Games»: [`GAMES_PROJECT_INSTRUCTIONS.md`](GAMES_PROJECT_INSTRUCTIONS.md).
+
 ## 1. Источники истины и порядок приоритета
 
 1. **`ref2game`** — обязательный workflow для каждого запроса по 2D-игре и ассетам.
@@ -16,6 +18,8 @@
 ## 2. Главный production pipeline
 
 Главное правило `ref2game`: **один generation call = один самостоятельный asset или один part sheet**. Не просить генератор одновременно делать «6 эпох + части + анимации + подписи + UI».
+
+**Перед первым production generation** выполняется G0 из `PRODUCTION_CONTRACT_V2.md`: паспорт объекта, назначение и инженерная причинность, референс и его статус, камера/проекция, epoch lineage, runtime target и blockers. Это preflight, **не новый шаг** в `PIPELINE_CONFIG.json -> tracker.steps`. После rig/scene integration выполняется G6 (проекция, посадка, события, motion QA), затем существующий game gate. При неизвестном угле острова запрещено подставлять 47°; незавершённая калибровка блокирует scene approval, но не отменяет создание isolated candidate.
 
 Канонический поток:
 
@@ -559,3 +563,12 @@ CI run id + job/state
 - Если внешний процесс ещё идёт, корректный результат хода — **checkpoint + текущий статус**, а не зависший ответ.
 
 **Главное правило:** пользователь не должен снова вручную нажимать Stop из-за того, что инструментальная цепочка или CI удерживают один ответ дольше 20 минут.
+
+
+## 17. Governance, совместимость веток и ChatGPT Project «Games»
+
+- Для всех новых и изменяемых ассетов применяются дополнительные **G0/G1/G6/G7** критерии из [`PRODUCTION_CONTRACT_V2.md`](PRODUCTION_CONTRACT_V2.md). Никакой из них не отменяет hash-bound approval, Drive original, измеренные pivots, CI и PR из разделов 1–16.
+- Паспорт из [`ASSET_BRIEF_TEMPLATE.md`](ASSET_BRIEF_TEMPLATE.md) фиксирует назначение, технические зависимости, E0–E5 delta, camera family, scene placement, события/FX, runtime logical path и проверяемый статус. `UNKNOWN` не заменяется догадкой.
+- Ветки разделены: `game-production` хранит production-инструкции/метаданные, `main` — актуальный `game/src/render/manifest.js`. Старые ссылки на `game-build` и `outputs/rocket/*` проверяются, а не предполагаются существующими. Сборку/тесты проводить только в подтверждённом полном дереве; отдельно отмечать отсутствующие файлы и CI blockers.
+- Настройки ChatGPT Project нельзя изменить коммитом: пользователь вручную копирует текст из [`GAMES_PROJECT_INSTRUCTIONS.md`](GAMES_PROJECT_INSTRUCTIONS.md) в Project instructions. Для repo-aware агентов действует корневой `AGENTS.md`.
+- Этот v2 release меняет **документы и добавляет только изолированный smoke-check документации/JSON** (`production-contract.yml`); существующие asset processing, promotion, game CI, runtime и сборка не меняются. Полные CI/runtime интеграции — отдельные PR с совместимым миграционным планом и проверкой. До такого PR новые design/scene gates считаются **manual review**, не «автоматически проверенными».
