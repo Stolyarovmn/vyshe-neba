@@ -5,12 +5,14 @@
 > Это **design target**, а не описание уже реализованной механики. Размеры, сокеты и эффекты ниже — решения для следующего production pass.
 >
 > Дополнительный обязательный дизайн/проекция/runtime контракт: [`art/docs/PRODUCTION_CONTRACT_V2.md`](../docs/PRODUCTION_CONTRACT_V2.md). Для новых/изменяемых семейств — [`ASSET_BRIEF_TEMPLATE.md`](../docs/ASSET_BRIEF_TEMPLATE.md). Угол камеры острова не подтверждён: не подставлять 47° без измерения и approval. Механики и размеры ниже не считаются реализованными, пока их не подтвердил runtime на проверенном commit.
+>
+> Для receipt-based production generation фактический request собирается `tools/art_pipeline/build_generation_request.py`; его deterministic order и verbatim style-bible embedding имеют приоритет над иллюстративной структурой prompt в разделе 6.
 
 ## Источники истины
 
-1. `art/style_bible.txt` — визуальный язык; добавляется **дословно** к каждому image-generation prompt.
+1. `art/style_bible.txt` — визуальный язык; добавляется **дословно** к каждому image-generation request.
 2. Этот manifest — роль объекта, целевой размер, состав частей, характер движения и технологическая эволюция.
-3. Утверждённый anchor-art в `art/gen/` — фактическая геометрия.
+3. Утверждённый anchor-art в `art/gen/` — фактическая production-геометрия; runtime publication проверяется отдельно по `RUNTIME_BRANCH_CONTRACT.md`.
 4. Runtime metadata — реальные pivot/anchor, **измеренные по утверждённому арту**, а не угаданные заранее.
 
 Правило ref2game: AI рисует физические части; код управляет движением, состоянием, FX, светом, частицами и реакцией на события. Нельзя изображать работу механизма покачиванием/вращением целого PNG, если у него есть реальные движущиеся части.
@@ -307,11 +309,9 @@ era_changed
 
 # 6. Prompt recipe
 
-Для каждой генерации:
+Ниже — **иллюстративный состав** asset prompt, а не порядок финального request. Для receipt-based production generation authoritative builder создаёт: `generated scope header → canonical asset prompt → art/style_bible.txt VERBATIM exactly once`.
 
 ```text
-[VERBATIM art/style_bible.txt]
-
 ASSET
 <name + slug>
 
