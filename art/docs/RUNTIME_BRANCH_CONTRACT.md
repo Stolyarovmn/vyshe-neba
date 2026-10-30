@@ -4,6 +4,8 @@
 
 This contract separates art production history from the clean game build/runtime tree.
 
+**Normative precedence:** this document supersedes older branch/storage/publication wording in `ASSET_PRODUCTION_PIPELINE.md` and `ASSET_TASK_TRACKER.md` wherever those older texts describe direct promotion into `main`, build-time runtime mirroring from production `art/gen`, or a single undivided `promote -> game_tests` boundary. Processing, QA, SHA-bound approval, tool pins and ref2game rules remain unchanged unless explicitly migrated elsewhere.
+
 ## Canonical branch roles
 
 ### `game-production`
@@ -54,13 +56,16 @@ Runtime publication is a separate operation after Boundary A is complete:
 1. pin the exact `game-production` commit containing the approved asset;
 2. verify the approved source SHA-256 against its production manifest/review;
 3. resolve an explicit, verified runtime mapping `production source -> main:game/assets/...`;
-4. check out `main` as the runtime tree;
+4. check out exact `main` base as the runtime tree;
 5. copy the approved bytes to the **existing canonical runtime path**, replacing the old file in place;
 6. verify the copied bytes have the approved SHA-256;
-7. create a runtime PR targeting `main` containing only the declared runtime asset replacements;
-8. run the available build/runtime checks on that exact PR commit.
+7. verify the runtime diff contains only explicitly declared changed targets;
+8. run the available build/runtime checks on that exact tree;
+9. create a runtime PR targeting `main` containing only those declared runtime asset replacements.
 
 If the canonical runtime path does not yet exist, publication is **BLOCKED**. A new asset needs a separate runtime-integration PR first (logical name/path/consumer/fallback/tests). Art promotion must not invent a new runtime path.
+
+Creating the runtime PR does not itself prove that the new bytes are already in `main`; publication is final only after the PR is merged/verified at the resulting runtime commit. Automatic merge is forbidden.
 
 ## No duplicate historical copies in runtime
 
@@ -79,27 +84,53 @@ Rollback uses Git history (`git revert`, previous commit/blob, or a revert PR), 
 
 Machine publication uses `art/runtime/RUNTIME_EXPORTS.json` on `game-production`.
 
-Each publishable entry must contain an explicit source, approved SHA-256 and canonical target under `game/assets/`. Default mode is `replace`; the target must already exist on the pinned `main` commit.
+Each publishable entry must contain:
 
-A missing mapping, missing target, SHA mismatch, target outside `game/assets/`, or unapproved production source is a blocking error.
+- explicit production `source` under `art/gen/`;
+- exact approved SHA-256;
+- explicit canonical `target` under `game/assets/`;
+- verified existing-target runtime contract;
+- publication `status=ready` only when source bytes actually exist in the production tree and approval evidence contains that SHA.
+
+Default mode is `replace_in_place`; target must already exist on the pinned `main` commit.
+
+A missing mapping, missing production source, missing target, SHA mismatch, target outside `game/assets/`, unapproved source, or non-ready status is a blocking error.
 
 ## Tracker semantics
 
-The current machine tracker remains unchanged in this docs-only contract: it still ends with `promote -> game_tests` until the separate CI/tool migration explicitly changes the tracker schema/step list.
+Paired CI/tool migration PR #31 introduces a new forward-compatible machine step. After that migration is merged, canonical tracker order is:
 
-For this branch model:
+```text
+generate
+→ edit
+→ archive_original
+→ source_prepare
+→ pixel_snap
+→ normalize
+→ aseprite_index
+→ qa_auto
+→ candidate_manifest
+→ visual_review
+→ promote
+→ publish_runtime
+→ game_tests
+```
 
-- `promote` means approved candidate has crossed Boundary A into production history;
-- Boundary B is evidenced by the SHA-bound runtime export report plus the separate runtime PR into `main`;
+- `promote` means approved candidate has crossed Boundary A into production history.
+- `publish_runtime` means exact approved bytes have crossed Boundary B into the clean runtime branch. A merely opened PR is not sufficient to claim final publication; merge/resulting runtime SHA must be confirmed.
 - `game_tests` applies only to the runtime/build tree and must not be inferred from production-only checks.
 
-A future tracker migration MAY add an explicit `publish_runtime` step, but it must be implemented together in `PIPELINE_CONFIG.json`, tracker code, workflows and migration logic. This document alone does not claim that machine step exists.
+Tracker schema remains forward-compatible: existing checkpoint states gain missing canonical steps as `pending` without losing earlier attempts/status/output hashes. `PIPELINE_CONFIG.json` is bumped as part of the paired tool migration because the canonical step list changes.
+
+Until the paired tool migration is actually merged, this docs branch describes the target contract but does not pretend the canonical `game-production` machine tracker already implements it.
 
 ## CI / workflow separation
 
 Production workflows run from `game-production` and may inspect/prepare candidates.
 
-Runtime publication workflow must use a separate checkout/worktree of `main` and must reject changes outside the declared runtime targets. It must never stage `art/gen`, production metadata, candidates, or legacy `outputs/rocket` mirrors into the runtime PR.
+Runtime publication workflow must use a separate checkout/worktree of `main` and must reject changes outside declared changed runtime targets. It must never stage `art/gen`, production metadata, candidates, raw sources, QA history or legacy `outputs/rocket` mirrors into the runtime PR.
+
+The runtime workflow must record both exact production source commit and exact runtime base commit. Build/install steps must not introduce extra tracked files such as lockfiles into the runtime PR.
 
 Runtime/manifest/code changes remain separate from pure asset replacement PRs. A replacement of an already-integrated asset should normally modify only its canonical `game/assets/...` file(s).
 
@@ -108,9 +139,10 @@ Runtime/manifest/code changes remain separate from pure asset replacement PRs. A
 1. Keep current `main` as the clean runtime/build branch; do not mass-copy production history into it.
 2. Change candidate promotion so its PR targets `game-production` and stages only production art/provenance.
 3. Add a separate runtime-publish workflow that reads an exact approved source from `game-production` and replaces only declared `main:game/assets/...` files.
-4. Add explicit runtime mappings only after verifying the target path and consumer against the pinned `main` manifest/code.
-5. Existing runtime files in `main` remain in place until individually replaced by approved assets; no duplicate backup copies are created.
-6. New assets without an existing runtime target remain `integration_pending/BLOCKED` until a separate runtime integration PR exists.
+4. Add `publish_runtime` to tracker/config/tooling as a forward-compatible step migration.
+5. Add explicit runtime mappings only after verifying the target path and consumer against the pinned `main` manifest/code and confirming the exact production source bytes exist.
+6. Existing runtime files in `main` remain in place until individually replaced by approved assets; no duplicate backup copies are created.
+7. New assets without an existing runtime target remain `integration_pending/BLOCKED` until a separate runtime integration PR exists.
 
 ## Rollback
 
@@ -127,3 +159,4 @@ Revert the runtime asset PR (or create a new PR restoring the previous Git blob)
 - `game-production` at the currently checked SHA does not yet contain the pending v2 contract/`AGENTS.md`; this contract is being introduced through the current draft PR chain and is not canonical until merged.
 - The current `main` branch has build code and runtime assets but no `game/test` directory at the checked SHA, so full same-commit game regression cannot be claimed there yet.
 - B03 `landing_guidance` has no verified runtime logical name/consumer/target on the checked `main`; its runtime publication remains blocked even after art approval until runtime integration is added separately.
+- The approved HD island runtime target and SHA are verified, but the exact approved `start_island_hd.png` binary is not currently committed at its expected production `art/gen/...` source path; therefore it is not publishable through Boundary B until that production-source gap is resolved.
