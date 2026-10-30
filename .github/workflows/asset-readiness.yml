@@ -153,7 +153,7 @@ jobs:
           print(f'PASS: approved HD island and projection preset bind to exact runtime bytes sha256={sha256} git_blob={blob}')
           PY
 
-      - name: Verify runtime export blockers are precise and fail closed
+      - name: Verify runtime exports are precise and fail closed
         run: |
           python3 - <<'PY'
           import hashlib, json
@@ -161,17 +161,22 @@ jobs:
 
           exports=json.loads(Path('art/runtime/RUNTIME_EXPORTS.json').read_text(encoding='utf-8'))
           island=exports['assets']['ENV_START_ISLAND_HD']
-          assert island['status'] == 'blocked_source_missing'
-          assert 'ENV_START_ISLAND_HD' in exports['blocked_assets']
+          assert island['status'] == 'ready'
+          assert island['runtime_contract_status'] == 'verified_existing_target'
+          assert island['runtime_main_verified_sha'] == 'af80ce810fbdc5088cfa01d8a193f94ddbcd2721'
+          assert 'ENV_START_ISLAND_HD' not in exports['blocked_assets']
           source=Path(island['files'][0]['source'])
           expected=island['files'][0]['sha256']
-          if source.is_file():
-              actual=hashlib.sha256(source.read_bytes()).hexdigest()
-              assert actual == expected, f'island production source exists with wrong SHA: {actual}'
-              print('PASS: exact island source is now present, but export remains safely blocked until a dedicated follow-up flips status to ready')
-          else:
-              print('PASS: island runtime export is fail-closed while exact production source bytes are absent')
+          assert source.is_file(), f'island production source missing: {source}'
+          actual=hashlib.sha256(source.read_bytes()).hexdigest()
+          assert actual == expected, f'island production source exists with wrong SHA: {actual}'
+          approval=json.loads(Path(island['approval_file']).read_text(encoding='utf-8'))
+          assert approval['approved'] is True
+          assert approval['approved_sha256'] == expected
+          print('PASS: exact island production source is present, approved and runtime-export metadata is ready')
+
           b03=exports['blocked_assets']['B03']
+          assert 'main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721' in b03
           assert 'bld_beacons_<year>' in b03
           assert 'base/beacons.png' in b03
           assert 'current runtime semantics widen landing tolerances' in b03
@@ -181,6 +186,7 @@ jobs:
       - name: Readiness boundary
         run: |
           echo 'PASS: isolated B03 E0 production imagegen request is ready with measured projection proxy.'
+          echo 'PASS: approved HD island production source is present and its explicit runtime export metadata is ready.'
           echo 'NOTE: B03 all six runtime targets/consumer are verified; runtime publication is blocked by a semantics/rig integration mismatch, not by unknown paths.'
           echo 'NOTE: 73.44 degrees is a reference-equivalent generation proxy, not a proven original 3D camera angle.'
           echo 'NOTE: production promotion may become available after candidate QA/approval even while runtime publication remains BLOCKED.'
