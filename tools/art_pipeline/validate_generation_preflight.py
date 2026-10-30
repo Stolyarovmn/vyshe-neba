@@ -2,8 +2,8 @@
 """Validate a machine-readable asset generation preflight receipt.
 
 This gate answers only whether an isolated source-generation call is allowed.
-It deliberately does not claim scene approval, runtime integration, promotion,
-Drive byte integrity, or game-regression success.
+It deliberately keeps production promotion and runtime publication as separate gates.
+It does not claim Drive byte integrity, visual approval, runtime integration or game CI.
 """
 from __future__ import annotations
 
@@ -60,6 +60,13 @@ def validate(receipt_rel: str) -> list[str]:
     machine = r.get("machine_pipeline", {})
     if machine.get("configured") is not True:
         errors.append("asset is not machine-configured")
+    pipeline_cfg, pipeline_error = load_json("art/placeables/PIPELINE_CONFIG.json")
+    if pipeline_error:
+        errors.append(pipeline_error)
+    else:
+        assert pipeline_cfg is not None
+        if machine.get("pipeline_config_version") != pipeline_cfg.get("version"):
+            errors.append("receipt machine_pipeline.pipeline_config_version does not match PIPELINE_CONFIG.json")
     for key in ("canvas", "registration"):
         value = machine.get(key)
         if not isinstance(value, list) or len(value) != 2 or not all(isinstance(v, int) for v in value):
@@ -107,13 +114,22 @@ def validate(receipt_rel: str) -> list[str]:
             errors.append(f"generation gate {key} is not true")
     if gate.get("can_generate_isolated_candidate") is not True:
         errors.append("isolated candidate generation is not allowed by receipt")
+    if not isinstance(gate.get("can_promote_to_production"), bool):
+        errors.append("can_promote_to_production must be explicit boolean")
+    if not isinstance(gate.get("can_publish_runtime"), bool):
+        errors.append("can_publish_runtime must be explicit boolean")
 
     runtime = r.get("runtime_contract", {})
-    if gate.get("can_promote") is True:
-        if gate.get("can_scene_approve") is not True:
-            errors.append("promotion cannot be open while scene approval is closed")
+    if gate.get("can_promote_to_production") is True and gate.get("can_scene_approve") is not True:
+        errors.append("production promotion cannot be open while scene approval is closed")
+    if gate.get("can_publish_runtime") is True:
+        if gate.get("can_promote_to_production") is not True:
+            errors.append("runtime publication cannot be open before production promotion gate")
         if runtime.get("status") != "verified":
-            errors.append("promotion cannot be open without verified runtime contract")
+            errors.append("runtime publication cannot be open without verified runtime contract")
+    if runtime.get("status") != "verified" and gate.get("can_publish_runtime") is not False:
+        errors.append("non-verified runtime contract must keep can_publish_runtime=false")
+
     if gate.get("can_scene_approve") is True:
         if camera.get("current_hd_reference_status") not in ("approved", "approved_by_user"):
             errors.append("scene approval cannot be open without approved current HD island reference")
@@ -134,7 +150,8 @@ def main() -> int:
         return 1
     print("PASS: isolated generation preflight is internally consistent")
     print("NOTE: numeric island elevation is a measured generation proxy, not a proven original 3D camera angle")
-    print("NOTE: scene/runtime/promotion/game gates may still be BLOCKED by the receipt")
+    print("NOTE: production promotion and runtime publication are separate gates")
+    print("NOTE: visual/runtime/game gates may still be BLOCKED by the receipt")
     return 0
 
 
