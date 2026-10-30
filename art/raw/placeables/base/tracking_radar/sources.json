@@ -76,7 +76,7 @@
       "source_gen_id": "2157de10-f9c9-4396-951c-4aa86b123f8b",
       "source_size": [1536, 1024],
       "source_sha256": "6bed53ec75ee20c871e390fccbb08a75077f91984a6c7b25faafac04f716a7e8",
-      "drive_file_id": "1Ta7YFArImPGLt-GW2QQvFTFlAF4_OFkI",
+      "drive_file_id": "1Ta7YfArImPGLt-GW2QQvFTFlAF4_OFkI",
       "reason": "Wrong-subject generation despite explicit B02 reference binding; produced the full infrastructure era catalog."
     },
     {
