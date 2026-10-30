@@ -19,4 +19,5 @@ Current sets:
 
 - `e0_1978/` — approved.
 - `e1_1986/` — approved; use together with E0 for lineage-aware E1 generation/review.
-- E2–E5 — pending sequential visual approval.
+- `e2_1998/` — approved; use together with E1 + E0 for lineage-aware E2 generation/review.
+- E3–E5 — pending sequential visual approval.

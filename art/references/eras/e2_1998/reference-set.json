@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "era": "E2",
+  "year": 1998,
+  "name": "Испытательный центр",
+  "status": "approved_visual_reference_set",
+  "approval_context": "User approved proceeding with E2 if monitors and other era signals matched the canonical matrix on 2026-10-30; visual review confirmed E2 CRT/rack/diagnostics language and sufficient E1→E2 differentiation.",
+  "authority": {
+    "rules": "art/docs/ERA_DESIGN_MATRIX.md",
+    "style": "art/style_bible.txt",
+    "previous_era_reference": "art/references/eras/e1_1986/reference-set.json",
+    "anchor_era_reference": "art/references/eras/e0_1978/reference-set.json",
+    "note": "Generated lettering/pseudo-text inside reference sheets is non-authoritative; use the imagery for era language only."
+  },
+  "transition_from_e1": {
+    "preserved": [
+      "industrial serviceability, standardized safety language and visible technical infrastructure",
+      "physical electromechanical construction with readable maintenance access"
+    ],
+    "replaced": [
+      "E1 workshop-centric cabinets and early electronics with denser rack-based test/diagnostic systems",
+      "primarily hydraulic/electromotor emphasis with motorized servo and motor-reducer systems",
+      "mixed industrial panels with a stronger beige/gray technical-plastic and aluminium laboratory language",
+      "basic organized trays with more explicit routed harnesses, connectors and diagnostic cabling"
+    ],
+    "added": [
+      "CRT-dominant operator and diagnostic stations in deep/bulky housings",
+      "electronic racks, ventilation grilles, modular diagnostic/service bays and replaceable electronics",
+      "denser grouped early LED indication and test instrumentation",
+      "specialized test-center buildings, measurement posts and service modules"
+    ],
+    "why": "The base has matured from a standardized workshop into a dedicated aerospace test center where diagnostics, instrumentation and motorized control are first-class infrastructure.",
+    "player_signal": "More electronics and racks, deeper CRT stations, dense routed cabling, specialized test/diagnostic buildings and visibly motorized equipment; E2 is intentionally more technically busy than cleaner E3."
+  },
+  "era_gate_review": {
+    "changed_axes": ["manufacturing", "materials", "drive", "interface", "infrastructure", "silhouette_architecture"],
+    "preserved_family_traits": ["industrial serviceability", "functional safety/maintenance readability"],
+    "blind_order_result": "pass",
+    "monitor_review": "pass: displays read as bulky CRT/diagnostic terminals, not flat E3 panels; limited early LCD-like elements are not era-defining."
+  },
+  "raw_archive": {
+    "provider": "google_drive",
+    "folder_id": "10zBY-Einty7p9wbHZCDuQxQ-FqQnd5RE",
+    "folder_name": "E2_1998"
+  },
+  "sheets": [
+    {
+      "id": "e2_matrix",
+      "role": "eight-axis era overview and test-center base-fragment reference: laboratory/test architecture, motorization, CRT diagnostics, racks, organized cable routes and 1998 materials/signals",
+      "source_generation_id": "abeb59ec-097a-4dca-970e-7bb94a6f4f46",
+      "drive_file_id": "1YO4xa9Bg-_r5ZQhvbNqLdZfVShcNkoJX",
+      "filename": "e2_1998_matrix.png",
+      "mime_type": "image/png",
+      "dimensions": [1536, 1024],
+      "bytes": 3316658,
+      "sha256": "d21ecedb5615f36a7ce590b3b16778d29fc791701edeefa787e9be439b07a63b"
+    },
+    {
+      "id": "e2_elements",
+      "role": "industrial/test component library: beige/gray plastics, routed cable systems, pipes, motor-reducers, actuators, racks, gauges, CRT monitors, early LEDs, connectors and service modules",
+      "source_generation_id": "37ef748d-b436-48fa-bbde-f127d0a98d02",
+      "drive_file_id": "1zmBfo6BNs5JKj9qsoUGryqTO4HK9KG3u",
+      "filename": "e2_1998_elements.png",
+      "mime_type": "image/png",
+      "dimensions": [1536, 1024],
+      "bytes": 2971359,
+      "sha256": "1cf73b1b296f1f7e02dce16737d5b983c2bdea26403726d84cb3f8ca9e50a709"
+    },
+    {
+      "id": "e2_applications",
+      "role": "whole-object/application examples for test/launch complex, diagnostic building, communications/radar, fuel system, service transport, power block, measurement post, hangar, test stand and cable/pipe corridors",
+      "source_generation_id": "5b3d3fbe-23e2-449c-b876-f26f4c6273d5",
+      "drive_file_id": "1NWc2VuWDZyOXYBnljffaREpScm2SWv-5",
+      "filename": "e2_1998_applications.png",
+      "mime_type": "image/png",
+      "dimensions": [1536, 1024],
+      "bytes": 3127260,
+      "sha256": "e4335a84f75d956866c3dbaccda932856d5b6cb862b84d628b34d16cd82d0c53"
+    }
+  ],
+  "rejected_attempts": [
+    {
+      "reason": "wrong era read: generator repeated E1/1986 instead of E2/1998",
+      "drive_folder_id": "1rHGB6TYaSoJfeKVE8x3T3_6tDTroBuhb",
+      "drive_file_ids": ["1BdPVT3UUHfi-Kq0B7XcpR748euf7nOTH", "1ovSxDR0tzx1PvHDsomgLM-15Ep7BqW-C"]
+    }
+  ],
+  "usage": {
+    "required_for_future_generation": true,
+    "reference_strategy": "Use all applicable E2 sheets together with approved E1 and E0 sets, the canonical era matrix and asset-specific brief. E2 should read as a busy diagnostic/electromechanical test center; do not prematurely simplify into E3 flat-display modularity.",
+    "system_separation": "Physical hardware/materials belong in art; active screen data, glow, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
+  }
+}
