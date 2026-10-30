@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { ASSET_FILES, BUILDING_ANCHORS, BUILDING_KEYS, ENTRY_KEYS, ISLAND, ISLAND_ROADS, WORLD_ENTRIES } from '../src/render/manifest.js';
+import {
+  ASSET_FILES, BUILDING_ANCHORS, BUILDING_KEYS, E0_BUILDING_SIZES, ENTRY_KEYS, ISLAND, ISLAND_ROADS, WORLD_ENTRIES,
+} from '../src/render/manifest.js';
 import { pngSize, repoRoot } from './render-helpers.mjs';
 
 const envDir = path.join(repoRoot, 'art', 'gen', 'environment');
@@ -90,10 +92,10 @@ test('раскладка: постройки не перекрываются м�
   }
 });
 
-test('раскладка: спрайты заметные (по ширине от 90 до 240 px острова) и пропорциональны следу', () => {
+test('раскладка: спрайты заметные (по ширине от 60 до 240 px острова; маяк — одна стойка) и пропорциональны следу', () => {
   for (const key of BUILDING_KEYS) {
     const { size, footprint } = BUILDING_ANCHORS[key];
-    assert.ok(size[0] >= 90 && size[0] <= 240, `${key}: ширина ${size[0]}`);
+    assert.ok(size[0] >= (key === 'beacons' ? 60 : 90) && size[0] <= 240, `${key}: ширина ${size[0]}`);
     assert.ok(footprint[0] <= size[0] && footprint[0] >= size[0] * 0.6, `${key}: след ${footprint[0]} при ширине ${size[0]}`);
   }
 });
@@ -168,6 +170,46 @@ test('дороги островной жизни проложены по суш�
         assert.ok(Math.hypot(x - core.center[0], y - core.center[1]) > core.radius, `${road.id}: дорога по столу`);
       }
       assert.ok(wet / (steps + 1) < 0.1, `${road.id}: участок ${i} в воде`);
+    }
+  }
+});
+
+test('HD-постройки E0: размеры спрайта на острове сохраняют пропорции PNG, соседи не перекрываются по спрайтам и следам', () => {
+  const heights = {};
+  for (const key of Object.keys(E0_BUILDING_SIZES)) {
+    const [pw, ph] = E0_BUILDING_SIZES[key];
+    const [w, h] = BUILDING_ANCHORS[key].size;
+    assert.ok(Math.abs(w / h - pw / ph) < 0.015 * (pw / ph) + 0.01, `${key}: пропорции ${(w / h).toFixed(3)} против PNG ${(pw / ph).toFixed(3)}`);
+    assert.ok(h >= 80 && h <= 200, `${key}: высота ${h}`);
+    heights[key] = h;
+  }
+  // спрайты (низ по центру) покупок E0 в пределах острова и не накрывают ракету на столе
+  const core = ISLAND.padCore;
+  const sprites = [];
+  for (const key of Object.keys(E0_BUILDING_SIZES)) {
+    BUILDING_ANCHORS[key].anchors.forEach((anchor, i) => {
+      const [w, h] = BUILDING_ANCHORS[key].size;
+      const rect = { x0: anchor[0] - w / 2, y0: anchor[1] - h, x1: anchor[0] + w / 2, y1: anchor[1] };
+      assert.ok(rect.x0 >= 0 && rect.x1 <= ISLAND.width && rect.y0 >= 0 && rect.y1 <= ISLAND.height, `${key}[${i}]: спрайт за островом`);
+      sprites.push({ tag: `${key}[${i}]`, rect, key });
+    });
+  }
+  for (const a of sprites) {
+    const nx = Math.min(Math.max(core.center[0], a.rect.x0), a.rect.x1);
+    // ракета на столе — вертикаль до 110 px над центром площадки (мачта и корпус): спрайт её не закрывает
+    const hitsRocket = nx > core.center[0] - 22 && nx < core.center[0] + 22 && a.rect.y1 > core.center[1] - 110 && a.rect.y0 < core.center[1] + 30;
+    assert.ok(!hitsRocket, `${a.tag} закрывает ракету на столе`);
+  }
+  // два спрайта, у которых нижние кромки близко (стоят «рядом», а не друг за другом), не должны перекрываться по площади больше чем на 18 %
+  for (let i = 0; i < sprites.length; i++) {
+    for (let j = i + 1; j < sprites.length; j++) {
+      const a = sprites[i].rect;
+      const b = sprites[j].rect;
+      const ox = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0);
+      const oy = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0);
+      if (ox <= 0 || oy <= 0) continue;
+      const smaller = Math.min((a.x1 - a.x0) * (a.y1 - a.y0), (b.x1 - b.x0) * (b.y1 - b.y0));
+      assert.ok((ox * oy) / smaller < 0.18, `${sprites[i].tag} и ${sprites[j].tag}: перекрытие спрайтов ${(100 * (ox * oy) / smaller).toFixed(0)} %`);
     }
   }
 });

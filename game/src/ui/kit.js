@@ -862,7 +862,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
   function plate(x, y, w, h, iconName, value, color) {
     const cc = cell();
     nine('raised', x, y, w, h);
-    const iw = Math.round(h * 0.82); // ширина области значка
+    const iw = Math.round(Math.min(h * 0.82, w * 0.3)); // ширина области значка: в узкой табличке уступает место числу
     const scr = { x: x + iw - cc * 2, y: y + cc * 3, w: w - iw - cc, h: h - cc * 6 };
     icon(iconName, x + iw * 0.5 - cc, y + h / 2, Math.round(h * 0.62), color);
     const size = Math.round(h * 0.34);

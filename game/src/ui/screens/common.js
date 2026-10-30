@@ -238,7 +238,7 @@ export function lockPlan(app, kit, reasons, w, o = {}) {
   return reasons.map((r) => {
     const tappable = !!(o.goto && r.kind === 'building' && r.building);
     const lines = kit.text.wrap(reasonFull(app, r), w - isz - Math.round(size * 0.9), size).slice(0, 3);
-    const h = Math.max(tappable ? L.touch(44) : Math.round(26 * (o.u ?? L.ui)), Math.round(lines.length * step + size * 0.9));
+    const h = Math.max(tappable ? L.touch(44) : Math.round(22 * (o.u ?? L.ui)), Math.round(lines.length * step + size * 0.5));
     return { r, lines, h, tappable };
   });
 }
@@ -310,7 +310,8 @@ export function infoCallout(app, kit, spec) {
   const rows = (spec.rows || []).slice(0, 3);
   // причины блокировки показываются целиком, включая нехватку денег; больше трёх строк в щиток не помещается
   const locks = (spec.locks || []).slice(0, 3);
-  const w = Math.min(Math.round(310 * L.ui), 480, L.area.w - L.gap * 2);
+  // в ландшафте щиток шире: цена и кнопка встают в одну строку, высота щитка меньше
+  const w = Math.min(Math.max(Math.round(310 * L.ui), L.portrait ? 0 : Math.round(L.area.w * 0.5)), 480, L.area.w - L.gap * 2);
   // подвал: цена и кнопка в одну строку; не помещаются без мелкого шрифта — цена отдельной строкой над кнопкой на всю ширину
   const hasBuy = !spec.noBuy && spec.next !== false;
   const buySize = kit.fs(15);

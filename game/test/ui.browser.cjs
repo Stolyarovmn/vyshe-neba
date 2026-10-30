@@ -288,6 +288,18 @@ async function tourScreens(page, vp, era = null) {
     await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
     await page.waitForTimeout(500);
     await audit(`полёт/${mode}`, 400);
+    if (mode === 'on') {
+      // жест наклона: палец тянет по экрану в свободном месте — след жеста, указатель крена без стрелок
+      await page.evaluate(() => {
+        const cv = document.querySelector('canvas');
+        const fire = (type, id, x, y) => cv.dispatchEvent(new PointerEvent(type, { pointerId: id, pointerType: 'touch', clientX: x, clientY: y, bubbles: true, isPrimary: true }));
+        globalThis.__steer = fire;
+        fire('pointerdown', 41, innerWidth * 0.4, innerHeight * 0.45);
+        fire('pointermove', 41, innerWidth * 0.4 + innerWidth * 0.1, innerHeight * 0.45);
+      });
+      await audit('полёт/жест наклона', 300);
+      await page.evaluate(() => globalThis.__steer('pointerup', 41, innerWidth * 0.5, innerHeight * 0.45));
+    }
     await page.evaluate(() => globalThis.__VN_APP__.pause());
     await audit(`пауза/${mode}`, 250);
     await page.evaluate(() => { globalThis.__VN_APP__.resume(); globalThis.__VN_APP__.queueCard('help', true); });
@@ -324,6 +336,71 @@ async function tourScreens(page, vp, era = null) {
     await audit(`итоги/${mission}`, 300);
     await page.evaluate(() => { globalThis.__VN_APP__.results = null; globalThis.__VN_APP__.go('hub'); });
   }
+
+  // магнит в полёте: значок в HUD (над ракетой магнит не рисуется)
+  await go(page, 'launch');
+  await page.evaluate(() => { globalThis.__VN_APP__.prefs.touchControls = 'on'; globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: { magnet: true } }); });
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+  await page.waitForTimeout(600);
+  await audit('полёт/магнит', 400);
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.abandon(); });
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
+  await page.waitForTimeout(300);
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); a.prefs.touchControls = 'auto'; });
+
+  // потолок эпохи: всё куплено, не хватает до модернизации — подсказка на хабе, причины блокировок, «Что дальше» в итогах
+  await page.evaluate(() => {
+    const a = globalThis.__VN_APP__;
+    const t = globalThis.__VN_TEST__;
+    let p = t.profile();
+    p.era = 0;
+    p.coins = 5e6;
+    p.data = 5e5;
+    for (let i = 0; i < 400; i++) {
+      let bought = false;
+      for (const id of Object.keys(a.data.BUILDINGS)) { const r = a.rules.buyBuilding(p, id); if (r.ok) { p = r.profile; bought = true; } }
+      for (const id of Object.keys(a.data.PARTS)) { const r = a.rules.buyPart(p, id); if (r.ok) { p = r.profile; bought = true; } }
+      if (!bought) break;
+    }
+    p.coins = 40;
+    p.data = 3;
+    t.setProfile(p);
+    a.history.length = 0;
+  });
+  await go(page, 'hub');
+  await page.waitForTimeout(500);
+  await audit('хаб/потолок эпохи', 400);
+  await go(page, 'rocket');
+  await page.waitForTimeout(300);
+  for (const id of ['engine', 'capsule']) {
+    await setUi(page, (k) => { globalThis.__VN_APP__.ui.rocket.selected = k; }, id);
+    await audit(`мастерская/причины/${id}`, 250);
+  }
+  await go(page, 'base');
+  await page.waitForTimeout(300);
+  await setUi(page, () => { globalThis.__VN_APP__.ui.base.sel = 'deluge'; });
+  await audit('стройка/причины', 250);
+  await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: {} }));
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+  await page.waitForTimeout(400);
+  await page.evaluate(() => globalThis.__VN_APP__.abandon());
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
+  await page.waitForTimeout(3300);
+  await audit('итоги/что дальше', 300);
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); });
+  // переход в эпоху доступен: отметка на памятнике и пульсирующая «!» на табличке эпохи
+  await page.evaluate(() => {
+    const t = globalThis.__VN_TEST__;
+    const p = t.profile();
+    p.coins = 9e4;
+    p.data = 900;
+    p.milestones.softLandings = 9;
+    p.milestones.maxAlt = 1e7;
+    t.setProfile(p);
+  });
+  await go(page, 'hub');
+  await page.waitForTimeout(500);
+  await audit('хаб/переход доступен', 400);
 
   // настройки: прокрутка сверху донизу
   await go(page, 'settings');

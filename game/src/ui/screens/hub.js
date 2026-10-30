@@ -179,20 +179,6 @@ export default {
       if (st.era) hub.focus?.('monument');
     }
 
-    // щиток у выбранного объекта
-    const bounds = sceneArea(L, { dock: true, back: false, era: true, gear: true });
-    if (st.sel) {
-      drawBuildingCallout(app, kit, st.sel, {
-        target: worldTarget(app, st.sel),
-        bounds,
-        goto: (key) => app.go('base', { select: key }, { push: true }),
-      });
-    } else if (st.era) {
-      eraCallout(app, kit, { id: 'era', target: worldTarget(app, 'monument'), bounds });
-    }
-    drawMonumentMark(app, kit, L, info, st);
-    drawEraHint(app, kit, L, info, st, bounds);
-
     // нижняя панель: ПУСК под защитной планкой и кнопки-иконки
     const D = dockLayout(L);
     kit.hazard(D.launch);
@@ -215,5 +201,19 @@ export default {
       const bob = Math.sin(app.time * 5) * 4;
       kit.icon('down', D.launch.x + D.launch.w / 2, D.bar.y - L.gap - 12 * L.ui + bob, Math.round(24 * L.ui), c.amber);
     }
+
+    // щиток у выбранного объекта рисуется после нижней панели: в тесном окне он перекрывает кнопки панели, а не наоборот
+    const bounds = sceneArea(L, { dock: true, back: false, era: true, gear: true });
+    if (st.sel) {
+      drawBuildingCallout(app, kit, st.sel, {
+        target: worldTarget(app, st.sel),
+        bounds,
+        goto: (key) => app.go('base', { select: key }, { push: true }),
+      });
+    } else if (st.era) {
+      eraCallout(app, kit, { id: 'era', target: worldTarget(app, 'monument'), bounds });
+    }
+    drawMonumentMark(app, kit, L, info, st);
+    drawEraHint(app, kit, L, info, st, bounds);
   },
 };

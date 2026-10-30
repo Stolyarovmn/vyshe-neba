@@ -425,7 +425,7 @@ test('поле магнита анимировано: стили линий ме
 test('лёгкие runtime-копии: файлы цел, в каталоге вместо тяжёлых оригиналов, размеры и вид близки к подготовленным спрайтам', () => {
   const meta = JSON.parse(fs.readFileSync(path.join(repoRoot, 'art', 'gen', 'runtime', 'runtime-sprites.meta.json'), 'utf8'));
   const names = Object.keys(ASSET_FILES).filter((name) => RUNTIME_SPRITE_PATTERN.test(name));
-  assert.equal(names.length, 34, 'базы 12 + магниты 6 + части шаров 12 + площадки 4');
+  assert.equal(names.length, 45, 'базы 12 + магниты 6 + части шаров 12 + площадки 4 + HD-постройки E0 11');
   assert.deepEqual([...names].sort(), Object.keys(meta.sprites).sort(), 'каталог и метаданные совпадают');
   let saved = 0;
   for (const name of names) {

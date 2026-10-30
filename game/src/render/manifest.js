@@ -16,7 +16,7 @@ const RUNTIME_SPRITE_DIR = 'art/gen/runtime/';
  * Спрайты, у которых в сборку идёт лёгкая PNG-8 копия (game/tools/optimize-sprites.py): базы Луны и Марса, города, магниты,
  * части шаров, площадки крайних эпох. Шаблон совпадает с PATTERN в этом инструменте.
  */
-export const RUNTIME_SPRITE_PATTERN = /^(outpost_(moon|mars)_\d{4}|magnet_\d{4}|balloon_\d{4}_(envelope|pod)|pad_(moon|mars)_(early|future))$/;
+export const RUNTIME_SPRITE_PATTERN = /^(outpost_(moon|mars)_\d{4}|magnet_\d{4}|balloon_\d{4}_(envelope|pod)|pad_(moon|mars)_(early|future)|bld_(beacons|gantry|deluge|service|rescue|fuel|logistics|radar|energy|observation|recovery)_1978)$/;
 
 /** Файл мирового спрайта по логическому имени: лёгкая runtime-копия или подготовленный оригинал. */
 export function worldSpriteFile(name) {
@@ -82,6 +82,14 @@ export const BACKDROP_ATLAS = {
  * bld_<ключ>_<год>, рендер возьмёт спрайт, а силуэт останется запасным.
  */
 export const PROCEDURAL_BUILDINGS = ['logistics', 'radar', 'energy', 'observation', 'recovery'];
+/**
+ * HD-спрайты построек эпохи E0 (bld_<ключ>_1978, art/gen/runtime): низ по центру, высота на острове — BUILDING_ANCHORS[key].size.
+ * Размеры [w, h] PNG. Для остальных эпох остаются прежние файлы infrastructure/ и программные силуэты.
+ */
+export const E0_BUILDING_SIZES = {
+  beacons: [236, 462], gantry: [340, 516], deluge: [421, 516], service: [516, 354], rescue: [516, 312], fuel: [516, 264],
+  logistics: [516, 458], radar: [376, 516], energy: [516, 463], observation: [473, 516], recovery: [516, 349],
+};
 export const BUILDING_KEYS = [
   'beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel', 'logistics', 'factory',
   'weather', 'control', 'radar', 'energy', 'observation', 'recovery',
@@ -135,7 +143,14 @@ function buildAssetFiles() {
     for (const part of BALLOON_PARTS) files[`balloon_${year}_${part}`] = worldSpriteFile(`balloon_${year}_${part}`);
   }
   for (const key of ART_BUILDINGS) {
-    for (const year of ERA_YEARS) files[`bld_${key}_${year}`] = `${INFRA_DIR}${key}/${year}.png`;
+    for (const year of ERA_YEARS) {
+      const name = `bld_${key}_${year}`;
+      files[name] = key in E0_BUILDING_SIZES && year === ERA_YEARS[0] ? worldSpriteFile(name) : `${INFRA_DIR}${key}/${year}.png`;
+    }
+  }
+  for (const key of PROCEDURAL_BUILDINGS) {
+    // у программных построек арт есть только для E0; для остальных эпох рисуется силуэт кодом
+    if (key in E0_BUILDING_SIZES) files[`bld_${key}_${ERA_YEARS[0]}`] = worldSpriteFile(`bld_${key}_${ERA_YEARS[0]}`);
   }
   for (const [key, dir] of Object.entries(PLACEABLE_BUILDINGS)) {
     ERA_YEARS.forEach((year, i) => {
@@ -212,6 +227,8 @@ export const FLAT_SPRITE_SIZES = {
 /** Размер подготовленного PNG [w, h] по логическому имени ('core_1998', 'cloud_2') или undefined. */
 export function spriteSize(name) {
   if (FLAT_SPRITE_SIZES[name]) return FLAT_SPRITE_SIZES[name];
+  const building = /^bld_([a-z]+)_1978$/.exec(name);
+  if (building && E0_BUILDING_SIZES[building[1]]) return E0_BUILDING_SIZES[building[1]];
   const part = /^balloon_(\d{4})_(envelope|pod)$/.exec(name);
   if (part) {
     const era = ERA_YEARS.indexOf(Number(part[1]));
@@ -305,20 +322,20 @@ ISLAND.topUnits = -ISLAND.launchOrigin[1] * ISLAND.unitsPerPx;
 
 // anchors: [[x, y], ...] px острова; size: видимый спрайт [w, h] px; footprint: след на земле [w, глубина] px.
 export const BUILDING_ANCHORS = {
-  beacons: { zone: 'launch_core', anchors: [[283, 395], [493, 395]], size: [100, 77], footprint: [90, 26] },
-  gantry: { zone: 'launch_core', anchors: [[480, 305]], size: [113, 190], footprint: [102, 34] },
-  deluge: { zone: 'launch_core', anchors: [[492, 452]], size: [130, 118], footprint: [117, 32] },
-  service: { zone: 'service_central', anchors: [[640, 395]], size: [120, 102], footprint: [108, 30] },
-  rescue: { zone: 'service_central', anchors: [[740, 340]], size: [125, 115], footprint: [112, 30] },
-  fuel: { zone: 'fuel_east', anchors: [[870, 470]], size: [170, 93], footprint: [153, 32] },
-  logistics: { zone: 'logistics_east', anchors: [[1200, 470]], size: [190, 105], footprint: [171, 34] },
+  beacons: { zone: 'launch_core', anchors: [[284, 396], [492, 396]], size: [72, 140], footprint: [62, 22] },
+  gantry: { zone: 'launch_core', anchors: [[484, 267]], size: [125, 190], footprint: [108, 32] },
+  deluge: { zone: 'launch_core', anchors: [[526, 528]], size: [122, 150], footprint: [105, 30] },
+  service: { zone: 'service_central', anchors: [[656, 423]], size: [140, 96], footprint: [120, 28] },
+  rescue: { zone: 'service_central', anchors: [[740, 340]], size: [139, 84], footprint: [120, 26] },
+  fuel: { zone: 'fuel_east', anchors: [[870, 470]], size: [160, 82], footprint: [138, 26] },
+  logistics: { zone: 'logistics_east', anchors: [[1200, 470]], size: [141, 125], footprint: [121, 30] },
   factory: { zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34] },
   weather: { zone: 'command_north', anchors: [[1000, 350]], size: [142, 180], footprint: [100, 28] },
   control: { zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34] },
-  radar: { zone: 'command_north', anchors: [[860, 170]], size: [170, 190], footprint: [140, 34] },
-  energy: { zone: 'utility_east', anchors: [[1500, 380]], size: [200, 115], footprint: [180, 36] },
-  observation: { zone: 'perimeter_east', anchors: [[1380, 320]], size: [150, 175], footprint: [120, 34] },
-  recovery: { zone: 'recovery_east', anchors: [[1610, 478]], size: [200, 112], footprint: [180, 34] },
+  radar: { zone: 'command_north', anchors: [[798, 174]], size: [124, 170], footprint: [107, 30] },
+  energy: { zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30] },
+  observation: { zone: 'perimeter_east', anchors: [[1378, 378]], size: [138, 150], footprint: [119, 30] },
+  recovery: { zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28] },
 };
 
 // Объекты-входы в мире (не покупаются): тап открывает экран. Раздел entries в BASE_ISLAND_LAYOUT.json.

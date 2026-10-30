@@ -204,12 +204,12 @@ function estimateRate(profile, config, destination, target, skill) {
   return { rate: expected / seconds, seconds };
 }
 
-function bestPlan(profile, skill) {
+function bestPlan(profile, skill, caution = 1) {
   let best = null;
   for (const destination of R.availableDestinations(profile).filter((d) => d.ok).map((d) => d.id)) {
     const config = configOf(profile, destination);
     if (destination === 'earth') {
-      const reach = safeReach(config) * SAFETY_FRACTION;
+      const reach = safeReach(config) * SAFETY_FRACTION * caution;
       for (const fraction of [0.45, 0.7, 1]) {
         const target = Math.max(40, Math.min(reach * fraction, SPACE_ALT * 1.02));
         const { rate } = estimateRate(profile, config, destination, target, skill);
@@ -223,7 +223,8 @@ function bestPlan(profile, skill) {
   return best ?? { destination: 'earth', target: 60, rate: 0 };
 }
 
-function choosePlan(profile, skill) {
+// `caution` (0.35..1) shrinks the income sorties after failures: the player learns what the rocket can really do.
+function choosePlan(profile, skill, caution = 1) {
   const { altitude, body } = milestoneInfo(profile);
   const open = new Map(R.availableDestinations(profile).map((d) => [d.id, d.ok]));
   if (body && open.get(body) && canExpedition(configOf(profile, body), body)) {
@@ -235,7 +236,7 @@ function choosePlan(profile, skill) {
     if (safeReach(config) >= need) return { destination: 'earth', target: Math.min(need, SPACE_ALT * 1.03), reason: 'milestone' };
   }
   if (!altitude && !body && profile.milestones.softLandings === 0) return { destination: 'earth', target: 120, reason: 'first-landing' };
-  const best = bestPlan(profile, skill);
+  const best = bestPlan(profile, skill, caution);
   return { destination: best.destination, target: best.target, reason: 'income' };
 }
 
@@ -251,7 +252,8 @@ async function loadRealFlight() {
   if (!existsSync(file) || !existsSync(path.join(path.dirname(file), 'autopilot.js'))) return null;
   const { runFlight } = await import(pathToFileURL(file).href);
   return (config, plan) => {
-    const mission = plan.destination === 'earth' ? 'hop' : 'space';
+    // A hop cannot come back from the zero-gravity zone: sorties to the space line use the turn-around mission.
+    const mission = plan.destination === 'earth' && plan.target < SPACE_ALT * 0.9 ? 'hop' : 'space';
     const { result } = runFlight(config, { skill: plan.skill, mission, targetAlt: plan.target, seed: config.seed, maxTime: 420 });
     return { ...result, duration: result.time + (plan.destination === 'earth' ? 8 : 12), real: true };
   };
@@ -305,6 +307,7 @@ export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = 
   const log = { purchases: 0, items: [] };
   const eras = [];
   let flights = 0;
+  let caution = 1;
   let firstFinsFlight = null; // flights completed when the first stabilizer level was bought
 
   while (profile.era < Math.min(5, untilEra + 1) && seconds / 60 < maxMinutes && flights < 20000) {
@@ -343,9 +346,12 @@ export async function runBot({ seed = 1, skill = 0.8, maxMinutes = 3000, real = 
       }
     }
 
-    const plan = choosePlan(profile, skill);
+    const plan = choosePlan(profile, skill, caution);
     const config = R.makeFlightConfig(profile, { destination: plan.destination, seed: flights + 1 });
     const result = fly(config, { destination: plan.destination, target: plan.target, skill, rng });
+    if (verbose) console.error(`  flight ${flights + 1}: ${plan.destination} target ${Math.round(plan.target)} -> ${result.outcome} ${result.reason ?? ''} alt ${Math.round(result.maxAlt)} fuel ${(result.fuelLeft01 ?? 0).toFixed(2)}`);
+    // Only the real simulation can contradict the estimate, so only there a failure teaches caution.
+    if (real) caution = result.outcome === 'landed' ? Math.min(1, caution * 1.05) : Math.max(0.35, caution * 0.8);
     const settled = R.settleFlight(profile, result, config);
     profile = settled.profile;
     seconds += result.duration + OVERHEAD.cycleSeconds;
