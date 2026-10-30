@@ -18,4 +18,5 @@ Era reference approval is separate from approval of any production asset. A refe
 Current sets:
 
 - `e0_1978/` — approved.
-- E1–E5 — pending sequential visual approval.
+- `e1_1986/` — approved; use together with E0 for lineage-aware E1 generation/review.
+- E2–E5 — pending sequential visual approval.
