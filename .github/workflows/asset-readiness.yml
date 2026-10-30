@@ -15,7 +15,9 @@ on:
       - 'tools/art_pipeline/validate_generation_preflight.py'
       - '.github/workflows/asset-readiness.yml'
   push:
-    branches: [game-production]
+    branches:
+      - game-production
+      - 'art/production-readiness-v2-*'
     paths:
       - 'art/briefs/**'
       - 'art/docs/ASSET_GENERATION_RUNBOOK.md'
