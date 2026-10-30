@@ -85,29 +85,15 @@ A missing mapping, missing target, SHA mismatch, target outside `game/assets/`, 
 
 ## Tracker semantics
 
-The machine tracker sequence is extended to:
+The current machine tracker remains unchanged in this docs-only contract: it still ends with `promote -> game_tests` until the separate CI/tool migration explicitly changes the tracker schema/step list.
 
-```text
-generate
-→ edit
-→ archive_original
-→ source_prepare
-→ pixel_snap
-→ normalize
-→ aseprite_index
-→ qa_auto
-→ candidate_manifest
-→ visual_review
-→ promote
-→ publish_runtime
-→ game_tests
-```
+For this branch model:
 
-- `promote` means approved candidate has crossed Boundary A into production history.
-- `publish_runtime` means the exact approved bytes have crossed Boundary B through a runtime PR/merge boundary.
-- `game_tests` applies to the runtime/build tree, not merely to production docs/config checks.
+- `promote` means approved candidate has crossed Boundary A into production history;
+- Boundary B is evidenced by the SHA-bound runtime export report plus the separate runtime PR into `main`;
+- `game_tests` applies only to the runtime/build tree and must not be inferred from production-only checks.
 
-Existing checkpoints are migrated forward by adding the new pending `publish_runtime` step; earlier successful steps remain reusable when their fingerprints and output SHA values still match.
+A future tracker migration MAY add an explicit `publish_runtime` step, but it must be implemented together in `PIPELINE_CONFIG.json`, tracker code, workflows and migration logic. This document alone does not claim that machine step exists.
 
 ## CI / workflow separation
 
