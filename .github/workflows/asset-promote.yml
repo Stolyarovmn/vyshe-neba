@@ -1,4 +1,4 @@
-name: Promote approved 2D asset
+name: Promote approved 2D asset to production
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ permissions:
   issues: write
 
 jobs:
-  promote:
+  promote-production:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     concurrency:
@@ -28,10 +28,11 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       CHECKPOINT_NAME: asset-checkpoint-${{ inputs.asset }}-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout production branch
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: main
+          ref: game-production
 
       - name: Restore latest candidate checkpoint
         run: |
@@ -68,7 +69,7 @@ jobs:
             --aseprite "$RUNNER_TEMP/art-tools/aseprite" \
             --resume
 
-      - name: Enforce hash-bound visual approval and stage production
+      - name: Enforce hash-bound visual approval and stage production only
         run: |
           python3 tools/art_pipeline/promote_asset.py \
             --repo-root . \
@@ -76,7 +77,18 @@ jobs:
             --candidate "$RUNNER_TEMP/candidate" \
             --state-dir "$RUNNER_TEMP/candidate/.tracker"
 
-      - name: Create promotion PR instead of pushing main
+      - name: Reject runtime/build files in production promotion diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          bad="$(git diff --name-only | grep -Ev '^art/gen/' || true)"
+          if [ -n "$bad" ]; then
+            echo 'Production promotion attempted to change non-production paths:' >&2
+            printf '%s\n' "$bad" >&2
+            exit 1
+          fi
+
+      - name: Create production promotion PR
         shell: bash
         run: |
           set -euo pipefail
@@ -85,19 +97,19 @@ jobs:
             exit 0
           fi
           asset='${{ inputs.asset }}'
-          branch="2d_promote-${asset,,}-${GITHUB_RUN_ID}"
+          branch="art_promote-${asset,,}-${GITHUB_RUN_ID}"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git switch -c "$branch"
-          git add -A art/gen outputs/rocket/runtime-assets.json outputs/rocket/dist/assets
-          git commit -m "Promote ${asset} approved art [skip asset-candidate]"
+          git add -A art/gen
+          git commit -m "Promote ${asset} approved art to production"
           git push origin "$branch"
           if ! gh pr create \
-            --base main \
+            --base game-production \
             --head "$branch" \
-            --title "2D: promote ${asset} approved asset" \
-            --body "Deterministic promotion from canonical sources. Automatic QA passed and visual approval was verified against exact PNG SHA-256 values. The asset task tracker is continued through the promotion PR and final game regression."; then
-            echo "::warning::Promotion branch $branch was pushed, but Actions cannot create pull requests. main was not modified."
+            --title "Art: promote ${asset} approved production asset" \
+            --body "Boundary A only: exact-SHA approved candidate -> game-production. This PR intentionally contains production art/provenance only and does not publish runtime files. Runtime publication is a separate PR into main using art/runtime/RUNTIME_EXPORTS.json."; then
+            echo "::warning::Promotion branch $branch was pushed, but Actions could not create the production PR. game-production/main were not modified directly."
           fi
 
       - name: Render tracker summary
