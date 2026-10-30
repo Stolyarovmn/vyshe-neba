@@ -36,12 +36,16 @@
   "camera": {
     "family": "island_top_3_4",
     "projection_angle": "UNKNOWN",
-    "projection_review": "pending",
+    "projection_review": "pending_candidate_scene_qa",
     "legacy_approved_reference_meta": "art/gen/environment/start_island_e0.meta.json",
     "legacy_approved_reference_sha256": "686762324a0b9244317fa0ff0327135f9039ad61c19c7510a88fdd18983e1ab3",
     "current_hd_reference_meta": "art/gen/environment/start_island_hd.meta.json",
-    "current_hd_reference_status": "pending",
-    "current_hd_approved_by_user": false
+    "current_hd_approval_record": "art/gen/environment/start_island_hd.approval.json",
+    "current_hd_reference_status": "approved_by_user",
+    "current_hd_approved_by_user": true,
+    "current_hd_reference_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+    "current_hd_reference_runtime_git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
+    "current_hd_reference_approved_on": "2026-10-30T14:33:35Z"
   },
   "runtime_contract": {
     "logical_name": "UNKNOWN",
@@ -62,11 +66,10 @@
     "transparent_background": true,
     "style_bible_verbatim": true,
     "can_generate_isolated_candidate": true,
-    "can_scene_approve": false,
+    "can_scene_approve": true,
     "can_promote": false
   },
   "blocked_stages": [
-    "scene_approval_until_hd_island_reference_is_approved",
     "rig_event_qa_until_runtime_event_consumer_is_verified",
     "runtime_integration_until_logical_name_and_consumer_are_verified",
     "promotion_until_all_applicable_gates_pass"
