@@ -1,0 +1,107 @@
+name: Publish approved production asset to clean runtime
+
+on:
+  workflow_dispatch:
+    inputs:
+      asset:
+        description: Asset key from art/runtime/RUNTIME_EXPORTS.json
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  publish-runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: runtime-asset-${{ inputs.asset }}
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout production source
+        uses: actions/checkout@v4
+        with:
+          ref: game-production
+          path: production
+          fetch-depth: 1
+
+      - name: Checkout clean runtime branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: runtime
+          fetch-depth: 0
+
+      - name: Replace canonical runtime files from exact approved production bytes
+        run: |
+          python3 production/tools/art_pipeline/publish_runtime_asset.py \
+            --repo-root production \
+            --runtime-root runtime \
+            --asset '${{ inputs.asset }}' \
+            --report "$RUNNER_TEMP/runtime-export.json"
+          cat "$RUNNER_TEMP/runtime-export.json"
+
+      - name: Enforce runtime diff boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runtime
+          mapfile -t allowed < <(jq -r '.files[].target' "$RUNNER_TEMP/runtime-export.json" | sort -u)
+          mapfile -t changed < <(git diff --name-only | sort -u)
+          if [ "${#changed[@]}" -eq 0 ]; then
+            echo 'Approved bytes already match runtime; no PR is needed.'
+            exit 0
+          fi
+          printf '%s\n' "${changed[@]}" > "$RUNNER_TEMP/changed.txt"
+          printf '%s\n' "${allowed[@]}" > "$RUNNER_TEMP/allowed.txt"
+          if ! diff -u "$RUNNER_TEMP/allowed.txt" "$RUNNER_TEMP/changed.txt"; then
+            echo 'Runtime publish changed paths outside the explicit export mapping.' >&2
+            exit 1
+          fi
+          if grep -E '(^|/)(old|previous|backup|bak|archive|v[0-9]+)(/|$)|(_old|_previous|_backup|\.bak)(\.|$)' "$RUNNER_TEMP/changed.txt"; then
+            echo 'Historical/backup runtime copy detected; runtime must contain only the active canonical file.' >&2
+            exit 1
+          fi
+
+      - name: Build exact runtime tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runtime
+          npm install --no-audit --no-fund
+          npm run build
+
+      - name: Create runtime replacement PR
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runtime
+          if git diff --quiet; then
+            echo 'Runtime already contains the exact approved bytes; nothing to publish.'
+            exit 0
+          fi
+          asset='${{ inputs.asset }}'
+          branch="runtime_asset-${asset,,}-${GITHUB_RUN_ID}"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
+          while IFS= read -r target; do git add -- "$target"; done < <(jq -r '.files[].target' "$RUNNER_TEMP/runtime-export.json")
+          staged="$(git diff --cached --name-only | sort -u)"
+          allowed="$(jq -r '.files[].target' "$RUNNER_TEMP/runtime-export.json" | sort -u)"
+          if [ "$staged" != "$allowed" ]; then
+            echo 'Staged runtime paths do not exactly equal export mapping.' >&2
+            printf 'staged:\n%s\nallowed:\n%s\n' "$staged" "$allowed" >&2
+            exit 1
+          fi
+          git commit -m "Runtime: replace ${asset} with approved production art"
+          git push origin "$branch"
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "Runtime: replace ${asset} approved asset" \
+            --body "Boundary B only: exact approved bytes from game-production replace existing canonical game/assets paths in main. No production history, backup copy, art/gen mirror or legacy outputs mirror is included. Rollback is by Git revert/history. Build command executed in this workflow: npm run build."
