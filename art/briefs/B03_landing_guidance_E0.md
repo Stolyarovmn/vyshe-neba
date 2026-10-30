@@ -6,12 +6,12 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally pre
 
 - Asset ID / slug / family / zone: `B03 / landing_guidance / base / launch_core`
 - Type: `base`
-- Owner / reviewer / branch / commit SHA: `owner UNKNOWN / reviewer user for island reference, B03 reviewer pending / art/production-readiness-v2-20261030 / commit pinned by PR`
+- Owner / reviewer / branch / commit SHA: `owner UNKNOWN / reviewer user for island reference, B03 reviewer pending / canonical game-production / SHA pinned by tracker at execution time`
 - Status: `design` — replacement E0 required; isolated candidate generation and later scene QA are allowed. Production promotion becomes available only after candidate/QA/approval gates. Runtime publication is separately blocked by a verified design-vs-runtime semantics/rig mismatch, not by an unknown asset path.
 - Gameplay role / видимый результат, **design target**: `PRODUCTION_MANIFEST.md` says B03 predicts touchdown point, safe corridor and approach state and must not steer the rocket.
-- Current runtime behavior at `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e`: building key `beacons` is implemented. `game/src/data/buildings.js` describes landing-zone illumination, landing-tolerance and perfect-landing effects; `game/src/sim/landing.js` actually widens touchdown tolerances by `1 + 0.25 * s.cfg.base.beacons` on the pad. This is **not the same mechanic** as the production-manifest tracking/corridor target.
+- Current runtime behavior at `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721`: building key `beacons` is implemented. `game/src/sim/landing.js` widens touchdown tolerances by `1 + 0.25 * s.cfg.base.beacons` on the pad. This is **not the same mechanic** as the production-manifest tracking/corridor target.
 - Runtime implementation status: asset mapping/consumer **verified**, design-target behavior **not verified/implemented**. Do not call the production-manifest mechanic implemented until a separate runtime integration change proves it.
-- Dependencies: the hub uses `profile.buildings.beacons` and the generic building renderer; the layout reserves a symmetric pair at the two `beacons` anchors. The intended future tracking-head/lamp event/state contract is not implemented in the verified runtime.
+- Dependencies: the hub/building renderer uses `profile.buildings.beacons`; the layout reserves a symmetric pair at the two `beacons` anchors. The intended future tracking-head/lamp event/state contract is not implemented in the verified runtime.
 - Что не входит в scope / новые механики запрещены: this art change does not alter landing physics, autopilot, HUD, guidance corridor, touchdown prediction, reward logic or runtime state machines.
 
 ## B. Физическая конструкция
@@ -25,7 +25,7 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally pre
 
 ## C. Camera, scene и runtime
 
-- Reference asset URL / SHA-256 / approval status: current HD reference is `art/gen/environment/start_island_hd.meta.json` plus `art/gen/environment/start_island_hd.approval.json`; exact approved SHA-256 `2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997`, approved by user on `2026-10-30T14:33:35Z`. The user-supplied PNG recomputed to Git blob SHA-1 `382ab3fb2906152e2bc2a2616d794192904e7d68`, exactly matching `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e:game/assets/shared/island/start-island.png`.
+- Reference asset URL / SHA-256 / approval status: current HD reference is `art/gen/environment/start_island_hd.meta.json` plus `art/gen/environment/start_island_hd.approval.json`; exact approved SHA-256 `2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997`, approved by user on `2026-10-30T14:33:35Z`. The approved PNG has Git blob SHA-1 `382ab3fb2906152e2bc2a2616d794192904e7d68`; it is now present both in runtime history evidence and canonical production history at `art/gen/environment/start_island_hd.png`.
 - Camera family: `island_top_3_4`.
 - Actual source projection angle: `UNKNOWN`; 47° is not approved evidence.
 - Projection calibration: `art/gen/environment/start_island_hd.projection.json`.
@@ -35,8 +35,8 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally pre
 - Gameplay-size, reduced zoom, portrait scene screenshots: `pending`; must be produced after a replacement candidate exists.
 - Runtime asset key: `beacons`.
 - Runtime logical-name pattern: `bld_beacons_<year>`, produced by `game/src/render/manifest.js::buildingSpriteName` and loaded for every `ART_BUILDINGS` era.
-- Runtime consumer: `game/src/render/hub.js` calls `drawPlacedBuildings`; `game/src/render/buildings.js` reads `profile.buildings.beacons`, places both configured anchors and resolves `bld_beacons_<year>` through the generic sprite path.
-- Existing canonical runtime target pattern: `game/assets/eras/e<era>-<year>/base/beacons.png`; E0 target exists at `game/assets/eras/e0-1978/base/beacons.png`, Git blob SHA-1 `2a528e56d50a20af1e19ef2c197d01f34794ccf4` on the pinned `main`.
+- Runtime consumer: `game/src/render/buildings.js` resolves `buildingSpriteName(key, level)` through `drawBuilding`; current runtime manifest/build gate verifies the era sprite path is present.
+- Existing canonical runtime target pattern: `game/assets/eras/e<era>-<year>/base/beacons.png`; current `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721` runtime build resolves all manifest entries.
 - Runtime fallback: generic `drawBuilding` falls back to procedural drawing only when the resolved sprite is unavailable; B03 is in `ART_BUILDINGS`, so the normal path is the era sprite.
 - E0–E5 mapping и размер/registration: configured E0–E5 years `[1978,1986,1998,2015,2035,2060]`; one-beacon canvas `46×82`, registration `(23,78)`, family `pixel_size=12`, <=32 colors.
 - Отклонения от утверждённого reference: current replacement E0 not generated yet.
@@ -56,10 +56,10 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally pre
 
 | Trigger / precondition | State before → after | Parts / motion / limits | Termination, cancel, cooldown | Игровой результат и visual signal | Reduced-motion equivalent |
 | --- | --- | --- | --- | --- | --- |
-| current runtime | static owned-building draw by `profile.buildings.beacons` | no verified per-part head/lamp rig | no verified B03 state machine | landing tolerances are widened by current simulation; data also defines beacon illumination/perfect-landing effects | current static sprite path |
+| current runtime | static owned-building draw by `profile.buildings.beacons` | no verified per-part head/lamp rig | no verified B03 state machine | landing tolerances are widened by current simulation | current static sprite path |
 | production-manifest target | `UNKNOWN` until a separate integration contract is implemented | `head` physically pans/tilts; `lamp` is a state part | `UNKNOWN` | target: safe/unsafe approach + touchdown/corridor acknowledgement | `UNKNOWN` |
 
-- Источник текущих gameplay values: `game/src/data/buildings.js` + `game/src/sim/landing.js` on pinned `main`; do not reinterpret them as the future tracking mechanic.
+- Источник текущих gameplay values: `game/src/sim/landing.js` on current pinned `main`; do not reinterpret them as the future tracking mechanic.
 - Источник будущих indicator patterns / head tracking: `UNKNOWN / BLOCKED` until a separate runtime state/event integration is specified and implemented.
 - Idle без ложной работы; ветер/погода/ночь/пауза: no fake perpetual WORK. Current runtime does not provide the production-manifest head/lamp state machine.
 - Что рисует AI, что анимирует/подсвечивает код: AI draws complete physical beacon parts. Intended future code owns head motion and lamp state. Guidance corridor, predicted touchdown marker, beams/light cones and HUD remain code-only and are not baked into the art.
@@ -70,16 +70,16 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts are intentionally pre
 - Prompt path + verbatim style bible check: `art/prompts/b03_landing_guidance.md`; production request must be built with `tools/art_pipeline/build_generation_request.py`, which appends `art/style_bible.txt` verbatim and injects the measured island projection proxy.
 - Source gen ID / exact original SHA / dimensions / Drive ID: replacement source `pending`. Existing E0 `7b0172e8-a316-4f42-bf91-7355d46037d3`, SHA-256 `1c9ecd76cdd455f97fe9f1d25c7acd6d94523b64a6120438fd360e3112599b11`, dimensions `1167×1347`, Drive ID `1yYEphiPqV0bK4P71sNG-u5Gm3iLyfTu7` is archived but rejected by gameplay-size QA.
 - Previous-era + E0 reference IDs: replacement E0 must become the new root; old E1–E5 remain archived provenance only.
-- Pipeline config / tool revisions / candidate SHA: target migration `PIPELINE_CONFIG.json` v3; Pixel Snapper revision `ae20461f60fb39e75d15f184bab1ebec1219511c`; Aseprite `1.3.18.6`; candidate SHA `pending`.
+- Pipeline config / tool revisions / candidate SHA: canonical `PIPELINE_CONFIG.json` v3; Pixel Snapper revision `ae20461f60fb39e75d15f184bab1ebec1219511c`; Aseprite `1.3.18.6`; candidate SHA `pending`.
 - Auto QA: `pending`.
 - Visual SHA-bound QA: `pending`.
 - Projection/scene QA: `pending`; approved island + measured generation proxy are available, but scene approval still requires an actual replacement candidate composited at real scale/zoom/occlusion.
 - Production promotion (`promote`): `pending`, not blocked by the runtime semantic mismatch. It may open after the exact replacement candidate passes archive/processing/auto-QA/visual/scene gates and stores approved art only in `game-production`.
-- Runtime mapping: **verified** for `beacons` / `bld_beacons_<year>` / `game/assets/eras/e<era>-<year>/base/beacons.png` on pinned `main`.
+- Runtime mapping: **verified** for `beacons` / `bld_beacons_<year>` / `game/assets/eras/e<era>-<year>/base/beacons.png` on current `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721`.
 - Runtime publication (`publish_runtime`): `BLOCKED` by semantics/rig integration, not by unknown path. Current runtime gameplay behavior and the production-manifest target differ materially; publishing the new art as if the target mechanic were implemented would be a false integration claim.
 - Rig/event QA: `BLOCKED` until the intended tracking head/lamp state machine is implemented and verified, or the production manifest is deliberately changed to the current runtime contract in a separate reviewed decision.
-- Game regression: `BLOCKED` until a runtime publication/integration PR exists. At checked `main@1a9362aceff825f99cf0b0481351bff0e5c6e04e`, `game/test` is absent, so no same-commit runtime test is claimed.
-- Open blockers / reason / owner / next action: (1) replacement E0 source not generated; generate one isolated tall/narrow beacon and archive untouched original; (2) resolve B03 design-target vs current-runtime semantics/rig integration before `publish_runtime`; (3) GitHub Actions currently fail before runner assignment, tracked in issue #29.
+- Game regression: `BLOCKED` until a runtime publication/integration PR exists. Current green `Game runtime build` is a build gate, not B03 integration regression.
+- Open blockers / reason / owner / next action: (1) replacement E0 source not generated; generate one isolated tall/narrow beacon and archive untouched original; (2) resolve B03 design-target vs current-runtime semantics/rig integration before `publish_runtime`.
 - Rollback (previous approved version): no production-approved B03 lineage is recorded; old E0–E5 originals remain archived provenance and must not be promoted as current production art.
 
 **Generation target:** one isolated B03 E0 beacon only. **Scene QA target:** open after candidate creation. **Production promotion target:** pending until candidate gates pass. **Runtime publication target:** BLOCKED by verified semantics/rig integration mismatch, not by an unknown runtime path.
