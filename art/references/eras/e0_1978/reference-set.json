@@ -24,11 +24,11 @@
   "sheets": [],
   "generation_checkpoint": {
     "role": "materials-construction",
-    "status": "blocked_generator_context_binding_after_contrast_contract",
+    "status": "candidate_pending_exact_sha_visual_approval",
     "production_base_sha": "46d24c4da3881b7b9da3ea76ad11318cd31026f2",
     "prompt": {
       "path": "art/prompts/era_references/e0_1978/materials-construction.md",
-      "git_blob_sha": "b57392eb1ebe2088399c83df5a9859c8d5e99b4b"
+      "git_blob_sha": "09faf60666e8a769ea9ec88d0bcf7aad2d0ea66c"
     },
     "style": {
       "path": "art/style_bible.txt",
@@ -99,22 +99,41 @@
         "bytes": 2779008,
         "sha256": "fcaac317919f4a6ce39a59c59f7687bd9fe6fb1500f72dadd7a6c73545cf84d9",
         "verdict": "rejected_reference_scope_cross_era_multi_role",
-        "reason": "The corrective retry again generated a two-era E0/E1 comparison board with mechanics, infrastructure, controls, displays and lighting rather than the isolated E0 materials-construction role."
+        "reason": "The corrective retry again generated a two-era comparison board with mechanics, infrastructure, controls, displays and lighting rather than the isolated E0 materials-construction role."
+      },
+      {
+        "attempt": 7,
+        "generation_id": "ca583179-6e19-4d59-83ca-907887aba7a7",
+        "filename": "e0_1978_materials-construction_candidate_7.png",
+        "drive_file_id": "11Fbp-Y4o9YRhZS99HgNJxTl2D-kkcjMq",
+        "dimensions": [1536, 1024],
+        "bytes": 2576256,
+        "sha256": "c4c153e8d3bd91613487405157abffb0d3e62b818239b8a85a9a918568a8c2d1",
+        "verdict": "source_scope_pass_pending_exact_sha_visual_approval",
+        "reason": "The result contains exactly twelve large E0 materials/construction specimens in a 4x3 field and does not introduce controls/displays, lighting/signals, utility mechanics, whole objects, labels or cross-era comparison content. Untouched PNG was archived before any processing."
       }
     ],
-    "blocker": "The current built-in image-generation invocation in this long conversation is not binding to the exact single-role E0 request even after the strengthened specimen-field and adjacent-era contrast contract merged in PR #49. Repeating the same method would violate retry/no-progress policy.",
-    "next_step": "Use a request-isolated built-in imagegen context that contains only the current E0 materials-construction prompt plus art/style_bible.txt exactly once. Do not reuse the contaminated multi-era conversation context for the next production generation attempt."
+    "candidate": {
+      "attempt": 7,
+      "sha256": "c4c153e8d3bd91613487405157abffb0d3e62b818239b8a85a9a918568a8c2d1",
+      "drive_file_id": "11Fbp-Y4o9YRhZS99HgNJxTl2D-kkcjMq",
+      "generation_id": "ca583179-6e19-4d59-83ca-907887aba7a7",
+      "source_gate": "pass",
+      "visual_approval": "pending"
+    },
+    "blocker": "Exact-SHA visual approval is still pending for candidate attempt 7. No destructive processing or canonical sheet promotion is allowed before that approval.",
+    "next_step": "Review candidate attempt 7 at exact SHA-256 c4c153e8d3bd91613487405157abffb0d3e62b818239b8a85a9a918568a8c2d1 for style, E0 era readability and role completeness. If approved, bind the materials-construction sheet to this exact source and proceed to the next E0 role in a separate image-generation call."
   },
   "approval_gate": {
-    "scope": "atomic_only_no_whole_objects_or_scenes_no_multi_role_infographic",
-    "style": "pending",
-    "era": "pending",
-    "role_completeness": "pending",
+    "scope": "candidate_7_pass",
+    "style": "pending_exact_sha_visual_approval",
+    "era": "pending_exact_sha_visual_approval",
+    "role_completeness": "pending_exact_sha_visual_approval",
     "cross_era_role_order": "pending"
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "BLOCKED until all four atomic E0 role sheets are exact-SHA approved. Use ERA_DESIGN_MATRIX.md and style_bible only; do not use previous broad reference boards.",
+    "reference_strategy": "BLOCKED until all four atomic E0 role sheets are exact-SHA approved. Candidate 7 is source-scope compliant but is not canonical until exact-SHA visual approval.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
