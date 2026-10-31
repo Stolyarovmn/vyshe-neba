@@ -1,10 +1,10 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "era": "E0",
   "year": 1978,
   "name": "Гаражная мечта",
   "status": "rebuild_required",
-  "approval_context": "Previous broad matrix/elements/applications references are invalid under the canonical atomic-only era reference contract and are not canonical visual evidence.",
+  "approval_context": "Canonical E0 is being rebuilt as four atomic roles, each role split into as many exact-SHA sheet-parts as needed for large readable specimens. Previous broad boards and the overpacked single-sheet candidate are non-canonical provenance.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -15,125 +15,54 @@
     "folder_id": "1SmhQyQhL5IGwo6vCkgtYTTHUMVrnhCMP",
     "folder_name": "E0_1978"
   },
-  "required_roles": [
-    "materials-construction",
-    "mechanics-infrastructure",
-    "controls-displays",
-    "lighting-signals"
+  "required_roles": ["materials-construction", "mechanics-infrastructure", "controls-displays", "lighting-signals"],
+  "sheet_density": {
+    "default_max_specimens_per_sheet": 8,
+    "current_generation_size": [1536, 1024],
+    "preferred_grid": [4, 2],
+    "nominal_cell_before_margins": [384, 512]
+  },
+  "role_plan": [
+    {"role":"materials-construction","sheet":"01-surfaces-stock","prompt":"art/prompts/era_references/e0_1978/materials-construction-01-surfaces-stock.md","specimens":8},
+    {"role":"materials-construction","sheet":"02-joints-repairs","prompt":"art/prompts/era_references/e0_1978/materials-construction-02-joints-repairs.md","specimens":8},
+    {"role":"materials-construction","sheet":"03-service-architecture","prompt":"art/prompts/era_references/e0_1978/materials-construction-03-service-architecture.md","specimens":8},
+    {"role":"mechanics-infrastructure","sheet":"01-manual-drives","prompt":"art/prompts/era_references/e0_1978/mechanics-infrastructure-01-manual-drives.md","specimens":8},
+    {"role":"mechanics-infrastructure","sheet":"02-joints-lifting","prompt":"art/prompts/era_references/e0_1978/mechanics-infrastructure-02-joints-lifting.md","specimens":8},
+    {"role":"mechanics-infrastructure","sheet":"03-utilities-cabling","prompt":"art/prompts/era_references/e0_1978/mechanics-infrastructure-03-utilities-cabling.md","specimens":8},
+    {"role":"controls-displays","sheet":"01-operator-controls","prompt":"art/prompts/era_references/e0_1978/controls-displays-01-operator-controls.md","specimens":8},
+    {"role":"controls-displays","sheet":"02-instruments-displays","prompt":"art/prompts/era_references/e0_1978/controls-displays-02-instruments-displays.md","specimens":8},
+    {"role":"lighting-signals","sheet":"01-lamps-fixtures","prompt":"art/prompts/era_references/e0_1978/lighting-signals-01-lamps-fixtures.md","specimens":8},
+    {"role":"lighting-signals","sheet":"02-signal-hardware","prompt":"art/prompts/era_references/e0_1978/lighting-signals-02-signal-hardware.md","specimens":8}
   ],
   "sheets": [],
   "generation_checkpoint": {
-    "role": "materials-construction",
-    "status": "candidate_pending_exact_sha_visual_approval",
+    "status": "blocked_pending_multi_sheet_contract_merge",
     "production_base_sha": "46d24c4da3881b7b9da3ea76ad11318cd31026f2",
-    "prompt": {
-      "path": "art/prompts/era_references/e0_1978/materials-construction.md",
-      "git_blob_sha": "09faf60666e8a769ea9ec88d0bcf7aad2d0ea66c"
-    },
-    "style": {
-      "path": "art/style_bible.txt",
-      "git_blob_sha": "7b49fab64625c00bf4779dea17ce64ac74c6b341"
-    },
+    "style": {"path":"art/style_bible.txt","git_blob_sha":"7b49fab64625c00bf4779dea17ce64ac74c6b341"},
     "attempts": [
-      {
-        "attempt": 1,
-        "generation_id": "82de9c91-702e-48b8-aa04-cdf7c0279707",
-        "filename": "e0_1978_materials-construction_rejected_scope_attempt_1.png",
-        "drive_file_id": "1sE1MBvwCpt9CsDd7QQFvAvy-iUte0tgq",
-        "dimensions": [1536, 1024],
-        "bytes": 2141941,
-        "sha256": "69ed13024ff365b84e6c227807d3271d536e0ef7b1430a12c4274a87f340cbf8",
-        "verdict": "rejected_reference_scope",
-        "reason": "The result generated a multi-role era board with materials, mechanics/infrastructure, controls/displays and lighting/signals instead of the single materials-construction atomic role sheet; it also introduced non-authoritative era/title text."
-      },
-      {
-        "attempt": 2,
-        "generation_id": "9ffcd823-4053-4f24-b080-01336eaba336",
-        "filename": "e0_1978_materials-construction_rejected_scope_attempt_2.png",
-        "drive_file_id": "1XR9-E259wwRennAy5YdYXaiyyLhmSlv8",
-        "dimensions": [1536, 1024],
-        "bytes": 2095816,
-        "sha256": "45fa32533b6cd57c032bb77157b2911aa4fc694432a2505b9c3df17a51ea2bfb",
-        "verdict": "rejected_reference_scope",
-        "reason": "The retry repeated the same multi-role era-board scope failure and introduced non-authoritative text/year labeling rather than a materials-construction-only sheet."
-      },
-      {
-        "attempt": 3,
-        "generation_id": "b7a907db-63be-4b3b-a761-82d39aedc31c",
-        "filename": "e0_1978_materials-construction_rejected_scope_attempt_3.png",
-        "drive_file_id": "1hDJFGvly1GVQgicS3H3GW4hiy0gjgMxY",
-        "dimensions": [1536, 1024],
-        "bytes": 2305793,
-        "sha256": "ca6ef74f6eea3d221261309a25d9cc2282f9b2fe15a76b58bf4e82bd5778b861",
-        "verdict": "rejected_reference_scope_wrong_era",
-        "reason": "A changed request-binding attempt still returned an E1 1960–1980 four-role infographic board instead of E0/1978 materials-construction only."
-      },
-      {
-        "attempt": 4,
-        "generation_id": "c4d7f3a1-98a6-4b29-ba1e-2740c4caabd1",
-        "filename": "e0_1978_materials-construction_rejected_scope_attempt_4.png",
-        "drive_file_id": "1O71oS3YtMCvLvWlgQC8o4XZ-7MaCjmjY",
-        "dimensions": [1536, 1024],
-        "bytes": 2322057,
-        "sha256": "033adc6ba616534d5a8bd0b49081fde47017c91b17eca13bb9ac11fc5cee590f",
-        "verdict": "rejected_reference_scope_wrong_era",
-        "reason": "The second changed binding method again returned an E1 1960–1980 four-role infographic board rather than the single E0 atomic role."
-      },
-      {
-        "attempt": 5,
-        "generation_id": "UNKNOWN_tool_response_not_exposed",
-        "filename": "e0_1978_materials-construction_rejected_scope_attempt_5.png",
-        "drive_file_id": "1Eb0DwSE12tPqUdSfmaHeNPMAzIkplxWO",
-        "dimensions": [1536, 1024],
-        "bytes": 2658171,
-        "sha256": "da2edd4f1ed3ac8c5f659eef73fd6f06bc50f287750402c50f13368b969ac7e9",
-        "verdict": "rejected_reference_scope_cross_era_multi_role",
-        "reason": "After PR #49 merged, the built-in imagegen still produced a comparative E0/E1 board containing multiple canonical roles instead of one text-free E0 materials-construction specimen field. The generation id was not exposed in the available tool response, so it is recorded as UNKNOWN rather than guessed."
-      },
-      {
-        "attempt": 6,
-        "generation_id": "5c99910b-8c78-41b1-b2a7-7d734bfcf6d8",
-        "filename": "e0_1978_materials-construction_rejected_scope_attempt_6.png",
-        "drive_file_id": "11wrzvGLK_B-qLqqYe2le7XPc8DILBADE",
-        "dimensions": [1536, 1024],
-        "bytes": 2779008,
-        "sha256": "fcaac317919f4a6ce39a59c59f7687bd9fe6fb1500f72dadd7a6c73545cf84d9",
-        "verdict": "rejected_reference_scope_cross_era_multi_role",
-        "reason": "The corrective retry again generated a two-era comparison board with mechanics, infrastructure, controls, displays and lighting rather than the isolated E0 materials-construction role."
-      },
-      {
-        "attempt": 7,
-        "generation_id": "ca583179-6e19-4d59-83ca-907887aba7a7",
-        "filename": "e0_1978_materials-construction_candidate_7.png",
-        "drive_file_id": "11Fbp-Y4o9YRhZS99HgNJxTl2D-kkcjMq",
-        "dimensions": [1536, 1024],
-        "bytes": 2576256,
-        "sha256": "c4c153e8d3bd91613487405157abffb0d3e62b818239b8a85a9a918568a8c2d1",
-        "verdict": "source_scope_pass_pending_exact_sha_visual_approval",
-        "reason": "The result contains exactly twelve large E0 materials/construction specimens in a 4x3 field and does not introduce controls/displays, lighting/signals, utility mechanics, whole objects, labels or cross-era comparison content. Untouched PNG was archived before any processing."
-      }
+      {"attempt":1,"generation_id":"82de9c91-702e-48b8-aa04-cdf7c0279707","filename":"e0_1978_materials-construction_rejected_scope_attempt_1.png","drive_file_id":"1sE1MBvwCpt9CsDd7QQFvAvy-iUte0tgq","dimensions":[1536,1024],"bytes":2141941,"sha256":"69ed13024ff365b84e6c227807d3271d536e0ef7b1430a12c4274a87f340cbf8","verdict":"rejected_reference_scope","reason":"The result generated a multi-role era board instead of one atomic role sheet; it also introduced non-authoritative era/title text."},
+      {"attempt":2,"generation_id":"9ffcd823-4053-4f24-b080-01336eaba336","filename":"e0_1978_materials-construction_rejected_scope_attempt_2.png","drive_file_id":"1XR9-E259wwRennAy5YdYXaiyyLhmSlv8","dimensions":[1536,1024],"bytes":2095816,"sha256":"45fa32533b6cd57c032bb77157b2911aa4fc694432a2505b9c3df17a51ea2bfb","verdict":"rejected_reference_scope","reason":"The retry repeated the same multi-role board scope failure and introduced non-authoritative text/year labeling."},
+      {"attempt":3,"generation_id":"b7a907db-63be-4b3b-a761-82d39aedc31c","filename":"e0_1978_materials-construction_rejected_scope_attempt_3.png","drive_file_id":"1hDJFGvly1GVQgicS3H3GW4hiy0gjgMxY","dimensions":[1536,1024],"bytes":2305793,"sha256":"ca6ef74f6eea3d221261309a25d9cc2282f9b2fe15a76b58bf4e82bd5778b861","verdict":"rejected_reference_scope_wrong_era","reason":"A changed request-binding attempt still returned a wrong-era four-role infographic board instead of E0 materials-construction only."},
+      {"attempt":4,"generation_id":"c4d7f3a1-98a6-4b29-ba1e-2740c4caabd1","filename":"e0_1978_materials-construction_rejected_scope_attempt_4.png","drive_file_id":"1O71oS3YtMCvLvWlgQC8o4XZ-7MaCjmjY","dimensions":[1536,1024],"bytes":2322057,"sha256":"033adc6ba616534d5a8bd0b49081fde47017c91b17eca13bb9ac11fc5cee590f","verdict":"rejected_reference_scope_wrong_era","reason":"The second changed binding method again returned a wrong-era four-role infographic board rather than the single E0 atomic role."},
+      {"attempt":5,"generation_id":"UNKNOWN_tool_response_not_exposed","filename":"e0_1978_materials-construction_rejected_scope_attempt_5.png","drive_file_id":"1Eb0DwSE12tPqUdSfmaHeNPMAzIkplxWO","dimensions":[1536,1024],"bytes":2658171,"sha256":"da2edd4f1ed3ac8c5f659eef73fd6f06bc50f287750402c50f13368b969ac7e9","verdict":"rejected_reference_scope_cross_era_multi_role","reason":"Imagegen still produced a comparative multi-role board instead of one text-free E0 materials-construction specimen field."},
+      {"attempt":6,"generation_id":"5c99910b-8c78-41b1-b2a7-7d734bfcf6d8","filename":"e0_1978_materials-construction_rejected_scope_attempt_6.png","drive_file_id":"11wrzvGLK_B-qLqqYe2le7XPc8DILBADE","dimensions":[1536,1024],"bytes":2779008,"sha256":"fcaac317919f4a6ce39a59c59f7687bd9fe6fb1500f72dadd7a6c73545cf84d9","verdict":"rejected_reference_scope_cross_era_multi_role","reason":"The corrective retry again generated a multi-role comparison board rather than isolated E0 materials-construction evidence."},
+      {"attempt":7,"generation_id":"ca583179-6e19-4d59-83ca-907887aba7a7","filename":"e0_1978_materials-construction_candidate_7.png","drive_file_id":"11Fbp-Y4o9YRhZS99HgNJxTl2D-kkcjMq","dimensions":[1536,1024],"bytes":2576256,"sha256":"c4c153e8d3bd91613487405157abffb0d3e62b818239b8a85a9a918568a8c2d1","verdict":"rejected_after_multi_sheet_density_correction","reason":"The source is atomic and role-pure, but it packs 12 specimens into one 4x3 image. The corrected canonical plan uses multiple sheet-parts with at most 8 large specimens per sheet; this source is provenance only and cannot become canonical."}
     ],
-    "candidate": {
-      "attempt": 7,
-      "sha256": "c4c153e8d3bd91613487405157abffb0d3e62b818239b8a85a9a918568a8c2d1",
-      "drive_file_id": "11Fbp-Y4o9YRhZS99HgNJxTl2D-kkcjMq",
-      "generation_id": "ca583179-6e19-4d59-83ca-907887aba7a7",
-      "source_gate": "pass",
-      "visual_approval": "pending"
-    },
-    "blocker": "Exact-SHA visual approval is still pending for candidate attempt 7. No destructive processing or canonical sheet promotion is allowed before that approval.",
-    "next_step": "Review candidate attempt 7 at exact SHA-256 c4c153e8d3bd91613487405157abffb0d3e62b818239b8a85a9a918568a8c2d1 for style, E0 era readability and role completeness. If approved, bind the materials-construction sheet to this exact source and proceed to the next E0 role in a separate image-generation call."
+    "current_sheet": "materials-construction/01-surfaces-stock",
+    "blocker": "PR #50 changes the active era-reference contract from one raster per role to one-or-more sheet-parts per role. Production generation of the new series must wait until that contract is merged into game-production; otherwise it would violate the currently merged contract.",
+    "next_step": "After PR #50 is merged, re-pin game-production and main, reread mandatory docs, then generate materials-construction sheet 01 from its exact prompt, archive untouched source, run scope/style/era/readability review, and continue sheet-by-sheet."
   },
   "approval_gate": {
-    "scope": "candidate_7_pass",
-    "style": "pending_exact_sha_visual_approval",
-    "era": "pending_exact_sha_visual_approval",
-    "role_completeness": "pending_exact_sha_visual_approval",
+    "scope": "pending_new_multi_sheet_sources",
+    "style": "pending",
+    "era": "pending",
+    "sheet_readability": "pending",
+    "role_completeness": "pending",
     "cross_era_role_order": "pending"
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "BLOCKED until all four atomic E0 role sheets are exact-SHA approved. Candidate 7 is source-scope compliant but is not canonical until exact-SHA visual approval.",
+    "reference_strategy": "BLOCKED until every planned E0 sheet-part is exact-SHA approved and all four roles are complete. Use ERA_DESIGN_MATRIX.md and style_bible only; do not use rejected attempts as visual evidence.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
