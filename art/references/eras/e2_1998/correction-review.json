@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "era": "E2",
+  "year": 1998,
+  "review_date": "2026-10-31",
+  "status": "pass",
+  "raw_source_sha256": "0e387ae0df0b968d2c518a4af1ae9b86809708caf2d4c186dda0742fd7982123",
+  "raw_source_drive_file_id": "1XeroZjKk8nWG2KoYxVwR1tBO6JDBEIuH",
+  "checks": {
+    "same_style_family": "pass",
+    "e1_to_e2_engineering_distinctness": "pass",
+    "crt_not_flat_display": "pass",
+    "neutral_fluorescent_e2_material_light_language": "pass",
+    "one_era_scope": "pass for accepted raw matrix",
+    "blind_order_grayscale": "pass"
+  },
+  "blind_order_evidence": {
+    "drive_file_id": "1zkqtR5rJFquxzj5SB5b5HFW-BboOmam6",
+    "sha256": "ff0140d918302ee577a417ca97c4f2a122f5c3d9afa78b13f4f7f39ff5c7d9f1"
+  },
+  "limitations": [
+    "elements/applications correction files are derived review views from the accepted raw matrix, not independent imagegen originals",
+    "generated pseudo-text is non-authoritative",
+    "this approves era visual-reference evidence only, not any runtime or production asset"
+  ]
+}

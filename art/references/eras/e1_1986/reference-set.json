@@ -12,78 +12,19 @@
     "note": "Generated lettering/pseudo-text inside reference sheets is non-authoritative; use the imagery for era language only."
   },
   "transition_from_e0": {
-    "preserved": [
-      "functional industrial readability and serviceability",
-      "olive/gray utilitarian ancestry with warm practical work lighting"
-    ],
-    "replaced": [
-      "ad-hoc hand-built construction with standardized industrial modules",
-      "open improvised cable runs with trays, harnesses and organized pipe racks",
-      "primarily manual mechanisms with hydraulics and electromechanical drives"
-    ],
-    "added": [
-      "standardized cabinets, service covers and connectors",
-      "denser red/amber/green status indication",
-      "monochrome and early color CRT interfaces where functionally justified",
-      "industrial safety color coding and floor/route marking"
-    ],
+    "preserved": ["functional industrial readability and serviceability","olive/gray utilitarian ancestry with warm practical work lighting"],
+    "replaced": ["ad-hoc hand-built construction with standardized industrial modules","open improvised cable runs with trays, harnesses and organized pipe racks","primarily manual mechanisms with hydraulics and electromechanical drives"],
+    "added": ["standardized cabinets, service covers and connectors","denser red/amber/green status indication","monochrome and early color CRT interfaces where functionally justified","industrial safety color coding and floor/route marking"],
     "why": "The base has matured from a garage prototype into a standardized workshop with repeatable production, maintenance and operating procedures.",
     "player_signal": "More ordered infrastructure, repeated module language, safety marking, organized utilities and denser but still period-appropriate controls."
   },
-  "raw_archive": {
-    "provider": "google_drive",
-    "folder_id": "1iPan8TlEoR90tHos-o50fkqf9_qzkqmq",
-    "folder_name": "E1_1986"
-  },
+  "raw_archive": {"provider":"google_drive","folder_id":"1iPan8TlEoR90tHos-o50fkqf9_qzkqmq","folder_name":"E1_1986"},
   "sheets": [
-    {
-      "id": "e1_matrix",
-      "role": "eight-axis era overview and base-fragment reference: standardized industrial architecture, materials, drives, interfaces, safety language and organized utilities",
-      "source_generation_id": "5e6b75f4-8eb4-421a-a701-ff98dec174f2",
-      "drive_file_id": "1vln5wyiFsQ89HaY_qDjGrXAQ4OTKtaGY",
-      "filename": "e1_1986_matrix.png",
-      "mime_type": "image/png",
-      "dimensions": [1491, 1055],
-      "bytes": 3419957,
-      "sha256": "c904ce9aa75f66c4c22796cbc8e6525e488951836ff8ba6cc5154a1c576ec527"
-    },
-    {
-      "id": "e1_elements",
-      "role": "industrial component library: standardized panels, safety marking, grilles, cable trays, pipe supports, hydraulics, electromechanical drives, indicator panels, switches, analog gauges, CRT terminals, industrial connectors and service hardware",
-      "source_generation_id": "8a821514-8a00-4e5c-bb70-3177fb066941",
-      "drive_file_id": "1G1sGz6fTesT1EyMz5QujNRmRveib3haW",
-      "filename": "e1_1986_elements.png",
-      "mime_type": "image/png",
-      "dimensions": [1491, 1055],
-      "bytes": 3166817,
-      "sha256": "5f3da1670ac30991574696fecbe9cdfddf7ed15b0f414876cc57ef786acabfe0"
-    },
-    {
-      "id": "e1_applications",
-      "role": "whole-object/application examples for landing beacon, radio/radar, fuel complex, workshop/hangar, logistics module, service vehicle, power/service node and organized technical infrastructure",
-      "source_generation_id": "26cf736e-ebe8-493e-9c19-a9b893173c12",
-      "drive_file_id": "1MgZnuKTNLYj5obuY6_fxJQ7CkvNYECZL",
-      "filename": "e1_1986_applications.png",
-      "mime_type": "image/png",
-      "dimensions": [1491, 1055],
-      "bytes": 3486273,
-      "sha256": "7e1a99ff41545b9a4c63605e14afce8656e1485133ded4799e35be53f9b0df28"
-    }
+    {"id":"e1_matrix","role":"eight-axis era overview and base-fragment reference: standardized industrial architecture, materials, drives, interfaces, safety language and organized utilities","source_generation_id":"5e6b75f4-8eb4-421a-a701-ff98dec174f2","drive_file_id":"1vln5wyiFsQ89HaY_qDjGrXAQ4OTKtaGY","filename":"e1_1986_matrix.png","mime_type":"image/png","dimensions":[1491,1055],"bytes":3419957,"sha256":"c904ce9aa75f66c4c22796cbc8e6525e488951836ff8ba6cc5154a1c576ec527"},
+    {"id":"e1_elements","role":"industrial component library: standardized panels, safety marking, grilles, cable trays, pipe supports, hydraulics, electromechanical drives, indicator panels, switches, analog gauges, CRT terminals, industrial connectors and service hardware","source_generation_id":"8a821514-8a00-4e5c-bb70-3177fb066941","drive_file_id":"1G1sGz6fTesT1EyMz5QujNRmRveib3haW","filename":"e1_1986_elements.png","mime_type":"image/png","dimensions":[1491,1055],"bytes":3166817,"sha256":"5f3da1670ac30991574696fecbe9cdfddf7ed15b0f414876cc57ef786acabfe0"},
+    {"id":"e1_applications","role":"whole-object/application examples for landing beacon, radio/radar, fuel complex, workshop/hangar, logistics module, service vehicle, power/service node and organized technical infrastructure","source_generation_id":"26cf736e-ebe8-493e-9c19-a9b893173c12","drive_file_id":"1MgZnuKTNLYj5obuY6_fxJQ7CkvNYECZL","filename":"e1_1986_applications.png","mime_type":"image/png","dimensions":[1491,1055],"bytes":3486273,"sha256":"7e1a99ff41545b9a4c63605e14afce8656e1485133ded4799e35be53f9b0df28"}
   ],
-  "rejected_attempts": [
-    {
-      "reason": "wrong era read: generator repeated E0 instead of E1",
-      "drive_folder_id": "1Jq_eCyapqu5rp0xine9gI5-9BA5OsBor",
-      "drive_file_ids": [
-        "14sU7_ue5HGHFLahg2HusB2cNHYfur_dV",
-        "1VUR5LNLzNuDAt0lExFSF0zwAHxjJF4rm",
-        "1w3U9SGA69kbSrUBUpHWG_oTVfZ5PpbJa"
-      ]
-    }
-  ],
-  "usage": {
-    "required_for_future_generation": true,
-    "reference_strategy": "Use all applicable E1 sheets together with the E0 approved reference set, the canonical era matrix and the asset-specific brief. Preserve lineage while transferring the E1 industrial-standard language rather than copying a depicted object literally.",
-    "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
-  }
+  "supplemental_corrections": [{"id":"e1_architecture_applications_correction","status":"selected_for_cross_era_review","role":"supplemental architecture/application evidence emphasizing standardized industrial modules, organized utilities and denser electromechanical service infrastructure without replacing the immutable original sheets","source_generation_id":"UNKNOWN","drive_file_id":"1doQ_N3OeceMOgIHfYr__fPVdJ_KPgb-z","filename":"e1_1986_architecture_applications_correction.png","mime_type":"image/png","dimensions":[1536,1024],"bytes":2786090,"sha256":"84861bce11a3a13067ae1b8d61cd2c29484535bb9299f845969d9a2c25ef0fb1","review_use":"used as E1 architecture/application panel in the 2026-10-31 E0→E1→E2 blind-order QA; original approved sheets remain canonical for other roles"}],
+  "rejected_attempts": [{"reason":"wrong era read: generator repeated E0 instead of E1","drive_folder_id":"1Jq_eCyapqu5rp0xine9gI5-9BA5OsBor","drive_file_ids":["14sU7_ue5HGHFLahg2HusB2cNHYfur_dV","1VUR5LNLzNuDAt0lExFSF0zwAHxjJF4rm","1w3U9SGA69kbSrUBUpHWG_oTVfZ5PpbJa"]}],
+  "usage": {"required_for_future_generation":true,"reference_strategy":"Use all applicable E1 sheets together with the E0 approved reference set, the canonical era matrix and the asset-specific brief. For architecture/application comparison, also consult the supplemental correction evidence.","system_separation":"Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."}
 }
