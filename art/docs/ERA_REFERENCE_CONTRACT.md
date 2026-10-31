@@ -24,6 +24,8 @@ Each era E0–E5 has exactly one reference set composed of four role sheets:
 
 A role sheet may contain many **isolated atomic examples**, but it must not depict a complete production object, complete building, complete vehicle, complete launch complex or staged base scene.
 
+A canonical role sheet is a **specimen field, not an infographic/UI poster**. The image itself should contain separated physical examples on one neutral background. Do not rely on title bars, era labels, captions, numbered sections, legends, dashboard frames or a four-quadrant board to communicate the era. Any technological ordering must remain readable when all text is removed.
+
 ### 1. materials-construction
 
 Show reusable material and construction vocabulary only:
@@ -86,7 +88,8 @@ Era reference sheets MUST NOT contain:
 - whole-object/application boards;
 - cross-era comparison boards inside a generation result;
 - object compositions that can be copied directly as a gameplay asset;
-- decorative pseudo-components without a causal engineering role.
+- decorative pseudo-components without a causal engineering role;
+- infographic/dashboard composition where several canonical roles are presented as separate labeled panels.
 
 If a generator returns any of the above, the source is rejected for **reference scope failure** even when its style and era are otherwise correct.
 
@@ -107,6 +110,14 @@ The eight axes from `ERA_DESIGN_MATRIX.md` remain mandatory, but visual evidence
 
 A whole building is never required to prove the silhouette/architecture axis.
 
+## Adjacent-era contrast contract
+
+Every role prompt for E1–E5 must state what is **replaced from the previous era**, not merely what is added. The prior-era prompt must also state the next-era signatures that are intentionally absent.
+
+For role-to-role blind order, adjacent eras must be distinguishable by construction/technology rather than by palette, cleanliness, damage, label text or lamp density alone. Examples of valid transitions include hand-fitted fabrication → repeatable stamped/folded modules, manual exposed drives → hydraulic/electromechanical assistance, individually mounted controls → standardized grouped modules, or isolated incandescent signals → planned standardized fixture families.
+
+If the reviewer cannot explain a physical manufacturing/mechanical/interface/lighting replacement between adjacent role sheets without looking at labels or color, the later era fails cross-era role review.
+
 ## Generation contract
 
 - One image-generation call = one role sheet for one era.
@@ -114,7 +125,8 @@ A whole building is never required to prove the silhouette/architecture axis.
 - Never generate the four roles as one broad era board.
 - The applicable role prompt is combined with `art/style_bible.txt` **verbatim exactly once**.
 - Keep examples visually separated and non-overlapping.
-- Use a neutral technical presentation with no scenery and minimal/non-authoritative text.
+- Use one neutral background; no scenery.
+- Do not request or accept title bars, era/year labels, captions, numbered sections, legends, UI/dashboard framing or four-quadrant layouts. Unlabeled material/value swatches are allowed where the role requires them.
 - The canonical upper-left lighting sentence from the style bible applies to every physical example.
 - The untouched source is archived and SHA-256 recorded before destructive processing while it remains a candidate for the canonical set.
 
@@ -122,13 +134,13 @@ A whole building is never required to prove the silhouette/architecture axis.
 
 An era becomes `approved_visual_reference_set` only when all four exact-SHA role sheets pass:
 
-1. scope review — atomic only, no whole objects/scenes;
+1. scope review — atomic only, no whole objects/scenes and no multi-role infographic board;
 2. style-family review — matches `art/style_bible.txt`;
 3. era review — visibly expresses the era matrix;
 4. role completeness review — required vocabulary is represented;
 5. cross-era role review — the same role can be ordered technologically across adjacent eras without relying on labels or palette alone.
 
-Blind-order QA is performed **role-to-role** (`materials` vs `materials`, `mechanics` vs `mechanics`, etc.), not by comparing whole architecture/application scenes.
+Blind-order QA is performed **role-to-role** (`materials` vs `materials`, `mechanics` vs `mechanics`, etc.), not by comparing whole architecture/application scenes. Reviewers must be able to name the physical technology/manufacturing replacement that establishes the order.
 
 ## Canonical-only storage rule
 
