@@ -42,7 +42,7 @@
   ],
   "sheets": [],
   "generation_checkpoint": {
-    "status": "source_rejected_retry_available",
+    "status": "blocked_retry_budget_exhausted",
     "production_base_sha": "634b4204eecc53c3984886e5ae8cb971d5640574",
     "current_sheet": "materials-construction/01-surfaces-stock",
     "prompt": {
@@ -53,25 +53,40 @@
       "path": "art/style_bible.txt",
       "git_blob_sha": "7b49fab64625c00bf4779dea17ce64ac74c6b341"
     },
-    "latest_attempt": {
-      "sheet_attempt": 1,
-      "generation_id": "f451ae8a-a182-4476-99a8-d1347671e6bb",
-      "filename": "e0_1978_materials-construction-01-surfaces-stock_rejected_scope_attempt_1.png",
-      "drive_file_id": "18rPVJBHu0aX4BQ1AMjgZkovpbUjuDeNb",
-      "dimensions": [1536, 1024],
-      "bytes": 2342010,
-      "sha256": "921b8bc9e8a240d1205bc89315f25f008658dcff2c16df6e35ad5eb629ccabd9",
-      "verdict": "rejected_reference_scope",
-      "reason": "The generation ignored the exact eight-specimen surfaces-and-stock allowlist and produced a broad multi-role board with many panels and unlisted joints, mechanics, utilities, controls, displays and lighting/signals. It is provenance only and must not be used as visual evidence."
-    },
-    "blocker": "The current long-context built-in imagegen invocation did not bind to the exact single sheet-part allowlist even after the multi-sheet contract was merged.",
-    "next_step": "Use one corrective retry in a request-isolated context containing only the exact merged materials-construction-01-surfaces-stock prompt plus art/style_bible.txt verbatim once; do not mention other role plans, other sheets or other eras in that generation context."
+    "attempts": [
+      {
+        "sheet_attempt": 1,
+        "generation_id": "f451ae8a-a182-4476-99a8-d1347671e6bb",
+        "filename": "e0_1978_materials-construction-01-surfaces-stock_rejected_scope_attempt_1.png",
+        "drive_file_id": "18rPVJBHu0aX4BQ1AMjgZkovpbUjuDeNb",
+        "dimensions": [1536, 1024],
+        "bytes": 2342010,
+        "sha256": "921b8bc9e8a240d1205bc89315f25f008658dcff2c16df6e35ad5eb629ccabd9",
+        "verdict": "rejected_reference_scope",
+        "reason": "The generation ignored the exact eight-specimen surfaces-and-stock allowlist and produced a broad multi-role board with many panels and unlisted joints, mechanics, utilities, controls, displays and lighting/signals."
+      },
+      {
+        "sheet_attempt": 2,
+        "generation_id": "2b75e6f5-acd5-4e7d-b6f2-b99b71050cdc",
+        "filename": "e0_1978_materials-construction-01-surfaces-stock_rejected_style_attempt_2.png",
+        "drive_file_id": "1N8Jf77J3fAi07hJcRAeSRNlfvD5nqpLg",
+        "dimensions": [1536, 1024],
+        "bytes": 1875063,
+        "sha256": "58ce97709152e259d0d0e4d569eddfe16a216982b1e0768397c6478f51d30fbb",
+        "verdict": "rejected_style_presentation",
+        "scope_gate": "pass",
+        "reason": "The corrective retry finally produced only the eight requested surfaces/stock specimen classes with no mixed roles, but it still violates the canonical presentation/style contract: visible baked cast shadows under the specimens, a dark vignetted/gradient background instead of one flat neutral field, and excessively heavy rust/chipping/random damage compared with the requested restrained E0 workshop wear. It is provenance only."
+      }
+    ],
+    "latest_attempt": 2,
+    "blocker": "The corrective retry exhausted the allowed retry budget for this sheet-part. Source scope now passes, but style/presentation still fails exact canonical requirements; no destructive processing or approval is allowed.",
+    "next_step": "Start a new interactive attempt from this checkpoint only after changing the generation method/request binding so the same eight allowlisted specimens are rendered on one flat neutral background with no baked cast shadows and restrained fabrication/service wear. Do not repeat the same method again in this turn."
   },
   "approval_gate": {
-    "scope": "failed_latest_attempt",
-    "style": "pending",
-    "era": "pending",
-    "sheet_readability": "pending",
+    "scope": "pass_latest_attempt",
+    "style": "failed_latest_attempt",
+    "era": "failed_latest_attempt_excessive_weathering",
+    "sheet_readability": "pass_latest_attempt",
     "role_completeness": "pending",
     "cross_era_role_order": "pending"
   },
