@@ -15,16 +15,29 @@ The canonical sources remain:
 
 ## Canonical reference-set shape
 
-Each era E0–E5 has exactly one reference set composed of four role sheets:
+Each era E0–E5 has exactly one canonical reference set composed of four **roles**:
 
 1. `materials-construction`
 2. `mechanics-infrastructure`
 3. `controls-displays`
 4. `lighting-signals`
 
-A role sheet may contain many **isolated atomic examples**, but it must not depict a complete production object, complete building, complete vehicle, complete launch complex or staged base scene.
+A role is not limited to one raster image. Each role contains **one or more atomic sheet-parts** when a single image would make the specimens too small to be useful. All sheet-parts together form that role's canonical evidence; this is still one canonical reference set, not parallel versions.
 
-A canonical role sheet is a **specimen field, not an infographic/UI poster**. The image itself should contain separated physical examples on one neutral background. Do not rely on title bars, era labels, captions, numbered sections, legends, dashboard frames or a four-quadrant board to communicate the era. Any technological ordering must remain readable when all text is removed.
+Each sheet-part contains only **isolated atomic examples** and must not depict a complete production object, complete building, complete vehicle, complete launch complex or staged base scene.
+
+A canonical sheet-part is a **specimen field, not an infographic/UI poster**. The image itself should contain separated physical examples on one neutral background. Do not rely on title bars, era labels, captions, numbered sections, legends, dashboard frames or a four-quadrant board to communicate the era. Any technological ordering must remain readable when all text is removed.
+
+### Specimen density / image quality
+
+Reference usefulness has priority over packing density.
+
+- Default maximum is **8 specimens per sheet-part**.
+- Use fewer than 8 when the subject needs more room to show construction, material edges, joints or mechanisms clearly.
+- More than 8 requires a written reason in the role plan and must still pass readability review.
+- For the current 1536×1024 generation size, the preferred 8-specimen layout is **4×2**: nominal cells are about **384×512 px before margins**. This is the current planning control, not a guarantee about future generator output sizes.
+- Do not shrink specimens merely to keep a role on one image. Split the role across additional sheet-parts instead.
+- Every sheet-part has its own exact prompt, generation ID when available, untouched Drive original, SHA-256 and approval verdict.
 
 ### 1. materials-construction
 
@@ -79,7 +92,7 @@ No baked glow, bloom, rays or dynamic FX. Code owns active illumination behavior
 
 ## Absolute exclusions
 
-Era reference sheets MUST NOT contain:
+Era reference sheet-parts MUST NOT contain:
 
 - whole buildings, hangars, towers or launch structures;
 - complete vehicles, aircraft, carts or recovery machines;
@@ -87,6 +100,7 @@ Era reference sheets MUST NOT contain:
 - base scenes, landscapes, staged yards or room scenes;
 - whole-object/application boards;
 - cross-era comparison boards inside a generation result;
+- several canonical roles mixed into one image;
 - object compositions that can be copied directly as a gameplay asset;
 - decorative pseudo-components without a causal engineering role;
 - infographic/dashboard composition where several canonical roles are presented as separate labeled panels.
@@ -116,14 +130,16 @@ Every role prompt for E1–E5 must state what is **replaced from the previous er
 
 For role-to-role blind order, adjacent eras must be distinguishable by construction/technology rather than by palette, cleanliness, damage, label text or lamp density alone. Examples of valid transitions include hand-fitted fabrication → repeatable stamped/folded modules, manual exposed drives → hydraulic/electromechanical assistance, individually mounted controls → standardized grouped modules, or isolated incandescent signals → planned standardized fixture families.
 
-If the reviewer cannot explain a physical manufacturing/mechanical/interface/lighting replacement between adjacent role sheets without looking at labels or color, the later era fails cross-era role review.
+If the reviewer cannot explain a physical manufacturing/mechanical/interface/lighting replacement between adjacent role sets without looking at labels or color, the later era fails cross-era role review.
 
 ## Generation contract
 
-- One image-generation call = one role sheet for one era.
+- One image-generation call = **one sheet-part of one role for one era**.
 - Never generate several eras in one call.
-- Never generate the four roles as one broad era board.
-- The applicable role prompt is combined with `art/style_bible.txt` **verbatim exactly once**.
+- Never mix several canonical roles in one call.
+- Never force an entire role onto one image when its specimens would become too small; create additional sheet-parts instead.
+- Each sheet-part prompt must enumerate the allowed specimens explicitly and say that **nothing not listed may be generated**.
+- The applicable sheet-part prompt is combined with `art/style_bible.txt` **verbatim exactly once**.
 - Keep examples visually separated and non-overlapping.
 - Use one neutral background; no scenery.
 - Do not request or accept title bars, era/year labels, captions, numbered sections, legends, UI/dashboard framing or four-quadrant layouts. Unlabeled material/value swatches are allowed where the role requires them.
@@ -132,19 +148,22 @@ If the reviewer cannot explain a physical manufacturing/mechanical/interface/lig
 
 ## Approval
 
-An era becomes `approved_visual_reference_set` only when all four exact-SHA role sheets pass:
+An era becomes `approved_visual_reference_set` only when **every exact-SHA sheet-part in all four roles** passes:
 
-1. scope review — atomic only, no whole objects/scenes and no multi-role infographic board;
+1. scope review — atomic only, no whole objects/scenes, no mixed-role infographic board and no unlisted specimen classes;
 2. style-family review — matches `art/style_bible.txt`;
 3. era review — visibly expresses the era matrix;
-4. role completeness review — required vocabulary is represented;
-5. cross-era role review — the same role can be ordered technologically across adjacent eras without relying on labels or palette alone.
+4. sheet readability review — specimens are large enough to serve as production visual evidence;
+5. role completeness review — required vocabulary is represented across the role's sheet-parts;
+6. cross-era role review — the complete matching role sets can be ordered technologically across adjacent eras without relying on labels or palette alone.
 
-Blind-order QA is performed **role-to-role** (`materials` vs `materials`, `mechanics` vs `mechanics`, etc.), not by comparing whole architecture/application scenes. Reviewers must be able to name the physical technology/manufacturing replacement that establishes the order.
+Blind-order QA is performed **role-to-role** (`materials` vs `materials`, `mechanics` vs `mechanics`, etc.), using all approved sheet-parts of the compared role, not complete architecture/application scenes. Reviewers must be able to name the physical technology/manufacturing replacement that establishes the order.
 
 ## Canonical-only storage rule
 
-Repository metadata under `art/references/eras/` describes only the single current canonical reference set or a pending rebuild state. Do not keep `legacy`, `superseded`, `_v2`, `applications`, architecture-correction or whole-object sidecars in canonical reference metadata.
+Repository metadata under `art/references/eras/` describes only the single current canonical reference set or a pending rebuild state. A canonical role may list multiple exact-SHA sheet-parts; these are components of the same role, not `legacy`, `superseded` or `_v2` alternatives.
+
+Do not keep `legacy`, `superseded`, `_v2`, `applications`, architecture-correction or whole-object sidecars in canonical reference metadata.
 
 Invalid reference boards are removed from canonical metadata immediately. Physical deletion of previously archived Drive originals is performed only after the rule change authorizing that cleanup is merged into `game-production`; until then they are non-canonical and must not be used as visual evidence.
 
