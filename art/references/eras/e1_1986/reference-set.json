@@ -1,20 +1,20 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "era": "E1",
   "year": 1986,
   "name": "Своя мастерская",
-  "status": "approved_visual_reference_set",
-  "approval_context": "User approved the E1 / 1986 reference direction and requested that the set be stored in the repository and used before proceeding to the next era on 2026-10-30.",
+  "status": "rebuild_required",
+  "approval_context": "Previous broad matrix/elements/applications references are invalid under the canonical atomic-only era reference contract and are not canonical visual evidence.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
+    "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
     "style": "art/style_bible.txt",
-    "previous_era_reference": "art/references/eras/e0_1978/reference-set.json",
-    "note": "Generated lettering/pseudo-text inside reference sheets is non-authoritative; use the imagery for era language only."
+    "previous_era_reference": "art/references/eras/e0_1978/reference-set.json"
   },
   "transition_from_e0": {
     "preserved": [
       "functional industrial readability and serviceability",
-      "olive/gray utilitarian ancestry with warm practical work lighting"
+      "olive/gray utilitarian ancestry with practical work lighting"
     ],
     "replaced": [
       "ad-hoc hand-built construction with standardized industrial modules",
@@ -24,66 +24,34 @@
     "added": [
       "standardized cabinets, service covers and connectors",
       "denser red/amber/green status indication",
-      "monochrome and early color CRT interfaces where functionally justified",
-      "industrial safety color coding and floor/route marking"
+      "monochrome and early color CRT hardware where functionally justified",
+      "industrial safety color coding"
     ],
     "why": "The base has matured from a garage prototype into a standardized workshop with repeatable production, maintenance and operating procedures.",
-    "player_signal": "More ordered infrastructure, repeated module language, safety marking, organized utilities and denser but still period-appropriate controls."
+    "player_signal": "More ordered construction, repeated module language, safety coding, organized utilities and denser but still period-appropriate controls."
   },
   "raw_archive": {
     "provider": "google_drive",
     "folder_id": "1iPan8TlEoR90tHos-o50fkqf9_qzkqmq",
     "folder_name": "E1_1986"
   },
-  "sheets": [
-    {
-      "id": "e1_matrix",
-      "role": "eight-axis era overview and base-fragment reference: standardized industrial architecture, materials, drives, interfaces, safety language and organized utilities",
-      "source_generation_id": "5e6b75f4-8eb4-421a-a701-ff98dec174f2",
-      "drive_file_id": "1vln5wyiFsQ89HaY_qDjGrXAQ4OTKtaGY",
-      "filename": "e1_1986_matrix.png",
-      "mime_type": "image/png",
-      "dimensions": [1491, 1055],
-      "bytes": 3419957,
-      "sha256": "c904ce9aa75f66c4c22796cbc8e6525e488951836ff8ba6cc5154a1c576ec527"
-    },
-    {
-      "id": "e1_elements",
-      "role": "industrial component library: standardized panels, safety marking, grilles, cable trays, pipe supports, hydraulics, electromechanical drives, indicator panels, switches, analog gauges, CRT terminals, industrial connectors and service hardware",
-      "source_generation_id": "8a821514-8a00-4e5c-bb70-3177fb066941",
-      "drive_file_id": "1G1sGz6fTesT1EyMz5QujNRmRveib3haW",
-      "filename": "e1_1986_elements.png",
-      "mime_type": "image/png",
-      "dimensions": [1491, 1055],
-      "bytes": 3166817,
-      "sha256": "5f3da1670ac30991574696fecbe9cdfddf7ed15b0f414876cc57ef786acabfe0"
-    },
-    {
-      "id": "e1_applications",
-      "role": "whole-object/application examples for landing beacon, radio/radar, fuel complex, workshop/hangar, logistics module, service vehicle, power/service node and organized technical infrastructure",
-      "source_generation_id": "26cf736e-ebe8-493e-9c19-a9b893173c12",
-      "drive_file_id": "1MgZnuKTNLYj5obuY6_fxJQ7CkvNYECZL",
-      "filename": "e1_1986_applications.png",
-      "mime_type": "image/png",
-      "dimensions": [1491, 1055],
-      "bytes": 3486273,
-      "sha256": "7e1a99ff41545b9a4c63605e14afce8656e1485133ded4799e35be53f9b0df28"
-    }
+  "required_roles": [
+    "materials-construction",
+    "mechanics-infrastructure",
+    "controls-displays",
+    "lighting-signals"
   ],
-  "rejected_attempts": [
-    {
-      "reason": "wrong era read: generator repeated E0 instead of E1",
-      "drive_folder_id": "1Jq_eCyapqu5rp0xine9gI5-9BA5OsBor",
-      "drive_file_ids": [
-        "14sU7_ue5HGHFLahg2HusB2cNHYfur_dV",
-        "1VUR5LNLzNuDAt0lExFSF0zwAHxjJF4rm",
-        "1w3U9SGA69kbSrUBUpHWG_oTVfZ5PpbJa"
-      ]
-    }
-  ],
+  "sheets": [],
+  "approval_gate": {
+    "scope": "atomic_only_no_whole_objects_or_scenes",
+    "style": "pending",
+    "era": "pending",
+    "role_completeness": "pending",
+    "cross_era_role_order": "pending"
+  },
   "usage": {
-    "required_for_future_generation": true,
-    "reference_strategy": "Use all applicable E1 sheets together with the E0 approved reference set, the canonical era matrix and the asset-specific brief. Preserve lineage while transferring the E1 industrial-standard language rather than copying a depicted object literally.",
+    "required_for_future_generation": false,
+    "reference_strategy": "BLOCKED until E0 is approved in the atomic format and all four atomic E1 role sheets are exact-SHA approved. Do not use previous broad reference boards.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
