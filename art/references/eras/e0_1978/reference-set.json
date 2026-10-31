@@ -4,7 +4,7 @@
   "year": 1978,
   "name": "Гаражная мечта",
   "status": "rebuild_required",
-  "approval_context": "Canonical E0 is being rebuilt as four atomic roles, each role split into as many exact-SHA sheet-parts as needed for large readable specimens. Rejected generation outputs are provenance only and are not canonical visual evidence.",
+  "approval_context": "Canonical E0 is being rebuilt as four atomic roles split into readable exact-SHA sheet-parts. Rejected generation outputs are provenance only; unapproved candidates are not yet canonical visual evidence.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -24,75 +24,176 @@
   ],
   "sheet_density": {
     "default_max_specimens_per_sheet": 8,
-    "current_generation_size": [1536, 1024],
-    "preferred_grid": [4, 2],
-    "nominal_cell_before_margins": [384, 512]
+    "current_generation_size": [
+      1536,
+      1024
+    ],
+    "preferred_grid": [
+      4,
+      2
+    ],
+    "nominal_cell_before_margins": [
+      384,
+      512
+    ]
   },
   "role_plan": [
-    {"role":"materials-construction","sheet":"01-surfaces-stock","prompt":"art/prompts/era_references/e0_1978/materials-construction-01-surfaces-stock.md","specimens":8},
-    {"role":"materials-construction","sheet":"02-joints-repairs","prompt":"art/prompts/era_references/e0_1978/materials-construction-02-joints-repairs.md","specimens":8},
-    {"role":"materials-construction","sheet":"03-service-architecture","prompt":"art/prompts/era_references/e0_1978/materials-construction-03-service-architecture.md","specimens":8},
-    {"role":"mechanics-infrastructure","sheet":"01-manual-drives","prompt":"art/prompts/era_references/e0_1978/mechanics-infrastructure-01-manual-drives.md","specimens":8},
-    {"role":"mechanics-infrastructure","sheet":"02-joints-lifting","prompt":"art/prompts/era_references/e0_1978/mechanics-infrastructure-02-joints-lifting.md","specimens":8},
-    {"role":"mechanics-infrastructure","sheet":"03-utilities-cabling","prompt":"art/prompts/era_references/e0_1978/mechanics-infrastructure-03-utilities-cabling.md","specimens":8},
-    {"role":"controls-displays","sheet":"01-operator-controls","prompt":"art/prompts/era_references/e0_1978/controls-displays-01-operator-controls.md","specimens":8},
-    {"role":"controls-displays","sheet":"02-instruments-displays","prompt":"art/prompts/era_references/e0_1978/controls-displays-02-instruments-displays.md","specimens":8},
-    {"role":"lighting-signals","sheet":"01-lamps-fixtures","prompt":"art/prompts/era_references/e0_1978/lighting-signals-01-lamps-fixtures.md","specimens":8},
-    {"role":"lighting-signals","sheet":"02-signal-hardware","prompt":"art/prompts/era_references/e0_1978/lighting-signals-02-signal-hardware.md","specimens":8}
+    {
+      "role": "materials-construction",
+      "sheet": "01-surfaces-stock",
+      "prompt": "art/prompts/era_references/e0_1978/materials-construction-01-surfaces-stock.md",
+      "specimens": 8
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "02-joints-repairs",
+      "prompt": "art/prompts/era_references/e0_1978/materials-construction-02-joints-repairs.md",
+      "specimens": 8
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "03-service-architecture",
+      "prompt": "art/prompts/era_references/e0_1978/materials-construction-03-service-architecture.md",
+      "specimens": 8
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "01-manual-drives",
+      "prompt": "art/prompts/era_references/e0_1978/mechanics-infrastructure-01-manual-drives.md",
+      "specimens": 8
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "02-joints-lifting",
+      "prompt": "art/prompts/era_references/e0_1978/mechanics-infrastructure-02-joints-lifting.md",
+      "specimens": 8
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "03-utilities-cabling",
+      "prompt": "art/prompts/era_references/e0_1978/mechanics-infrastructure-03-utilities-cabling.md",
+      "specimens": 8
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "01-operator-controls",
+      "prompt": "art/prompts/era_references/e0_1978/controls-displays-01-operator-controls.md",
+      "specimens": 8
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "02-instruments-displays",
+      "prompt": "art/prompts/era_references/e0_1978/controls-displays-02-instruments-displays.md",
+      "specimens": 8
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "01-lamps-fixtures",
+      "prompt": "art/prompts/era_references/e0_1978/lighting-signals-01-lamps-fixtures.md",
+      "specimens": 8
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "02-signal-hardware",
+      "prompt": "art/prompts/era_references/e0_1978/lighting-signals-02-signal-hardware.md",
+      "specimens": 8
+    }
   ],
   "sheets": [],
   "generation_checkpoint": {
-    "status": "blocked_retry_budget_exhausted",
+    "status": "candidate_pending_visual_review",
     "production_base_sha": "634b4204eecc53c3984886e5ae8cb971d5640574",
-    "current_sheet": "materials-construction/01-surfaces-stock",
-    "prompt": {
-      "path": "art/prompts/era_references/e0_1978/materials-construction-01-surfaces-stock.md",
-      "git_blob_sha": "e43698988da140ee22a219b624a4cf926c6bae89"
-    },
-    "style": {
-      "path": "art/style_bible.txt",
-      "git_blob_sha": "7b49fab64625c00bf4779dea17ce64ac74c6b341"
-    },
-    "attempts": [
-      {
-        "sheet_attempt": 1,
-        "generation_id": "f451ae8a-a182-4476-99a8-d1347671e6bb",
-        "filename": "e0_1978_materials-construction-01-surfaces-stock_rejected_scope_attempt_1.png",
-        "drive_file_id": "18rPVJBHu0aX4BQ1AMjgZkovpbUjuDeNb",
-        "dimensions": [1536, 1024],
-        "bytes": 2342010,
-        "sha256": "921b8bc9e8a240d1205bc89315f25f008658dcff2c16df6e35ad5eb629ccabd9",
-        "verdict": "rejected_reference_scope",
-        "reason": "The generation ignored the exact eight-specimen surfaces-and-stock allowlist and produced a broad multi-role board with many panels and unlisted joints, mechanics, utilities, controls, displays and lighting/signals."
+    "sheet_states": {
+      "materials-construction/01-surfaces-stock": {
+        "status": "blocked_retry_budget_exhausted",
+        "prompt": {
+          "path": "art/prompts/era_references/e0_1978/materials-construction-01-surfaces-stock.md",
+          "git_blob_sha": "e43698988da140ee22a219b624a4cf926c6bae89"
+        },
+        "attempts": [
+          {
+            "sheet_attempt": 1,
+            "generation_id": "f451ae8a-a182-4476-99a8-d1347671e6bb",
+            "filename": "e0_1978_materials-construction-01-surfaces-stock_rejected_scope_attempt_1.png",
+            "drive_file_id": "18rPVJBHu0aX4BQ1AMjgZkovpbUjuDeNb",
+            "dimensions": [
+              1536,
+              1024
+            ],
+            "bytes": 2342010,
+            "sha256": "921b8bc9e8a240d1205bc89315f25f008658dcff2c16df6e35ad5eb629ccabd9",
+            "verdict": "rejected_reference_scope"
+          },
+          {
+            "sheet_attempt": 2,
+            "generation_id": "2b75e6f5-acd5-4e7d-b6f2-b99b71050cdc",
+            "filename": "e0_1978_materials-construction-01-surfaces-stock_rejected_style_attempt_2.png",
+            "drive_file_id": "1N8Jf77J3fAi07hJcRAeSRNlfvD5nqpLg",
+            "dimensions": [
+              1536,
+              1024
+            ],
+            "bytes": 1875063,
+            "sha256": "58ce97709152e259d0d0e4d569eddfe16a216982b1e0768397c6478f51d30fbb",
+            "verdict": "rejected_style_presentation",
+            "scope_gate": "pass",
+            "reason": "Only the eight requested specimen classes were present, but baked cast shadows, a dark gradient/vignette background and excessive weathering failed the canonical presentation/style gate."
+          }
+        ],
+        "latest_attempt": 2,
+        "blocker": "Retry budget exhausted for this sheet-part attempt cycle."
       },
-      {
-        "sheet_attempt": 2,
-        "generation_id": "2b75e6f5-acd5-4e7d-b6f2-b99b71050cdc",
-        "filename": "e0_1978_materials-construction-01-surfaces-stock_rejected_style_attempt_2.png",
-        "drive_file_id": "1N8Jf77J3fAi07hJcRAeSRNlfvD5nqpLg",
-        "dimensions": [1536, 1024],
-        "bytes": 1875063,
-        "sha256": "58ce97709152e259d0d0e4d569eddfe16a216982b1e0768397c6478f51d30fbb",
-        "verdict": "rejected_style_presentation",
-        "scope_gate": "pass",
-        "reason": "The corrective retry finally produced only the eight requested surfaces/stock specimen classes with no mixed roles, but it still violates the canonical presentation/style contract: visible baked cast shadows under the specimens, a dark vignetted/gradient background instead of one flat neutral field, and excessively heavy rust/chipping/random damage compared with the requested restrained E0 workshop wear. It is provenance only."
+      "materials-construction/02-joints-repairs": {
+        "status": "candidate_pending_exact_sha_visual_review",
+        "prompt": {
+          "path": "art/prompts/era_references/e0_1978/materials-construction-02-joints-repairs.md",
+          "git_blob_sha": "ead679bd78478dcea038176e4205fbafccf354d7"
+        },
+        "style": {
+          "path": "art/style_bible.txt",
+          "git_blob_sha": "7b49fab64625c00bf4779dea17ce64ac74c6b341"
+        },
+        "attempts": [
+          {
+            "sheet_attempt": 1,
+            "generation_id": "5ecc7882-1e37-4923-88f7-a9c017b398b6",
+            "filename": "e0_1978_materials-construction-02-joints-repairs_candidate_1.png",
+            "drive_file_id": "1fgWpNCIIiQNUzzHQ9SZpm6RZlLCTy6u7",
+            "dimensions": [
+              1536,
+              1024
+            ],
+            "bytes": 2052480,
+            "sha256": "6efe2f5e3a2f0951456a486c2cc5b435da761603e79a2a72e9cb003d109a899d",
+            "verdict": "candidate_pending_exact_sha_visual_review",
+            "scope_gate": "pass",
+            "self_review": {
+              "style_family": "pass_with_weathering_watch",
+              "era": "pass_with_weathering_watch",
+              "sheet_readability": "pass"
+            },
+            "reason": "Exactly eight requested joint/repair specimen classes are present on one flat neutral field, with no labels, scene, whole asset or mixed canonical role. Weathering is visibly strong, so exact-SHA visual review remains required before canonical approval."
+          }
+        ],
+        "latest_attempt": 1,
+        "blocker": "Exact-SHA visual approval has not yet been recorded."
       }
-    ],
-    "latest_attempt": 2,
-    "blocker": "The corrective retry exhausted the allowed retry budget for this sheet-part. Source scope now passes, but style/presentation still fails exact canonical requirements; no destructive processing or approval is allowed.",
-    "next_step": "Start a new interactive attempt from this checkpoint only after changing the generation method/request binding so the same eight allowlisted specimens are rendered on one flat neutral background with no baked cast shadows and restrained fabrication/service wear. Do not repeat the same method again in this turn."
+    },
+    "current_sheet": "materials-construction/02-joints-repairs",
+    "blocker": "Sheet 01 remains rejected; sheet 02 is an archived candidate pending exact-SHA visual review. Canonical sheets remains empty until approval.",
+    "next_step": "Continue one sheet-part at a time with materials-construction/03-service-architecture, using exactly its eight-item allowlist. Keep sheet 02 SHA-bound candidate pending review; do not treat it as canonical until approved."
   },
   "approval_gate": {
-    "scope": "pass_latest_attempt",
-    "style": "failed_latest_attempt",
-    "era": "failed_latest_attempt_excessive_weathering",
-    "sheet_readability": "pass_latest_attempt",
+    "scope": "sheet02_source_pass_sheet01_rejected",
+    "style": "sheet02_pending_exact_sha_review",
+    "era": "sheet02_pending_exact_sha_review",
+    "sheet_readability": "sheet02_pass_self_review",
     "role_completeness": "pending",
     "cross_era_role_order": "pending"
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "BLOCKED until every planned E0 sheet-part is exact-SHA approved and all four roles are complete. Rejected attempts are provenance only and must not be used as visual evidence.",
+    "reference_strategy": "BLOCKED until every planned E0 sheet-part is exact-SHA approved and all four roles are complete. Rejected attempts and unapproved candidates are not canonical visual evidence.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
