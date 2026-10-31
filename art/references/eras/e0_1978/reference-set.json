@@ -116,10 +116,7 @@
             "generation_id": "f451ae8a-a182-4476-99a8-d1347671e6bb",
             "filename": "e0_1978_materials-construction-01-surfaces-stock_rejected_scope_attempt_1.png",
             "drive_file_id": "18rPVJBHu0aX4BQ1AMjgZkovpbUjuDeNb",
-            "dimensions": [
-              1536,
-              1024
-            ],
+            "dimensions": [1536, 1024],
             "bytes": 2342010,
             "sha256": "921b8bc9e8a240d1205bc89315f25f008658dcff2c16df6e35ad5eb629ccabd9",
             "verdict": "rejected_reference_scope"
@@ -129,10 +126,7 @@
             "generation_id": "2b75e6f5-acd5-4e7d-b6f2-b99b71050cdc",
             "filename": "e0_1978_materials-construction-01-surfaces-stock_rejected_style_attempt_2.png",
             "drive_file_id": "1N8Jf77J3fAi07hJcRAeSRNlfvD5nqpLg",
-            "dimensions": [
-              1536,
-              1024
-            ],
+            "dimensions": [1536, 1024],
             "bytes": 1875063,
             "sha256": "58ce97709152e259d0d0e4d569eddfe16a216982b1e0768397c6478f51d30fbb",
             "verdict": "rejected_style_presentation",
@@ -159,10 +153,7 @@
             "generation_id": "5ecc7882-1e37-4923-88f7-a9c017b398b6",
             "filename": "e0_1978_materials-construction-02-joints-repairs_candidate_1.png",
             "drive_file_id": "1fgWpNCIIiQNUzzHQ9SZpm6RZlLCTy6u7",
-            "dimensions": [
-              1536,
-              1024
-            ],
+            "dimensions": [1536, 1024],
             "bytes": 2052480,
             "sha256": "6efe2f5e3a2f0951456a486c2cc5b435da761603e79a2a72e9cb003d109a899d",
             "verdict": "candidate_pending_exact_sha_visual_review",
@@ -177,17 +168,49 @@
         ],
         "latest_attempt": 1,
         "blocker": "Exact-SHA visual approval has not yet been recorded."
+      },
+      "materials-construction/03-service-architecture": {
+        "status": "candidate_pending_exact_sha_visual_review",
+        "prompt": {
+          "path": "art/prompts/era_references/e0_1978/materials-construction-03-service-architecture.md",
+          "git_blob_sha": "f1f3dad10c5b5be3685a42c77a98b539cb0ddf2e"
+        },
+        "style": {
+          "path": "art/style_bible.txt",
+          "git_blob_sha": "7b49fab64625c00bf4779dea17ce64ac74c6b341"
+        },
+        "attempts": [
+          {
+            "sheet_attempt": 1,
+            "generation_id": "96bb05c6-5c89-4e85-b8c6-162787c4f406",
+            "filename": "e0_1978_materials-construction-03-service-architecture_candidate_1.png",
+            "drive_file_id": "19aMUG1St8IMwsDL8YNryYteAS3Jm7vBG",
+            "dimensions": [1536, 1024],
+            "bytes": 2069454,
+            "sha256": "d4407f9e4ac9bcbf48bc1360d3c2d490550d51e2779203c4976769d80d623040",
+            "verdict": "candidate_pending_exact_sha_visual_review",
+            "scope_gate": "pass",
+            "self_review": {
+              "style_family": "pass_with_weathering_watch",
+              "era": "pass_with_weathering_watch",
+              "sheet_readability": "pass"
+            },
+            "reason": "Exactly eight requested service/architecture fragment classes are present on a flat neutral field, with no labels, complete building, scene or mixed canonical role. Weathering remains somewhat strong, so exact-SHA visual review is required before canonical approval."
+          }
+        ],
+        "latest_attempt": 1,
+        "blocker": "Exact-SHA visual approval has not yet been recorded."
       }
     },
-    "current_sheet": "materials-construction/02-joints-repairs",
-    "blocker": "Sheet 01 remains rejected; sheet 02 is an archived candidate pending exact-SHA visual review. Canonical sheets remains empty until approval.",
-    "next_step": "Continue one sheet-part at a time with materials-construction/03-service-architecture, using exactly its eight-item allowlist. Keep sheet 02 SHA-bound candidate pending review; do not treat it as canonical until approved."
+    "current_sheet": "materials-construction/03-service-architecture",
+    "blocker": "Sheet 01 remains rejected; sheets 02 and 03 are archived candidates pending exact-SHA visual review. Canonical sheets remains empty until approval.",
+    "next_step": "Continue one sheet-part at a time with mechanics-infrastructure/01-manual-drives, using exactly its eight-item allowlist. Do not use unapproved candidates as canonical evidence."
   },
   "approval_gate": {
-    "scope": "sheet02_source_pass_sheet01_rejected",
-    "style": "sheet02_pending_exact_sha_review",
-    "era": "sheet02_pending_exact_sha_review",
-    "sheet_readability": "sheet02_pass_self_review",
+    "scope": "sheet02_and_sheet03_source_pass_sheet01_rejected",
+    "style": "sheet02_and_sheet03_pending_exact_sha_review",
+    "era": "sheet02_and_sheet03_pending_exact_sha_review",
+    "sheet_readability": "sheet02_and_sheet03_pass_self_review",
     "role_completeness": "pending",
     "cross_era_role_order": "pending"
   },
