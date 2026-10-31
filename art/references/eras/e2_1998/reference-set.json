@@ -1,146 +1,59 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "era": "E2",
   "year": 1998,
   "name": "Испытательный центр",
-  "status": "correction_required",
-  "approval_context": "The original E2 set passed an initial content/monitor review on 2026-10-30, but a later side-by-side E0→E1→E2 blind-order review found a blocking style-family mismatch: the E2 sheets are substantially more photorealistic/render-like than the canonical E0/E1 pixel-look references. Engineering content remains useful evidence, but E2 is not an approved canonical visual reference set until same-style correction sheets replace or supersede the current three sheets.",
+  "status": "rebuild_required",
+  "approval_context": "Previous broad matrix/elements/applications references and same-style correction boards are invalid under the canonical atomic-only era reference contract and are not canonical visual evidence.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
+    "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
     "style": "art/style_bible.txt",
     "previous_era_reference": "art/references/eras/e1_1986/reference-set.json",
-    "anchor_era_reference": "art/references/eras/e0_1978/reference-set.json",
-    "note": "Generated lettering/pseudo-text inside reference sheets is non-authoritative; use the imagery for era language only."
+    "anchor_era_reference": "art/references/eras/e0_1978/reference-set.json"
   },
   "transition_from_e1": {
     "preserved": [
-      "industrial serviceability, standardized safety language and visible technical infrastructure",
+      "industrial serviceability and standardized safety language",
       "physical electromechanical construction with readable maintenance access"
     ],
     "replaced": [
-      "E1 workshop-centric cabinets and early electronics with denser rack-based test/diagnostic systems",
+      "E1 workshop-centric modules with denser rack-based test/diagnostic electronics",
       "primarily hydraulic/electromotor emphasis with motorized servo and motor-reducer systems",
-      "mixed industrial panels with a stronger beige/gray technical-plastic and aluminium laboratory language",
+      "mixed industrial surfaces with stronger beige/gray technical-plastic and aluminium laboratory language",
       "basic organized trays with more explicit routed harnesses, connectors and diagnostic cabling"
     ],
     "added": [
-      "CRT-dominant operator and diagnostic stations in deep/bulky housings",
-      "electronic racks, ventilation grilles, modular diagnostic/service bays and replaceable electronics",
+      "bulky CRT diagnostic hardware and deep housings",
+      "electronic racks, ventilation grilles and replaceable electronics modules",
       "denser grouped early LED indication and test instrumentation",
-      "specialized test-center buildings, measurement posts and service modules"
+      "specialized diagnostic connectors and service interfaces"
     ],
     "why": "The base has matured from a standardized workshop into a dedicated aerospace test center where diagnostics, instrumentation and motorized control are first-class infrastructure.",
-    "player_signal": "More electronics and racks, deeper CRT stations, dense routed cabling, specialized test/diagnostic buildings and visibly motorized equipment; E2 is intentionally more technically busy than cleaner E3."
-  },
-  "era_gate_review": {
-    "changed_axes": [
-      "manufacturing",
-      "materials",
-      "drive",
-      "interface",
-      "infrastructure",
-      "silhouette_architecture"
-    ],
-    "preserved_family_traits": [
-      "industrial serviceability",
-      "functional safety/maintenance readability"
-    ],
-    "engineering_distinctness": "pass: E2 content is materially different from E1 on at least six era axes",
-    "monitor_review": "pass: displays read as bulky CRT/diagnostic terminals, not flat E3 panels; limited early LCD-like elements are not era-defining",
-    "style_family_review": "fail: the current E2 matrix/elements/applications sheets render substantially more photorealistically than the canonical E0/E1 HD pixel-look reference language",
-    "blind_order_result": "blocked_pending_same_style_e2_correction"
-  },
-  "correction_contract": {
-    "preserve_from_current_e2": [
-      "specialized test-center and diagnostic architecture",
-      "bulky CRT operator stations and rack electronics",
-      "servo/motor-reducer and pump/actuator emphasis",
-      "beige/gray technical plastics with steel/aluminium",
-      "organized routed cable/pipe corridors and diagnostic connectors",
-      "partial automation and specialized service/test vehicles"
-    ],
-    "must_change": [
-      "redraw in the same cohesive HD pixel-art/pixel-look family as the approved E0/E1 references",
-      "replace photographic/render-like surfaces and lens-like realism with deliberate pixel clusters, stepped shading and selective chromatic outlines",
-      "keep E2 visibly more technical and laboratory/test-oriented than E1 without changing the era into E3",
-      "strengthen neutral/fluorescent work-light language and beige/gray technical materials so E2 is not distinguished only by density",
-      "retain CRT/rack diagnostics and avoid flat-display E3 shorthand"
-    ],
-    "approval_rule": "E2 returns to approved status only after replacement/correction sheets pass exact-SHA visual review and a side-by-side E0→E1→E2 blind-order/style-family review."
+    "player_signal": "More electronics, deeper CRT hardware, dense routed cabling, diagnostic connectors and visibly motorized/servo components; E2 is technically busier than cleaner E3."
   },
   "raw_archive": {
     "provider": "google_drive",
     "folder_id": "10zBY-Einty7p9wbHZCDuQxQ-FqQnd5RE",
     "folder_name": "E2_1998"
   },
-  "sheets": [
-    {
-      "id": "e2_matrix",
-      "role": "engineering-content evidence only until style correction: test-center base fragment, laboratory/test architecture, motorization, CRT diagnostics, racks, organized cable routes and 1998 materials/signals",
-      "source_generation_id": "abeb59ec-097a-4dca-970e-7bb94a6f4f46",
-      "drive_file_id": "1YO4xa9Bg-_r5ZQhvbNqLdZfVShcNkoJX",
-      "filename": "e2_1998_matrix.png",
-      "mime_type": "image/png",
-      "dimensions": [1536, 1024],
-      "bytes": 3316658,
-      "sha256": "d21ecedb5615f36a7ce590b3b16778d29fc791701edeefa787e9be439b07a63b"
-    },
-    {
-      "id": "e2_elements",
-      "role": "engineering-content evidence only until style correction: beige/gray plastics, routed cable systems, pipes, motor-reducers, actuators, racks, gauges, CRT monitors, early LEDs, connectors and service modules",
-      "source_generation_id": "37ef748d-b436-48fa-bbde-f127d0a98d02",
-      "drive_file_id": "1zmBfo6BNs5JKj9qsoUGryqTO4HK9KG3u",
-      "filename": "e2_1998_elements.png",
-      "mime_type": "image/png",
-      "dimensions": [1536, 1024],
-      "bytes": 2971359,
-      "sha256": "1cf73b1b296f1f7e02dce16737d5b983c2bdea26403726d84cb3f8ca9e50a709"
-    },
-    {
-      "id": "e2_applications",
-      "role": "engineering-content evidence only until style correction: test/launch complex, diagnostic building, communications/radar, fuel system, service transport, power block, measurement post, hangar, test stand and cable/pipe corridors",
-      "source_generation_id": "5b3d3fbe-23e2-449c-b876-f26f4c6273d5",
-      "drive_file_id": "1NWc2VuWDZyOXYBnljffaREpScm2SWv-5",
-      "filename": "e2_1998_applications.png",
-      "mime_type": "image/png",
-      "dimensions": [1536, 1024],
-      "bytes": 3127260,
-      "sha256": "e4335a84f75d956866c3dbaccda932856d5b6cb862b84d628b34d16cd82d0c53"
-    }
+  "required_roles": [
+    "materials-construction",
+    "mechanics-infrastructure",
+    "controls-displays",
+    "lighting-signals"
   ],
-  "rejected_attempts": [
-    {
-      "reason": "wrong era read: generator repeated E1/1986 instead of E2/1998",
-      "drive_folder_id": "1rHGB6TYaSoJfeKVE8x3T3_6tDTroBuhb",
-      "drive_file_ids": [
-        "1BdPVT3UUHfi-Kq0B7XcpR748euf7nOTH",
-        "1ovSxDR0tzx1PvHDsomgLM-15Ep7BqW-C"
-      ]
-    },
-    {
-      "reason": "2026-10-30 style-correction attempt violated the one-era scope by generating a combined E0/E1/E2 comparison board instead of an E2-only correction sheet",
-      "generation_id": "551c712b-45e3-4d76-866d-cd410461af7b",
-      "drive_folder_id": "1rHGB6TYaSoJfeKVE8x3T3_6tDTroBuhb",
-      "drive_file_id": "1oT21KatBYbbE63HRYDxiQu2RvSnekzMs",
-      "filename": "e2_1998_rejected_scope_comparison_attempt_1.png",
-      "dimensions": [1536, 1024],
-      "bytes": 3129172,
-      "sha256": "c035865b89f7a8c1a55ded53546d0d35f4ce3dd6b575cb16d6686e9f83ee9b40"
-    },
-    {
-      "reason": "2026-10-30 retry repeated the same one-era scope failure by generating another combined E0/E1/E2 board; retry budget exhausted for this method in the current interactive turn",
-      "generation_id": "77e34b8b-691e-42e6-8cd5-d5a29a42f922",
-      "drive_folder_id": "1rHGB6TYaSoJfeKVE8x3T3_6tDTroBuhb",
-      "drive_file_id": "101sBBYBajQeHpq8wk-kWF6pOOdxvrEyX",
-      "filename": "e2_1998_rejected_scope_comparison_attempt_2.png",
-      "dimensions": [1536, 1024],
-      "bytes": 3314623,
-      "sha256": "9276ed0d738fac3a2049118ef0a625ad771f60454a81723b327e03074196f3b8"
-    }
-  ],
+  "sheets": [],
+  "approval_gate": {
+    "scope": "atomic_only_no_whole_objects_or_scenes",
+    "style": "pending",
+    "era": "pending",
+    "role_completeness": "pending",
+    "cross_era_role_order": "pending"
+  },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "Do not use the current E2 sheets as canonical visual-style references until same-style correction is approved. They may be consulted only for engineering-content evidence (CRT/racks/diagnostics/test-center specialization) together with the canonical era matrix and approved E0/E1 references.",
+    "reference_strategy": "BLOCKED until E0 and E1 are approved in the atomic format and all four atomic E2 role sheets are exact-SHA approved. Do not use previous broad reference boards or PR #45 correction boards.",
     "system_separation": "Physical hardware/materials belong in art; active screen data, glow, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }

@@ -1,58 +1,37 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "era": "E0",
   "year": 1978,
   "name": "Гаражная мечта",
-  "status": "approved_visual_reference_set",
-  "approval_context": "User accepted the E0 matrix/reference direction and requested that the set be stored and used for subsequent era/object generation on 2026-10-30.",
+  "status": "rebuild_required",
+  "approval_context": "Previous broad matrix/elements/applications references are invalid under the canonical atomic-only era reference contract and are not canonical visual evidence.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
-    "style": "art/style_bible.txt",
-    "note": "Generated lettering/pseudo-text inside reference sheets is non-authoritative; use the imagery for era language only."
+    "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
+    "style": "art/style_bible.txt"
   },
   "raw_archive": {
     "provider": "google_drive",
     "folder_id": "1SmhQyQhL5IGwo6vCkgtYTTHUMVrnhCMP",
     "folder_name": "E0_1978"
   },
-  "sheets": [
-    {
-      "id": "e0_matrix",
-      "role": "eight-axis era overview: manufacturing, materials, drive, interface, lighting/signals, infrastructure, autonomy/service, silhouette/architecture",
-      "source_generation_id": "01459420-4aa4-4513-9ebc-7f701ac807db",
-      "drive_file_id": "1qjrBq2O9ciule1kkY_Q-Gx8RxYdBaHtZ",
-      "filename": "e0_1978_matrix.png",
-      "mime_type": "image/png",
-      "dimensions": [1491, 1055],
-      "bytes": 2988097,
-      "sha256": "9922a64f7a11d38b99282b6c8d182df2067b7ce72d1ddbe6ff487eea5286806f"
-    },
-    {
-      "id": "e0_elements",
-      "role": "component library: switches, analog instruments, levers, CRT, lamps, structural steel, chain/belt drives, gearboxes, cable/service hardware",
-      "source_generation_id": "c33e35a7-c149-478c-a2b4-cc2e1031b30b",
-      "drive_file_id": "1D-HSa8aafYXVKtiBQP5ipAF2wFqiceQH",
-      "filename": "e0_1978_elements.png",
-      "mime_type": "image/png",
-      "dimensions": [1491, 1055],
-      "bytes": 2988217,
-      "sha256": "d15a0c27ef551419f241a327ca74ad3793d29b54f87b3bae2dc7dc9b2a02fac7"
-    },
-    {
-      "id": "e0_applications",
-      "role": "whole-object/application examples for beacons, radar, service vehicle, industrial/service building, launch structure and cargo handling",
-      "source_generation_id": "0568020a-8e65-4ffe-afef-637b451f1196",
-      "drive_file_id": "13-3pm8gdH-bYUR3PDhqm9bFuX5JnGzXZ",
-      "filename": "e0_1978_applications.png",
-      "mime_type": "image/png",
-      "dimensions": [1491, 1055],
-      "bytes": 2850222,
-      "sha256": "ec731f524d0d309740c76b4c2f2953bfa36d0464c13dc0522b02548b52b5ccf9"
-    }
+  "required_roles": [
+    "materials-construction",
+    "mechanics-infrastructure",
+    "controls-displays",
+    "lighting-signals"
   ],
+  "sheets": [],
+  "approval_gate": {
+    "scope": "atomic_only_no_whole_objects_or_scenes",
+    "style": "pending",
+    "era": "pending",
+    "role_completeness": "pending",
+    "cross_era_role_order": "pending"
+  },
   "usage": {
-    "required_for_future_generation": true,
-    "reference_strategy": "Use all applicable E0 sheets together with the canonical era matrix and asset-specific brief. Transfer era language, not literal object identity.",
+    "required_for_future_generation": false,
+    "reference_strategy": "BLOCKED until all four atomic E0 role sheets are exact-SHA approved. Use ERA_DESIGN_MATRIX.md and style_bible only; do not use previous broad reference boards.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
