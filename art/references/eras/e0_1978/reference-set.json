@@ -24,8 +24,8 @@
   "sheets": [],
   "generation_checkpoint": {
     "role": "materials-construction",
-    "status": "blocked_after_retry_budget",
-    "production_base_sha": "4874f0c2d42683e1a1885b8af70fc7e12cfcb77c",
+    "status": "blocked_generator_request_binding",
+    "production_base_sha": "ed1533433c4acf2f386fbf6da2ebb0ffa71308fb",
     "prompt": {
       "path": "art/prompts/era_references/e0_1978/materials-construction.md",
       "git_blob_sha": "6e247a1e3681b938ba68a03a8c9c82a0e1d33d08"
@@ -56,9 +56,32 @@
         "sha256": "45fa32533b6cd57c032bb77157b2911aa4fc694432a2505b9c3df17a51ea2bfb",
         "verdict": "rejected_reference_scope",
         "reason": "The retry repeated the same multi-role era-board scope failure and introduced non-authoritative text/year labeling rather than a materials-construction-only sheet."
+      },
+      {
+        "attempt": 3,
+        "generation_id": "b7a907db-63be-4b3b-a761-82d39aedc31c",
+        "filename": "e0_1978_materials-construction_rejected_scope_attempt_3.png",
+        "drive_file_id": "1hDJFGvly1GVQgicS3H3GW4hiy0gjgMxY",
+        "dimensions": [1536, 1024],
+        "bytes": 2305793,
+        "sha256": "ca6ef74f6eea3d221261309a25d9cc2282f9b2fe15a76b58bf4e82bd5778b861",
+        "verdict": "rejected_reference_scope_and_era",
+        "reason": "A changed latest-context binding still returned an E1 1960-1980 four-role infographic board, not E0/1978 and not a materials-construction-only atomic sheet."
+      },
+      {
+        "attempt": 4,
+        "generation_id": "c4d7f3a1-98a6-4b29-ba1e-2740c4caabd1",
+        "filename": "e0_1978_materials-construction_rejected_scope_attempt_4.png",
+        "drive_file_id": "1O71oS3YtMCvLvWlgQC8o4XZ-7MaCjmjY",
+        "dimensions": [1536, 1024],
+        "bytes": 2322057,
+        "sha256": "033adc6ba616534d5a8bd0b49081fde47017c91b17eca13bb9ac11fc5cee590f",
+        "verdict": "rejected_reference_scope_and_era",
+        "reason": "A second changed binding with explicit exclusions again returned an E1 1960-1980 four-role board containing mechanics, controls/displays and lighting/signals, so the generator did not honor the single-role E0 scope."
       }
     ],
-    "next_step": "Do not repeat this generation method in the same interactive turn. Change request-binding/generation method so the tool receives only the single materials-construction role contract, then generate a new untouched source and re-run scope review."
+    "blocker": "The current built-in image-generation invocation in this conversation is not isolating the prepared single-role E0 request: two changed request-binding attempts still produced the same wrong-era multi-role board. Continuing with the same invocation would violate the retry/no-progress policy and the atomic reference contract.",
+    "next_step": "Use a request-isolated imagegen invocation that can receive only the prepared E0 materials-construction request plus style_bible exactly once; do not generate further E0 reference sheets until that binding is available and verified."
   },
   "approval_gate": {
     "scope": "atomic_only_no_whole_objects_or_scenes",
