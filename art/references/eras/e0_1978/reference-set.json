@@ -25,27 +25,22 @@
   "generation_checkpoint": {
     "status":"blocked_with_remaining_plan",
     "production_base_sha":"634b4204eecc53c3984886e5ae8cb971d5640574",
-    "summary": {
-      "planned_sheet_parts":10,
-      "candidate_pending_exact_sha_visual_review":3,
-      "blocked_retry_budget_exhausted":4,
-      "not_started":3
-    },
+    "summary": {"planned_sheet_parts":10,"candidate_pending_exact_sha_visual_review":3,"blocked_retry_budget_exhausted":4,"not_started":3},
     "sheet_states": {
       "materials-construction/01-surfaces-stock": {"status":"blocked_retry_budget_exhausted"},
       "materials-construction/02-joints-repairs": {"status":"candidate_pending_exact_sha_visual_review","generation_id":"5ecc7882-1e37-4923-88f7-a9c017b398b6","drive_file_id":"1fgWpNCIIiQNUzzHQ9SZpm6RZlLCTy6u7","sha256":"6efe2f5e3a2f0951456a486c2cc5b435da761603e79a2a72e9cb003d109a899d"},
       "materials-construction/03-service-architecture": {"status":"candidate_pending_exact_sha_visual_review","generation_id":"96bb05c6-5c89-4e85-b8c6-162787c4f406","drive_file_id":"19aMUG1St8IMwsDL8YNryYteAS3Jm7vBG","sha256":"d4407f9e4ac9bcbf48bc1360d3c2d490550d51e2779203c4976769d80d623040"},
       "mechanics-infrastructure/01-manual-drives": {"status":"blocked_retry_budget_exhausted"},
-      "mechanics-infrastructure/02-joints-lifting": {"status":"blocked_retry_budget_exhausted"},
+      "mechanics-infrastructure/02-joints-lifting": {"status":"blocked_retry_budget_exhausted","attempts":[{"sheet_attempt":3,"generation_id":"80216b7e-79af-4fd5-a1c8-872e16e3c9a2","drive_file_id":"14Dhjn2TeNVfx-60IQfuN224-V14QYj2a","dimensions":[1536,1024],"bytes":1952246,"sha256":"c9a0f2c481e79f36fb29754e181fe5cbac546f966f0a92ec99e856972ef8be3b","verdict":"rejected_reference_scope","reason":"Seven requested hardware classes were present, but specimen 1 was rendered as a D-shackle rather than the required removable-pin hinge with thick steel leaves."}]},
       "mechanics-infrastructure/03-utilities-cabling": {"status":"candidate_pending_exact_sha_visual_review","generation_id":"bfa79042-0341-47bc-b461-628c26fe6c76","drive_file_id":"1Te10yl1MN5Dn63C38itebv-7S0RAw0tF","dimensions":[1536,1024],"bytes":1796263,"sha256":"b1aaabc33e631bfdf72dc7e28a15c3b4fa0f7233ce34879f274201c180bcbc5e","scope_gate":"pass","style_family":"pass","era":"pass","sheet_readability":"pass"},
       "controls-displays/01-operator-controls": {"status":"blocked_retry_budget_exhausted","attempts":[{"sheet_attempt":1,"generation_id":"b80ec262-ef43-4d08-99dc-5808bb614751","drive_file_id":"1Cg10O0vT4WpZwJw8apb2H7xJcA81jl9P","sha256":"8b68c5522bc110ca7690d9c363d50eb16ffe30eba74ffd7ca4187031f6f672ab","verdict":"rejected_reference_scope"},{"sheet_attempt":2,"generation_id":"1cc8a94c-fb8c-488b-8e1d-f57195fd566e","drive_file_id":"1h5EzHDIX2YR-X6hkGi0_NNTrWkG34Fbp","sha256":"3257efa82ff2c7788fe001a5536dea73ce7b065659dbf092a76ea530636c3fc1","verdict":"rejected_reference_scope"}]},
       "controls-displays/02-instruments-displays": {"status":"not_started"},
       "lighting-signals/01-lamps-fixtures": {"status":"not_started"},
       "lighting-signals/02-signal-hardware": {"status":"not_started"}
     },
-    "current_sheet":"controls-displays/01-operator-controls",
-    "blocker":"The current image-generation binding repeated the previous utilities/cabling vocabulary twice instead of the exact operator-control allowlist. Retry budget for this sheet-part is exhausted for this turn.",
-    "next_step":"Continue with controls-displays/02-instruments-displays exactly its eight-item allowlist. Revisit blocked sheet-parts only with a changed request-binding method."
+    "current_sheet":"mechanics-infrastructure/02-joints-lifting",
+    "blocker":"Latest joints-lifting image contains a D-shackle instead of the required removable-pin hinge; source rejected. Other previously blocked sheet-parts remain blocked until a changed request-binding method is used.",
+    "next_step":"Generate the next unstarted sheet-part controls-displays/02-instruments-displays exactly its eight-item allowlist, or retry joints-lifting only with a changed request-binding method."
   },
   "approval_gate": {"scope":"three_candidates_pass_four_sheet_parts_blocked","style":"three_candidates_pending_exact_sha_review","era":"three_candidates_pending_exact_sha_review","sheet_readability":"three_candidates_pass_self_review","role_completeness":"pending","cross_era_role_order":"pending"},
   "usage": {"required_for_future_generation":false,"reference_strategy":"BLOCKED until every planned E0 sheet-part is exact-SHA approved and all four roles are complete. Rejected attempts and unapproved candidates are not canonical visual evidence.","system_separation":"Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."}
