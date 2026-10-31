@@ -24,11 +24,11 @@
   "sheets": [],
   "generation_checkpoint": {
     "role": "materials-construction",
-    "status": "blocked_after_retry_budget",
-    "production_base_sha": "4874f0c2d42683e1a1885b8af70fc7e12cfcb77c",
+    "status": "blocked_generator_context_binding_after_contrast_contract",
+    "production_base_sha": "46d24c4da3881b7b9da3ea76ad11318cd31026f2",
     "prompt": {
       "path": "art/prompts/era_references/e0_1978/materials-construction.md",
-      "git_blob_sha": "6e247a1e3681b938ba68a03a8c9c82a0e1d33d08"
+      "git_blob_sha": "b57392eb1ebe2088399c83df5a9859c8d5e99b4b"
     },
     "style": {
       "path": "art/style_bible.txt",
@@ -56,12 +56,57 @@
         "sha256": "45fa32533b6cd57c032bb77157b2911aa4fc694432a2505b9c3df17a51ea2bfb",
         "verdict": "rejected_reference_scope",
         "reason": "The retry repeated the same multi-role era-board scope failure and introduced non-authoritative text/year labeling rather than a materials-construction-only sheet."
+      },
+      {
+        "attempt": 3,
+        "generation_id": "b7a907db-63be-4b3b-a761-82d39aedc31c",
+        "filename": "e0_1978_materials-construction_rejected_scope_attempt_3.png",
+        "drive_file_id": "1hDJFGvly1GVQgicS3H3GW4hiy0gjgMxY",
+        "dimensions": [1536, 1024],
+        "bytes": 2305793,
+        "sha256": "ca6ef74f6eea3d221261309a25d9cc2282f9b2fe15a76b58bf4e82bd5778b861",
+        "verdict": "rejected_reference_scope_wrong_era",
+        "reason": "A changed request-binding attempt still returned an E1 1960–1980 four-role infographic board instead of E0/1978 materials-construction only."
+      },
+      {
+        "attempt": 4,
+        "generation_id": "c4d7f3a1-98a6-4b29-ba1e-2740c4caabd1",
+        "filename": "e0_1978_materials-construction_rejected_scope_attempt_4.png",
+        "drive_file_id": "1O71oS3YtMCvLvWlgQC8o4XZ-7MaCjmjY",
+        "dimensions": [1536, 1024],
+        "bytes": 2322057,
+        "sha256": "033adc6ba616534d5a8bd0b49081fde47017c91b17eca13bb9ac11fc5cee590f",
+        "verdict": "rejected_reference_scope_wrong_era",
+        "reason": "The second changed binding method again returned an E1 1960–1980 four-role infographic board rather than the single E0 atomic role."
+      },
+      {
+        "attempt": 5,
+        "generation_id": "UNKNOWN_tool_response_not_exposed",
+        "filename": "e0_1978_materials-construction_rejected_scope_attempt_5.png",
+        "drive_file_id": "1Eb0DwSE12tPqUdSfmaHeNPMAzIkplxWO",
+        "dimensions": [1536, 1024],
+        "bytes": 2658171,
+        "sha256": "da2edd4f1ed3ac8c5f659eef73fd6f06bc50f287750402c50f13368b969ac7e9",
+        "verdict": "rejected_reference_scope_cross_era_multi_role",
+        "reason": "After PR #49 merged, the built-in imagegen still produced a comparative E0/E1 board containing multiple canonical roles instead of one text-free E0 materials-construction specimen field. The generation id was not exposed in the available tool response, so it is recorded as UNKNOWN rather than guessed."
+      },
+      {
+        "attempt": 6,
+        "generation_id": "5c99910b-8c78-41b1-b2a7-7d734bfcf6d8",
+        "filename": "e0_1978_materials-construction_rejected_scope_attempt_6.png",
+        "drive_file_id": "11wrzvGLK_B-qLqqYe2le7XPc8DILBADE",
+        "dimensions": [1536, 1024],
+        "bytes": 2779008,
+        "sha256": "fcaac317919f4a6ce39a59c59f7687bd9fe6fb1500f72dadd7a6c73545cf84d9",
+        "verdict": "rejected_reference_scope_cross_era_multi_role",
+        "reason": "The corrective retry again generated a two-era E0/E1 comparison board with mechanics, infrastructure, controls, displays and lighting rather than the isolated E0 materials-construction role."
       }
     ],
-    "next_step": "Do not repeat this generation method in the same interactive turn. Change request-binding/generation method so the tool receives only the single materials-construction role contract, then generate a new untouched source and re-run scope review."
+    "blocker": "The current built-in image-generation invocation in this long conversation is not binding to the exact single-role E0 request even after the strengthened specimen-field and adjacent-era contrast contract merged in PR #49. Repeating the same method would violate retry/no-progress policy.",
+    "next_step": "Use a request-isolated built-in imagegen context that contains only the current E0 materials-construction prompt plus art/style_bible.txt exactly once. Do not reuse the contaminated multi-era conversation context for the next production generation attempt."
   },
   "approval_gate": {
-    "scope": "atomic_only_no_whole_objects_or_scenes",
+    "scope": "atomic_only_no_whole_objects_or_scenes_no_multi_role_infographic",
     "style": "pending",
     "era": "pending",
     "role_completeness": "pending",
