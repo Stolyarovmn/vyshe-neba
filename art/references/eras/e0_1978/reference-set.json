@@ -5,23 +5,10 @@
   "name": "Гаражная мечта",
   "status": "rebuild_required",
   "approval_context": "Canonical E0 is being rebuilt as four atomic roles, each role split into as many exact-SHA sheet-parts as needed for large readable specimens. Previous broad boards and the overpacked single-sheet candidate are non-canonical provenance.",
-  "authority": {
-    "rules": "art/docs/ERA_DESIGN_MATRIX.md",
-    "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
-    "style": "art/style_bible.txt"
-  },
-  "raw_archive": {
-    "provider": "google_drive",
-    "folder_id": "1SmhQyQhL5IGwo6vCkgtYTTHUMVrnhCMP",
-    "folder_name": "E0_1978"
-  },
-  "required_roles": ["materials-construction", "mechanics-infrastructure", "controls-displays", "lighting-signals"],
-  "sheet_density": {
-    "default_max_specimens_per_sheet": 8,
-    "current_generation_size": [1536, 1024],
-    "preferred_grid": [4, 2],
-    "nominal_cell_before_margins": [384, 512]
-  },
+  "authority": {"rules":"art/docs/ERA_DESIGN_MATRIX.md","reference_contract":"art/docs/ERA_REFERENCE_CONTRACT.md","style":"art/style_bible.txt"},
+  "raw_archive": {"provider":"google_drive","folder_id":"1SmhQyQhL5IGwo6vCkgtYTTHUMVrnhCMP","folder_name":"E0_1978"},
+  "required_roles": ["materials-construction","mechanics-infrastructure","controls-displays","lighting-signals"],
+  "sheet_density": {"default_max_specimens_per_sheet":8,"current_generation_size":[1536,1024],"preferred_grid":[4,2],"nominal_cell_before_margins":[384,512]},
   "role_plan": [
     {"role":"materials-construction","sheet":"01-surfaces-stock","prompt":"art/prompts/era_references/e0_1978/materials-construction-01-surfaces-stock.md","specimens":8},
     {"role":"materials-construction","sheet":"02-joints-repairs","prompt":"art/prompts/era_references/e0_1978/materials-construction-02-joints-repairs.md","specimens":8},
@@ -52,17 +39,6 @@
     "blocker": "PR #50 must be merged before generating the new multi-sheet canonical E0 series because current game-production still defines one raster per role.",
     "next_step": "After PR #50 is merged, generate materials-construction sheet 01 using only its exact allowlisted prompt plus style_bible, archive untouched original, run source/style/era/readability review, then continue through the remaining nine sheet-parts."
   },
-  "approval_gate": {
-    "scope": "pending_new_multi_sheet_sources",
-    "style": "pending",
-    "era": "pending",
-    "sheet_readability": "pending",
-    "role_completeness": "pending",
-    "cross_era_role_order": "pending"
-  },
-  "usage": {
-    "required_for_future_generation": false,
-    "reference_strategy": "BLOCKED until every planned E0 sheet-part is exact-SHA approved and all four roles are complete. Use ERA_DESIGN_MATRIX.md and style_bible only; do not use rejected attempts as visual evidence.",
-    "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
-  }
+  "approval_gate": {"scope":"pending_new_multi_sheet_sources","style":"pending","era":"pending","sheet_readability":"pending","role_completeness":"pending","cross_era_role_order":"pending"},
+  "usage": {"required_for_future_generation":false,"reference_strategy":"BLOCKED until every planned E0 sheet-part is exact-SHA approved and all four roles are complete. Use ERA_DESIGN_MATRIX.md and style_bible only; do not use rejected attempts as visual evidence.","system_separation":"Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."}
 }
