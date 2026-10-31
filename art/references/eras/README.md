@@ -17,7 +17,7 @@ Era reference approval is separate from approval of any production asset. A refe
 
 Current sets:
 
-- `e0_1978/` — approved; architecture/application correction is being reviewed separately and does not overwrite the immutable original sheets.
-- `e1_1986/` — approved; use together with E0 for lineage-aware E1 generation/review; architecture/application correction is being reviewed separately.
-- `e2_1998/` — **correction required**. Engineering-content evidence (CRT/racks/diagnostics/test-center specialization) remains useful, but the current sheets fail the common style-family review because they are substantially more photorealistic/render-like than E0/E1. Do not use E2 as a canonical visual-style reference until same-style correction sheets pass exact-SHA and E0→E1→E2 blind-order/style review.
+- `e0_1978/` — approved. Original matrix/elements/applications remain immutable; `e0_1978_architecture_applications_correction_v2.png` is registered as supplemental cross-era architecture/application evidence.
+- `e1_1986/` — approved; use together with E0 for lineage-aware E1 generation/review. `e1_1986_architecture_applications_correction.png` is registered as supplemental cross-era architecture/application evidence.
+- `e2_1998/` — approved after the 2026-10-31 same-style correction. The corrected matrix raw original is the canonical E2 style source; role-specific elements/applications files are explicitly derived review views from that exact raw. The old photorealistic/render-like E2 sheets remain superseded engineering-content history only. E0→E1→E2 blind-order/style review: PASS.
 - E3–E5 — pending sequential visual approval.
