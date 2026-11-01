@@ -1,23 +1,26 @@
-E1 / 1986 — materials-construction — sheet 02 / standardized joints and replaceable repairs
+E1 / 1986 — materials-construction — 02-joints-repairs / standardized joints and replaceable repairs
 
-Generate ONE E1-only atomic specimen field containing EXACTLY the eight specimens listed below and NOTHING ELSE.
+Generate ONE E1-only atomic specimen field containing EXACTLY the 8 specimens listed below and NOTHING ELSE.
 
-LAYOUT: 1536×1024 landscape, 4×2 grid, eight large isolated construction specimens, one specimen per cell, generous empty spacing, neutral background, no labels or captions.
+LAYOUT: 1536×1024 landscape, 4×2 grid, 8 large isolated specimens, one specimen per cell, generous empty spacing, neutral background, no labels or captions.
 
-ALLOWED SPECIMENS — exactly these eight:
-1. Standardized welded T-joint — two factory-cut steel plates at 90° with a neat, consistent fillet weld bead and square preparation.
-2. Stamped triangular gusset bracket — one pressed/folded steel gusset with identical punched mounting holes and clean repeatable edges.
-3. Bolted lap joint — two overlapping steel plates joined by identical zinc-plated hex bolts, nuts and washers in perfectly even spacing.
-4. Spot-welded sheet-metal seam — two overlapping thin steel edges with a regular row of identical spot-weld marks.
-5. Replaceable bolted reinforcement plate — one rectangular strengthening/splice plate fixed with an even standardized bolt pattern, designed to be removable rather than field-welded.
-6. Folded L-bracket — one-piece stamped/folded steel angle bracket with a flanged edge and two identical punched mounting holes.
-7. Standardized channel splice — two short channel ends joined locally by paired identical splice plates and uniform bolts, not a full frame.
-8. Modular box-section frame node — short box-section fragments meeting at one local node with repeatable bolt-on gusset plates, not a complete frame.
+ALLOWED SPECIMENS — exactly these 8:
+1. Standardized welded T-joint — Two factory-cut steel plates at 90° with a neat consistent fillet weld bead and square preparation; controlled industrial weld only, no crude repair patch.
+2. Stamped triangular gusset bracket — One pressed/folded steel gusset with identical punched mounting holes and clean repeatable edges; single standardized bracket only.
+3. Bolted lap joint — Two overlapping steel plates joined by identical zinc-plated hex bolts, nuts and washers in perfectly even spacing; no mismatched fasteners.
+4. Spot-welded sheet-metal seam — Two overlapping thin steel edges with a regular row of identical spot-weld marks; clean repeatable seam only.
+5. Replaceable bolted reinforcement plate — One rectangular strengthening/splice plate fixed with an even standardized bolt pattern, designed to be removable rather than field-welded.
+6. Folded L-bracket — One-piece stamped/folded steel angle bracket with a flanged edge and two identical punched mounting holes; no rough hand-cut plate.
+7. Standardized channel splice — Two short channel ends joined locally by paired identical splice plates and uniform bolts; local splice only, not a full frame.
+8. Modular box-section frame node — Short box-section fragments meeting at one local node with repeatable bolt-on gusset plates; local node only, not a complete frame.
 
-DO NOT GENERATE ANYTHING NOT LISTED ABOVE. No crude repair patches, mismatched fasteners, rough hand-drilled plates, timber, hatches, grilles, pipes, cables, mechanisms, instruments, lamps, whole machines, buildings, rooms or scenes.
+DO NOT GENERATE ANYTHING NOT LISTED ABOVE. crude repair patches; mismatched fasteners; rough hand-drilled plates; timber; hatches or grilles; pipes or cables; mechanisms; instruments or lamps; whole machines; buildings, rooms or scenes; text, labels, logos or pseudo-writing; baked cast shadows or contact shadows; glow, bloom, rays or temporary FX.
 
-E1 visual character: serial industrial fabrication, repeatable hole patterns, interchangeable brackets and controlled welds. REPLACED PREVIOUS-ERA LANGUAGE: ad-hoc field repair, mismatched bolts, oversized improvised gussets and irregular hand-laid joints are intentionally absent.
+E1 visual character: serial industrial fabrication with repeatable hole patterns, interchangeable brackets and controlled welds
+REQUIRED ERA SIGNALS: factory-cut geometry; repeatable punched holes; uniform zinc-plated fasteners; controlled weld beads; removable standardized repair plates.
+REPLACED PREVIOUS-ERA LANGUAGE: ad-hoc field repair; mismatched bolts; oversized improvised gussets; irregular hand-laid joints.
+FORBIDDEN REGRESSION: crude one-off patches; random bolt spacing; rough hand drilling; oversized irregular welds; timber repair pieces.
 
-PRESENTATION: isolated physical specimens only, no title bar, no era/year text, no legend, no decorative infographic frame, no scenery, no cast shadow.
+PRESENTATION: isolated physical specimens only; examples must not overlap; one neutral background; no title bar, era/year text, captions, numbered labels, legend, UI/dashboard frame or scenery; no baked cast shadow, glow, bloom, rays or other temporary FX.
 
-Append `art/style_bible.txt` verbatim exactly once to the generation request.
+The generation request MUST append `art/style_bible.txt` verbatim exactly once. Do not paraphrase it.

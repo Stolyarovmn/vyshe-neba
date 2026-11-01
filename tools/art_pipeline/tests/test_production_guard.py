@@ -100,6 +100,22 @@ class ProductionGuardTests(unittest.TestCase):
         self.assertIn("immediately before", skill)
         self.assertIn("делай следующий набор", skill)
 
+    def test_every_e1_role_plan_sheet_has_machine_spec(self):
+        reference_set = json.loads((ROOT / "art/references/eras/e1_1986/reference-set.json").read_text(encoding="utf-8"))
+        planned = reference_set["role_plan"]
+        self.assertEqual(10, len(planned))
+        expected_paths = []
+        for item in planned:
+            spec_path = ROOT / "art/reference_specs/e1_1986" / f'{item["role"]}-{item["sheet"]}.json'
+            expected_paths.append(spec_path)
+            self.assertTrue(spec_path.is_file(), f"missing machine spec for {item['role']}/{item['sheet']}")
+            spec_value = json.loads(spec_path.read_text(encoding="utf-8"))
+            self.assertEqual(item["role"], spec_value["role"])
+            self.assertEqual(item["sheet"], spec_value["sheet"])
+            self.assertEqual(item["specimens"], spec_value["expected_specimen_count"])
+            self.assertEqual([], pg.validate_spec(spec_value))
+        self.assertEqual(10, len(set(expected_paths)))
+
     def test_source_dimension_mismatch_fails(self):
         value = self.load_spec()
         with tempfile.TemporaryDirectory() as td:

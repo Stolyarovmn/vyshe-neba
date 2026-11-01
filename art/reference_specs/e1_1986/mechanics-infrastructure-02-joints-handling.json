@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "mechanics-infrastructure",
+  "sheet": "02-joints-handling",
+  "title": "standardized joints and handling mechanisms",
+  "expected_specimen_count": 8,
+  "generation": {"size":[1536,1024],"layout":[4,2],"one_role_per_call":true,"one_era_per_call":true},
+  "prompt_file": "art/prompts/era_references/e1_1986/mechanics-infrastructure-02-joints-handling.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {"provider":"google_drive","folder_id":"1iPan8TlEoR90tHos-o50fkqf9_qzkqmq","folder_name":"E1_1986"},
+  "specimens": [
+    {"id":"01","name":"Forged clevis-and-pin joint","description":"Standardized clevis, machined cross-pin and spring retaining clip with clean repeatable geometry."},
+    {"id":"02","name":"Pivot yoke with replaceable bushings","description":"Painted steel yoke, bronze bushings and machined axle pin; all serviceable and standardized."},
+    {"id":"03","name":"Sealed pillow-block bearing","description":"Cast industrial housing, sealed bearing, two mounting holes and one grease nipple."},
+    {"id":"04","name":"Steel guide-roller carriage","description":"Two standardized rollers on a compact carriage running on a short C-channel guide; no larger machine."},
+    {"id":"05","name":"Electric wire-rope winch module","description":"Compact motor/gearbox, drum, brake housing and a very short length of steel cable; no boom, frame or vehicle."},
+    {"id":"06","name":"Electric chain-hoist module","description":"Compact hoist body with chain sprocket housing, a short load chain and hook; no beam, trolley, crane or structure."},
+    {"id":"07","name":"Spring-loaded indexing plunger","description":"Standardized threaded metal housing, internal spring, retractable pin and molded pull knob."},
+    {"id":"08","name":"Forged turnbuckle tensioner","description":"Industrial turnbuckle body with locknuts and forged eye ends; clean standardized finish."}
+  ],
+  "global_forbidden": ["complete crane or gantry","vehicle","lifting frame","motorized trolley","complete hydraulic system","pipework or wiring","instruments or control panels","buildings or scenes","text, labels, logos or pseudo-writing","baked cast shadows or contact shadows","glow, bloom, rays or temporary FX"],
+  "era_contract": {
+    "character":"factory-made serviceable joints and assisted handling modules with cast/forged housings and replaceable wear parts",
+    "required_signals":["forged standardized joints","replaceable bushings and sealed bearings","compact electric lifting modules","repeatable roller guides","serviceable tensioning/indexing hardware"],
+    "replaced_previous_language":["crude hand-winch construction","exposed makeshift joints","one-off welded handling hardware","manual-only lifting modules"],
+    "forbidden_regressions":["rough welded clevises","hand-cranked winches","improvised roller assemblies","unsealed crude bearings","complete lifting machines"]
+  },
+  "presentation": {"isolated_specimens":true,"non_overlapping":true,"neutral_background":true,"no_labels_or_text":true,"no_scenery":true,"no_cast_shadow":true,"no_baked_fx":true}
+}

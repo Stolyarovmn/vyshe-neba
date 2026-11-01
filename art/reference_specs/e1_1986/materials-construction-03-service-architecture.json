@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "materials-construction",
+  "sheet": "03-service-architecture",
+  "title": "standardized service and architecture fragments",
+  "expected_specimen_count": 8,
+  "generation": {"size":[1536,1024],"layout":[4,2],"one_role_per_call":true,"one_era_per_call":true},
+  "prompt_file": "art/prompts/era_references/e1_1986/materials-construction-03-service-architecture.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {"provider":"google_drive","folder_id":"1iPan8TlEoR90tHos-o50fkqf9_qzkqmq","folder_name":"E1_1986"},
+  "specimens": [
+    {"id":"01","name":"Standardized pressed-steel service hatch","description":"Rectangular painted door in a folded frame with two identical industrial hinges and one recessed quarter-turn latch; only the hatch assembly, not a wall."},
+    {"id":"02","name":"Stamped perforated ventilation grille","description":"Uniform perforated steel grille in a folded painted frame; no fan behind it and no surrounding machine."},
+    {"id":"03","name":"Pressed louver panel","description":"Rectangular painted-steel ventilation fragment with evenly formed identical louvers; no surrounding wall."},
+    {"id":"04","name":"Profiled-metal wall-to-roof corner fragment","description":"Small local junction with factory-formed flashing, profiled sheet and cold-formed support; fragment only, not a building."},
+    {"id":"05","name":"Modular wall-panel to C-channel connection","description":"One painted/insulated panel edge attached to a galvanized cold-formed C-channel with standardized clips or bolts; local connection only."},
+    {"id":"06","name":"Profiled roof sheet to Z-purlin connection","description":"Small local roof fragment with identical industrial fasteners and a cold-formed Z support; no complete roof."},
+    {"id":"07","name":"Standardized steel base plate on concrete plinth","description":"One local column-base fragment with four identical anchor bolts on a smooth cast-concrete plinth; no full column."},
+    {"id":"08","name":"Galvanized anti-slip grating threshold","description":"Small service threshold fragment with factory grating and a folded steel edge frame; isolated fragment only."}
+  ],
+  "global_forbidden": ["complete wall or facade","room","complete roof","building, hangar or tower","pipes or hoses","cables or connectors","mechanisms or instruments","lamps or signs","vehicles or scenes","text, labels, logos or pseudo-writing","baked cast shadows or contact shadows","glow, bloom, rays or temporary FX"],
+  "era_contract": {
+    "character":"repeatable industrial building components using pressed/folded sheet metal, standardized service access and cold-formed supports",
+    "required_signals":["folded painted service hardware","uniform perforation/louver patterns","cold-formed C/Z supports","standardized anchor/fastener patterns","factory grating and flashing"],
+    "replaced_previous_language":["crude corrugated junctions","rough concrete interfaces","hand-built hatches","coarse one-off service details"],
+    "forbidden_regressions":["complete architecture","rough one-off framing","irregular fasteners","hand-made hatch geometry","crude untreated concrete interfaces"]
+  },
+  "presentation": {"isolated_specimens":true,"non_overlapping":true,"neutral_background":true,"no_labels_or_text":true,"no_scenery":true,"no_cast_shadow":true,"no_baked_fx":true}
+}
