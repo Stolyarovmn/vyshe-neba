@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-01-surfaces-stock.json",
+  "generation_id": "7bc0bb4e-83b2-4f30-a26d-eefd43da1e96",
+  "source": {
+    "sha256": "f296701ed7a3125b060ece1fe15711523b960b883e6309058396e5b443a63710",
+    "bytes": 2002465,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1MeRbmRs4oa1SjRASx54ZT1pYLginsExW",
+    "drive_url": "https://drive.google.com/file/d/1MeRbmRs4oa1SjRASx54ZT1pYLginsExW/view?usp=drivesdk",
+    "drive_parent_folder_id": "1RSvbxm62sMJYpDDjg-KLUJ9B1L6_JYoc"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","verdict":"fail","notes":"visible orange oxidation/distressed edge wear violates the tightened E1 spec"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","verdict":"fail","notes":"edge chipping and orange oxidation remain too strong for the requested clean factory stock"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","verdict":"fail","notes":"again replaced by an unrequested cream/beige flat plate"},
+    {"id":"04","name":"Short galvanized steel angle profile","verdict":"fail","notes":"again rendered as a yellow-painted angle rather than unpainted galvanized equal-leg L-section"},
+    {"id":"05","name":"Short anodized aluminium U-channel extrusion","verdict":"fail","notes":"visible orange oxidation/distressed wear violates the clean anodized-finish requirement"},
+    {"id":"06","name":"Short square steel box-section","verdict":"fail","notes":"visible orange oxidation/distressed wear violates the even gray-primer requirement"},
+    {"id":"07","name":"Molded phenolic / early industrial-plastic spacer block","verdict":"pass","notes":"dark brown molded spacer with one clean bore is present and readable"},
+    {"id":"08","name":"Molded neoprene vibration pad","verdict":"pass","notes":"isolated dark rubber pad is present and readable"}
+  ],
+  "reviewer": "ChatGPT vision self-review",
+  "review_method": "direct visual inspection of the exact generated PNG against game-production@ad210d5aa192b4b579343a546528de029418875c production-guard spec",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "specimen 03 again remains absent and is replaced by an unrequested cream/beige flat plate",
+    "specimen 04 again remains yellow-painted rather than unpainted galvanized steel",
+    "multiple metal specimens again contain visible orange oxidation/distressed wear explicitly forbidden by the tightened E1 spec",
+    "two consecutive guarded retries reproduced the same defect class, so this generation method must stop for this turn under the retry policy"
+  ]
+}

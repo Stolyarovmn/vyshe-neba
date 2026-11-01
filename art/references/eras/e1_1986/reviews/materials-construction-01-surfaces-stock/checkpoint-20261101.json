@@ -1,31 +1,39 @@
 {
   "schema_version": 1,
-  "production_base_sha": "1201a702a13418b870ecf6d1ea2264abe301930b",
+  "production_base_sha": "ad210d5aa192b4b579343a546528de029418875c",
+  "current_game_production_sha_at_checkpoint": "c417add853a96358f07c7e3901bb4c1b7bdda13c",
   "era": "E1",
   "year": 1986,
   "role": "materials-construction",
   "sheet": "01-surfaces-stock",
   "spec_file": "art/reference_specs/e1_1986/materials-construction-01-surfaces-stock.json",
-  "status": "blocked_retry_budget_exhausted",
+  "status": "blocked_repeated_defect_change_method_required",
   "attempts_in_this_turn": 2,
   "max_attempts_per_turn": 2,
+  "total_rejected_attempts_archived": 5,
   "latest_attempt": {
-    "generation_id": "83712a6f-4d90-43e7-b505-c4abe3757b84",
-    "sha256": "ed5bbc63233f130c95f47890a9594f515de83246754cb0e9339fc4d165411cf9",
-    "drive_file_id": "1sxO1xIC68OfBleGMU0LgIKdI5z_YJtJw",
-    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-03-83712a6f.json",
+    "generation_id": "7bc0bb4e-83b2-4f30-a26d-eefd43da1e96",
+    "sha256": "f296701ed7a3125b060ece1fe15711523b960b883e6309058396e5b443a63710",
+    "bytes": 2002465,
+    "dimensions": [1536, 1024],
+    "drive_file_id": "1MeRbmRs4oa1SjRASx54ZT1pYLginsExW",
+    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-05-7bc0bb4e.json",
     "verdict": "source_reject"
   },
   "previous_attempt_this_turn": {
-    "generation_id": "c347dade-35e6-4a99-b9ff-d5f51d9de871",
-    "sha256": "de8f3c11a34f26b7ac189105c4d8f73250498df34536d2d2055cbcd109554c37",
-    "drive_file_id": "15yiKK-S3TONt9x7BkDXaN0ZLsXBC6dwA",
-    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-02-c347dade.json",
+    "generation_id": "79ae4428-f856-464f-9e75-b31630cf0baa",
+    "sha256": "7469559ccae71faf0741be74d48a7263b25bf97e7dd130573c7607502d5626dc",
+    "bytes": 1956776,
+    "dimensions": [1536, 1024],
+    "drive_file_id": "1_FI_dxxDN-cLKiajVNh_ehGbHfmtWdwE",
+    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-04-79ae4428.json",
     "verdict": "source_reject"
   },
   "blocking_defect_class": [
-    "generator collapses specimen 03 safety-yellow folded sheet and specimen 04 galvanized angle into one yellow angle while inserting an unrequested cream plate",
-    "generator keeps adding excessive distressed/oxidized wear that regresses toward E0"
+    "even after the merged disambiguation guard, the generator still replaces the safety-yellow broad folded coupon with a cream/beige flat plate",
+    "the generator still replaces the unpainted galvanized L-profile with a yellow-painted angle",
+    "the generator still adds visible orange oxidation/heavy distressed wear that the tightened E1 spec explicitly forbids"
   ],
-  "next_step": "Do not make a third production generation attempt in this turn. Tighten the machine-readable spec/guard regression so specimen 03 and 04 are compositionally disambiguated and E1 wear limits are explicit, then start a new turn from this checkpoint."
+  "retry_policy": "Two consecutive production-generation attempts in this turn reproduced the same defect class; do not make another generation attempt with the same 8-specimen composition in this turn.",
+  "next_step": "Change method before the next generation: split the combined 8-specimen surfaces-stock sheet into two guarded 4-specimen sheet-parts so the yellow folded coupon and galvanized L-profile are not competing inside the same composition. Update machine-readable specs, generated prompts, E1 role plan/checkpoint and regression tests first; only then generate the first 4-specimen sheet-part."
 }
