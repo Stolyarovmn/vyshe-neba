@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-01-surfaces-stock.json",
+  "generation_id": "71a424ea-6b0a-43ae-aefb-49ca0c0821ce",
+  "source": {
+    "sha256": "241b85f0a65c1d450d676f1d1812f33a9c6ab702a600c8aba812e6ae96907ec0",
+    "bytes": 1855239,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1p7uE4fGMOCrrrfdNVxAtfnP5oeHv8DBG",
+    "drive_url": "https://drive.google.com/file/d/1p7uE4fGMOCrrrfdNVxAtfnP5oeHv8DBG/view?usp=drivesdk",
+    "drive_parent_folder_id": "1RSvbxm62sMJYpDDjg-KLUJ9B1L6_JYoc"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "fail",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","verdict":"fail","notes":"still uses heavy orange oxidation, edge chipping and distressed scratches instead of controlled factory enamel"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","verdict":"fail","notes":"still uses heavy chipped/distressed edges and orange oxidation beyond the allowed few tiny chips"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","verdict":"fail","notes":"still absent and substituted by a cream/beige distressed flat plate"},
+    {"id":"04","name":"Short galvanized steel angle profile","verdict":"fail","notes":"still rendered as a yellow-painted L-profile rather than unpainted galvanized steel"},
+    {"id":"05","name":"Short anodized aluminium U-channel extrusion","verdict":"fail","notes":"U-channel geometry is present but remains strongly oxidized/distressed instead of clean anodized aluminium"},
+    {"id":"06","name":"Short square steel box-section","verdict":"fail","notes":"square hollow section is present but remains strongly oxidized/distressed instead of even gray primer"},
+    {"id":"07","name":"Molded phenolic / early industrial-plastic spacer block","verdict":"fail","notes":"still substituted by stacked copper/orange plate-like pieces rather than one solid dark molded phenolic spacer"},
+    {"id":"08","name":"Molded neoprene vibration pad","verdict":"pass","notes":"thick black rectangular ribbed pad remains readable"}
+  ],
+  "reviewer": "ChatGPT vision self-review",
+  "review_method": "direct visual inspection of the exact generated PNG against game-production@a0b013979a8f9a73b7a35e8d0c832569238ba1ef guarded 8-specimen spec; second corrective attempt in the interactive turn",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "the corrective attempt reproduced the same specimen substitutions as attempt 06",
+    "specimen 03 remains a cream/beige plate instead of the safety-yellow folded coupon",
+    "specimen 04 remains a yellow-painted angle instead of unpainted galvanized steel",
+    "specimen 07 remains stacked copper/orange plate-like parts instead of a solid phenolic spacer",
+    "strong orange oxidation/distressed wear remains across the metal specimens",
+    "visible baked/contact shadows remain",
+    "two production-generation attempts in this turn now reproduce the same defect class; retry budget is exhausted"
+  ]
+}

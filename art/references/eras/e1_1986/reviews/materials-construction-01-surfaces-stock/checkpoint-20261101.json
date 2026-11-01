@@ -1,39 +1,41 @@
 {
   "schema_version": 1,
-  "production_base_sha": "ad210d5aa192b4b579343a546528de029418875c",
-  "current_game_production_sha_at_checkpoint": "c417add853a96358f07c7e3901bb4c1b7bdda13c",
+  "production_base_sha": "a0b013979a8f9a73b7a35e8d0c832569238ba1ef",
+  "current_game_production_sha_at_checkpoint": "a0b013979a8f9a73b7a35e8d0c832569238ba1ef",
   "era": "E1",
   "year": 1986,
   "role": "materials-construction",
   "sheet": "01-surfaces-stock",
   "spec_file": "art/reference_specs/e1_1986/materials-construction-01-surfaces-stock.json",
-  "status": "blocked_repeated_defect_change_method_required",
+  "status": "blocked_retry_budget_exhausted",
   "attempts_in_this_turn": 2,
   "max_attempts_per_turn": 2,
-  "total_rejected_attempts_archived": 5,
+  "total_rejected_attempts_archived": 7,
   "latest_attempt": {
-    "generation_id": "7bc0bb4e-83b2-4f30-a26d-eefd43da1e96",
-    "sha256": "f296701ed7a3125b060ece1fe15711523b960b883e6309058396e5b443a63710",
-    "bytes": 2002465,
+    "generation_id": "71a424ea-6b0a-43ae-aefb-49ca0c0821ce",
+    "sha256": "241b85f0a65c1d450d676f1d1812f33a9c6ab702a600c8aba812e6ae96907ec0",
+    "bytes": 1855239,
     "dimensions": [1536, 1024],
-    "drive_file_id": "1MeRbmRs4oa1SjRASx54ZT1pYLginsExW",
-    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-05-7bc0bb4e.json",
+    "drive_file_id": "1p7uE4fGMOCrrrfdNVxAtfnP5oeHv8DBG",
+    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-07-71a424ea.json",
     "verdict": "source_reject"
   },
   "previous_attempt_this_turn": {
-    "generation_id": "79ae4428-f856-464f-9e75-b31630cf0baa",
-    "sha256": "7469559ccae71faf0741be74d48a7263b25bf97e7dd130573c7607502d5626dc",
-    "bytes": 1956776,
+    "generation_id": "969011c1-ba95-40be-b4ef-44e86c0f0323",
+    "sha256": "f31a39f7806f83d23065f13dbe1a466dbb2595bf98c77bf3ab53e0c3215730a8",
+    "bytes": 1867303,
     "dimensions": [1536, 1024],
-    "drive_file_id": "1_FI_dxxDN-cLKiajVNh_ehGbHfmtWdwE",
-    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-04-79ae4428.json",
+    "drive_file_id": "1qR-WTM_c9ZCPFTqNQleRa_vMZiU9U_mH",
+    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-06-969011c1.json",
     "verdict": "source_reject"
   },
   "blocking_defect_class": [
-    "even after the merged disambiguation guard, the generator still replaces the safety-yellow broad folded coupon with a cream/beige flat plate",
-    "the generator still replaces the unpainted galvanized L-profile with a yellow-painted angle",
-    "the generator still adds visible orange oxidation/heavy distressed wear that the tightened E1 spec explicitly forbids"
+    "the safety-yellow broad folded coupon is repeatedly replaced by a cream/beige flat plate",
+    "the unpainted galvanized L-profile is repeatedly replaced by a yellow-painted angle",
+    "the dark molded phenolic spacer is repeatedly replaced by stacked copper/orange plate-like parts",
+    "strong orange oxidation and distressed wear repeatedly return despite being explicitly forbidden",
+    "baked/contact shadows remain visible"
   ],
-  "retry_policy": "Two consecutive production-generation attempts in this turn reproduced the same defect class; do not make another generation attempt with the same 8-specimen composition in this turn.",
-  "next_step": "Change method before the next generation: split the combined 8-specimen surfaces-stock sheet into two guarded 4-specimen sheet-parts so the yellow folded coupon and galvanized L-profile are not competing inside the same composition. Update machine-readable specs, generated prompts, E1 role plan/checkpoint and regression tests first; only then generate the first 4-specimen sheet-part."
+  "retry_policy": "Two production-generation attempts in this interactive turn reproduced the same blocking defect class. No further generation attempt is allowed in this turn.",
+  "next_step": "Resume from this exact checkpoint in the next turn. Keep the canonical 8-specimen 4x2 plan, but change the imagegen invocation/control method so the deterministic guard request is preserved more faithfully; do not advance to the next E1 sheet until 01-surfaces-stock gets exact-SHA source PASS."
 }
