@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vyshe-neba.local/schemas/production-guard-reference-sheet-spec.schema.json",
+  "title": "Vyshe Neba atomic era-reference sheet spec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","kind","era","year","role","sheet","title","expected_specimen_count","generation","prompt_file","style_bible_file","archive","specimens","global_forbidden","era_contract","presentation"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "kind": {"const": "era_reference_sheet"},
+    "era": {"enum": ["E0","E1","E2","E3","E4","E5"]},
+    "year": {"enum": [1978,1986,1998,2015,2035,2060]},
+    "role": {"enum": ["materials-construction","mechanics-infrastructure","controls-displays","lighting-signals"]},
+    "sheet": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "expected_specimen_count": {"type": "integer", "minimum": 1, "maximum": 8},
+    "generation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["size","layout","one_role_per_call","one_era_per_call"],
+      "properties": {
+        "size": {"type": "array", "prefixItems": [{"type":"integer","minimum":1},{"type":"integer","minimum":1}], "items": false},
+        "layout": {"type": "array", "prefixItems": [{"type":"integer","minimum":1},{"type":"integer","minimum":1}], "items": false},
+        "one_role_per_call": {"const": true},
+        "one_era_per_call": {"const": true}
+      }
+    },
+    "prompt_file": {"type": "string", "minLength": 1},
+    "style_bible_file": {"const": "art/style_bible.txt"},
+    "archive": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider","folder_id","folder_name"],
+      "properties": {
+        "provider": {"const":"google_drive"},
+        "folder_id": {"type":"string","minLength":1},
+        "folder_name": {"type":"string","minLength":1}
+      }
+    },
+    "specimens": {
+      "type": "array", "minItems": 1, "maxItems": 8,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id","name","description"],
+        "properties": {
+          "id": {"type":"string","minLength":1},
+          "name": {"type":"string","minLength":1},
+          "description": {"type":"string","minLength":1}
+        }
+      }
+    },
+    "global_forbidden": {"type":"array","minItems":1,"items":{"type":"string","minLength":1}},
+    "era_contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["character","required_signals","replaced_previous_language","forbidden_regressions"],
+      "properties": {
+        "character": {"type":"string","minLength":1},
+        "required_signals": {"type":"array","minItems":1,"items":{"type":"string","minLength":1}},
+        "replaced_previous_language": {"type":"array","items":{"type":"string","minLength":1}},
+        "forbidden_regressions": {"type":"array","items":{"type":"string","minLength":1}}
+      }
+    },
+    "presentation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["isolated_specimens","non_overlapping","neutral_background","no_labels_or_text","no_scenery","no_cast_shadow","no_baked_fx"],
+      "properties": {
+        "isolated_specimens": {"const": true}, "non_overlapping": {"const": true}, "neutral_background": {"const": true},
+        "no_labels_or_text": {"const": true}, "no_scenery": {"const": true}, "no_cast_shadow": {"const": true}, "no_baked_fx": {"const": true}
+      }
+    }
+  }
+}
