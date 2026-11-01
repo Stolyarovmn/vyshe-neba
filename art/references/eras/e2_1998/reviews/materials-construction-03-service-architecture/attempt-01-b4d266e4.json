@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-03-service-architecture.json",
+  "generation_id": "b4d266e4-2382-4117-aa72-d17411c062f1",
+  "source": {
+    "sha256": "c1fa2b491d19e8d8a490fc6f94c12f5bfffc3780fc6f45dc0b3725321906736c",
+    "bytes": 1884394,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1ew39Apxn6Y3HNr1Y39zD-pN70mUIbf3v",
+    "drive_url": "https://drive.google.com/file/d/1ew39Apxn6Y3HNr1Y39zD-pN70mUIbf3v/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Flush gasketed electronics service-panel edge","verdict":"pass","notes":"Local beige-gray service-panel edge has a visible dark gasket line and exactly two captive quarter-turn fasteners; no complete wall or cabinet."},
+    {"id":"02","name":"Removable perforated equipment-bay ventilation panel fragment","verdict":"pass","notes":"Regular perforation field, precision folded edges and integrated mounting points read as a removable panel fragment only."},
+    {"id":"03","name":"Replaceable formed-louver cassette fragment","verdict":"pass","notes":"Even repeated louvers and four integrated mounting points are present; no fan, wall or machine."},
+    {"id":"04","name":"Insulated wall-panel to anodized service-frame connection","verdict":"pass","notes":"Sandwich-panel edge, anodized service frame and gasketed clip connection remain a local architecture fragment."},
+    {"id":"05","name":"Raised technical-floor panel on adjustable pedestal head","verdict":"pass","notes":"Anti-static floor-panel corner sits on one adjustable pedestal head; no complete floor system or room context."},
+    {"id":"06","name":"Removable service-trench cover edge fragment","verdict":"pass","notes":"Anti-slip metal cover fragment is seated in a recessed support frame and includes one flush lifting slot; no trench scene or visible utilities."},
+    {"id":"07","name":"Precision equipment plinth-to-floor isolation interface","verdict":"pass","notes":"Painted-steel plinth fragment, dark elastomer isolation layer and concrete/grout pad are clearly separated as one local interface."},
+    {"id":"08","name":"Anodized partition/service-frame corner with replaceable gasket","verdict":"pass","notes":"Small anodized 90-degree frame corner with a visible dark gasket channel; no glazing, door, window or complete partition."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 machine spec and style/era contracts; local SHA-256, dimensions and byte count verified; Drive archive readback preserved the same byte count before review acceptance.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
