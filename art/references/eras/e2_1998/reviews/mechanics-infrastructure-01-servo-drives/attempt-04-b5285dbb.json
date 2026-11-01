@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/mechanics-infrastructure-01-servo-drives.json",
+  "generation_id": "b5285dbb-d38e-4516-b637-5ccd1e133c41",
+  "source": {
+    "sha256": "2d2c34535222e2dc8f49c61bb4083018445019614a7c10f5eb5919f758902d1d",
+    "bytes": 1978441,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1ox8YFST_YSxQhYMxanVZbuGuVjf51SuQ",
+    "drive_url": "https://drive.google.com/file/d/1ox8YFST_YSxQhYMxanVZbuGuVjf51SuQ/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"AC servo motor with rear encoder housing","verdict":"fail","notes":"Generated a folded chassis corner/joint instead of a servo motor."},
+    {"id":"02","name":"Servo motor with inline planetary gearbox","verdict":"fail","notes":"Generated a lap/splice joint instead of a servo plus planetary gearbox."},
+    {"id":"03","name":"Servo motor with right-angle gear reducer","verdict":"fail","notes":"Generated a captive-thread mount instead of a servo plus right-angle reducer."},
+    {"id":"04","name":"Motorized ballscrew linear actuator","verdict":"fail","notes":"Generated an interlocking sheet-metal seam instead of a motorized ballscrew actuator."},
+    {"id":"05","name":"Electric rotary actuator with integrated brake","verdict":"fail","notes":"Generated a rack-ear/chassis joint instead of a rotary actuator."},
+    {"id":"06","name":"Direct-drive torque-motor rotary module","verdict":"fail","notes":"Generated quarter-turn service-panel hardware instead of an annular torque-motor module."},
+    {"id":"07","name":"Brushless spindle/drive motor with resolver housing","verdict":"fail","notes":"Generated a reinforcement plate instead of a brushless motor with resolver housing."},
+    {"id":"08","name":"Electrohydraulic servo cylinder with position-transducer body","verdict":"fail","notes":"Generated an isolation mount instead of an electrohydraulic servo cylinder."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 machine spec. The generator substituted the previous materials-construction joint vocabulary for all eight requested servo-drive specimens.",
+  "final_verdict": "fail",
+  "rejection_reasons": ["Reference scope failure: none of the eight required servo-drive specimens is present; the sheet repeats unrelated materials-construction/service hardware."]
+}
