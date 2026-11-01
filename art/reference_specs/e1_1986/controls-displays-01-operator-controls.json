@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "controls-displays",
+  "sheet": "01-operator-controls",
+  "title": "standardized operator controls",
+  "expected_specimen_count": 8,
+  "generation": {"size":[1536,1024],"layout":[4,2],"one_role_per_call":true,"one_era_per_call":true},
+  "prompt_file": "art/prompts/era_references/e1_1986/controls-displays-01-operator-controls.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {"provider":"google_drive","folder_id":"1iPan8TlEoR90tHos-o50fkqf9_qzkqmq","folder_name":"E1_1986"},
+  "specimens": [
+    {"id":"01","name":"Standardized black industrial pushbutton","description":"Round flush-mount button in a metal/plastic bezel; unlit and unlabeled."},
+    {"id":"02","name":"Standardized green industrial pushbutton","description":"Round flush-mount button in the same factory family; unlit and unlabeled."},
+    {"id":"03","name":"Red mushroom emergency-stop","description":"Large standardized mushroom head with twist/pull reset hardware; no text or arrows."},
+    {"id":"04","name":"Rotary selector switch","description":"Black molded pointer knob in a standardized bezel with three physical detents; no letters or numbers."},
+    {"id":"05","name":"Keyed rotary switch","description":"Compact industrial key switch with a plain metal key and standardized bezel; no text."},
+    {"id":"06","name":"Short industrial control lever","description":"Metal lever with black molded ball handle and a compact notched detent plate; no labels."},
+    {"id":"07","name":"Compact industrial joystick","description":"Short black handle with rubber bellows/boot and a square standardized mounting bezel."},
+    {"id":"08","name":"Three-pushbutton station block","description":"One compact rectangular mounting plate holding three identical unlabeled pushbuttons in a straight aligned row."}
+  ],
+  "global_forbidden": ["raw hand-cut plates","knife switches","loose mismatched toggles","gauges or CRTs","terminal blocks or relays","lamps or wiring","complete control panels or desks","rooms, machines or scenes","text, letters, numbers, arrows, logos or pseudo-writing","baked cast shadows or contact shadows","glow, bloom, rays or temporary FX"],
+  "era_contract": {
+    "character":"interchangeable operator components, aligned factory families, safer standardized emergency controls and machine-assisted operation",
+    "required_signals":["repeatable pushbutton families","standard mushroom emergency stop","standard selector/key switches","molded handles and bellows","aligned multi-button station modules"],
+    "replaced_previous_language":["individually fitted mismatched toggles","knife switches","crude mechanical-only controls","one-off mounting plates"],
+    "forbidden_regressions":["knife-switch dominance","random toggle mixes","hand-cut control plates","unstandardized emergency hardware","complete control consoles"]
+  },
+  "presentation": {"isolated_specimens":true,"non_overlapping":true,"neutral_background":true,"no_labels_or_text":true,"no_scenery":true,"no_cast_shadow":true,"no_baked_fx":true}
+}

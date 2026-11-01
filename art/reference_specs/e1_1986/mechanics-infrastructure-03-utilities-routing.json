@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "mechanics-infrastructure",
+  "sheet": "03-utilities-routing",
+  "title": "organized utilities and routing",
+  "expected_specimen_count": 8,
+  "generation": {"size":[1536,1024],"layout":[4,2],"one_role_per_call":true,"one_era_per_call":true},
+  "prompt_file": "art/prompts/era_references/e1_1986/mechanics-infrastructure-03-utilities-routing.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {"provider":"google_drive","folder_id":"1iPan8TlEoR90tHos-o50fkqf9_qzkqmq","folder_name":"E1_1986"},
+  "specimens": [
+    {"id":"01","name":"Perforated steel cable-tray segment","description":"Short galvanized or painted tray with a neatly laid multi-core cable bundle retained by uniform clips."},
+    {"id":"02","name":"Bundled electrical harness on standardized clamps","description":"Several insulated cables routed in parallel through identical P-clamps on a short mounting strip."},
+    {"id":"03","name":"Steel electrical conduit 90-degree sweep","description":"Factory-bent conduit elbow with one threaded union coupling; no junction box."},
+    {"id":"04","name":"Die-cast junction box","description":"Rectangular gasketed industrial box with removable lid and two standardized cable glands; no attached cables."},
+    {"id":"05","name":"Painted steel pipe 90-degree elbow","description":"Clean industrial elbow with one standardized union coupling; no valve or surrounding pipe network."},
+    {"id":"06","name":"Flanged pipe joint","description":"Two short pipe ends with matching circular flanges, gasket edge and identical evenly spaced bolts."},
+    {"id":"07","name":"Hydraulic hose segment","description":"Reinforced black hose with factory-crimped ferrule fittings and one molded bend restrictor; no manifold."},
+    {"id":"08","name":"Compact solenoid valve manifold block","description":"Small metal block with four standardized fluid ports and two coil housings; no hoses or wires."}
+  ],
+  "global_forbidden": ["loose open wiring","improvised junctions","hand gate valves","pumps or tanks","gauges","complete hydraulic systems","complete cable racks","whole machines","buildings or scenes","text, labels, logos or pseudo-writing","baked cast shadows or contact shadows","glow, bloom, rays or temporary FX"],
+  "era_contract": {
+    "character":"deliberately routed and supported utilities with standardized connectors/fittings and hydraulic/electrical service modules",
+    "required_signals":["perforated cable trays","parallel clamped harnesses","factory conduit bends","gasketed junction boxes","standard flanges and crimped hose fittings","compact solenoid manifolds"],
+    "replaced_previous_language":["loose exposed runs","improvised clamps","individually hand-routed utilities","mostly manual valve hardware"],
+    "forbidden_regressions":["random loose cables","open twisted wiring","homemade junction boxes","irregular pipe fittings","dominant hand-operated valves"]
+  },
+  "presentation": {"isolated_specimens":true,"non_overlapping":true,"neutral_background":true,"no_labels_or_text":true,"no_scenery":true,"no_cast_shadow":true,"no_baked_fx":true}
+}

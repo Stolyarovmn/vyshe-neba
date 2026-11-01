@@ -11,6 +11,9 @@ spec JSON
 → production_guard.py validate-spec
 → production_guard.py render-prompt (checked into art/prompts/...)
 → production_guard.py build-request (+ style_bible verbatim once)
+→ imagegen_chat_bridge.py build-chat-block
+→ imagegen_chat_bridge.py verify-chat-block
+→ exact complete chat block immediately before conversational imagegen
 → one imagegen call
 → production_guard.py verify-source
 → untouched Drive archive + SHA-256 provenance
@@ -19,6 +22,6 @@ spec JSON
 → only then continue downstream
 ```
 
-`validate-tree` fails when a generated prompt drifts from its JSON spec.
+`validate-tree` fails when a generated prompt drifts from its JSON spec. The production-guard regression suite also fails when any E1 `reference-set.json -> role_plan` sheet lacks a corresponding machine spec.
 
-E1 `materials-construction/01-surfaces-stock` is the current guarded reference sheet. It contains exactly 8 explicitly enumerated specimens in a 4×2 layout. Each specimen has a fixed cell assignment and may appear exactly once; duplication, omission, substitution, merging or unlisted stock classes are source-gate failures. The earlier 4+4 split specs are no longer canonical and have been removed; their rejected raster attempts remain provenance only under the E1 review/archive history.
+E1 currently has machine-readable specs for all 10 planned atomic sheet-parts: 3 `materials-construction`, 3 `mechanics-infrastructure`, 2 `controls-displays`, and 2 `lighting-signals`. Each contains exactly 8 explicitly enumerated specimens in the canonical 4×2 layout. Duplication, omission, substitution, merging or unlisted specimen classes are source-gate failures.

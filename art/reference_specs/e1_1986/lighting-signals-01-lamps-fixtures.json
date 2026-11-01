@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "lighting-signals",
+  "sheet": "01-lamps-fixtures",
+  "title": "standardized lamps and work fixtures",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [1536, 1024],
+    "layout": [4, 2],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e1_1986/lighting-signals-01-lamps-fixtures.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {"provider":"google_drive","folder_id":"1iPan8TlEoR90tHos-o50fkqf9_qzkqmq","folder_name":"E1_1986"},
+  "specimens": [
+    {"id":"01","name":"Enclosed fluorescent strip fixture","description":"Rectangular industrial housing with prismatic diffuser; lamp off, no glow."},
+    {"id":"02","name":"Rectangular bulkhead lamp","description":"Gasketed metal frame with ribbed/prismatic glass; lamp off, no glow."},
+    {"id":"03","name":"Standardized pendant work lamp","description":"Painted/enamelled metal shade with enclosed protective glass lens; lamp off."},
+    {"id":"04","name":"Compact adjustable machine work lamp","description":"Cast metal lamp housing on a short pivot bracket with sealed lens; lamp off."},
+    {"id":"05","name":"Small red round panel indicator","description":"Standardized physical lens and bezel; unlit."},
+    {"id":"06","name":"Small amber round panel indicator","description":"Matching standardized lens and bezel; unlit."},
+    {"id":"07","name":"Small green round panel indicator","description":"Matching standardized lens and bezel; unlit."},
+    {"id":"08","name":"Three-lamp red/amber/green status cluster","description":"One compact standardized housing containing three aligned physical lenses; all unlit."}
+  ],
+  "global_forbidden": ["bare household bulbs","improvised clamp lamps","rotating beacons","reflectors or floodlights","wiring or control panels","complete machines","buildings, rooms or scenes","text, labels, logos or pseudo-writing","active light","glow, bloom or rays","projected light pools","baked cast shadows or contact shadows"],
+  "era_contract": {
+    "character":"planned factory lighting with enclosed standardized fixtures and denser repeatable status indication",
+    "required_signals":["enclosed fluorescent and bulkhead fixtures","standardized protected work lamps","matching red/amber/green indicator families","compact grouped status housings"],
+    "replaced_previous_language":["bare bulbs","one-off cage lamps","sparse ad-hoc indicator placement","improvised work-light fittings"],
+    "forbidden_regressions":["bare exposed bulbs","random cage lamps","oversized one-off indicators","active glow effects","decorative light strips"]
+  },
+  "presentation": {"isolated_specimens":true,"non_overlapping":true,"neutral_background":true,"no_labels_or_text":true,"no_scenery":true,"no_cast_shadow":true,"no_baked_fx":true}
+}

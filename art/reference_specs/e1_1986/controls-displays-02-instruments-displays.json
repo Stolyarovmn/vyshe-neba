@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "controls-displays",
+  "sheet": "02-instruments-displays",
+  "title": "instruments, status and CRT hardware",
+  "expected_specimen_count": 8,
+  "generation": {"size":[1536,1024],"layout":[4,2],"one_role_per_call":true,"one_era_per_call":true},
+  "prompt_file": "art/prompts/era_references/e1_1986/controls-displays-02-instruments-displays.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {"provider":"google_drive","folder_id":"1iPan8TlEoR90tHos-o50fkqf9_qzkqmq","folder_name":"E1_1986"},
+  "specimens": [
+    {"id":"01","name":"Standardized round pressure gauge","description":"Flush-panel metal bezel, black needle and unlabeled tick marks only; no text, numbers or units."},
+    {"id":"02","name":"Rectangular moving-coil meter","description":"Factory-standard metal/plastic bezel with black needle and unlabeled tick marks only; no text or numbers."},
+    {"id":"03","name":"Dual analog gauge cluster","description":"Two matching small round gauges in one standardized rectangular mounting bezel; needles and unlabeled ticks only."},
+    {"id":"04","name":"Three-lamp status indicator cluster","description":"Aligned red, amber and green physical lenses in one compact standardized housing; all unlit and unlabeled."},
+    {"id":"05","name":"Plug-in relay/service module","description":"Two socketed industrial relays in a compact removable metal/plastic module with plain test buttons; no text."},
+    {"id":"06","name":"Modular terminal/connector strip","description":"Standardized plug-in terminal blocks and multipin industrial connectors on one short service rail; no wires or labels."},
+    {"id":"07","name":"Monochrome CRT bezel/housing fragment","description":"Deep industrial metal/plastic bezel with convex dark green-gray glass; screen off/blank, no controls or surrounding console."},
+    {"id":"08","name":"Early color CRT bezel/housing fragment","description":"Deep gray industrial bezel with curved dark glass; screen off/blank, no controls, no console and no screen content."}
+  ],
+  "global_forbidden": ["text, digits or units","waveforms or screen graphics","flat-panel displays","complete monitors with control consoles","full racks or desks","rooms, vehicles, machines or scenes","wires or labels","baked cast shadows or contact shadows","glow, bloom, rays or temporary FX"],
+  "era_contract": {
+    "character":"standardized instrumentation families, grouped status hardware, plug-in service electronics and deep CRT hardware",
+    "required_signals":["matching analog instrument families","grouped status lenses","plug-in service electronics","standard connector strips","deep monochrome and early color CRT housings"],
+    "replaced_previous_language":["mostly isolated analog instruments","sparse individually mounted components","one-off control hardware"],
+    "forbidden_regressions":["flat displays","modern LCD styling","complete workstations","random unmatched gauges","dense modern LED interfaces"]
+  },
+  "presentation": {"isolated_specimens":true,"non_overlapping":true,"neutral_background":true,"no_labels_or_text":true,"no_scenery":true,"no_cast_shadow":true,"no_baked_fx":true}
+}

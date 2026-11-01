@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "lighting-signals",
+  "sheet": "02-signal-hardware",
+  "title": "standardized signal hardware",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [1536, 1024],
+    "layout": [4, 2],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e1_1986/lighting-signals-02-signal-hardware.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {"provider":"google_drive","folder_id":"1iPan8TlEoR90tHos-o50fkqf9_qzkqmq","folder_name":"E1_1986"},
+  "specimens": [
+    {"id":"01","name":"Standardized red rotating warning beacon","description":"Molded/ribbed red lens on a repeatable industrial metal/plastic base; switched off, no glow."},
+    {"id":"02","name":"Standardized amber rotating warning beacon","description":"Matching amber lens and base family; switched off, no glow."},
+    {"id":"03","name":"Vertical three-color stack light","description":"Standardized cylindrical red, amber and green segments on a short metal base; all switched off."},
+    {"id":"04","name":"Paired red-and-amber warning lamps","description":"Two matching rectangular physical lamp housings in one standardized bracket; both off."},
+    {"id":"05","name":"Green hooded status lamp","description":"Standardized green lens with a formed metal visibility hood; switched off."},
+    {"id":"06","name":"Red prismatic reflector","description":"Rectangular red reflector in a stamped metal mounting frame; no light source."},
+    {"id":"07","name":"Amber prismatic reflector","description":"Matching amber reflector in the same stamped metal mounting family; no light source."},
+    {"id":"08","name":"Sealed directional flood/work light","description":"Rectangular/ribbed glass lens in a formed metal housing with standardized adjustable bracket; switched off."}
+  ],
+  "global_forbidden": ["complete beacon tower","vehicle or runway assembly","warning panel","wiring or signs","buildings, rooms or scenes","text, labels, logos or pseudo-writing","active light","glow, bloom or rays","projected light pools","baked cast shadows or contact shadows"],
+  "era_contract": {
+    "character":"planned standardized warning/status families with repeated housings and multi-state stack signaling",
+    "required_signals":["matching red/amber beacon families","standard three-color stack light","paired warning housings","hooded status lamp","repeatable reflector family","sealed directional work-light housing"],
+    "replaced_previous_language":["oversized one-off warning hardware","sparse individually improvised signal fittings","ad-hoc isolated beacon construction"],
+    "forbidden_regressions":["one-off homemade beacon bases","random mismatched signal housings","active glow effects","decorative light strips","complete warning assemblies"]
+  },
+  "presentation": {"isolated_specimens":true,"non_overlapping":true,"neutral_background":true,"no_labels_or_text":true,"no_scenery":true,"no_cast_shadow":true,"no_baked_fx":true}
+}

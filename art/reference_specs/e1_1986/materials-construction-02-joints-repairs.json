@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "materials-construction",
+  "sheet": "02-joints-repairs",
+  "title": "standardized joints and replaceable repairs",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [1536,1024],
+    "layout": [4,2],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e1_1986/materials-construction-02-joints-repairs.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {"provider":"google_drive","folder_id":"1iPan8TlEoR90tHos-o50fkqf9_qzkqmq","folder_name":"E1_1986"},
+  "specimens": [
+    {"id":"01","name":"Standardized welded T-joint","description":"Two factory-cut steel plates at 90° with a neat consistent fillet weld bead and square preparation; controlled industrial weld only, no crude repair patch."},
+    {"id":"02","name":"Stamped triangular gusset bracket","description":"One pressed/folded steel gusset with identical punched mounting holes and clean repeatable edges; single standardized bracket only."},
+    {"id":"03","name":"Bolted lap joint","description":"Two overlapping steel plates joined by identical zinc-plated hex bolts, nuts and washers in perfectly even spacing; no mismatched fasteners."},
+    {"id":"04","name":"Spot-welded sheet-metal seam","description":"Two overlapping thin steel edges with a regular row of identical spot-weld marks; clean repeatable seam only."},
+    {"id":"05","name":"Replaceable bolted reinforcement plate","description":"One rectangular strengthening/splice plate fixed with an even standardized bolt pattern, designed to be removable rather than field-welded."},
+    {"id":"06","name":"Folded L-bracket","description":"One-piece stamped/folded steel angle bracket with a flanged edge and two identical punched mounting holes; no rough hand-cut plate."},
+    {"id":"07","name":"Standardized channel splice","description":"Two short channel ends joined locally by paired identical splice plates and uniform bolts; local splice only, not a full frame."},
+    {"id":"08","name":"Modular box-section frame node","description":"Short box-section fragments meeting at one local node with repeatable bolt-on gusset plates; local node only, not a complete frame."}
+  ],
+  "global_forbidden": ["crude repair patches","mismatched fasteners","rough hand-drilled plates","timber","hatches or grilles","pipes or cables","mechanisms","instruments or lamps","whole machines","buildings, rooms or scenes","text, labels, logos or pseudo-writing","baked cast shadows or contact shadows","glow, bloom, rays or temporary FX"],
+  "era_contract": {
+    "character":"serial industrial fabrication with repeatable hole patterns, interchangeable brackets and controlled welds",
+    "required_signals":["factory-cut geometry","repeatable punched holes","uniform zinc-plated fasteners","controlled weld beads","removable standardized repair plates"],
+    "replaced_previous_language":["ad-hoc field repair","mismatched bolts","oversized improvised gussets","irregular hand-laid joints"],
+    "forbidden_regressions":["crude one-off patches","random bolt spacing","rough hand drilling","oversized irregular welds","timber repair pieces"]
+  },
+  "presentation": {"isolated_specimens":true,"non_overlapping":true,"neutral_background":true,"no_labels_or_text":true,"no_scenery":true,"no_cast_shadow":true,"no_baked_fx":true}
+}
