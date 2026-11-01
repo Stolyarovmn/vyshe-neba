@@ -7,7 +7,7 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts remain `UNKNOWN`; blo
 - Asset ID / slug / family / zone: `B03 / landing_guidance / base / launch_core`
 - Type: `base`
 - Owner / reviewer / branch / commit SHA: `owner UNKNOWN / reviewer user for island reference, B03 candidate reviewer pending / canonical game-production / SHA pinned at execution time`
-- Status: `design / source_rejected` — no accepted replacement E0 source exists yet. Two 2026-10-30 attempts were archived untouched and rejected before processing.
+- Status: `design / source_rejected` — no accepted replacement E0 source exists yet. Three 2026-10-30 replacement attempts were archived untouched and rejected before destructive processing.
 - Gameplay role / visible result, **design target**: `PRODUCTION_MANIFEST.md` says B03 predicts touchdown point, safe corridor and approach state and must not steer the rocket.
 - Current runtime behavior at `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721`: building key `beacons` is implemented; current landing simulation widens landing tolerances according to beacon level. This is **not** the production-manifest tracking/corridor mechanic.
 - Runtime implementation status: asset mapping/consumer **verified**; design-target behavior/rig **not implemented or verified**.
@@ -18,7 +18,7 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts remain `UNKNOWN`; blo
 
 - E0 construction target: portable tripod/base → tall mast/yoke → **small manual optical aiming head** → separate physical signal lamp.
 - The mast/yoke must carry most of the height; the head must not read as a large horizontal surveillance camera, cannon or telescope.
-- Materials/manufacturing details beyond the E0 `garage dream` logic remain `UNKNOWN`; do not invent decorative cabling.
+- E0 manufacturing/material language is constrained by `ERA_DESIGN_MATRIX.md` and the applicable exact-SHA atomic E0 reference sheets. References provide reusable construction/material/mechanical/signal vocabulary only; they do not determine B03 identity or layout.
 - Parts: `base`; `head`; `lamp`; mast/yoke is structural geometry connecting base and aiming head.
 - Joint intent: physical pan/tilt aiming head; bottom-center placement registration `(23,78)`.
 - Measured pivots: `pending` until exact approved replacement art.
@@ -46,7 +46,7 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts remain `UNKNOWN`; blo
 
 | Era | Continuity | Change | Status |
 | --- | --- | --- | --- |
-| E0 / 1978 | root | tripod + tall mast/yoke + small manual optical head + separate lamp | replacement source required; current attempts rejected |
+| E0 / 1978 | root | tripod + tall mast/yoke + small manual optical head + separate lamp | replacement source required; three current attempts rejected |
 | E1 / 1986 | preserve footprint/axis/lamp/portrait silhouette | sectional radio beacon / heavier industrial head | blocked until E0 exact-SHA approval |
 | E2 / 1998 | preserve physical ancestry | motorized optical/radio tracker | blocked on E1 |
 | E3 / 2015 | preserve pan/tilt ancestry | laser-optical multi-sensor head, no baked beam | blocked on E2 |
@@ -54,6 +54,12 @@ Based on `art/docs/ASSET_BRIEF_TEMPLATE.md`. Unknown facts remain `UNKNOWN`; blo
 | E5 / 2060 | preserve family scale/registration | lightweight multispectral directional head | blocked on E4 |
 
 Old E0–E5 originals remain archive provenance only; they are not approved lineage roots.
+
+### E0 atomic visual evidence
+
+`art/references/eras/e0_1978/reference-set.json` is currently `candidate_complete_pending_cross_era_review`: 10/10 planned atomic sheet-parts have immutable Drive-backed exact-SHA candidates with per-sheet self-review PASS, but the era is not yet `approved_visual_reference_set`.
+
+For the next B03 E0 generation, applicable E0 atomic sheets may be used as role-labelled visual-engineering evidence together with the era matrix and this brief. B03 has no required operator console/display, so `controls-displays` must not be injected merely to consume every role. Reference sheets must never determine the finished beacon identity, whole-object composition or gameplay function.
 
 ## E. Events / animation / signals
 
@@ -85,7 +91,14 @@ AI draws complete physical parts. Future code owns head motion, lamp state, guid
    - Drive ID `1zcWJox7a9HjtJwv71Xn6o2RcYziOAmLC`;
    - rejected because the aiming head reads as a large surveillance-camera body and the view is too low/front-side for the `island_top_3_4` reference family.
 
-Both were archived untouched before review and moved to Drive `_rejected`; no destructive processing was performed.
+3. `e6ead6df-4913-479a-9069-c84adfcdae28`
+   - raw PNG `941×1672`, `681208` bytes;
+   - SHA-256 `10c97d1f0d00909ca3ce71648b34b34245eec219a95d4039f7f48cc736b73f0f`;
+   - Drive ID `1X5kqdc--HrIE2uB00XEjm8g7mwuVUEy5`;
+   - exact Drive readback matched SHA before review; rejected original was moved unchanged to `_rejected` folder `1OGGRdCTDh_yaMJ_2H6krOm0UNAFFCHVf`;
+   - rejected because the aiming assembly again reads as a large horizontal box-camera and dominates the upper silhouette.
+
+All three were archived untouched before review; no destructive processing was performed on any rejected replacement attempt.
 
 - Auto QA: `pending` — no accepted source/candidate.
 - Visual SHA-bound QA: `pending`.
@@ -95,6 +108,6 @@ Both were archived untouched before review and moved to Drive `_rejected`; no de
 - Runtime publication (`publish_runtime`): **BLOCKED by semantics/rig integration**.
 - Rig/event QA: **BLOCKED** until tracking head/lamp runtime state contract is implemented and verified or the production design target is explicitly revised.
 - Game regression: **BLOCKED** until B03 runtime integration/publication exists.
-- Next source action: new interactive turn only, because the prior turn used the two-attempt generation budget. Tighten the source around a smaller manual optical head, mast/yoke carrying most height, and visible top planes matching the exact island reference.
+- Next source action: after this checkpoint reconciliation is reviewed/merged, re-pin `game-production`/`main`, rerun `validate_generation_preflight.py`, rebuild the deterministic request, verify the exact applicable E0 reference bytes/SHA and approved island reference, then start a new interactive production attempt. Maximum two generation attempts in that turn; archive/review each exact source before any destructive processing.
 
 **Generation target:** one isolated B03 E0 / 1978 beacon only. E1–E5 remain blocked until E0 exact-SHA approval.
