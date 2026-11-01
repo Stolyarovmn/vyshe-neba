@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/mechanics-infrastructure-01-assisted-drives.json",
+  "generation_id": "eaf854ca-c9ec-41b8-926b-d5781fe29476",
+  "source": {
+    "sha256": "796426ef8d9dfd9310e76fed57d0a8ed49e8a725c5b65002264901643dcefc43",
+    "bytes": 1947491,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1SzP2HSrH0odAtbOJjNOLepIA-JYQGjpY",
+    "drive_url": "https://drive.google.com/file/d/1SzP2HSrH0odAtbOJjNOLepIA-JYQGjpY/view?usp=drivesdk",
+    "drive_parent_folder_id": "1iPan8TlEoR90tHos-o50fkqf9_qzkqmq",
+    "origin_kind": "imagegen_edit",
+    "edit_parent_generation_id": "0c44d7cd-0c33-40b4-8d15-5c1dfdd5bd6b",
+    "edit_instruction_summary": "User-directed removal of the manual lever from specimen 08; resulting image was treated as a new immutable source and fully re-reviewed because the edit regenerated the whole raster."
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Compact foot-mounted industrial electric motor",
+      "verdict": "pass",
+      "notes": "PASS: isolated ribbed TEFC-style industrial electric motor with shaft, mounting feet and top terminal box; no cable or surrounding machine."
+    },
+    {
+      "id": "02",
+      "name": "Standardized motor-and-helical-gearbox package",
+      "verdict": "pass",
+      "notes": "PASS: isolated standardized motor joined to an inline cast gearbox with one output shaft and repeatable industrial mounting language; no external machine."
+    },
+    {
+      "id": "03",
+      "name": "Hydraulic cylinder",
+      "verdict": "pass",
+      "notes": "PASS: painted hydraulic cylinder with polished rod, clevis/eye ends and two visible hose ports; no hoses attached."
+    },
+    {
+      "id": "04",
+      "name": "Compact hydraulic rotary actuator",
+      "verdict": "pass",
+      "notes": "PASS: compact cast hydraulic rotary actuator with mounting flange/base, keyed output shaft and two service ports; no hoses or larger mechanism."
+    },
+    {
+      "id": "05",
+      "name": "Guarded V-belt drive fragment",
+      "verdict": "pass",
+      "notes": "PASS: two pulleys and one V-belt are enclosed by a substantial removable yellow formed-sheet/mesh safety guard; the hazardous drive is protected while its operating principle remains clearly readable; no motor or machine."
+    },
+    {
+      "id": "06",
+      "name": "Guarded roller-chain drive fragment",
+      "verdict": "pass",
+      "notes": "PASS: two sprockets and chain are surrounded by a substantial formed-metal/mesh safety guard; the mechanism remains readable without becoming a completely unguarded E0-style transmission; no external machine."
+    },
+    {
+      "id": "07",
+      "name": "Industrial linear solenoid actuator",
+      "verdict": "pass",
+      "notes": "PASS: isolated linear electromechanical/solenoid actuator with visible coil housing, straight plunger and mounting flange; no wiring."
+    },
+    {
+      "id": "08",
+      "name": "Electromagnetic clutch/brake module",
+      "verdict": "pass",
+      "notes": "PASS: compact axial clutch/brake module with opposed shaft hubs, central red serviceable drum/cover, simple mounting base and top service plate. The previously objectionable manual lever is absent; no terminal box or surrounding drivetrain."
+    }
+  ],
+  "reviewer": "assistant_self_review_with_user_art_direction_decision",
+  "review_method": "Exact untouched 1536x1024 edit result was archived to Google Drive, downloaded back from Drive, and byte-reverified at SHA-256 796426ef8d9dfd9310e76fed57d0a8ed49e8a725c5b65002264901643dcefc43 (1947491 bytes). The full sheet was visually re-reviewed specimen-by-specimen against the current E1 mechanics-infrastructure/01-assisted-drives machine spec and canonical style/era rules because the imagegen edit regenerated the raster rather than changing only a local pixel region. User art-direction explicitly requested removal of the manual lever from specimen 08. Specimens 05/06 retain protective mesh/form-sheet guards while leaving the drive principle visible, matching the canonical E1 era matrix. Specimen 08 now reads as a passive axial clutch/brake module without a manual operating lever.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "approval_state": "pass_pending_cross_era_role_review",
+  "supersedes_candidate": {
+    "generation_id": "6ad1abf6-354c-440b-a6c3-0d66de775bdf",
+    "sha256": "73b6674deab1ca86682f4311de648462bd7eff7cb7f2864b99f93f62704c9df2",
+    "reason": "User art-direction preferred the lever-free specimen 08. The replacement is a new immutable full-sheet source and was re-reviewed in full."
+  }
+}
