@@ -4,7 +4,7 @@
   "year": 1986,
   "name": "Своя мастерская",
   "status": "generation_in_progress",
-  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. The first materials sheet is one canonical guarded 8-specimen 4x2 sheet. Seven source-rejected attempts are archived for that sheet; no E1 sheet is approved yet.",
+  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. The first guarded materials-construction/01-surfaces-stock sheet now has an immutable Drive-backed exact source with scope/style/era/readability self-review PASS and is pending the required E0↔E1 cross-era role review. Seven earlier source-rejected attempts remain provenance only. Nine E1 sheet-parts remain to be generated and reviewed.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -66,16 +66,33 @@
   "sheets": [],
   "generation_checkpoint": {
     "status": "generation_in_progress",
-    "production_base_sha": "a0b013979a8f9a73b7a35e8d0c832569238ba1ef",
+    "production_base_sha": "3d0c141320bd2850889148eefc12e398e166f2ef",
     "summary": {
       "planned_sheet_parts": 10,
-      "exact_sha_visual_review_pass_pending_cross_era": 0,
+      "exact_sha_visual_review_pass_pending_cross_era": 1,
       "not_started": 9,
-      "source_rejected_sheet_parts": 1,
+      "source_rejected_sheet_parts": 0,
       "archived_rejected_attempts_for_surfaces_stock": 7
     },
     "sheet_states": {
-      "materials-construction/01-surfaces-stock": {"status":"blocked_retry_budget_exhausted","rejected_attempts":7,"review_directory":"art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/"},
+      "materials-construction/01-surfaces-stock": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "6a1e654d-1af9-4ad7-a9fd-7c43dc1c9dd0",
+        "drive_file_id": "1FHJwBhAStLnU9WFA8Jr7G7QKUUEGI9a5",
+        "dimensions": [1536, 1024],
+        "bytes": 1339142,
+        "sha256": "78cf0a9246d4baf709a39f05346d133ec133e15a125b8d70d078492acfca4f88",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact untouched source bytes measured locally, archived to Drive, and visually reviewed against the canonical E1 eight-specimen spec and style contract. Generation predated the explicit conversational bridge merge and used the user's explicit complete eight-item instruction; all subsequent guarded imagegen calls use the merged bridge."
+        },
+        "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-08-6a1e654d.json"
+      },
       "materials-construction/02-joints-repairs": {"status":"not_started"},
       "materials-construction/03-service-architecture": {"status":"not_started"},
       "mechanics-infrastructure/01-assisted-drives": {"status":"not_started"},
@@ -97,7 +114,7 @@
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "Keep the canonical ten-sheet E1 plan with 8 specimens per 4x2 sheet. Resume materials-construction/01-surfaces-stock from its exact checkpoint in a new interactive turn and change the imagegen invocation/control method; do not advance to the next E1 sheet until 01-surfaces-stock gets exact-SHA source PASS. All rejected outputs are provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
+    "reference_strategy": "Use materials-construction/01-surfaces-stock only as an exact-SHA E1 candidate pending the matching E0↔E1 cross-era materials-role review. Generate materials-construction/02-joints-repairs next through the merged explicit conversational imagegen bridge, then archive and review exact bytes before any later E1 sheet. All seven rejected surfaces-stock outputs remain provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
