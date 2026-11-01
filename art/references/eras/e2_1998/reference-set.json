@@ -4,7 +4,7 @@
   "year": 1998,
   "name": "Испытательный центр",
   "status": "rebuild_required",
-  "approval_context": "Previous broad matrix/elements/applications references and same-style correction boards are invalid under the canonical atomic-only era reference contract and are not canonical visual evidence.",
+  "approval_context": "Previous broad matrix/elements/applications references and same-style correction boards are invalid under the canonical atomic-only era reference contract and are not canonical visual evidence. E0 and E1 are now approved lineage evidence. The first E2 atomic machine spec is prepared, but no guarded E2 source has been accepted yet.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -35,7 +35,8 @@
   "raw_archive": {
     "provider": "google_drive",
     "folder_id": "10zBY-Einty7p9wbHZCDuQxQ-FqQnd5RE",
-    "folder_name": "E2_1998"
+    "folder_name": "E2_1998",
+    "rejected_folder_id": "1JbPCR1OjxlQji6AZnplUeq-wvdpTPTim"
   },
   "required_roles": [
     "materials-construction",
@@ -43,9 +44,49 @@
     "controls-displays",
     "lighting-signals"
   ],
+  "sheet_density": {
+    "default_max_specimens_per_sheet": 8,
+    "current_generation_size": [1536, 1024],
+    "preferred_grid": [4, 2],
+    "nominal_cell_before_margins": [384, 512]
+  },
+  "planned_sheets": [
+    {
+      "role": "materials-construction",
+      "sheet": "01-surfaces-stock",
+      "spec": "art/reference_specs/e2_1998/materials-construction-01-surfaces-stock.json",
+      "prompt": "art/prompts/era_references/e2_1998/materials-construction-01-surfaces-stock.md",
+      "specimens": 8,
+      "status": "spec_ready_generation_pending"
+    }
+  ],
   "sheets": [],
+  "generation_checkpoint": {
+    "status": "rebuild_required_first_spec_ready",
+    "production_base_sha": "0b376a15df3a5705d142395736e31f93d35fcab3",
+    "current_sheet": "materials-construction/01-surfaces-stock",
+    "summary": {
+      "guarded_sheet_specs_ready": 1,
+      "canonical_exact_sha_candidates": 0,
+      "archived_rejected_pre_spec_attempts": 1
+    },
+    "rejected_attempts": {
+      "materials-construction/01-surfaces-stock": [
+        {
+          "generation_id": "c5ae2857-4d1a-45dd-a7b1-0b14aaad2fa2",
+          "sha256": "8c95558ab5f43908b0024679822ce25860f6dd14cb05e9e9aeb0e3fba441213d",
+          "bytes": 1448929,
+          "dimensions": [1536, 1024],
+          "drive_file_id": "1Bhp4Ha1IehXWfgNO_uSWcSxZng5kUVcZ",
+          "review_file": "art/references/eras/e2_1998/reviews/materials-construction-01-surfaces-stock/attempt-00-c5ae2857.json",
+          "reason": "Generated before the E2 machine spec and production_guard request/chat-bridge existed. Visually useful but process-invalid; archived as rejected provenance and forbidden as canonical visual evidence."
+        }
+      ]
+    },
+    "next_step": "Validate the new E2 materials-construction/01-surfaces-stock machine spec and generated prompt with production_guard, then generate exactly one new guarded source from the canonical request/chat bridge."
+  },
   "approval_gate": {
-    "scope": "atomic_only_no_whole_objects_or_scenes",
+    "scope": "pending",
     "style": "pending",
     "era": "pending",
     "role_completeness": "pending",
@@ -53,7 +94,7 @@
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "BLOCKED until E0 and E1 are approved in the atomic format and all four atomic E2 role sheets are exact-SHA approved. Do not use previous broad reference boards or PR #45 correction boards.",
+    "reference_strategy": "E0 and E1 are approved atomic lineage evidence. E2 remains BLOCKED as canonical visual evidence until every required E2 role is complete, exact-SHA reviewed and the E1↔E2 cross-era role-order gate passes. Previous broad reference boards, PR #45 correction boards and the archived pre-spec rejected attempt must not be used as canonical visual evidence.",
     "system_separation": "Physical hardware/materials belong in art; active screen data, glow, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }

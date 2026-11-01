@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-01-surfaces-stock.json",
+  "generation_id": "c5ae2857-4d1a-45dd-a7b1-0b14aaad2fa2",
+  "request_binding": {
+    "machine_spec_existed_before_generation": false,
+    "production_guard_validate_spec_before_generation": false,
+    "production_guard_build_request_before_generation": false,
+    "verified_chat_bridge_before_generation": false,
+    "verdict": "fail",
+    "note": "The image was generated conversationally before the canonical E2 machine spec existed. The spec path in this review is the later canonical target used only to document why this source is rejected; it was not the generation input."
+  },
+  "source": {
+    "sha256": "8c95558ab5f43908b0024679822ce25860f6dd14cb05e9e9aeb0e3fba441213d",
+    "bytes": 1448929,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1Bhp4Ha1IehXWfgNO_uSWcSxZng5kUVcZ",
+    "drive_url": "https://drive.google.com/file/d/1Bhp4Ha1IehXWfgNO_uSWcSxZng5kUVcZ/view?usp=drivesdk",
+    "drive_parent_folder_id": "1JbPCR1OjxlQji6AZnplUeq-wvdpTPTim"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Light-gray precision-painted steel electronics plate","verdict":"pass","notes":"Readable clean precision-painted electronics/test-equipment plate."},
+    {"id":"02","name":"Beige-gray molded ABS/PC technical panel","verdict":"pass","notes":"Readable molded beige-gray technical panel; visually close to the intended instrumentation-plastic language."},
+    {"id":"03","name":"Anodized aluminium instrument faceplate blank","verdict":"pass","notes":"Readable anodized faceplate blank with precise cutouts and no instruments or text."},
+    {"id":"04","name":"Precision-folded electronics chassis fragment","verdict":"pass","notes":"Readable purpose-built folded electronics chassis fragment with multiple precise folds."},
+    {"id":"05","name":"Perforated ventilation sheet coupon","verdict":"pass","notes":"Readable regular perforated ventilation stock, not a complete fan or enclosure."},
+    {"id":"06","name":"Short anodized aluminium rack-mount profile","verdict":"pass","notes":"Readable rack-specific profile with repeated mounting holes."},
+    {"id":"07","name":"Molded glass-filled nylon spacer/support block","verdict":"pass","notes":"Readable purpose-built dark engineering-polymer support block."},
+    {"id":"08","name":"Precision die-cut EPDM/silicone isolation pad","verdict":"pass","notes":"Readable precision gasket/isolation pad with central opening and four mounting holes."}
+  ],
+  "reviewer": "ChatGPT vision self-review with user rejection decision",
+  "review_method": "Direct visual inspection of the exact generated PNG. Visual gates pass, but the source is rejected because it was generated before the canonical machine spec and production_guard request/chat-bridge existed; the user explicitly chose to reject it and finish the documents first.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "machine-readable E2 spec did not exist before generation",
+    "production_guard validate-spec/build-request was not run before generation",
+    "verified imagegen chat bridge was not built before generation",
+    "therefore the exact source cannot be promoted to canonical E2 evidence even though its visual content is acceptable",
+    "user explicitly rejected this attempt and requested document completion before a new generation"
+  ]
+}
