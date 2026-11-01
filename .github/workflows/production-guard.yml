@@ -9,6 +9,7 @@ on:
       - 'art/schemas/production-guard-*.json'
       - 'art/prompts/era_references/**'
       - 'tools/art_pipeline/production_guard.py'
+      - 'tools/art_pipeline/imagegen_chat_bridge.py'
       - 'tools/art_pipeline/tests/test_production_guard.py'
       - '.github/workflows/production-guard.yml'
   push:
@@ -19,6 +20,7 @@ on:
       - 'art/schemas/production-guard-*.json'
       - 'art/prompts/era_references/**'
       - 'tools/art_pipeline/production_guard.py'
+      - 'tools/art_pipeline/imagegen_chat_bridge.py'
       - 'tools/art_pipeline/tests/test_production_guard.py'
       - '.github/workflows/production-guard.yml'
   workflow_dispatch:
@@ -34,6 +36,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate production-guard specs and prompt drift
         run: python3 tools/art_pipeline/production_guard.py validate-tree
+      - name: Compile explicit imagegen context bridge
+        run: python3 -m py_compile tools/art_pipeline/imagegen_chat_bridge.py
       - name: Run production-guard regression tests
         run: python3 tools/art_pipeline/tests/test_production_guard.py
       - name: Parse guard JSON schemas

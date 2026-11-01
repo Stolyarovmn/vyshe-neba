@@ -1,6 +1,6 @@
 ---
 name: vyshe-neba-production-guard
-description: Deterministic production guard for «Выше неба». Use for every production image generation/review to turn allowlists, forbidden features, era-transition rules, exact-source provenance and review gates into machine-checkable data before any asset can be called accepted.
+description: Deterministic fail-closed production guard for «Выше неба». Use for every production image generation/review to turn allowlists, forbidden features, era-transition rules, explicit imagegen-context delivery, exact-source provenance and review gates into machine-checkable data before any asset can be called accepted.
 ---
 
 # Vyshe Neba Production Guard
@@ -57,7 +57,7 @@ python3 tools/art_pipeline/production_guard.py validate-tree
 
 This also rejects prompt/spec drift.
 
-### 3. Build the actual request deterministically
+### 3. Build the canonical request deterministically
 
 ```bash
 python3 tools/art_pipeline/production_guard.py build-request \
@@ -65,11 +65,41 @@ python3 tools/art_pipeline/production_guard.py build-request \
   --output /tmp/generation-request.txt
 ```
 
-Use that request unchanged for the image-generation call. The builder appends `art/style_bible.txt` verbatim exactly once.
+The builder appends `art/style_bible.txt` verbatim exactly once.
 
 One call = one sheet-part, one role, one era. Never merge roles, eras or alternatives into one call.
 
-### 4. Preserve exact bytes before destructive work
+### 4. Deliver the full request to conversational imagegen
+
+A deterministic request file is not enough when the current image-generation surface does **not** accept that file/string as a literal prompt argument and instead infers instructions from conversational context. In that runtime, the guard must create an explicit context bridge:
+
+```bash
+python3 tools/art_pipeline/imagegen_chat_bridge.py build-chat-block \
+  art/reference_specs/<era>/<role>-<sheet>.json \
+  --output /tmp/imagegen-chat-block.txt
+
+python3 tools/art_pipeline/imagegen_chat_bridge.py verify-chat-block \
+  art/reference_specs/<era>/<role>-<sheet>.json \
+  /tmp/imagegen-chat-block.txt
+```
+
+`verify-chat-block` must PASS before imagegen.
+
+Then:
+
+1. place the **exact complete contents** of `/tmp/imagegen-chat-block.txt` in the assistant message immediately before the image-generation tool call;
+2. make the image-generation tool call as the next action;
+3. insert **no additional natural-language instruction** between the block and the tool call;
+4. never replace the block with shorthand such as `делай следующий набор`, `same as above`, `use the spec`, `continue`, or a summary of the requested specimens;
+5. never manually rewrite, reorder, shorten or translate individual specimens/exclusions in the bridge block.
+
+If the runtime accepts a real literal prompt argument, use the canonical `build-request` output unchanged through that argument instead. Do not use both delivery modes in a way that creates competing prompt text.
+
+If neither literal prompt delivery nor the exact explicit chat block can be used, image generation is `BLOCKED`; do not guess that the generator received the canonical request.
+
+This bridge makes request delivery auditable and closes the observed “short command loses item-level constraints” defect class. It does **not** guarantee that the image generator will obey every instruction; semantic visual review remains mandatory.
+
+### 5. Preserve exact bytes before destructive work
 
 Immediately after every attempt, including a rejection:
 
@@ -87,7 +117,7 @@ python3 tools/art_pipeline/production_guard.py verify-source \
 
 A dimension mismatch is a technical source failure even if the image looks good.
 
-### 5. Create a structured visual review
+### 6. Create a structured visual review
 
 After Drive upload:
 
@@ -114,7 +144,7 @@ The reviewer must explicitly inspect and set every gate and every specimen verdi
 
 Every listed specimen receives its own `pass | fail | pending` verdict.
 
-### 6. Fail closed
+### 7. Fail closed
 
 ```bash
 python3 tools/art_pipeline/production_guard.py validate-review \
@@ -125,17 +155,17 @@ Approval is impossible while **any** gate/specimen is `fail` or `pending`, while
 
 If rejected, record concrete rejection reasons and stop before destructive processing. A source-era/scope/composition defect is never repaired downstream by Pixel Snapper, normalization or Aseprite.
 
-### 7. Continue through the canonical pipeline only after source PASS
+### 8. Continue through the canonical pipeline only after source PASS
 
 For placeables, resume the existing canonical pipeline and tracker. For world sprites, keep the separate ref2game route. This skill does not alter those flows.
 
 ## What the guard can and cannot prove
 
-Deterministic code can prove schema consistency, allowlist size, prompt construction, exact style-bible embedding, PNG dimensions, SHA-256, byte count, provenance fields and that all required review fields were explicitly closed.
+Deterministic code can prove schema consistency, allowlist size, prompt construction, exact style-bible embedding, exact explicit-chat-block construction, PNG dimensions, SHA-256, byte count, provenance fields and that all required review fields were explicitly closed.
 
-It cannot reliably infer semantic visual facts such as “this object reads more like E0 than E1” from pixels without a vision reviewer. Those checks remain mandatory, but the guard makes them impossible to omit silently.
+It cannot prove that a conversational imagegen backend internally interpreted the context exactly as intended, nor can it reliably infer semantic visual facts such as “this object reads more like E0 than E1” from pixels without a vision reviewer. Those checks remain mandatory.
 
-Never describe the system as literally error-free. The guarantee is **fail-closed process coverage**, not perfect visual perception.
+Never describe the system as literally error-free. The guarantee is **fail-closed process coverage and exact request delivery at the interface we control**, not perfect generator obedience or perfect visual perception.
 
 ## Change control
 

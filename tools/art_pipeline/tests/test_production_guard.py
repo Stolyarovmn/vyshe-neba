@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import importlib.util
 import json
 import struct
+import sys
 import tempfile
 import unittest
 import zlib
 from pathlib import Path
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "production_guard.py"
-spec = importlib.util.spec_from_file_location("production_guard", MODULE_PATH)
-pg = importlib.util.module_from_spec(spec)
-assert spec and spec.loader
-spec.loader.exec_module(pg)
-ROOT = MODULE_PATH.resolve().parents[2]
+TOOLS_DIR = Path(__file__).resolve().parents[1]
+ROOT = TOOLS_DIR.resolve().parents[1]
+sys.path.insert(0, str(TOOLS_DIR))
+
+import production_guard as pg
+import imagegen_chat_bridge as bridge
+
 SPEC_PATH = ROOT / "art/reference_specs/e1_1986/materials-construction-01-surfaces-stock.json"
 
 
@@ -69,6 +70,35 @@ class ProductionGuardTests(unittest.TestCase):
         style = (ROOT / "art/style_bible.txt").read_text(encoding="utf-8")
         request = pg.build_request(self.load_spec())
         self.assertEqual(1, request.count(style))
+
+    def test_chat_bridge_embeds_exact_request_once(self):
+        value = self.load_spec()
+        request = pg.build_request(value)
+        block = bridge.build_chat_block(value)
+        self.assertEqual(1, block.count(request))
+        self.assertIn(f"canonical_request_sha256: {bridge.sha256_text(request)}", block)
+        self.assertTrue(block.startswith(bridge.BEGIN + "\n"))
+        self.assertTrue(block.endswith(bridge.END + "\n"))
+        self.assertIn(bridge.NEXT_ACTION, block)
+        for specimen in value["specimens"]:
+            self.assertIn(specimen["name"], block)
+            self.assertIn(specimen["description"], block)
+        self.assertEqual([], bridge.verify_chat_block(value, block))
+
+    def test_chat_bridge_rejects_paraphrase_or_truncation(self):
+        value = self.load_spec()
+        block = bridge.build_chat_block(value)
+        shortened = block.replace(value["specimens"][7]["description"], "same as above")
+        errors = bridge.verify_chat_block(value, shortened)
+        self.assertTrue(errors)
+        self.assertTrue(any("differs" in error for error in errors))
+
+    def test_chat_bridge_skill_requires_immediate_delivery(self):
+        skill = (ROOT / "skills/vyshe-neba-production-guard/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("build-chat-block", skill)
+        self.assertIn("verify-chat-block", skill)
+        self.assertIn("immediately before", skill)
+        self.assertIn("делай следующий набор", skill)
 
     def test_source_dimension_mismatch_fails(self):
         value = self.load_spec()
