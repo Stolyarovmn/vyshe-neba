@@ -4,7 +4,7 @@
   "year": 1986,
   "name": "Своя мастерская",
   "status": "generation_in_progress",
-  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. The first materials sheet is one canonical guarded 8-specimen 4x2 sheet. No E1 sheet is approved yet.",
+  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. The first materials sheet is one canonical guarded 8-specimen 4x2 sheet. Seven source-rejected attempts are archived for that sheet; no E1 sheet is approved yet.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -66,14 +66,16 @@
   "sheets": [],
   "generation_checkpoint": {
     "status": "generation_in_progress",
-    "production_base_sha": "50b2f8c3c89d876bcce51e5ab340bab44ad1e8dc",
+    "production_base_sha": "a0b013979a8f9a73b7a35e8d0c832569238ba1ef",
     "summary": {
       "planned_sheet_parts": 10,
       "exact_sha_visual_review_pass_pending_cross_era": 0,
-      "not_started": 10
+      "not_started": 9,
+      "source_rejected_sheet_parts": 1,
+      "archived_rejected_attempts_for_surfaces_stock": 7
     },
     "sheet_states": {
-      "materials-construction/01-surfaces-stock": {"status":"not_started"},
+      "materials-construction/01-surfaces-stock": {"status":"blocked_retry_budget_exhausted","rejected_attempts":7,"review_directory":"art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/"},
       "materials-construction/02-joints-repairs": {"status":"not_started"},
       "materials-construction/03-service-architecture": {"status":"not_started"},
       "mechanics-infrastructure/01-assisted-drives": {"status":"not_started"},
@@ -95,7 +97,7 @@
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "Generate the ten planned E1 atomic sheet-parts in 8-specimen 4x2 format unless a future explicit approved plan changes a specific sheet. Start with guarded materials-construction/01-surfaces-stock. Rejected outputs under review/archive history are provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
+    "reference_strategy": "Keep the canonical ten-sheet E1 plan with 8 specimens per 4x2 sheet. Resume materials-construction/01-surfaces-stock from its exact checkpoint in a new interactive turn and change the imagegen invocation/control method; do not advance to the next E1 sheet until 01-surfaces-stock gets exact-SHA source PASS. All rejected outputs are provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
