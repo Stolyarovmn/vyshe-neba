@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/mechanics-infrastructure-01-servo-drives.json",
+  "generation_id": "708b2117-1fe4-44dd-90a2-4fb00cc30155",
+  "source": {
+    "sha256": "2e292dce8855dd6a1fbc2b96b3e323e8e20190676500933496046d4561dd050d",
+    "bytes": 1830401,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1uao0NaKX8QER74taJ4d8EGSnKz_tjq-5",
+    "drive_url": "https://drive.google.com/file/d/1uao0NaKX8QER74taJ4d8EGSnKz_tjq-5/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"AC servo motor with rear encoder housing","verdict":"pass","notes":"Compact finned servo motor with flange, output shaft and distinct rear feedback/connector housing; no cable or surrounding machine."},
+    {"id":"02","name":"Servo motor with inline planetary gearbox","verdict":"pass","notes":"Servo motor is visibly coupled coaxially to a compact planetary reducer with a single output shaft."},
+    {"id":"03","name":"Servo motor with right-angle gear reducer","verdict":"pass","notes":"Motor and serviceable gearbox form a compact offset/right-angle reduction package with a distinct output shaft, not an external drivetrain."},
+    {"id":"04","name":"Motorized ballscrew linear actuator","verdict":"pass","notes":"Short servo-driven linear actuator visibly includes motor, screw/rail housing, carriage and end support; no larger frame."},
+    {"id":"05","name":"Electric rotary actuator with integrated brake","verdict":"pass","notes":"Compact rotary drive combines motor, reduction body, brake-like rear/mid can and one front output flange as one module."},
+    {"id":"06","name":"Direct-drive torque-motor rotary module","verdict":"pass","notes":"Low-profile annular rotary module has a large central bore, precision mounting ring and integrated side feedback housing; no complete turntable."},
+    {"id":"07","name":"Brushless spindle/drive motor with resolver housing","verdict":"pass","notes":"Late-1990s brushless motor shows machined front flange, short shaft, finned body and rear resolver/feedback housing without fan shroud or cable."},
+    {"id":"08","name":"Electrohydraulic servo cylinder with position-transducer body","verdict":"pass","notes":"Precision cylinder shows polished rod/clevis ends, integrated servo-valve block and separate linear position-transducer body; no hoses or manifold network."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 machine spec, style bible and E2 era contract; dimensions, byte count and SHA-256 verified locally; Google Drive readback matched the exact byte count and SHA-256 before acceptance.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
