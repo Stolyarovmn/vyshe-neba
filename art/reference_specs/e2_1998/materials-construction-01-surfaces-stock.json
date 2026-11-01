@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E2",
+  "year": 1998,
+  "role": "materials-construction",
+  "sheet": "01-surfaces-stock",
+  "title": "precision test-equipment surfaces and stock",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [1536, 1024],
+    "layout": [4, 2],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e2_1998/materials-construction-01-surfaces-stock.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "10zBY-Einty7p9wbHZCDuQxQ-FqQnd5RE",
+    "folder_name": "E2_1998"
+  },
+  "specimens": [
+    {"id":"01","name":"Light-gray precision-painted steel electronics plate","description":"TOP ROW CELL 1 ONLY. Clean rectangular light-gray serial steel plate for electronic/test equipment with smooth controlled factory paint, precise straight factory edges and a calm uninterrupted face; no holes, cutouts, ribs, ventilation, fasteners, attached hardware, rust, heavy chipping or distressed wear"},
+    {"id":"02","name":"Beige-gray molded ABS/PC technical panel","description":"TOP ROW CELL 2 ONLY. Rigid beige-gray molded technical-plastic panel for laboratory/test equipment with a neat molded perimeter edge and exactly one small functional stiffening rib; industrial instrumentation plastic, not consumer-product styling, no cutouts, buttons, connectors, text or attached hardware"},
+    {"id":"03","name":"Anodized aluminium instrument faceplate blank","description":"TOP ROW CELL 3 ONLY. Flat instrumentation-grade anodized aluminium faceplate blank with precise machined outer edges and a restrained set of clean functional cutouts of different sizes; no instruments, switches, buttons, connectors, labels, text, screws or attached components"},
+    {"id":"04","name":"Precision-folded electronics chassis fragment","description":"TOP ROW CELL 4 ONLY. Short purpose-built sheet-metal electronics chassis fragment with several precise factory 90-degree folds, repeatable geometry and clean formed flanges for dense test electronics; clearly more specialized than a simple folded-sheet coupon, but not a complete enclosure, rack, cabinet or machine"},
+    {"id":"05","name":"Perforated ventilation sheet coupon","description":"BOTTOM ROW CELL 1 ONLY. Rectangular metal sheet coupon with a regular factory-made array of identical ventilation perforations, clean edges and even finish; only perforated sheet stock, not a finished grille, fan, filter, frame, cover or housing"},
+    {"id":"06","name":"Short anodized aluminium rack-mount profile","description":"BOTTOM ROW CELL 2 ONLY. Short specialized anodized aluminium mounting profile for test/rack equipment with repeatable extruded geometry and one regular row of mounting holes along its mounting flange; not a generic angle/U-channel/box section, not a full rack, rail assembly, cabinet or enclosure"},
+    {"id":"07","name":"Molded glass-filled nylon spacer/support block","description":"BOTTOM ROW CELL 3 ONLY. Single dark-gray molded glass-filled-nylon engineering support block with a compact purpose-built shape, one functional mounting bore or seating point and restrained structural ribbing; no metal inserts, stacked pieces, phenolic brown material, consumer styling or attached hardware"},
+    {"id":"08","name":"Precision die-cut EPDM/silicone isolation pad","description":"BOTTOM ROW CELL 4 ONLY. Flat dark EPDM/silicone vibration-isolation or sealing pad with a precise die-cut rectangular outline, one large central functional opening and four small mounting holes near the corners; clean technical gasket/isolation part, not a generic ribbed neoprene slab, roll, hose or molded block"}
+  ],
+  "global_forbidden": [
+    "text, letters, numbers, logos or pseudo-writing",
+    "whole racks, electronic cabinets, computers, CRTs, machines, vehicles, complete buildings, laboratories, rooms or staged scenes",
+    "any ninth or extra specimen, duplicate specimen, omitted specimen, merged specimen, substitution, or reinterpretation of one listed specimen as another",
+    "baked cast shadows, contact shadows, glow, bloom, rays or temporary FX",
+    "bolts or screws as standalone specimens, hinges, hatches, assembled ventilation grilles, fans, filters, connectors, cables, motors, controls, displays, instruments or lamps",
+    "generic L-angle, generic U-channel or generic square box-section stock except the explicitly listed specialized rack-mount profile",
+    "wood, transparent glass, carbon-fiber composite, glossy consumer plastic, foam, raw timber, phenolic brown spacer stock, generic ribbed neoprene pads or any unlisted material class",
+    "visible rust, orange oxidation, heavy chipping, distressed patina, dirt-dominant wear or hand-cut scars",
+    "photorealistic PBR material-catalog rendering, filtered 3D-render appearance or soft studio-product photography"
+  ],
+  "era_contract": {
+    "character": "specialized late-1990s aerospace test-equipment construction: precision sheet-metal fabrication, instrumentation aluminium, beige/gray technical plastics, rack-specific mounting language, regular ventilation stock and purpose-built engineering polymers/isolation materials",
+    "required_signals": [
+      "precision repeatable factory fabrication for electronic/test equipment",
+      "steel and anodized aluminium combined with beige/gray technical plastics",
+      "rack-specific mounting geometry rather than generic workshop stock",
+      "regular industrial ventilation perforation and electronics-service material language",
+      "purpose-built engineering polymer support and precision isolation/gasket materials"
+    ],
+    "replaced_previous_language": [
+      "generic E1 factory-painted workshop plate and simple folded-sheet stock",
+      "generic galvanized angle, U-channel and square box-section profiles as the dominant stock language",
+      "early phenolic spacer blocks",
+      "simple molded neoprene vibration pads",
+      "workshop-centric material vocabulary without explicit test-electronics specialization"
+    ],
+    "forbidden_regressions": [
+      "safety-yellow simple folded coupon, generic galvanized L-profile, generic U-channel or generic square box-section standing in for the E2 electronics-specific pieces",
+      "brown phenolic spacer replacing the glass-filled-nylon support",
+      "simple ribbed neoprene slab replacing the precision die-cut isolation pad",
+      "olive-heavy workshop stock, rough hand fabrication, rust or distressed wear as the main era cue",
+      "cleaner E1-only styling without rack, precision electronics, technical-plastic or specialized isolation language"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}
