@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-01-surfaces-stock.json",
+  "generation_id": "c347dade-35e6-4a99-b9ff-d5f51d9de871",
+  "source": {
+    "sha256": "de8f3c11a34f26b7ac189105c4d8f73250498df34536d2d2055cbcd109554c37",
+    "bytes": 2019075,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "15yiKK-S3TONt9x7BkDXaN0ZLsXBC6dwA",
+    "drive_url": "https://drive.google.com/file/d/15yiKK-S3TONt9x7BkDXaN0ZLsXBC6dwA/view?usp=drivesdk",
+    "drive_parent_folder_id": "1RSvbxm62sMJYpDDjg-KLUJ9B1L6_JYoc"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","verdict":"fail","notes":"wear/chipping is too heavy for the required lightly serviced factory stock"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","verdict":"fail","notes":"edge loss/oxidized wear is stronger than the requested few small chips"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","verdict":"fail","notes":"a cream/beige flat plate appears in this slot instead of the required safety-yellow folded sample"},
+    {"id":"04","name":"Short galvanized steel angle profile","verdict":"fail","notes":"the visible angle is safety-yellow rather than galvanized steel, collapsing specimens 03 and 04"},
+    {"id":"05","name":"Short anodized aluminium U-channel extrusion","verdict":"fail","notes":"profile is present but uses too much distressed/oxidized E0-like wear"},
+    {"id":"06","name":"Short square steel box-section","verdict":"fail","notes":"profile is present but the finish is too distressed for even gray primer"},
+    {"id":"07","name":"Molded phenolic / early industrial-plastic spacer block","verdict":"pass","notes":"dark molded block with a clean through-bore reads correctly"},
+    {"id":"08","name":"Molded neoprene vibration pad","verdict":"pass","notes":"isolated dark rubber pad is consistent with the requested material class"}
+  ],
+  "reviewer": "ChatGPT vision self-review",
+  "review_method": "direct visual inspection of exact generated PNG against the merged production-guard spec and E1 era contract",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "specimen 03 is missing: the image contains a cream flat plate instead of a safety-yellow folded sheet-metal sample",
+    "the only L-profile is safety-yellow, so specimen 04 galvanized angle is also not represented correctly",
+    "multiple metal specimens use heavy distressed/oxidized wear that regresses toward the E0 garage-fabrication language"
+  ]
+}
