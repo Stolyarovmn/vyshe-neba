@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/mechanics-infrastructure-02-joints-handling.json",
+  "generation_id": "ef695218-90ca-472f-8165-9030930189d1",
+  "source": {
+    "sha256": "f3bbea342883e5549d55e5f84a9357fb8ef2a72ae1e08cd6abadb2f52efa3a9c",
+    "bytes": 1972787,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1RhIQ0wkyhKCYi_-vg_HI1C_i-nQ1bA-q",
+    "drive_url": "https://drive.google.com/file/d/1RhIQ0wkyhKCYi_-vg_HI1C_i-nQ1bA-q/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Forged clevis-and-pin joint","verdict":"pass","notes":"PASS — isolated forged clevis-and-pin joint with clean machined cross-pin and visible spring retaining clip; geometry reads standardized rather than rough welded E0 hardware."},
+    {"id":"02","name":"Pivot yoke with replaceable bushings","verdict":"pass","notes":"PASS — painted pivot yoke with two clearly contrasting bronze-colored replaceable bushings and a machined axle pin; serviceable standardized construction."},
+    {"id":"03","name":"Sealed pillow-block bearing","verdict":"pass","notes":"PASS — sealed pillow-block bearing in a cast housing with two mounting holes and one grease nipple; clearly more industrial/standardized than E0 crude bearing language."},
+    {"id":"04","name":"Steel guide-roller carriage","verdict":"pass","notes":"PASS — compact steel guide carriage on a short C-channel with the requested paired guide-roller mechanism; no larger machine or trolley system."},
+    {"id":"05","name":"Electric wire-rope winch module","verdict":"pass","notes":"PASS — compact electric wire-rope winch module with motor/gearbox, drum/brake housing and only a short hanging cable segment; no boom, frame or vehicle."},
+    {"id":"06","name":"Electric chain-hoist module","verdict":"pass","notes":"PASS — compact electric chain-hoist body with sprocket/gear housing, short load chain and hook; no beam, trolley, crane or supporting structure."},
+    {"id":"07","name":"Spring-loaded indexing plunger","verdict":"pass","notes":"PASS — standardized threaded indexing plunger with retractable pin and pull knob; spring-loaded function is legible through the compact serviceable plunger construction."},
+    {"id":"08","name":"Forged turnbuckle tensioner","verdict":"pass","notes":"PASS — forged turnbuckle tensioner with eye ends, locknuts and visible threaded adjustment; clean repeatable industrial finish."}
+  ],
+  "reviewer": "assistant_self_review_with_user_visual_acceptance",
+  "review_method": "Exact untouched 1536x1024 PNG was measured and SHA-256 verified locally, archived to the canonical E1 Drive folder, downloaded back from Drive with matching byte count and SHA-256, then visually reviewed specimen-by-specimen against the current machine spec, style bible, E1 era matrix, global exclusions, and the exact E0 mechanics-infrastructure/02-joints-lifting candidate. User explicitly accepted this rendered sheet as PASS. E1 progression is physically legible: standardized forged/cast joints, sealed bearing, repeatable roller carriage, and electric winch/chain-hoist replace E0 rough/manual lifting and exposed improvised joint language.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
