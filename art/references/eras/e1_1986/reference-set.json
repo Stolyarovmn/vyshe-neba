@@ -4,7 +4,7 @@
   "year": 1986,
   "name": "Своя мастерская",
   "status": "generation_in_progress",
-  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. The first guarded materials-construction/01-surfaces-stock sheet now has an immutable Drive-backed exact source with scope/style/era/readability self-review PASS and is pending the required E0↔E1 cross-era role review. Seven earlier source-rejected attempts remain provenance only. Nine E1 sheet-parts remain to be generated and reviewed.",
+  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. The first two materials-construction sheets now have immutable Drive-backed exact sources with scope/style/era/readability self-review PASS and are pending the required E0↔E1 cross-era materials-role review. Seven earlier source-rejected surfaces-stock attempts remain provenance only. Eight E1 sheet-parts remain to be generated and reviewed.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -66,11 +66,11 @@
   "sheets": [],
   "generation_checkpoint": {
     "status": "generation_in_progress",
-    "production_base_sha": "3d0c141320bd2850889148eefc12e398e166f2ef",
+    "production_base_sha": "07eb5813fba9294586e862cc5e683d5d9d9148f3",
     "summary": {
       "planned_sheet_parts": 10,
-      "exact_sha_visual_review_pass_pending_cross_era": 1,
-      "not_started": 9,
+      "exact_sha_visual_review_pass_pending_cross_era": 2,
+      "not_started": 8,
       "source_rejected_sheet_parts": 0,
       "archived_rejected_attempts_for_surfaces_stock": 7
     },
@@ -89,11 +89,28 @@
         "exact_sha_visual_review": {
           "verdict": "pass_pending_cross_era",
           "reviewer": "assistant_self_review",
-          "method": "Exact untouched source bytes measured locally, archived to Drive, and visually reviewed against the canonical E1 eight-specimen spec and style contract. Generation predated the explicit conversational bridge merge and used the user's explicit complete eight-item instruction; all subsequent guarded imagegen calls use the merged bridge."
+          "method": "Exact untouched source bytes measured locally, archived to Drive, and visually reviewed against the canonical E1 eight-specimen spec and style contract. Generation predated the explicit conversational bridge merge and used the user's explicit complete eight-item instruction; all subsequent guarded imagegen calls use the merged bridge or the guard-approved literal prompt delivery mode."
         },
         "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-08-6a1e654d.json"
       },
-      "materials-construction/02-joints-repairs": {"status":"not_started"},
+      "materials-construction/02-joints-repairs": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "cebacff5-22e0-4083-8979-8906bcbe67be",
+        "drive_file_id": "1-iSY6iJyTlU-FAcErdWdPdvLvDuaL-kQ",
+        "dimensions": [1536, 1024],
+        "bytes": 1718031,
+        "sha256": "44fc852936e7e7de808341c732bdd1241b9cf31924679fa681e12ec6c3615996",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact untouched source bytes measured locally, archived to Drive, and visually reviewed against the canonical E1 eight-specimen spec and style contract. Canonical request SHA-256 83b7f3cf28b9b34181a859975ae5547107f3533751f270780cf699f5c261dd38; successful imagegen invocation supplied the complete build-request unchanged as the literal prompt after the interface required non-empty literal prompt delivery."
+        },
+        "review_file": "art/references/eras/e1_1986/reviews/materials-construction-02-joints-repairs/attempt-01-cebacff5.json"
+      },
       "materials-construction/03-service-architecture": {"status":"not_started"},
       "mechanics-infrastructure/01-assisted-drives": {"status":"not_started"},
       "mechanics-infrastructure/02-joints-handling": {"status":"not_started"},
@@ -114,7 +131,7 @@
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "Use materials-construction/01-surfaces-stock only as an exact-SHA E1 candidate pending the matching E0↔E1 cross-era materials-role review. Generate materials-construction/02-joints-repairs next through the merged explicit conversational imagegen bridge, then archive and review exact bytes before any later E1 sheet. All seven rejected surfaces-stock outputs remain provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
+    "reference_strategy": "Use materials-construction/01-surfaces-stock and 02-joints-repairs only as exact-SHA E1 candidates pending the matching E0↔E1 cross-era materials-role review. Generate materials-construction/03-service-architecture next through the merged production guard, using the complete canonical build-request as a literal prompt when the current imagegen interface supports/requires it; otherwise use a verified explicit chat block. Archive and review exact bytes before any later E1 sheet. All seven rejected surfaces-stock outputs remain provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }

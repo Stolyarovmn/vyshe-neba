@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-02-joints-repairs.json",
+  "generation_id": "cebacff5-22e0-4083-8979-8906bcbe67be",
+  "source": {
+    "sha256": "44fc852936e7e7de808341c732bdd1241b9cf31924679fa681e12ec6c3615996",
+    "bytes": 1718031,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1-iSY6iJyTlU-FAcErdWdPdvLvDuaL-kQ",
+    "drive_url": "https://drive.google.com/file/d/1-iSY6iJyTlU-FAcErdWdPdvLvDuaL-kQ/view?usp=drivesdk",
+    "drive_parent_folder_id": "1iPan8TlEoR90tHos-o50fkqf9_qzkqmq"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Standardized welded T-joint","verdict":"pass","notes":"factory-cut 90-degree plates with a neat consistent fillet weld; no crude patch language"},
+    {"id":"02","name":"Stamped triangular gusset bracket","verdict":"pass","notes":"single clean repeatable triangular bracket with punched mounting holes and controlled formed geometry"},
+    {"id":"03","name":"Bolted lap joint","verdict":"pass","notes":"overlapping plates use matching hex fasteners and washers with regular spacing"},
+    {"id":"04","name":"Spot-welded sheet-metal seam","verdict":"pass","notes":"overlapping sheet edges show one regular row of identical localized spot-weld marks"},
+    {"id":"05","name":"Replaceable bolted reinforcement plate","verdict":"pass","notes":"one removable rectangular reinforcement/splice plate with a uniform standardized bolt pattern"},
+    {"id":"06","name":"Folded L-bracket","verdict":"pass","notes":"one-piece folded angle bracket with clean formed edge and two punched mounting holes"},
+    {"id":"07","name":"Standardized channel splice","verdict":"pass","notes":"two short channel fragments are joined locally by paired splice plates and uniform fasteners; not a full frame"},
+    {"id":"08","name":"Modular box-section frame node","verdict":"pass","notes":"local box-section node uses repeatable bolt-on triangular gussets and remains an isolated fragment"}
+  ],
+  "reviewer": "assistant_self_review",
+  "review_method": "Exact untouched PNG visually reviewed against game-production@07eb5813fba9294586e862cc5e683d5d9d9148f3 machine spec and canonical style. production_guard spec validation passed locally by the canonical algorithm; explicit chat block verification returned no errors with canonical request SHA-256 83b7f3cf28b9b34181a859975ae5547107f3533751f270780cf699f5c261dd38. The first conversational invocation was rejected by the imagegen interface because it required a non-empty literal prompt; the successful retry supplied the complete canonical build-request unchanged as that literal prompt, which is the alternate delivery mode explicitly allowed by the merged guard skill. Exact source bytes were then measured and archived to Drive before any destructive processing.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "approval_state": "pass_pending_cross_era_role_review"
+}
