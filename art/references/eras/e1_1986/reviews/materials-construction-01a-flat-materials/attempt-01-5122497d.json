@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-01a-flat-materials.json",
+  "generation_id": "5122497d-f10e-4536-9c13-f1de2c2b0d9d",
+  "source": {
+    "sha256": "f3b05ed16058a46d0aa3bf39389cd45b37b7c5309da673ce9749091acab77dff",
+    "bytes": 2315691,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1XQN-rh4Fufl7FmUPSUjbps7SghVcWaMZ",
+    "drive_url": "https://drive.google.com/file/d/1XQN-rh4Fufl7FmUPSUjbps7SghVcWaMZ/view?usp=drivesdk",
+    "drive_parent_folder_id": "1RSvbxm62sMJYpDDjg-KLUJ9B1L6_JYoc"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "fail",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","verdict":"fail","notes":"surface and edge wear are heavily distressed/chipped instead of a smooth factory-painted plate with only faint non-corrosive scuffs; result also reads as photoreal product reference rather than canonical HD pixel-look"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","verdict":"fail","notes":"edge damage is too extensive and distressed for the requested uniform factory coating with only a few tiny edge chips"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","verdict":"fail","notes":"rendered as a long channel/profile-like section with multiple returns rather than a broad flat coupon with one narrow 90-degree return flange along one short edge"},
+    {"id":"04","name":"Molded neoprene vibration pad","verdict":"fail","notes":"missing; its cell is occupied by an unlisted galvanized metal sheet specimen"}
+  ],
+  "reviewer": "ChatGPT vision self-review",
+  "review_method": "direct visual inspection of the exact generated PNG against game-production@91e0950445bb0cec513f48a8cf416f7d41c0af46 production-guard spec",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "specimen 04 is absent and replaced by an unlisted galvanized sheet",
+    "specimen 03 collapses into a profile/channel instead of the required broad folded coupon",
+    "metal surfaces regress to heavy distressed edge wear forbidden by the E1 spec",
+    "rendering misses the canonical HD pixel-art / pixel-look style family"
+  ]
+}
