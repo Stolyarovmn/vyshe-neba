@@ -29,7 +29,23 @@ For **E0 / 1978**, the aiming assembly must read as a small hand-serviceable opt
 - Keep the physical signal lamp clearly separate from the aiming head. The image may show the lamp glass/material, but illumination/glow is code-owned: no baked halo or light bloom.
 - Avoid decorative loose cabling unless it is mechanically necessary to connect visible parts.
 
-For ground projection, match the exact approved island reference rather than a generic isometric object. The source must visibly read as `island_top_3_4`: show readable upper planes on the tripod/base hardware, yoke/head and lamp cap, with vertical/front faces visually subordinate to the top-down 3/4 read. Reject a result that reads predominantly frontal or side-on even when the numeric projection proxy was present in the request. The actual original 3D camera angle remains `UNKNOWN`; do not invent 47°.
+## Ground projection lock — mandatory
+
+For ground projection, match the **exact approved island reference** rather than a generic isometric object. Camera family is `island_top_3_4`.
+
+The actual original 3D camera angle remains `UNKNOWN`; **47° is unsupported and must not be used**.
+
+Use the measured SHA-bound island proxy as generation control:
+
+- elevation above the ground plane: **`73.44°`**;
+- tilt from straight top-down: **`16.56°`**;
+- projected ground-circle compression: **`0.958515`**.
+
+These numbers are a generation proxy, not a recovered camera fact. The exact approved island appearance has priority if the numeric proxy and visual reference appear to disagree.
+
+The source must visibly read as `island_top_3_4`: show clearly readable upper planes on tripod/base hardware, yoke/head, lamp cap, mounting plates and feet; vertical/front faces must be visually subordinate to the top-down 3/4 read. Depth on the ground plane must look compressed rather than like a conventional low isometric/front 3/4 product view.
+
+**Reject at source gate** if the object reads predominantly frontal, side-on or low-angle, even if the request contained the proxy values. A visually lower camera is a source defect and must be regenerated; it must not be delegated to Pixel Snapper, normalize or Aseprite.
 
 Era lineage:
 
