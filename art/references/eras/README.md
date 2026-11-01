@@ -34,9 +34,11 @@ Era reference approval is separate from approval of any production asset and doe
 
 ## Current sets
 
-- `e0_1978/` — **candidate complete, pending E0↔E1 cross-era role review**; 10/10 planned atomic sheet-parts have immutable exact-SHA candidates with per-sheet self-review PASS, but E0 is not yet `approved_visual_reference_set`.
-- `e1_1986/` — **candidate complete, pending E0↔E1 cross-era role review**; all 10/10 planned atomic sheet-parts (3 materials + 3 mechanics + 2 controls + 2 lighting) now have immutable Drive-backed exact-SHA candidates with structured per-sheet visual review PASS. All four roles are complete. Rejected attempts remain provenance only and are not visual evidence. The next gate is the complete role-to-role E0↔E1 blind-order review; E1 is not yet `approved_visual_reference_set`.
-- `e2_1998/` — **rebuild required** under the atomic-only multi-sheet role contract; previous broad boards and style-correction attempts are not canonical evidence.
+- `e0_1978/` — **approved visual reference set**; 10/10 exact-SHA atomic sheet-parts and all four complete roles passed the required E0↔E1 blind-order review. Canonical/required for E0 generation.
+- `e1_1986/` — **approved visual reference set**; 10/10 exact-SHA atomic sheet-parts and all four complete roles passed the required E0↔E1 blind-order review. Canonical/required for E1 generation and the approved lineage base for rebuilding E2.
+- `e2_1998/` — **rebuild required** under the atomic-only multi-sheet role contract; previous broad boards and style-correction attempts are not canonical evidence. Next production step: **E2 / 1998 atomic reference rebuild against approved E1 lineage**.
 - E3–E5 — pending; must be created directly in the atomic-only format after E0–E2 are approved.
 
 Cross-era blind-order review compares matching complete role sets (`materials` to `materials`, `mechanics` to `mechanics`, etc.), using all approved/candidate sheet-parts of the role being reviewed and never complete architecture/application scenes. Canonical approval is granted only after the required adjacent-era role review passes.
+
+The E0↔E1 durable review evidence is recorded at `art/references/eras/e1_1986/reviews/cross-era-e0-e1-role-order.json`. This is a project-local record format introduced because no dedicated cross-era review schema/tool existed at the time of review; it does not redefine the normative contracts or production-guard tooling.
