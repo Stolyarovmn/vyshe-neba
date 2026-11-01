@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "production_base_sha": "1201a702a13418b870ecf6d1ea2264abe301930b",
+  "era": "E1",
+  "year": 1986,
+  "role": "materials-construction",
+  "sheet": "01-surfaces-stock",
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-01-surfaces-stock.json",
+  "status": "blocked_retry_budget_exhausted",
+  "attempts_in_this_turn": 2,
+  "max_attempts_per_turn": 2,
+  "latest_attempt": {
+    "generation_id": "83712a6f-4d90-43e7-b505-c4abe3757b84",
+    "sha256": "ed5bbc63233f130c95f47890a9594f515de83246754cb0e9339fc4d165411cf9",
+    "drive_file_id": "1sxO1xIC68OfBleGMU0LgIKdI5z_YJtJw",
+    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-03-83712a6f.json",
+    "verdict": "source_reject"
+  },
+  "previous_attempt_this_turn": {
+    "generation_id": "c347dade-35e6-4a99-b9ff-d5f51d9de871",
+    "sha256": "de8f3c11a34f26b7ac189105c4d8f73250498df34536d2d2055cbcd109554c37",
+    "drive_file_id": "15yiKK-S3TONt9x7BkDXaN0ZLsXBC6dwA",
+    "review_file": "art/references/eras/e1_1986/reviews/materials-construction-01-surfaces-stock/attempt-02-c347dade.json",
+    "verdict": "source_reject"
+  },
+  "blocking_defect_class": [
+    "generator collapses specimen 03 safety-yellow folded sheet and specimen 04 galvanized angle into one yellow angle while inserting an unrequested cream plate",
+    "generator keeps adding excessive distressed/oxidized wear that regresses toward E0"
+  ],
+  "next_step": "Do not make a third production generation attempt in this turn. Tighten the machine-readable spec/guard regression so specimen 03 and 04 are compositionally disambiguated and E1 wear limits are explicit, then start a new turn from this checkpoint."
+}
