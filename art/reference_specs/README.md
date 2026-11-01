@@ -21,4 +21,4 @@ spec JSON
 
 `validate-tree` fails when a generated prompt drifts from its JSON spec.
 
-E1 `materials-construction` is the first fully guarded reference area. The original combined `01-surfaces-stock` spec was removed after five source rejects repeatedly collapsed the yellow folded sheet and galvanized L-profile. Its canonical replacement is two separate 4-specimen sheet-parts: `01a-flat-materials` and `01b-profiles-polymers`. Historical rejected outputs remain only under the E1 review/provenance directory and are not canonical visual evidence.
+E1 `materials-construction/01-surfaces-stock` is the current guarded reference sheet. It contains exactly 8 explicitly enumerated specimens in a 4×2 layout. Each specimen has a fixed cell assignment and may appear exactly once; duplication, omission, substitution, merging or unlisted stock classes are source-gate failures. The earlier 4+4 split specs are no longer canonical and have been removed; their rejected raster attempts remain provenance only under the E1 review/archive history.
