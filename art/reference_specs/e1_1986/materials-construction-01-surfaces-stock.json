@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "materials-construction",
+  "sheet": "01-surfaces-stock",
+  "title": "standardized surfaces and stock",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [1536, 1024],
+    "layout": [4, 2],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e1_1986/materials-construction-01-surfaces-stock.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1iPan8TlEoR90tHos-o50fkqf9_qzkqmq",
+    "folder_name": "E1_1986"
+  },
+  "specimens": [
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","description":"TOP ROW CELL 1 ONLY. Rectangular industrial-gray steel plate with smooth sprayed enamel, clean rolled edges and only faint non-corrosive service scuffs; no rust, orange oxidation, raw bare-metal face or heavy chipping"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","description":"TOP ROW CELL 2 ONLY. Rectangular olive-gray factory-painted panel with uniform utilitarian coating and only a few tiny edge chips exposing clean steel; no joints, fasteners, rust, orange oxidation or distressed patina"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","description":"TOP ROW CELL 3 ONLY. Broad safety-yellow rectangular sheet coupon whose large flat face clearly dominates, with exactly one narrow 90-degree return flange along one short edge; NOT an angle profile, NOT a channel, NOT a constant L-section, no second return flange, no holes or attached hardware"},
+    {"id":"04","name":"Short galvanized steel angle profile","description":"TOP ROW CELL 4 ONLY. Short unpainted galvanized equal-leg L-section with two narrow legs of equal width, uniform thickness, zinc-spangle metallic finish and a clean factory-cut end; absolutely no yellow paint, no broad sheet face, no holes or fasteners"},
+    {"id":"05","name":"Short anodized aluminium U-channel extrusion","description":"BOTTOM ROW CELL 1 ONLY. Straight short U-channel extrusion with repeatable geometry, clean machined end and clean anodized aluminium finish; no attached hardware, rust, orange oxidation or painted safety color"},
+    {"id":"06","name":"Short square steel box-section","description":"BOTTOM ROW CELL 2 ONLY. Standardized short hollow square box-section with clearly visible square open end, clean factory cut and even gray primer; no round tube, no fasteners, rust or orange oxidation"},
+    {"id":"07","name":"Molded phenolic / early industrial-plastic spacer block","description":"BOTTOM ROW CELL 3 ONLY. Rectangular dark-brown to black molded phenolic spacer block with exactly one clean functional through-bore; solid molded material, no wood grain, foam core, metal inserts or transparent plastic"},
+    {"id":"08","name":"Molded neoprene vibration pad","description":"BOTTOM ROW CELL 4 ONLY. Thick black rectangular molded neoprene vibration pad with crisp molded edges and shallow functional ribbing across the face; flat pad, not a roll or tube, no metal inserts"}
+  ],
+  "global_forbidden": [
+    "text, letters, numbers, logos or pseudo-writing",
+    "whole machines, complete buildings, rooms or staged scenes",
+    "any ninth or extra specimen, duplicate specimen, omitted specimen, merged specimen, substitution, or reinterpretation of one listed specimen as another",
+    "baked cast shadows, contact shadows, glow, bloom, rays or temporary FX",
+    "welds, bolts, rivets, hinges, brackets, hatches or grilles",
+    "pipes, valves, hoses, cables, connectors, gears, motors, bearings, instruments, switches or lamps",
+    "wood, glass, transparent panels, round tubes, PVC or white plastic extrusions, rolled rubber sheets, foam-core blocks or any unlisted stock class",
+    "visible rust, orange oxidation, heavy chipping, distressed patina or hand-cut scars on any specimen",
+    "photorealistic PBR material-catalog rendering, filtered 3D-render appearance or soft studio-product photography"
+  ],
+  "era_contract": {
+    "character": "standardized factory stock, repeatable dimensions, controlled coatings, clean bends and extrusions, and early industrial polymers",
+    "required_signals": ["smooth factory coatings","repeatable rolled/folded/extruded geometry","clean galvanized/anodized/primed finishes","early industrial phenolic and molded rubber stock"],
+    "replaced_previous_language": ["rough hand-cut stock","timber spacers","heavy oxidation","crude field fabrication","improvised rubber scraps"],
+    "forbidden_regressions": ["cream or beige flat plate replacing the safety-yellow folded sample","yellow-painted angle replacing the unpainted galvanized L-profile","wood replacing the phenolic spacer","rolled rubber replacing the molded neoprene pad","heavy rust or hand-cut scars as dominant cues"]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}
