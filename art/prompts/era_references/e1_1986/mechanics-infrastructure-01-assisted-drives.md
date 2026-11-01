@@ -9,12 +9,12 @@ ALLOWED SPECIMENS — exactly these 8:
 2. Standardized motor-and-helical-gearbox package — Compact electric motor joined to an inline cast gearbox with repeatable flange or feet and one output shaft; no external machine.
 3. Hydraulic cylinder — Painted industrial cylinder with polished rod, clevis ends and two clearly visible hose ports; no hoses attached.
 4. Compact hydraulic rotary actuator — Cast body with standardized mounting flange and keyed output shaft; no hoses and no larger mechanism.
-5. Guarded V-belt drive fragment — Two pulleys and one V-belt with a simple removable formed-sheet safety guard belonging to the mechanism; no motor or machine.
-6. Guarded roller-chain drive fragment — Two sprockets and chain with a standardized formed-metal guard; no external machine.
+5. Guarded V-belt drive fragment — Two pulleys and one V-belt behind a removable formed-sheet safety cover that closes the entire front/outer face of the transmission; only small ventilation slots or a narrow inspection opening may expose limited belt area, never both pulleys or the full belt path; no motor or machine.
+6. Guarded roller-chain drive fragment — Two sprockets and one chain behind a removable formed-metal safety cover that closes the entire front/outer face of the transmission; only small ventilation slots or a narrow inspection opening may expose limited chain area, never both sprockets or the full chain loop; no external machine.
 7. Industrial linear solenoid actuator — Metal coil housing, straight plunger and mounting flange; no wiring.
-8. Electromagnetic clutch/brake module — Compact cast housing with two shaft hubs and a serviceable protective cover; no surrounding drivetrain.
+8. Electromagnetic clutch/brake module — Compact clutch/brake module centered on the shaft line: short axial drum/disc housing with two shaft hubs and a removable service cover; silhouette must be visibly shorter and flatter than an electric motor, with no cooling fins, fan shroud, terminal box, lifting eye or motor-style feet; no surrounding drivetrain.
 
-DO NOT GENERATE ANYTHING NOT LISTED ABOVE. hand cranks; manual screw jacks; open unguarded transmissions; loose cables; pipework or valves; gauges or control panels; whole machines; cranes or vehicles; buildings or scenes; text, labels, logos or pseudo-writing; baked cast shadows or contact shadows; glow, bloom, rays or temporary FX.
+DO NOT GENERATE ANYTHING NOT LISTED ABOVE. hand cranks; manual screw jacks; open unguarded transmissions; open-front belt or chain display/cutaway guards; motor-like clutch/brake housings with cooling fins, fan shrouds, terminal boxes, lifting eyes or motor-style feet; loose cables; pipework or valves; gauges or control panels; whole machines; cranes or vehicles; buildings or scenes; text, labels, logos or pseudo-writing; baked cast shadows or contact shadows; glow, bloom, rays or temporary FX.
 
 E1 visual character: industrial assistance through standardized electric and hydraulic actuation, guarded dangerous drives and repeatable cast/formed housings
 REQUIRED ERA SIGNALS: standard industrial motor housings; hydraulic actuators; guarded belt and chain drives; repeatable cast gear housings; serviceable electromechanical modules.
