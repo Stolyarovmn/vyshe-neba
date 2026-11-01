@@ -3,42 +3,330 @@
   "era": "E0",
   "year": 1978,
   "name": "Гаражная мечта",
-  "status": "rebuild_required",
-  "approval_context": "Canonical E0 is being rebuilt as four atomic roles, each role split into as many exact-SHA sheet-parts as needed for large readable specimens. Previous broad boards and the overpacked single-sheet candidate are non-canonical provenance.",
-  "authority": {"rules":"art/docs/ERA_DESIGN_MATRIX.md","reference_contract":"art/docs/ERA_REFERENCE_CONTRACT.md","style":"art/style_bible.txt"},
-  "raw_archive": {"provider":"google_drive","folder_id":"1SmhQyQhL5IGwo6vCkgtYTTHUMVrnhCMP","folder_name":"E0_1978"},
-  "required_roles": ["materials-construction","mechanics-infrastructure","controls-displays","lighting-signals"],
-  "sheet_density": {"default_max_specimens_per_sheet":8,"current_generation_size":[1536,1024],"preferred_grid":[4,2],"nominal_cell_before_margins":[384,512]},
+  "status": "candidate_complete_pending_cross_era_review",
+  "approval_context": "All ten planned E0 atomic sheet-parts now have immutable Drive-backed exact bytes. Scope/style/era/readability and exact-SHA self-review pass for all ten, and all four roles are complete. Canonical approved_visual_reference_set status remains blocked only on the required matching E1 cross-era role-order review.",
+  "authority": {
+    "rules": "art/docs/ERA_DESIGN_MATRIX.md",
+    "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
+    "style": "art/style_bible.txt"
+  },
+  "raw_archive": {
+    "provider": "google_drive",
+    "folder_id": "1SmhQyQhL5IGwo6vCkgtYTTHUMVrnhCMP",
+    "folder_name": "E0_1978",
+    "rejected_folder_id": "1OmCR7ma069BqwFNkddybV5O5YMkvAsch"
+  },
+  "required_roles": [
+    "materials-construction",
+    "mechanics-infrastructure",
+    "controls-displays",
+    "lighting-signals"
+  ],
+  "sheet_density": {
+    "default_max_specimens_per_sheet": 8,
+    "current_generation_size": [
+      1536,
+      1024
+    ],
+    "preferred_grid": [
+      4,
+      2
+    ],
+    "nominal_cell_before_margins": [
+      384,
+      512
+    ]
+  },
   "role_plan": [
-    {"role":"materials-construction","sheet":"01-surfaces-stock","prompt":"art/prompts/era_references/e0_1978/materials-construction-01-surfaces-stock.md","specimens":8},
-    {"role":"materials-construction","sheet":"02-joints-repairs","prompt":"art/prompts/era_references/e0_1978/materials-construction-02-joints-repairs.md","specimens":8},
-    {"role":"materials-construction","sheet":"03-service-architecture","prompt":"art/prompts/era_references/e0_1978/materials-construction-03-service-architecture.md","specimens":8},
-    {"role":"mechanics-infrastructure","sheet":"01-manual-drives","prompt":"art/prompts/era_references/e0_1978/mechanics-infrastructure-01-manual-drives.md","specimens":8},
-    {"role":"mechanics-infrastructure","sheet":"02-joints-lifting","prompt":"art/prompts/era_references/e0_1978/mechanics-infrastructure-02-joints-lifting.md","specimens":8},
-    {"role":"mechanics-infrastructure","sheet":"03-utilities-cabling","prompt":"art/prompts/era_references/e0_1978/mechanics-infrastructure-03-utilities-cabling.md","specimens":8},
-    {"role":"controls-displays","sheet":"01-operator-controls","prompt":"art/prompts/era_references/e0_1978/controls-displays-01-operator-controls.md","specimens":8},
-    {"role":"controls-displays","sheet":"02-instruments-displays","prompt":"art/prompts/era_references/e0_1978/controls-displays-02-instruments-displays.md","specimens":8},
-    {"role":"lighting-signals","sheet":"01-lamps-fixtures","prompt":"art/prompts/era_references/e0_1978/lighting-signals-01-lamps-fixtures.md","specimens":8},
-    {"role":"lighting-signals","sheet":"02-signal-hardware","prompt":"art/prompts/era_references/e0_1978/lighting-signals-02-signal-hardware.md","specimens":8}
+    {
+      "role": "materials-construction",
+      "sheet": "01-surfaces-stock",
+      "prompt": "art/prompts/era_references/e0_1978/materials-construction-01-surfaces-stock.md",
+      "specimens": 8
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "02-joints-repairs",
+      "prompt": "art/prompts/era_references/e0_1978/materials-construction-02-joints-repairs.md",
+      "specimens": 8
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "03-service-architecture",
+      "prompt": "art/prompts/era_references/e0_1978/materials-construction-03-service-architecture.md",
+      "specimens": 8
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "01-manual-drives",
+      "prompt": "art/prompts/era_references/e0_1978/mechanics-infrastructure-01-manual-drives.md",
+      "specimens": 8
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "02-joints-lifting",
+      "prompt": "art/prompts/era_references/e0_1978/mechanics-infrastructure-02-joints-lifting.md",
+      "specimens": 8
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "03-utilities-cabling",
+      "prompt": "art/prompts/era_references/e0_1978/mechanics-infrastructure-03-utilities-cabling.md",
+      "specimens": 8
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "01-operator-controls",
+      "prompt": "art/prompts/era_references/e0_1978/controls-displays-01-operator-controls.md",
+      "specimens": 8
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "02-instruments-displays",
+      "prompt": "art/prompts/era_references/e0_1978/controls-displays-02-instruments-displays.md",
+      "specimens": 8
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "01-lamps-fixtures",
+      "prompt": "art/prompts/era_references/e0_1978/lighting-signals-01-lamps-fixtures.md",
+      "specimens": 8
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "02-signal-hardware",
+      "prompt": "art/prompts/era_references/e0_1978/lighting-signals-02-signal-hardware.md",
+      "specimens": 8
+    }
   ],
   "sheets": [],
   "generation_checkpoint": {
-    "status": "blocked_pending_multi_sheet_contract_merge",
-    "production_base_sha": "46d24c4da3881b7b9da3ea76ad11318cd31026f2",
-    "style": {"path":"art/style_bible.txt","git_blob_sha":"7b49fab64625c00bf4779dea17ce64ac74c6b341"},
-    "attempts": [
-      {"attempt":1,"generation_id":"82de9c91-702e-48b8-aa04-cdf7c0279707","filename":"e0_1978_materials-construction_rejected_scope_attempt_1.png","drive_file_id":"1sE1MBvwCpt9CsDd7QQFvAvy-iUte0tgq","dimensions":[1536,1024],"bytes":2141941,"sha256":"69ed13024ff365b84e6c227807d3271d536e0ef7b1430a12c4274a87f340cbf8","verdict":"rejected_reference_scope"},
-      {"attempt":2,"generation_id":"9ffcd823-4053-4f24-b080-01336eaba336","filename":"e0_1978_materials-construction_rejected_scope_attempt_2.png","drive_file_id":"1XR9-E259wwRennAy5YdYXaiyyLhmSlv8","dimensions":[1536,1024],"bytes":2095816,"sha256":"45fa32533b6cd57c032bb77157b2911aa4fc694432a2505b9c3df17a51ea2bfb","verdict":"rejected_reference_scope"},
-      {"attempt":3,"generation_id":"b7a907db-63be-4b3b-a761-82d39aedc31c","filename":"e0_1978_materials-construction_rejected_scope_attempt_3.png","drive_file_id":"1hDJFGvly1GVQgicS3H3GW4hiy0gjgMxY","dimensions":[1536,1024],"bytes":2305793,"sha256":"ca6ef74f6eea3d221261309a25d9cc2282f9b2fe15a76b58bf4e82bd5778b861","verdict":"rejected_reference_scope_wrong_era"},
-      {"attempt":4,"generation_id":"c4d7f3a1-98a6-4b29-ba1e-2740c4caabd1","filename":"e0_1978_materials-construction_rejected_scope_attempt_4.png","drive_file_id":"1O71oS3YtMCvLvWlgQC8o4XZ-7MaCjmjY","dimensions":[1536,1024],"bytes":2322057,"sha256":"033adc6ba616534d5a8bd0b49081fde47017c91b17eca13bb9ac11fc5cee590f","verdict":"rejected_reference_scope_wrong_era"},
-      {"attempt":5,"generation_id":"UNKNOWN_tool_response_not_exposed","filename":"e0_1978_materials-construction_rejected_scope_attempt_5.png","drive_file_id":"1Eb0DwSE12tPqUdSfmaHeNPMAzIkplxWO","dimensions":[1536,1024],"bytes":2658171,"sha256":"da2edd4f1ed3ac8c5f659eef73fd6f06bc50f287750402c50f13368b969ac7e9","verdict":"rejected_reference_scope_cross_era_multi_role"},
-      {"attempt":6,"generation_id":"5c99910b-8c78-41b1-b2a7-7d734bfcf6d8","filename":"e0_1978_materials-construction_rejected_scope_attempt_6.png","drive_file_id":"11wrzvGLK_B-qLqqYe2le7XPc8DILBADE","dimensions":[1536,1024],"bytes":2779008,"sha256":"fcaac317919f4a6ce39a59c59f7687bd9fe6fb1500f72dadd7a6c73545cf84d9","verdict":"rejected_reference_scope_cross_era_multi_role"},
-      {"attempt":7,"generation_id":"ca583179-6e19-4d59-83ca-907887aba7a7","filename":"e0_1978_materials-construction_candidate_7.png","drive_file_id":"11Fbp-Y4o9YRhZS99HgNJxTl2D-kkcjMq","dimensions":[1536,1024],"bytes":2576256,"sha256":"c4c153e8d3bd91613487405157abffb0d3e62b818239b8a85a9a918568a8c2d1","verdict":"rejected_after_multi_sheet_density_correction","reason":"Atomic and role-pure, but 12 specimens in one 4x3 image are now considered too dense. The canonical E0 plan uses 10 separate sheet-parts with exactly 8 large specimens each."}
-    ],
-    "current_sheet": "materials-construction/01-surfaces-stock",
-    "blocker": "PR #50 must be merged before generating the new multi-sheet canonical E0 series because current game-production still defines one raster per role.",
-    "next_step": "After PR #50 is merged, generate materials-construction sheet 01 using only its exact allowlisted prompt plus style_bible, archive untouched original, run source/style/era/readability review, then continue through the remaining nine sheet-parts."
+    "status": "candidate_complete_pending_cross_era_review",
+    "production_base_sha": "634b4204eecc53c3984886e5ae8cb971d5640574",
+    "summary": {
+      "planned_sheet_parts": 10,
+      "exact_sha_visual_review_pass_pending_cross_era": 10,
+      "blocked": 0,
+      "not_started": 0
+    },
+    "sheet_states": {
+      "materials-construction/01-surfaces-stock": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "dfd46422-45c1-4945-a6d3-c421a0de2fce",
+        "drive_file_id": "1s48mIZAYL8OHuWrSoFVYeDfBEKRjHe7p",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 1918587,
+        "sha256": "5d49bfa8e8561972226862a70c251e57ad42b0a8fa6242b7649f58868b3c5aee",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      },
+      "materials-construction/02-joints-repairs": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "5ecc7882-1e37-4923-88f7-a9c017b398b6",
+        "drive_file_id": "1fgWpNCIIiQNUzzHQ9SZpm6RZlLCTy6u7",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 2052480,
+        "sha256": "6efe2f5e3a2f0951456a486c2cc5b435da761603e79a2a72e9cb003d109a899d",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      },
+      "materials-construction/03-service-architecture": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "96bb05c6-5c89-4e85-b8c6-162787c4f406",
+        "drive_file_id": "19aMUG1St8IMwsDL8YNryYteAS3Jm7vBG",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 2069454,
+        "sha256": "d4407f9e4ac9bcbf48bc1360d3c2d490550d51e2779203c4976769d80d623040",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      },
+      "mechanics-infrastructure/01-manual-drives": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "UNKNOWN_tool_response_not_exposed",
+        "drive_file_id": "1Tk39RYHgSjhuXzMblMPNFM5I7ELdudpg",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 1803619,
+        "sha256": "36c52034690af8c1d78221bfe3d849cec175363ac41318b13c144b8c41ad9a46",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      },
+      "mechanics-infrastructure/02-joints-lifting": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "UNKNOWN_tool_response_not_exposed",
+        "drive_file_id": "18TAG8V_GQ8IxLeHHv16UX8ElzpDthDZ-",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 1924364,
+        "sha256": "aae9bf1771a4039e8cc58970bea6cbf0d83b97056c601368c858a3a3bc14f374",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      },
+      "mechanics-infrastructure/03-utilities-cabling": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "830c40f1-de50-41d2-993d-1f7da3b32cba",
+        "drive_file_id": "1qrUV-hawpalHG0jikOn1RO9ESYJUpxeO",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 1802792,
+        "sha256": "9302dee8e3dc7983d0ff3869504ade2e5adcda5d1eac218f173ea96d5762ffbf",
+        "note": "Exact later candidate accepted for continued review; earlier unapproved utilities candidate remains provenance only.",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      },
+      "controls-displays/01-operator-controls": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "994f477d-2feb-49b9-a746-46cfa5ba6cfb",
+        "drive_file_id": "1sJXrlZ3oTyMmbH_wUnRmBziund6Z_q9R",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 1855906,
+        "sha256": "75013d529f538f0fb38844c4228f9d000f9590cb2a36c433aa5d8abeef0aed08",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      },
+      "controls-displays/02-instruments-displays": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "5490be9b-073d-4ab9-bb11-c9e9b8ba76c6",
+        "drive_file_id": "17dpiW0dVZeiVzw_d06F-rZLmuMaS9EYW",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 1937139,
+        "sha256": "12d2b12960eca24ba2fc3a916c015feefb6d340672d130f737202e721a89cd72",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      },
+      "lighting-signals/01-lamps-fixtures": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "abce0cc6-4428-4091-b225-f2d5bedf4f09",
+        "drive_file_id": "1CyGXroexCBg3ORLsHeWl8WGGVoHzfRrq",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 1886546,
+        "sha256": "4a6d2436c3468d106425933f1640ddbff1cfdb538a81e74070f926cae7d27103",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      },
+      "lighting-signals/02-signal-hardware": {
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "39c05118-ea9d-4fb9-9091-9f24664de614",
+        "drive_file_id": "1aMbNH0TiDfeMaOVKkiZnLu3u87x0opIA",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 1875610,
+        "sha256": "cbf1c6c37c9537d9ba257aa6e95769e312920a5bd5be30a2ff0c76ed6ec87c78",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review",
+          "method": "Exact Drive-backed bytes fetched/reused locally, SHA-256 reverified, and visually reviewed against the canonical E0 sheet prompt and style contract."
+        }
+      }
+    },
+    "current_sheet": null,
+    "blocker": "E0 cannot become approved_visual_reference_set until matching E1 role sets exist and the required cross-era role-order review passes.",
+    "next_step": "Build the E1 atomic role set from the same four-role contract, then run role-to-role E0↔E1 blind-order review. Do not use E0 as approved canonical evidence before that gate passes."
   },
-  "approval_gate": {"scope":"pending_new_multi_sheet_sources","style":"pending","era":"pending","sheet_readability":"pending","role_completeness":"pending","cross_era_role_order":"pending"},
-  "usage": {"required_for_future_generation":false,"reference_strategy":"BLOCKED until every planned E0 sheet-part is exact-SHA approved and all four roles are complete. Use ERA_DESIGN_MATRIX.md and style_bible only; do not use rejected attempts as visual evidence.","system_separation":"Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."}
+  "approval_gate": {
+    "scope": "pass_all_10_exact_sha_candidates",
+    "style": "pass_all_10_exact_sha_candidates",
+    "era": "pass_all_10_exact_sha_candidates",
+    "sheet_readability": "pass_all_10_exact_sha_candidates",
+    "role_completeness": "pass_all_four_roles",
+    "cross_era_role_order": "blocked_pending_matching_e1_role_set"
+  },
+  "usage": {
+    "required_for_future_generation": false,
+    "reference_strategy": "NOT YET CANONICAL. Ten exact-SHA E0 candidates and all four roles are complete, but required cross-era role-order review against E1 is still pending.",
+    "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
+  }
 }
