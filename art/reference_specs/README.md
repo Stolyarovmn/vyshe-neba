@@ -21,4 +21,4 @@ spec JSON
 
 `validate-tree` fails when a generated prompt drifts from its JSON spec.
 
-The first migrated sheet is E1 `materials-construction/01-surfaces-stock`; the same schema is reusable for the remaining E1 sheet-parts and later eras.
+E1 `materials-construction` is the first fully guarded reference area. The original combined `01-surfaces-stock` spec was removed after five source rejects repeatedly collapsed the yellow folded sheet and galvanized L-profile. Its canonical replacement is two separate 4-specimen sheet-parts: `01a-flat-materials` and `01b-profiles-polymers`. Historical rejected outputs remain only under the E1 review/provenance directory and are not canonical visual evidence.

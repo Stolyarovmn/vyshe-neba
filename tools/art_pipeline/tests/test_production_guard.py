@@ -15,7 +15,8 @@ pg = importlib.util.module_from_spec(spec)
 assert spec and spec.loader
 spec.loader.exec_module(pg)
 ROOT = MODULE_PATH.resolve().parents[2]
-VALID_SPEC_PATH = ROOT / "art/reference_specs/e1_1986/materials-construction-01-surfaces-stock.json"
+FLAT_SPEC_PATH = ROOT / "art/reference_specs/e1_1986/materials-construction-01a-flat-materials.json"
+PROFILE_SPEC_PATH = ROOT / "art/reference_specs/e1_1986/materials-construction-01b-profiles-polymers.json"
 
 
 def make_png(path: Path, width: int, height: int) -> None:
@@ -27,42 +28,49 @@ def make_png(path: Path, width: int, height: int) -> None:
 
 
 class ProductionGuardTests(unittest.TestCase):
-    def load_spec(self):
-        return json.loads(VALID_SPEC_PATH.read_text(encoding="utf-8"))
+    def load_spec(self, path: Path = FLAT_SPEC_PATH):
+        return json.loads(path.read_text(encoding="utf-8"))
 
-    def test_valid_spec(self):
-        self.assertEqual([], pg.validate_spec(self.load_spec()))
+    def test_split_specs_are_valid(self):
+        self.assertEqual([], pg.validate_spec(self.load_spec(FLAT_SPEC_PATH)))
+        self.assertEqual([], pg.validate_spec(self.load_spec(PROFILE_SPEC_PATH)))
 
     def test_more_than_eight_is_blocked(self):
         value = self.load_spec()
-        value["specimens"].append({"id":"09","name":"extra","description":"forbidden ninth item"})
+        for index in range(5, 10):
+            value["specimens"].append({"id":f"{index:02d}","name":f"extra-{index}","description":"forbidden extra item"})
         value["expected_specimen_count"] = 9
         errors = pg.validate_spec(value)
         self.assertTrue(any("maximum 8" in e for e in errors))
 
     def test_prompt_contains_allowlist_and_previous_era_guard(self):
         prompt = pg.render_prompt(self.load_spec())
-        self.assertIn("EXACTLY the 8 specimens", prompt)
+        self.assertIn("EXACTLY the 4 specimens", prompt)
         self.assertIn("DO NOT GENERATE ANYTHING NOT LISTED ABOVE", prompt)
         self.assertIn("FORBIDDEN REGRESSION", prompt)
         self.assertIn("no baked cast shadow", prompt)
 
-    def test_surfaces_stock_disambiguates_folded_sheet_from_angle_and_forbids_rust(self):
-        value = self.load_spec()
-        specimens = {item["id"]: item for item in value["specimens"]}
-        self.assertIn("broad flat face must dominate", specimens["03"]["description"])
-        self.assertIn("NOT an angle profile", specimens["03"]["description"])
-        self.assertIn("absolutely no yellow paint", specimens["04"]["description"])
-        self.assertTrue(any("visible rust" in item and "orange oxidation" in item for item in value["global_forbidden"]))
-        prompt = pg.render_prompt(value)
-        self.assertIn("cream or beige flat plate replacing the safety-yellow folded sample", prompt)
-        self.assertIn("yellow-painted angle replacing the unpainted galvanized L-profile", prompt)
+    def test_surfaces_stock_is_split_to_prevent_specimen_collapse(self):
+        flat = self.load_spec(FLAT_SPEC_PATH)
+        profiles = self.load_spec(PROFILE_SPEC_PATH)
+        flat_names = {item["name"] for item in flat["specimens"]}
+        profile_names = {item["name"] for item in profiles["specimens"]}
+        self.assertIn("Safety-yellow folded sheet-metal sample", flat_names)
+        self.assertNotIn("Short galvanized steel angle profile", flat_names)
+        self.assertIn("Short galvanized steel angle profile", profile_names)
+        self.assertNotIn("Safety-yellow folded sheet-metal sample", profile_names)
+        self.assertEqual([2, 2], flat["generation"]["layout"])
+        self.assertEqual([2, 2], profiles["generation"]["layout"])
+        self.assertTrue(any("angle profiles" in item for item in flat["global_forbidden"]))
+        self.assertTrue(any("painted safety-yellow sheet coupons" in item for item in profiles["global_forbidden"]))
+        self.assertTrue(any("visible rust" in item and "orange oxidation" in item for item in flat["global_forbidden"]))
+        self.assertTrue(any("visible rust" in item and "orange oxidation" in item for item in profiles["global_forbidden"]))
 
     def test_request_embeds_style_once(self):
-        value = self.load_spec()
-        request = pg.build_request(value)
         style = (ROOT / "art/style_bible.txt").read_text(encoding="utf-8")
-        self.assertEqual(1, request.count(style))
+        for path in (FLAT_SPEC_PATH, PROFILE_SPEC_PATH):
+            request = pg.build_request(self.load_spec(path))
+            self.assertEqual(1, request.count(style))
 
     def test_source_dimension_mismatch_fails(self):
         value = self.load_spec()
