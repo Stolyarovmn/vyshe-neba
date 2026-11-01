@@ -3,8 +3,8 @@
   "era": "E1",
   "year": 1986,
   "name": "Своя мастерская",
-  "status": "generation_ready",
-  "approval_context": "E1 is planned as ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. E0 has 10/10 immutable exact-SHA candidates with per-sheet self-review PASS and is intentionally pending E0↔E1 cross-era role review; therefore E1 generation is the required next step rather than being blocked on an impossible prior E0 approval.",
+  "status": "generation_in_progress",
+  "approval_context": "E1 is planned as ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. E0 has 10/10 immutable exact-SHA candidates with per-sheet self-review PASS and is intentionally pending E0↔E1 cross-era role review. E1 generation is in progress; the first materials-construction/01-surfaces-stock attempt was archived and source-rejected, so no E1 sheet is approved yet.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -36,7 +36,8 @@
   "raw_archive": {
     "provider": "google_drive",
     "folder_id": "1iPan8TlEoR90tHos-o50fkqf9_qzkqmq",
-    "folder_name": "E1_1986"
+    "folder_name": "E1_1986",
+    "rejected_folder_id": "1RSvbxm62sMJYpDDjg-KLUJ9B1L6_JYoc"
   },
   "required_roles": [
     "materials-construction",
@@ -46,43 +47,145 @@
   ],
   "sheet_density": {
     "default_max_specimens_per_sheet": 8,
-    "current_generation_size": [1536, 1024],
-    "preferred_grid": [4, 2],
-    "nominal_cell_before_margins": [384, 512]
+    "current_generation_size": [
+      1536,
+      1024
+    ],
+    "preferred_grid": [
+      4,
+      2
+    ],
+    "nominal_cell_before_margins": [
+      384,
+      512
+    ]
   },
   "role_plan": [
-    {"role":"materials-construction","sheet":"01-surfaces-stock","prompt":"art/prompts/era_references/e1_1986/materials-construction-01-surfaces-stock.md","specimens":8},
-    {"role":"materials-construction","sheet":"02-joints-repairs","prompt":"art/prompts/era_references/e1_1986/materials-construction-02-joints-repairs.md","specimens":8},
-    {"role":"materials-construction","sheet":"03-service-architecture","prompt":"art/prompts/era_references/e1_1986/materials-construction-03-service-architecture.md","specimens":8},
-    {"role":"mechanics-infrastructure","sheet":"01-assisted-drives","prompt":"art/prompts/era_references/e1_1986/mechanics-infrastructure-01-assisted-drives.md","specimens":8},
-    {"role":"mechanics-infrastructure","sheet":"02-joints-handling","prompt":"art/prompts/era_references/e1_1986/mechanics-infrastructure-02-joints-handling.md","specimens":8},
-    {"role":"mechanics-infrastructure","sheet":"03-utilities-routing","prompt":"art/prompts/era_references/e1_1986/mechanics-infrastructure-03-utilities-routing.md","specimens":8},
-    {"role":"controls-displays","sheet":"01-operator-controls","prompt":"art/prompts/era_references/e1_1986/controls-displays-01-operator-controls.md","specimens":8},
-    {"role":"controls-displays","sheet":"02-instruments-displays","prompt":"art/prompts/era_references/e1_1986/controls-displays-02-instruments-displays.md","specimens":8},
-    {"role":"lighting-signals","sheet":"01-lamps-fixtures","prompt":"art/prompts/era_references/e1_1986/lighting-signals-01-lamps-fixtures.md","specimens":8},
-    {"role":"lighting-signals","sheet":"02-signal-hardware","prompt":"art/prompts/era_references/e1_1986/lighting-signals-02-signal-hardware.md","specimens":8}
+    {
+      "role": "materials-construction",
+      "sheet": "01-surfaces-stock",
+      "prompt": "art/prompts/era_references/e1_1986/materials-construction-01-surfaces-stock.md",
+      "specimens": 8
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "02-joints-repairs",
+      "prompt": "art/prompts/era_references/e1_1986/materials-construction-02-joints-repairs.md",
+      "specimens": 8
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "03-service-architecture",
+      "prompt": "art/prompts/era_references/e1_1986/materials-construction-03-service-architecture.md",
+      "specimens": 8
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "01-assisted-drives",
+      "prompt": "art/prompts/era_references/e1_1986/mechanics-infrastructure-01-assisted-drives.md",
+      "specimens": 8
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "02-joints-handling",
+      "prompt": "art/prompts/era_references/e1_1986/mechanics-infrastructure-02-joints-handling.md",
+      "specimens": 8
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "03-utilities-routing",
+      "prompt": "art/prompts/era_references/e1_1986/mechanics-infrastructure-03-utilities-routing.md",
+      "specimens": 8
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "01-operator-controls",
+      "prompt": "art/prompts/era_references/e1_1986/controls-displays-01-operator-controls.md",
+      "specimens": 8
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "02-instruments-displays",
+      "prompt": "art/prompts/era_references/e1_1986/controls-displays-02-instruments-displays.md",
+      "specimens": 8
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "01-lamps-fixtures",
+      "prompt": "art/prompts/era_references/e1_1986/lighting-signals-01-lamps-fixtures.md",
+      "specimens": 8
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "02-signal-hardware",
+      "prompt": "art/prompts/era_references/e1_1986/lighting-signals-02-signal-hardware.md",
+      "specimens": 8
+    }
   ],
   "sheets": [],
   "generation_checkpoint": {
-    "status": "not_started",
-    "production_base_sha": "2687ae4799acd1759ecc206d1149997f4e17ca35",
+    "status": "generation_in_progress",
+    "production_base_sha": "f99881c16efcc049d37db2dbfe588f3ad8d4059d",
     "summary": {
       "planned_sheet_parts": 10,
       "exact_sha_visual_review_pass_pending_cross_era": 0,
-      "blocked": 0,
-      "not_started": 10
+      "needs_regeneration": 1,
+      "not_started": 9,
+      "rejected_attempts_archived": 1
     },
     "sheet_states": {
-      "materials-construction/01-surfaces-stock": {"status":"not_started"},
-      "materials-construction/02-joints-repairs": {"status":"not_started"},
-      "materials-construction/03-service-architecture": {"status":"not_started"},
-      "mechanics-infrastructure/01-assisted-drives": {"status":"not_started"},
-      "mechanics-infrastructure/02-joints-handling": {"status":"not_started"},
-      "mechanics-infrastructure/03-utilities-routing": {"status":"not_started"},
-      "controls-displays/01-operator-controls": {"status":"not_started"},
-      "controls-displays/02-instruments-displays": {"status":"not_started"},
-      "lighting-signals/01-lamps-fixtures": {"status":"not_started"},
-      "lighting-signals/02-signal-hardware": {"status":"not_started"}
+      "materials-construction/01-surfaces-stock": {
+        "status": "rejected_attempt_archived",
+        "next_action": "regenerate",
+        "attempts": [
+          {
+            "generation_id": "7994a53d-ab04-4169-9822-30f45eeb510c",
+            "drive_file_id": "10Zcz_qgdRIl-PFxxPFkZkyfw_7kNZz3Z",
+            "drive_parent_folder_id": "1RSvbxm62sMJYpDDjg-KLUJ9B1L6_JYoc",
+            "dimensions": [
+              1774,
+              887
+            ],
+            "bytes": 2264263,
+            "sha256": "a62bb156ceec25e0b636126d31d999ed6d9792cb3cba55627f58e3be633291b4",
+            "verdict": "source_reject",
+            "reasons": [
+              "wrong output dimensions: 1774x887 instead of the planned 1536x1024",
+              "specimen 3 is a dirty-beige painted plate instead of a safety-yellow folded sheet-metal sample",
+              "specimen 7 is a wooden spacer block instead of a molded phenolic/early industrial-plastic spacer block",
+              "several specimens use heavy rust, rough field-fabrication and previous-era wear language instead of standardized factory stock",
+              "the sheet includes baked contact/cast shadows despite the no-baked-cast-shadow rule"
+            ]
+          }
+        ]
+      },
+      "materials-construction/02-joints-repairs": {
+        "status": "not_started"
+      },
+      "materials-construction/03-service-architecture": {
+        "status": "not_started"
+      },
+      "mechanics-infrastructure/01-assisted-drives": {
+        "status": "not_started"
+      },
+      "mechanics-infrastructure/02-joints-handling": {
+        "status": "not_started"
+      },
+      "mechanics-infrastructure/03-utilities-routing": {
+        "status": "not_started"
+      },
+      "controls-displays/01-operator-controls": {
+        "status": "not_started"
+      },
+      "controls-displays/02-instruments-displays": {
+        "status": "not_started"
+      },
+      "lighting-signals/01-lamps-fixtures": {
+        "status": "not_started"
+      },
+      "lighting-signals/02-signal-hardware": {
+        "status": "not_started"
+      }
     }
   },
   "approval_gate": {
