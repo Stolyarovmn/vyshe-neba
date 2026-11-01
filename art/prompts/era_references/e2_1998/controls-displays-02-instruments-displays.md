@@ -1,0 +1,26 @@
+E2 / 1998 — controls-displays — 02-instruments-displays / CRT diagnostics, rack electronics and service interfaces
+
+Generate ONE E2-only atomic specimen field containing EXACTLY the 8 specimens listed below and NOTHING ELSE.
+
+LAYOUT: 1536×1024 landscape, 4×2 grid, 8 large isolated specimens, one specimen per cell, generous empty spacing, neutral background, no labels or captions.
+
+ALLOWED SPECIMENS — exactly these 8:
+1. Deep monochrome CRT diagnostic display housing fragment — TOP ROW CELL 1 ONLY. Deep beige/gray industrial CRT bezel/housing fragment with convex dark green-gray glass, pronounced rear depth and ventilation detail; screen off/blank, no controls, labels, graphics or complete workstation.
+2. Deep color CRT test-monitor housing fragment — TOP ROW CELL 2 ONLY. Deep gray/beige late-1990s color CRT bezel/housing fragment with curved dark glass, thick apparatus-grade case depth and ventilation slots; screen off/blank, no controls, labels or console.
+3. Rack-mount plug-in electronics module — TOP ROW CELL 3 ONLY. One removable rack electronics module with anodized front plate, two extraction/ejector handles, ventilation slots and captive fasteners; no text, screen, external cable or full rack.
+4. Replaceable PCB cassette/service module — TOP ROW CELL 4 ONLY. Compact slide-in electronics cassette with beige/gray front face, two extraction tabs and a restrained row of small physical diagnostic LED lenses; all lenses unlit, no labels, exposed PCB artwork or rack.
+5. Coax diagnostic connector-panel fragment — BOTTOM ROW CELL 1 ONLY. Small anodized panel fragment with exactly four identical coax/BNC-style diagnostic sockets in an even pattern; no cables, text, labels, knobs or surrounding instrument.
+6. Multipin diagnostic service-interface module — BOTTOM ROW CELL 2 ONLY. Compact service module with one large multipin rectangular connector, one circular multipin connector and two plain mechanical test-access caps; no cables, text, buttons, screen or full panel.
+7. Grouped early-LED status-bar module — BOTTOM ROW CELL 3 ONLY. Narrow beige/gray physical module containing eight small unlit LED lenses grouped into red, amber and green sections by spacing only; no printed separators, text, numbers or active glow.
+8. Small specialized monochrome LCD readout module — BOTTOM ROW CELL 4 ONLY. One compact early specialized monochrome LCD hardware module with thick gray bezel and blank/off dark-green display window; no digits, text, buttons, backlight glow or surrounding instrument.
+
+DO NOT GENERATE ANYTHING NOT LISTED ABOVE. text, letters, numbers, units, logos or pseudo-writing; waveforms, screen graphics, lit pixels, active CRT/LCD content or illuminated LEDs; flat modern widescreen displays, touchscreens, thin consumer monitors or E3-style clean digital panels; complete racks, complete monitors with control desks, workstations, control rooms, machines, vehicles or scenes; any ninth or extra specimen, duplicate specimen, omitted specimen, merged specimen or substitution; wires, loose cables, keyboards, operator controls or lamps; baked cast shadows, contact shadows, glow, bloom, rays or temporary FX; photorealistic electronics product photography, filtered 3D render or soft studio catalog lighting.
+
+E2 visual character: late-1990s test/diagnostic interface language dominated by deep CRT hardware, removable rack electronics, diagnostic connector panels and grouped early LEDs, with only a small specialized early LCD as a minority technology
+REQUIRED ERA SIGNALS: two visibly deep CRT hardware families; rack-mount removable electronics with extraction hardware; replaceable service cassette language; dedicated coax/multipin diagnostic interfaces; grouped small early LEDs; one explicitly minority specialized monochrome LCD module.
+REPLACED PREVIOUS-ERA LANGUAGE: E1 matching analog gauges and simple relay/terminal strips as the main instrumentation language; isolated early CRT bezels without surrounding rack/service electronics context; sparse status lamps rather than dense grouped diagnostic indication.
+FORBIDDEN REGRESSION: flat-panel dominance; modern thin LCD styling; complete workstations or racks; random unmatched gauges; large sparse E1 indicator lenses as the main diagnostic cue; screen graphics or active glow.
+
+PRESENTATION: isolated physical specimens only; examples must not overlap; one neutral background; no title bar, era/year text, captions, numbered labels, legend, UI/dashboard frame or scenery; no baked cast shadow, glow, bloom, rays or other temporary FX.
+
+The generation request MUST append `art/style_bible.txt` verbatim exactly once. Do not paraphrase it.

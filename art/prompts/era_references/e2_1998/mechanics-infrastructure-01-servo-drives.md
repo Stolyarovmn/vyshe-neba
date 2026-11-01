@@ -1,0 +1,26 @@
+E2 / 1998 — mechanics-infrastructure — 01-servo-drives / servo, motor-reducer and closed-loop drive modules
+
+Generate ONE E2-only atomic specimen field containing EXACTLY the 8 specimens listed below and NOTHING ELSE.
+
+LAYOUT: 1536×1024 landscape, 4×2 grid, 8 large isolated specimens, one specimen per cell, generous empty spacing, neutral background, no labels or captions.
+
+ALLOWED SPECIMENS — exactly these 8:
+1. AC servo motor with rear encoder housing — TOP ROW CELL 1 ONLY. Compact finned industrial AC servo motor with clean flange mount, short output shaft and distinct rear encoder/resolver housing; connector sockets may be molded into the body but no cables are attached.
+2. Servo motor with inline planetary gearbox — TOP ROW CELL 2 ONLY. Precision servo motor joined to a compact coaxial planetary gearbox with repeatable flange geometry and one output shaft; no surrounding machine, cable or control box.
+3. Servo motor with right-angle gear reducer — TOP ROW CELL 3 ONLY. Compact servo motor joined to a precision right-angle worm or bevel gear reducer with a machined output shaft and serviceable cast housing; no external drivetrain.
+4. Motorized ballscrew linear actuator — TOP ROW CELL 4 ONLY. Short enclosed or semi-enclosed electric linear actuator with servo motor, ballscrew housing, sliding rod/carriage and end-bearing blocks; no larger mechanism, cable or frame.
+5. Electric rotary actuator with integrated brake — BOTTOM ROW CELL 1 ONLY. Compact cast rotary actuator module with electric motor section, reduction housing, integrated brake can and one output flange; no external linkage or control wiring.
+6. Direct-drive torque-motor rotary module — BOTTOM ROW CELL 2 ONLY. Compact low-profile annular torque-motor/rotary-stage drive module with central bore, precision mounting flange and encoder ring housing; physical drive only, no complete turntable or instrument.
+7. Brushless spindle/drive motor with resolver housing — BOTTOM ROW CELL 3 ONLY. Compact late-1990s brushless motor with machined front flange, short shaft, finned housing and rear resolver/feedback can; no fan shroud, cable or machine.
+8. Electrohydraulic servo cylinder with position-transducer body — BOTTOM ROW CELL 4 ONLY. Precision hydraulic cylinder with polished rod, clevis ends, compact integrated servo-valve block and a visible linear position-transducer housing; no hoses, external manifold or complete hydraulic system.
+
+DO NOT GENERATE ANYTHING NOT LISTED ABOVE. text, letters, numbers, logos or pseudo-writing; hand cranks, manual screw jacks, open belt drives, open chain drives or manual-only actuation; whole machines, robot arms, cranes, vehicles, turntables, test rigs, buildings, rooms or scenes; any ninth or extra specimen, duplicate specimen, omitted specimen, merged specimen or substitution; loose cables, complete wiring harnesses, pipe networks, gauges, control panels, screens or lamps; generic E1 TEFC motor alone as the dominant vocabulary, simple hydraulic cylinder without feedback, solenoids as the main drive class; baked cast shadows, contact shadows, glow, bloom, rays or temporary FX; photorealistic PBR product rendering, filtered 3D render or soft studio photography.
+
+E2 visual character: late-1990s closed-loop test-center actuation dominated by servo motors, motor-reducers, encoder/resolver feedback and precision electric linear/rotary drives, with electrohydraulic servo retained only where functionally appropriate
+REQUIRED ERA SIGNALS: servo motors with explicit feedback housings; planetary/right-angle motor-reducer packages; motorized ballscrew linear actuation; precision rotary/torque-motor drive modules; closed-loop electrohydraulic actuation.
+REPLACED PREVIOUS-ERA LANGUAGE: E1 generic industrial motors and simple inline gearboxes as the main drive language; hydraulic cylinders without position feedback; guarded belt/chain fragments as common drive vocabulary; basic solenoid or clutch modules standing in for precision motion control.
+FORBIDDEN REGRESSION: dominant manual actuation; open belt/chain drives; generic motor-only E1 appearance without feedback; simple uninstrumented hydraulic cylinders; improvised motor mounts or whole machines.
+
+PRESENTATION: isolated physical specimens only; examples must not overlap; one neutral background; no title bar, era/year text, captions, numbered labels, legend, UI/dashboard frame or scenery; no baked cast shadow, glow, bloom, rays or other temporary FX.
+
+The generation request MUST append `art/style_bible.txt` verbatim exactly once. Do not paraphrase it.
