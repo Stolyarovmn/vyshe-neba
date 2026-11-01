@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/mechanics-infrastructure-01-assisted-drives.json",
+  "generation_id": "a3fd0ac7-b7ad-4441-9369-d8cab774f261",
+  "source": {
+    "sha256": "a30d1d82b4291ee704e5c7146da4e875fff117b003b223bc5c5bd54dbc3ab955",
+    "bytes": 2024061,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1YNgq_Xt1o1ChH8hsDedOQzr8f-AWHjQL",
+    "drive_url": "https://drive.google.com/file/d/1YNgq_Xt1o1ChH8hsDedOQzr8f-AWHjQL/view?usp=drivesdk",
+    "drive_parent_folder_id": "1RSvbxm62sMJYpDDjg-KLUJ9B1L6_JYoc"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Compact foot-mounted industrial electric motor",
+      "verdict": "pass",
+      "notes": "ribbed foot-mounted industrial motor with shaft, feet and terminal box is clearly readable"
+    },
+    {
+      "id": "02",
+      "name": "Standardized motor-and-helical-gearbox package",
+      "verdict": "pass",
+      "notes": "motor and inline cast gearbox form one standardized package with a single output shaft"
+    },
+    {
+      "id": "03",
+      "name": "Hydraulic cylinder",
+      "verdict": "pass",
+      "notes": "painted cylinder, polished rod, clevis ends and two hose ports are clearly present without hoses"
+    },
+    {
+      "id": "04",
+      "name": "Compact hydraulic rotary actuator",
+      "verdict": "pass",
+      "notes": "compact cast rotary actuator body with flange, shaft and two ports is readable without external mechanism"
+    },
+    {
+      "id": "05",
+      "name": "Guarded V-belt drive fragment",
+      "verdict": "fail",
+      "notes": "formed sheet surrounds the top and sides, but the full front face leaves the V-belt and both pulleys exposed; it reads as an open transmission rather than a protective safety guard"
+    },
+    {
+      "id": "06",
+      "name": "Guarded roller-chain drive fragment",
+      "verdict": "fail",
+      "notes": "formed housing surrounds the perimeter but the full front face leaves chain and sprockets exposed; this violates the guarded-drive requirement"
+    },
+    {
+      "id": "07",
+      "name": "Industrial linear solenoid actuator",
+      "verdict": "pass",
+      "notes": "coil housing, straight plunger and mounting flange are clear with no wiring"
+    },
+    {
+      "id": "08",
+      "name": "Electromagnetic clutch/brake module",
+      "verdict": "fail",
+      "notes": "the cylindrical vented housing with feet reads primarily as another electric motor/generator rather than an unambiguous clutch/brake module"
+    }
+  ],
+  "reviewer": "ChatGPT vision self-review",
+  "review_method": "direct visual inspection of the exact untouched PNG against game-production@6e8875ef6fc2180dad4483e41839642b7cb7da6b guarded 8-specimen spec, canonical style, and exact E0 manual-drives comparison SHA-256 36c52034690af8c1d78221bfe3d849cec175363ac41318b13c144b8c41ad9a46; canonical request SHA-256 9f7578fb04d733e1ccaaede260e4ffafd29ccd24430d7328af228b0a6480ff82",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "specimens 05 and 06 expose the moving belt/chain transmissions through the entire front face instead of showing a protective safety guard",
+    "the exposed-transmission presentation regresses toward the E0 open-drive language explicitly forbidden by the E1 spec",
+    "specimen 08 remains motor-like and does not read unambiguously as an electromagnetic clutch/brake module"
+  ]
+}
