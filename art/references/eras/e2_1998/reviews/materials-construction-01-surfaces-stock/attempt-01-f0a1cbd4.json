@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-01-surfaces-stock.json",
+  "generation_id": "f0a1cbd4-18bb-4a1f-8542-db63a31fc13f",
+  "source": {
+    "sha256": "7b49d0a3a8a85cd70482f5f3af6fd9a3948dcfe0c43f43f8e9e274c525984cad",
+    "bytes": 1654749,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1BzA8xC4iU3NwxuMnkcjykFZz5TOml83_",
+    "drive_url": "https://drive.google.com/file/d/1BzA8xC4iU3NwxuMnkcjykFZz5TOml83_/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Light-gray precision-painted steel electronics plate",
+      "verdict": "pass",
+      "notes": "Single clean light-gray precision-painted plate; no holes, fasteners, ventilation or distress."
+    },
+    {
+      "id": "02",
+      "name": "Beige-gray molded ABS/PC technical panel",
+      "verdict": "pass",
+      "notes": "Single beige-gray molded panel with molded perimeter and one horizontal stiffening rib; no controls/connectors/text."
+    },
+    {
+      "id": "03",
+      "name": "Anodized aluminium instrument faceplate blank",
+      "verdict": "pass",
+      "notes": "Single anodized faceplate blank with clean functional cutouts and no attached instruments or labels."
+    },
+    {
+      "id": "04",
+      "name": "Precision-folded electronics chassis fragment",
+      "verdict": "pass",
+      "notes": "Single open precision-folded chassis fragment with multiple factory folds/flanges; not a closed rack/cabinet/machine."
+    },
+    {
+      "id": "05",
+      "name": "Perforated ventilation sheet coupon",
+      "verdict": "pass",
+      "notes": "Single regular perforated ventilation-sheet coupon without fan/filter/frame/housing."
+    },
+    {
+      "id": "06",
+      "name": "Short anodized aluminium rack-mount profile",
+      "verdict": "pass",
+      "notes": "Single specialized rack-mount extrusion with one regular mounting-hole row and rack-specific geometry."
+    },
+    {
+      "id": "07",
+      "name": "Molded glass-filled nylon spacer/support block",
+      "verdict": "pass",
+      "notes": "Single dark engineering-polymer support block with one bore and restrained structural ribbing; no inserts/hardware."
+    },
+    {
+      "id": "08",
+      "name": "Precision die-cut EPDM/silicone isolation pad",
+      "verdict": "pass",
+      "notes": "Single flat dark isolation/gasket pad with one large central opening and four corner mounting holes."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Direct vision review of the exact SHA-bound untouched PNG against the merged machine spec; Drive readback bytes SHA-256 verified identical.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
