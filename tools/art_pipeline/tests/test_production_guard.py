@@ -47,6 +47,17 @@ class ProductionGuardTests(unittest.TestCase):
         self.assertIn("FORBIDDEN REGRESSION", prompt)
         self.assertIn("no baked cast shadow", prompt)
 
+    def test_surfaces_stock_disambiguates_folded_sheet_from_angle_and_forbids_rust(self):
+        value = self.load_spec()
+        specimens = {item["id"]: item for item in value["specimens"]}
+        self.assertIn("broad flat face must dominate", specimens["03"]["description"])
+        self.assertIn("NOT an angle profile", specimens["03"]["description"])
+        self.assertIn("absolutely no yellow paint", specimens["04"]["description"])
+        self.assertTrue(any("visible rust" in item and "orange oxidation" in item for item in value["global_forbidden"]))
+        prompt = pg.render_prompt(value)
+        self.assertIn("cream or beige flat plate replacing the safety-yellow folded sample", prompt)
+        self.assertIn("yellow-painted angle replacing the unpainted galvanized L-profile", prompt)
+
     def test_request_embeds_style_once(self):
         value = self.load_spec()
         request = pg.build_request(value)
