@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-01-surfaces-stock.json",
+  "generation_id": "6a1e654d-1af9-4ad7-a9fd-7c43dc1c9dd0",
+  "source": {
+    "sha256": "78cf0a9246d4baf709a39f05346d133ec133e15a125b8d70d078492acfca4f88",
+    "bytes": 1339142,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1FHJwBhAStLnU9WFA8Jr7G7QKUUEGI9a5",
+    "drive_url": "https://drive.google.com/file/d/1FHJwBhAStLnU9WFA8Jr7G7QKUUEGI9a5/view?usp=drivesdk",
+    "drive_parent_folder_id": "1iPan8TlEoR90tHos-o50fkqf9_qzkqmq"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","verdict":"pass","notes":"industrial-gray rectangular plate with clean factory-painted finish and no visible rust"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","verdict":"pass","notes":"olive-gray factory-painted panel with only sparse small edge wear"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","verdict":"pass","notes":"broad yellow flat sheet clearly dominates with one narrow 90-degree return flange on one short edge"},
+    {"id":"04","name":"Short galvanized steel angle profile","verdict":"pass","notes":"unpainted galvanized equal-leg L-angle, distinct from the yellow folded coupon"},
+    {"id":"05","name":"Short anodized aluminium U-channel extrusion","verdict":"pass","notes":"clean short U-channel with repeatable extrusion geometry and anodized-metal reading"},
+    {"id":"06","name":"Short square steel box-section","verdict":"pass","notes":"square hollow box-section with visible square open end and even gray finish"},
+    {"id":"07","name":"Molded phenolic / early industrial-plastic spacer block","verdict":"pass","notes":"single solid dark-brown phenolic block with exactly one through-bore"},
+    {"id":"08","name":"Molded neoprene vibration pad","verdict":"pass","notes":"thick black rectangular molded pad with shallow functional ribbing"}
+  ],
+  "reviewer": "assistant_self_review",
+  "review_method": "Exact untouched PNG visually reviewed against the canonical 8-specimen E1 materials-construction spec and style contract; exact bytes measured locally and archived to Drive. Generation occurred before the explicit conversational bridge became canonical, from the user's explicit complete eight-item instruction; bridge enforcement applies to subsequent generation calls.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "approval_state": "pass_pending_cross_era_role_review"
+}
