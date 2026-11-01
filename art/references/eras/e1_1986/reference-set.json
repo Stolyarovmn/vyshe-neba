@@ -4,7 +4,7 @@
   "year": 1986,
   "name": "Своя мастерская",
   "status": "generation_in_progress",
-  "approval_context": "E1 now uses eleven atomic sheet-parts in the same four-role structure as the complete E0 candidate. After five rejected attempts, the former combined 8-specimen materials-construction/01-surfaces-stock sheet was removed from the canonical plan and split into two guarded 4-specimen sheet-parts to prevent repeated specimen collapse. No E1 sheet is approved yet.",
+  "approval_context": "E1 uses eleven atomic sheet-parts in the same four-role structure as the complete E0 candidate. After five rejected attempts, the former combined 8-specimen materials-construction/01-surfaces-stock sheet was removed from the canonical plan and split into two guarded 4-specimen sheet-parts. The first 01a-flat-materials generation turn produced three archived source-rejected outputs; no E1 sheet is approved yet.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -68,11 +68,13 @@
   "sheets": [],
   "generation_checkpoint": {
     "status": "generation_in_progress",
-    "production_base_sha": "a1a59e886a507741bae4d78200316d53510b8b76",
+    "production_base_sha": "91e0950445bb0cec513f48a8cf416f7d41c0af46",
     "summary": {
       "planned_sheet_parts": 11,
       "exact_sha_visual_review_pass_pending_cross_era": 0,
-      "not_started": 11,
+      "not_started": 10,
+      "source_rejected_sheet_parts": 1,
+      "archived_rejected_attempts_for_current_01a": 3,
       "archived_rejected_attempts_for_retired_combined_sheet": 5
     },
     "retired_combined_sheet": {
@@ -82,7 +84,7 @@
       "rejected_attempts": 5
     },
     "sheet_states": {
-      "materials-construction/01a-flat-materials": {"status":"not_started"},
+      "materials-construction/01a-flat-materials": {"status":"source_rejected","rejected_attempts":3,"review_directory":"art/references/eras/e1_1986/reviews/materials-construction-01a-flat-materials/"},
       "materials-construction/01b-profiles-polymers": {"status":"not_started"},
       "materials-construction/02-joints-repairs": {"status":"not_started"},
       "materials-construction/03-service-architecture": {"status":"not_started"},
@@ -105,7 +107,7 @@
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "Generate the eleven planned E1 atomic sheet-parts from their machine-readable guarded specs/prompts. Begin with 01a-flat-materials, then 01b-profiles-polymers. The five rejected combined-sheet attempts are provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
+    "reference_strategy": "Retry 01a-flat-materials only after changing the imagegen invocation/control method so the guarded 4-item request reaches the generator unchanged. Do not advance to 01b until 01a has an exact-SHA source PASS. The five rejected combined-sheet attempts and the three rejected 01a attempts are provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
