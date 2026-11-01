@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/mechanics-infrastructure-03-diagnostic-utilities-routing.json",
+  "generation_id": "621e62ae-3aab-49ce-ba2a-2005c87d3448",
+  "source": {
+    "sha256": "bc224cbc8592d4991abb49b0535badb47220777bd2405f493c372ec3abb78f58",
+    "bytes": 1795734,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1qsUm48_0ICJZxEs7eLEQmeD7Gfgu2HWA",
+    "drive_url": "https://drive.google.com/file/d/1qsUm48_0ICJZxEs7eLEQmeD7Gfgu2HWA/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Slotted wiring-duct segment with routed harness","verdict":"pass","notes":"Short gray slotted wiring duct contains a neatly routed multicolor harness under a snap-on lid edge; remains a local fragment only."},
+    {"id":"02","name":"Braided multi-core harness branch with heat-shrink breakout","verdict":"pass","notes":"Braided harness splits into three controlled branches through molded breakout sleeves and repeated strain-relief clamps; no labels or uncontrolled loose wiring."},
+    {"id":"03","name":"Shielded coaxial diagnostic cable segment","verdict":"pass","notes":"Single short shielded test cable has matching metal bayonet/coax connectors at both ends and molded strain reliefs; no instrument or panel."},
+    {"id":"04","name":"Circular multipin bayonet connector pair with short tails","verdict":"pass","notes":"Matching circular multipin plug/receptacle pair uses knurled locking shells and very short organized harness tails; no equipment panel or labels."},
+    {"id":"05","name":"Grouped sealed cable-gland bulkhead pass-through","verdict":"pass","notes":"Small bulkhead plate shows exactly four identical sealed glands in an even pattern with short cable stubs; no full enclosure or wall."},
+    {"id":"06","name":"Stainless instrumentation-tubing elbow and compression union","verdict":"pass","notes":"Short clean stainless tube fragment has one precise 90-degree bend and a compression-union assembly without valves, gauges or surrounding network."},
+    {"id":"07","name":"Crimped service hose with quick-disconnect coupling","verdict":"pass","notes":"Short reinforced hose has a factory-crimped ferrule and one compact quick-disconnect coupling; no manifold or complete hydraulic system."},
+    {"id":"08","name":"Compact solenoid manifold with dedicated diagnostic/test ports","verdict":"pass","notes":"Compact machined manifold block has two solenoid coil housings, standardized ports and two capped diagnostic/test ports with no hoses, wires, gauges or cabinet."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 machine spec, style bible and E2 era contract; local SHA-256, dimensions and byte count verified; Google Drive upload metadata confirms the same exact byte count and destination before acceptance.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
