@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "production_base_sha": "6e8875ef6fc2180dad4483e41839642b7cb7da6b",
+  "current_game_production_sha_at_checkpoint": "6e8875ef6fc2180dad4483e41839642b7cb7da6b",
+  "era": "E1",
+  "year": 1986,
+  "role": "mechanics-infrastructure",
+  "sheet": "01-assisted-drives",
+  "spec_file": "art/reference_specs/e1_1986/mechanics-infrastructure-01-assisted-drives.json",
+  "status": "blocked_retry_budget_exhausted",
+  "attempts_in_this_turn": 2,
+  "max_attempts_per_turn": 2,
+  "total_rejected_attempts_archived": 2,
+  "latest_attempt": {
+    "generation_id": "6ad1abf6-354c-440b-a6c3-0d66de775bdf",
+    "sha256": "73b6674deab1ca86682f4311de648462bd7eff7cb7f2864b99f93f62704c9df2",
+    "bytes": 1866458,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "drive_file_id": "17CUPIXHCrhXJWbCayOOZwIt8gs35rKSf",
+    "review_file": "art/references/eras/e1_1986/reviews/mechanics-infrastructure-01-assisted-drives/attempt-02-6ad1abf6.json",
+    "verdict": "source_reject"
+  },
+  "previous_attempt_this_turn": {
+    "generation_id": "a3fd0ac7-b7ad-4441-9369-d8cab774f261",
+    "sha256": "a30d1d82b4291ee704e5c7146da4e875fff117b003b223bc5c5bd54dbc3ab955",
+    "bytes": 2024061,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "drive_file_id": "1YNgq_Xt1o1ChH8hsDedOQzr8f-AWHjQL",
+    "review_file": "art/references/eras/e1_1986/reviews/mechanics-infrastructure-01-assisted-drives/attempt-01-a3fd0ac7.json",
+    "verdict": "source_reject"
+  },
+  "blocking_defect_class": [
+    "V-belt safety guard is repeatedly rendered as a perimeter/top shell with the entire belt and pulleys exposed through the front face",
+    "roller-chain safety guard is repeatedly rendered as a perimeter/top shell with the entire chain and sprockets exposed through the front face",
+    "electromagnetic clutch/brake module is repeatedly rendered with a motor/generator-like cylindrical vented silhouette"
+  ],
+  "retry_policy": "Two production-generation attempts in this interactive turn reproduced the same blocking defect class. No further generation attempt is allowed in this turn.",
+  "next_step": "Resume this same sheet from the exact checkpoint in a new interactive turn. Do not advance to mechanics-infrastructure/02-joints-handling until 01-assisted-drives receives exact-SHA source PASS. If the defect repeats, tighten the machine-readable specimen constraints for a front-enclosing safety guard and a non-motor clutch/brake silhouette before further generation."
+}
