@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-01a-flat-materials.json",
+  "generation_id": "c9e1ff12-e224-4c5a-9a39-daf620f0e13f",
+  "source": {
+    "sha256": "c7e76b5b2564ee21521c0e77936e5540cc2f81bf04db963524ee95b4893233bb",
+    "bytes": 2119053,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1ol0U8YXWSPZ1BG_X2_eI-cNUCoUSkU5H",
+    "drive_url": "https://drive.google.com/file/d/1ol0U8YXWSPZ1BG_X2_eI-cNUCoUSkU5H/view?usp=drivesdk",
+    "drive_parent_folder_id": "1RSvbxm62sMJYpDDjg-KLUJ9B1L6_JYoc"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "fail",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "fail",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "fail",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","verdict":"fail","notes":"rendered as bare/brushed metal instead of factory-painted industrial-gray steel"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","verdict":"fail","notes":"edge damage/chipping is much heavier than the few tiny chips allowed by the spec"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","verdict":"fail","notes":"rendered as a channel/profile-like bent section rather than a broad flat coupon with one narrow return flange"},
+    {"id":"04","name":"Molded neoprene vibration pad","verdict":"fail","notes":"rendered as a rolled rubber strip rather than a thick rectangular molded pad with shallow functional ribbing"}
+  ],
+  "reviewer": "ChatGPT vision self-review",
+  "review_method": "direct visual inspection of the exact generated PNG against game-production@91e0950445bb0cec513f48a8cf416f7d41c0af46 production-guard spec",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "image contains eight specimens instead of the exact four required by the 2x2 spec",
+    "multiple unlisted profile/tube/PVC/composite classes are present",
+    "all four requested specimens are materially or geometrically wrong",
+    "soft baked/contact shadows are visible under several specimens",
+    "rendering misses the canonical HD pixel-art / pixel-look style family"
+  ]
+}
