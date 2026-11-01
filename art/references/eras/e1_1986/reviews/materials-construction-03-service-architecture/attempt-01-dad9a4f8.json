@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-03-service-architecture.json",
+  "generation_id": "dad9a4f8-c4f0-49fd-a338-3ea07b714b61",
+  "source": {
+    "sha256": "0fc76b9199d5fd6d438f18060a660d1f6e42ba783cb6a97ef88fd98e55279dbd",
+    "bytes": 2022715,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1BSEgVw-kUA7FQ6pXOuIZOmhKaJkAJbue",
+    "drive_url": "https://drive.google.com/file/d/1BSEgVw-kUA7FQ6pXOuIZOmhKaJkAJbue/view?usp=drivesdk",
+    "drive_parent_folder_id": "1iPan8TlEoR90tHos-o50fkqf9_qzkqmq"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Standardized pressed-steel service hatch",
+      "verdict": "pass",
+      "notes": "PASS: one isolated pressed-steel hatch assembly; rectangular folded frame, two matching hinges and one recessed quarter-turn latch; no surrounding wall."
+    },
+    {
+      "id": "02",
+      "name": "Stamped perforated ventilation grille",
+      "verdict": "pass",
+      "notes": "PASS: one isolated perforated steel grille with uniform repeated circular perforations in a folded frame; no fan or machine body."
+    },
+    {
+      "id": "03",
+      "name": "Pressed louver panel",
+      "verdict": "pass",
+      "notes": "PASS: one isolated pressed louver panel with evenly repeated louvers and painted folded frame; no surrounding wall."
+    },
+    {
+      "id": "04",
+      "name": "Profiled-metal wall-to-roof corner fragment",
+      "verdict": "pass",
+      "notes": "PASS: local profiled-sheet wall/roof corner only, with formed flashing and cold-formed support; does not form a complete roof, facade or building."
+    },
+    {
+      "id": "05",
+      "name": "Modular wall-panel to C-channel connection",
+      "verdict": "pass",
+      "notes": "PASS: isolated insulated/painted panel edge joined to a galvanized cold-formed C-channel by repeated standardized brackets/bolts; local connection only."
+    },
+    {
+      "id": "06",
+      "name": "Profiled roof sheet to Z-purlin connection",
+      "verdict": "pass",
+      "notes": "PASS: isolated profiled roof sheet segment fastened with repeated industrial fasteners to a Z-shaped cold-formed support; no complete roof."
+    },
+    {
+      "id": "07",
+      "name": "Standardized steel base plate on concrete plinth",
+      "verdict": "pass",
+      "notes": "PASS: local painted steel base plate/short column stub on a cast-concrete plinth with four regular anchor bolts; no full column or larger structure."
+    },
+    {
+      "id": "08",
+      "name": "Galvanized anti-slip grating threshold",
+      "verdict": "pass",
+      "notes": "PASS: isolated galvanized anti-slip open grating threshold with folded edge frame; no stairs, walkway system or surrounding architecture."
+    }
+  ],
+  "reviewer": "assistant_self_review",
+  "review_method": "Exact untouched 1536x1024 source inspected specimen-by-specimen at full resolution against the machine-readable allowlist, global forbidden classes, canonical style bible and E1 era contract; matching E0 service-architecture candidate was fetched from its recorded Drive ID, SHA-256 reverified as d4407f9e4ac9bcbf48bc1360d3c2d490550d51e2779203c4976769d80d623040, and visually compared for regression. The E1 source uses cleaner repeatable pressed/folded fabrication, uniform perforation/louver patterns, cold-formed C/Z supports, regular fasteners/anchors, factory grating/flashing, and materially less hand-built/rough treatment. Neutral background has mild tonal variation but no specimen-shaped baked contact/cast shadow, glow, bloom or temporary FX.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "approval_state": "pass_pending_cross_era_role_review"
+}
