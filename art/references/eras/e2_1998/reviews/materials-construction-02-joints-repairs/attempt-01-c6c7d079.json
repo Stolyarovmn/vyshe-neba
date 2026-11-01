@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json",
+  "generation_id": "c6c7d079-10f1-4004-ba90-8a4f767646e6",
+  "source": {
+    "sha256": "11f9409d75592613c06dac213b6de3c6bf7254e958087e67b8685ba2fa0ae7af",
+    "bytes": 1873888,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1IgWMVeMtrOOzKkmS7fuWxN0sBhm1wUmx",
+    "drive_url": "https://drive.google.com/file/d/1IgWMVeMtrOOzKkmS7fuWxN0sBhm1wUmx/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Precision folded chassis corner with captive threaded inserts","verdict":"pass","notes":"Two captive threaded inserts are integrated into one precision folded chassis corner; no loose hardware or complete enclosure."},
+    {"id":"02","name":"Flush countersunk aluminium lap joint","verdict":"pass","notes":"Two short aluminium panel fragments form one precise lap joint with an even row of embedded screw heads; no separate fastener specimen."},
+    {"id":"03","name":"Reinforced captive-thread mounting point","verdict":"pass","notes":"Single locally reinforced sheet-metal mounting point with one captive threaded insert is clearly isolated."},
+    {"id":"04","name":"Precision interlocking tab-and-slot chassis seam","verdict":"pass","notes":"Two short sheet-metal fragments visibly interlock through repeatable tab/slot geometry; no complete box or rack."},
+    {"id":"05","name":"Removable rack-ear-to-chassis joint","verdict":"pass","notes":"Local rack-ear fragment, slotted mounting geometry and embedded service hardware remain an atomic joint rather than a rack assembly."},
+    {"id":"06","name":"Captive quarter-turn service-panel flange joint","verdict":"pass","notes":"Exactly two captive quarter-turn fasteners connect a local service flange and panel-edge fragment; not a complete hatch."},
+    {"id":"07","name":"Replaceable precision reinforcement doubler","verdict":"pass","notes":"Replaceable doubler shows two locator slots and an even embedded fastening pattern without crude repair language."},
+    {"id":"08","name":"Rack-rail structural corner node with captive nut strip","verdict":"pass","notes":"Short perforated rack rail, transverse member and compact corner node read as one local rack-specific structural node only."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 machine spec and style/era contracts; dimensions, byte count and SHA-256 verified locally, Drive archive readback preserved exact byte count, and the accepted source was moved from the rejected holding folder into the canonical E2_1998 archive folder.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
