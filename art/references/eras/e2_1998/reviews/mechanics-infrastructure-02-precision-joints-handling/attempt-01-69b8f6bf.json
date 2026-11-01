@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/mechanics-infrastructure-02-precision-joints-handling.json",
+  "generation_id": "69b8f6bf-07ff-4046-b8f8-3f63e3ff1842",
+  "source": {
+    "sha256": "0d0c92fafd8d56fea71598ccae02ee2a2cc2a573f7872b94e5187d724df6aa79",
+    "bytes": 1786594,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1w60e8R2bfGbVLG42PHBBhIFmiiZbGuXA",
+    "drive_url": "https://drive.google.com/file/d/1w60e8R2bfGbVLG42PHBBhIFmiiZbGuXA/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Maintenance-free spherical rod-end bearing","verdict":"pass","notes":"Single sealed spherical rod-end bearing with threaded shank and standardized finish is isolated and legible."},
+    {"id":"02","name":"Clevis joint with spherical-bearing cartridge","verdict":"pass","notes":"Machined clevis surrounds a replaceable spherical-bearing cartridge with retained cross-pin hardware; no attached machine."},
+    {"id":"03","name":"Recirculating linear-guide carriage on short rail","verdict":"pass","notes":"Precision guide block rides on a short machined rail with regular mounting holes; no actuator is attached."},
+    {"id":"04","name":"Preloaded sealed guide-roller carriage","verdict":"pass","notes":"Compact carriage uses four visible sealed rollers around a short guide profile without becoming a larger track system."},
+    {"id":"05","name":"Electric wire-rope winch with encoder/brake module","verdict":"pass","notes":"Motor-reducer winch has a drum, brake/feedback housings and only a short cable tail; no boom, crane or vehicle."},
+    {"id":"06","name":"Electric chain-hoist module with limit-switch housings","verdict":"pass","notes":"Compact electric hoist body includes short load chain, hook and two small physical limit-switch housings; no beam or trolley."},
+    {"id":"07","name":"Gas-spring counterbalance strut with ball-joint ends","verdict":"pass","notes":"Industrial gas spring has polished rod, dark cylinder and standardized joint/socket ends with no surrounding hatch or mechanism."},
+    {"id":"08","name":"Compact rotary indexing bearing-and-lock module","verdict":"pass","notes":"Low-profile rotary bearing housing shows circular mounting pattern and a distinct indexing/locking plunger module without a complete table."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 machine spec, style bible and E2 era contract; dimensions, byte count and SHA-256 verified locally; Google Drive readback matched the exact byte count and SHA-256 before acceptance.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
