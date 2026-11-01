@@ -35,7 +35,7 @@ Era reference approval is separate from approval of any production asset and doe
 ## Current sets
 
 - `e0_1978/` — **candidate complete, pending E0↔E1 cross-era role review**; 10/10 planned atomic sheet-parts have immutable exact-SHA candidates with per-sheet self-review PASS, but E0 is not yet `approved_visual_reference_set`.
-- `e1_1986/` — **generation in progress** in an 11-sheet atomic plan (4 materials + 3 mechanics + 2 controls + 2 lighting). After five rejected attempts, the former combined 8-specimen `materials-construction/01-surfaces-stock` sheet was removed from the canonical plan and split into two guarded 4-specimen sheet-parts; rejected combined-sheet outputs remain provenance only. Building E1 is the required next step to execute the E0↔E1 cross-era gate.
+- `e1_1986/` — **generation in progress** in a 10-sheet atomic plan (3 materials + 3 mechanics + 2 controls + 2 lighting). The first guarded `materials-construction/01-surfaces-stock` sheet is again one canonical 8-specimen 4×2 sheet by explicit production decision; the temporary 4+4 split is no longer canonical. All rejected split/combined outputs remain provenance only and are not visual evidence. Building E1 is the required next step to execute the E0↔E1 cross-era gate.
 - `e2_1998/` — **rebuild required** under the atomic-only multi-sheet role contract; previous broad boards and style-correction attempts are not canonical evidence.
 - E3–E5 — pending; must be created directly in the atomic-only format after E0–E2 are approved.
 
