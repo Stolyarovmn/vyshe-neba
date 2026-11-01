@@ -4,7 +4,7 @@
   "year": 1986,
   "name": "Своя мастерская",
   "status": "generation_in_progress",
-  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. All three materials-construction sheets now have immutable Drive-backed exact sources with scope/style/era/readability self-review PASS and are pending the required E0↔E1 cross-era materials-role review. Seven earlier source-rejected surfaces-stock attempts remain provenance only. Seven E1 sheet-parts remain to be generated and reviewed.",
+  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. All three materials-construction sheets have immutable Drive-backed exact sources with scope/style/era/readability self-review PASS and are pending the required E0↔E1 cross-era materials-role review. The first mechanics-infrastructure sheet has two archived source-rejected attempts in this interactive turn and is blocked by the retry budget; six later E1 sheet-parts remain not started.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -125,13 +125,14 @@
   "sheets": [],
   "generation_checkpoint": {
     "status": "generation_in_progress",
-    "production_base_sha": "c9c72909ef5db248d4592f70c36de76fc1953625",
+    "production_base_sha": "6e8875ef6fc2180dad4483e41839642b7cb7da6b",
     "summary": {
       "planned_sheet_parts": 10,
       "exact_sha_visual_review_pass_pending_cross_era": 3,
-      "not_started": 7,
-      "source_rejected_sheet_parts": 0,
-      "archived_rejected_attempts_for_surfaces_stock": 7
+      "not_started": 6,
+      "source_rejected_sheet_parts": 1,
+      "archived_rejected_attempts_for_surfaces_stock": 7,
+      "archived_rejected_attempts_for_assisted_drives": 2
     },
     "sheet_states": {
       "materials-construction/01-surfaces-stock": {
@@ -198,7 +199,9 @@
         "review_file": "art/references/eras/e1_1986/reviews/materials-construction-03-service-architecture/attempt-01-dad9a4f8.json"
       },
       "mechanics-infrastructure/01-assisted-drives": {
-        "status": "not_started"
+        "status": "blocked_retry_budget_exhausted",
+        "rejected_attempts": 2,
+        "review_directory": "art/references/eras/e1_1986/reviews/mechanics-infrastructure-01-assisted-drives/"
       },
       "mechanics-infrastructure/02-joints-handling": {
         "status": "not_started"
@@ -230,7 +233,7 @@
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "Use all three materials-construction candidates (01-surfaces-stock, 02-joints-repairs and 03-service-architecture) only as exact-SHA E1 candidates pending the matching E0↔E1 cross-era materials-role review. Generate mechanics-infrastructure/01-assisted-drives next through the merged production guard, using the complete canonical build-request as a literal prompt when the current imagegen interface supports/requires it; otherwise use a verified explicit chat block. Archive and review exact bytes before any later E1 sheet. All seven rejected surfaces-stock outputs remain provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
+    "reference_strategy": "Use all three materials-construction candidates only as exact-SHA E1 candidates pending the matching E0↔E1 cross-era materials-role review. Resume mechanics-infrastructure/01-assisted-drives from its exact blocked checkpoint in a new interactive turn; do not advance to mechanics-infrastructure/02-joints-handling until 01-assisted-drives gets exact-SHA source PASS. Both rejected assisted-drives outputs are provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
