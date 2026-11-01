@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e1_1986/materials-construction-01a-flat-materials.json",
+  "generation_id": "1aa47191-a3de-4fa4-b135-9973a071ec78",
+  "source": {
+    "sha256": "4fe952faf229feb0b96ed93641c411004ecf138a18c35f611155977cc288c17d",
+    "bytes": 1813303,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1uFwQclcnvWzdHQr714kY4Txc1QM_3fqA",
+    "drive_url": "https://drive.google.com/file/d/1uFwQclcnvWzdHQr714kY4Txc1QM_3fqA/view?usp=drivesdk",
+    "drive_parent_folder_id": "1RSvbxm62sMJYpDDjg-KLUJ9B1L6_JYoc"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "fail",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "fail",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","verdict":"fail","notes":"present but strongly distressed/rusted at edges rather than a smooth controlled factory coating"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","verdict":"fail","notes":"present but heavily chipped/distressed beyond the allowed few tiny edge chips"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","verdict":"fail","notes":"rendered as an angle/channel-like profile rather than a broad flat coupon with one narrow short-edge return flange"},
+    {"id":"04","name":"Molded neoprene vibration pad","verdict":"fail","notes":"a dark block is present, but the sheet also contains four unlisted classes and the pad lacks the requested crisp molded ribbed-pad reading"}
+  ],
+  "reviewer": "ChatGPT vision self-review",
+  "review_method": "direct visual inspection of the exact generated PNG against game-production@91e0950445bb0cec513f48a8cf416f7d41c0af46 production-guard spec",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "image contains eight specimens instead of the exact four required by the 2x2 spec",
+    "multiple unlisted specimen classes are present, including channel/profile, composite/plastic and glass-like samples",
+    "yellow specimen is again a profile rather than the required broad folded coupon",
+    "metal surfaces regress to heavy distressed/rusted language and the rendering misses the canonical HD pixel-look"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "era": "E1",
+  "year": 1986,
+  "role": "materials-construction",
+  "sheet": "01a-flat-materials",
+  "production_base_sha": "91e0950445bb0cec513f48a8cf416f7d41c0af46",
+  "status": "source_rejected",
+  "attempts": [
+    {"generation_id":"5122497d-f10e-4536-9c13-f1de2c2b0d9d","sha256":"f3b05ed16058a46d0aa3bf39389cd45b37b7c5309da673ce9749091acab77dff","review":"attempt-01-5122497d.json","verdict":"fail"},
+    {"generation_id":"1aa47191-a3de-4fa4-b135-9973a071ec78","sha256":"4fe952faf229feb0b96ed93641c411004ecf138a18c35f611155977cc288c17d","review":"attempt-02-1aa47191.json","verdict":"fail"},
+    {"generation_id":"c9e1ff12-e224-4c5a-9a39-daf620f0e13f","sha256":"c7e76b5b2564ee21521c0e77936e5540cc2f81bf04db963524ee95b4893233bb","review":"attempt-03-c9e1ff12.json","verdict":"fail"}
+  ],
+  "common_failures": [
+    "imagegen did not preserve the exact four-specimen 2x2 contract",
+    "unlisted material/profile classes appeared",
+    "the safety-yellow broad folded coupon collapsed into a profile/channel form",
+    "factory-clean E1 surfaces regressed toward distressed/chipped material language",
+    "canonical HD pixel-art / pixel-look style was not preserved"
+  ],
+  "processing": "blocked_before_destructive_processing",
+  "promotion": "blocked",
+  "next_step": "Do not generate again in this interactive turn. Re-enter from the exact checkpoint and change the imagegen invocation/control method so the built guard request reaches the generator unchanged; then retry 01a only."
+}
