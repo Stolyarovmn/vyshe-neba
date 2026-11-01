@@ -4,7 +4,7 @@
   "year": 1986,
   "name": "Своя мастерская",
   "status": "generation_in_progress",
-  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. All three materials-construction sheets have immutable Drive-backed exact sources with scope/style/era/readability self-review PASS and are pending the required E0↔E1 cross-era materials-role review. The first mechanics-infrastructure sheet has two archived source-rejected attempts in this interactive turn and is blocked by the retry budget; six later E1 sheet-parts remain not started.",
+  "approval_context": "E1 uses ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. All three materials-construction sheets and mechanics-infrastructure/01-assisted-drives now have immutable Drive-backed exact sources with scope/style/era/readability self-review PASS, pending the required matching E0↔E1 cross-era role reviews. Four of ten E1 sheet-parts are accepted at per-sheet review and six remain not started. Assisted-drives attempt 01 remains rejected provenance; attempt 02 was re-reviewed and accepted after PR #69 corrected an over-strict guard interpretation to match the canonical E1 era matrix.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -47,102 +47,40 @@
   ],
   "sheet_density": {
     "default_max_specimens_per_sheet": 8,
-    "current_generation_size": [
-      1536,
-      1024
-    ],
-    "preferred_grid": [
-      4,
-      2
-    ],
-    "nominal_cell_before_margins": [
-      384,
-      512
-    ]
+    "current_generation_size": [1536, 1024],
+    "preferred_grid": [4, 2],
+    "nominal_cell_before_margins": [384, 512]
   },
   "role_plan": [
-    {
-      "role": "materials-construction",
-      "sheet": "01-surfaces-stock",
-      "prompt": "art/prompts/era_references/e1_1986/materials-construction-01-surfaces-stock.md",
-      "specimens": 8
-    },
-    {
-      "role": "materials-construction",
-      "sheet": "02-joints-repairs",
-      "prompt": "art/prompts/era_references/e1_1986/materials-construction-02-joints-repairs.md",
-      "specimens": 8
-    },
-    {
-      "role": "materials-construction",
-      "sheet": "03-service-architecture",
-      "prompt": "art/prompts/era_references/e1_1986/materials-construction-03-service-architecture.md",
-      "specimens": 8
-    },
-    {
-      "role": "mechanics-infrastructure",
-      "sheet": "01-assisted-drives",
-      "prompt": "art/prompts/era_references/e1_1986/mechanics-infrastructure-01-assisted-drives.md",
-      "specimens": 8
-    },
-    {
-      "role": "mechanics-infrastructure",
-      "sheet": "02-joints-handling",
-      "prompt": "art/prompts/era_references/e1_1986/mechanics-infrastructure-02-joints-handling.md",
-      "specimens": 8
-    },
-    {
-      "role": "mechanics-infrastructure",
-      "sheet": "03-utilities-routing",
-      "prompt": "art/prompts/era_references/e1_1986/mechanics-infrastructure-03-utilities-routing.md",
-      "specimens": 8
-    },
-    {
-      "role": "controls-displays",
-      "sheet": "01-operator-controls",
-      "prompt": "art/prompts/era_references/e1_1986/controls-displays-01-operator-controls.md",
-      "specimens": 8
-    },
-    {
-      "role": "controls-displays",
-      "sheet": "02-instruments-displays",
-      "prompt": "art/prompts/era_references/e1_1986/controls-displays-02-instruments-displays.md",
-      "specimens": 8
-    },
-    {
-      "role": "lighting-signals",
-      "sheet": "01-lamps-fixtures",
-      "prompt": "art/prompts/era_references/e1_1986/lighting-signals-01-lamps-fixtures.md",
-      "specimens": 8
-    },
-    {
-      "role": "lighting-signals",
-      "sheet": "02-signal-hardware",
-      "prompt": "art/prompts/era_references/e1_1986/lighting-signals-02-signal-hardware.md",
-      "specimens": 8
-    }
+    {"role":"materials-construction","sheet":"01-surfaces-stock","prompt":"art/prompts/era_references/e1_1986/materials-construction-01-surfaces-stock.md","specimens":8},
+    {"role":"materials-construction","sheet":"02-joints-repairs","prompt":"art/prompts/era_references/e1_1986/materials-construction-02-joints-repairs.md","specimens":8},
+    {"role":"materials-construction","sheet":"03-service-architecture","prompt":"art/prompts/era_references/e1_1986/materials-construction-03-service-architecture.md","specimens":8},
+    {"role":"mechanics-infrastructure","sheet":"01-assisted-drives","prompt":"art/prompts/era_references/e1_1986/mechanics-infrastructure-01-assisted-drives.md","specimens":8},
+    {"role":"mechanics-infrastructure","sheet":"02-joints-handling","prompt":"art/prompts/era_references/e1_1986/mechanics-infrastructure-02-joints-handling.md","specimens":8},
+    {"role":"mechanics-infrastructure","sheet":"03-utilities-routing","prompt":"art/prompts/era_references/e1_1986/mechanics-infrastructure-03-utilities-routing.md","specimens":8},
+    {"role":"controls-displays","sheet":"01-operator-controls","prompt":"art/prompts/era_references/e1_1986/controls-displays-01-operator-controls.md","specimens":8},
+    {"role":"controls-displays","sheet":"02-instruments-displays","prompt":"art/prompts/era_references/e1_1986/controls-displays-02-instruments-displays.md","specimens":8},
+    {"role":"lighting-signals","sheet":"01-lamps-fixtures","prompt":"art/prompts/era_references/e1_1986/lighting-signals-01-lamps-fixtures.md","specimens":8},
+    {"role":"lighting-signals","sheet":"02-signal-hardware","prompt":"art/prompts/era_references/e1_1986/lighting-signals-02-signal-hardware.md","specimens":8}
   ],
   "sheets": [],
   "generation_checkpoint": {
     "status": "generation_in_progress",
-    "production_base_sha": "6e8875ef6fc2180dad4483e41839642b7cb7da6b",
+    "production_base_sha": "5c24cc6e8208e66658f827b3f9b462df2627899b",
     "summary": {
       "planned_sheet_parts": 10,
-      "exact_sha_visual_review_pass_pending_cross_era": 3,
+      "exact_sha_visual_review_pass_pending_cross_era": 4,
       "not_started": 6,
-      "source_rejected_sheet_parts": 1,
+      "source_rejected_sheet_parts": 0,
       "archived_rejected_attempts_for_surfaces_stock": 7,
-      "archived_rejected_attempts_for_assisted_drives": 2
+      "archived_rejected_attempts_for_assisted_drives": 1
     },
     "sheet_states": {
       "materials-construction/01-surfaces-stock": {
         "status": "exact_sha_visual_review_pass_pending_cross_era",
         "generation_id": "6a1e654d-1af9-4ad7-a9fd-7c43dc1c9dd0",
         "drive_file_id": "1FHJwBhAStLnU9WFA8Jr7G7QKUUEGI9a5",
-        "dimensions": [
-          1536,
-          1024
-        ],
+        "dimensions": [1536,1024],
         "bytes": 1339142,
         "sha256": "78cf0a9246d4baf709a39f05346d133ec133e15a125b8d70d078492acfca4f88",
         "scope_gate": "pass",
@@ -160,10 +98,7 @@
         "status": "exact_sha_visual_review_pass_pending_cross_era",
         "generation_id": "cebacff5-22e0-4083-8979-8906bcbe67be",
         "drive_file_id": "1-iSY6iJyTlU-FAcErdWdPdvLvDuaL-kQ",
-        "dimensions": [
-          1536,
-          1024
-        ],
+        "dimensions": [1536,1024],
         "bytes": 1718031,
         "sha256": "44fc852936e7e7de808341c732bdd1241b9cf31924679fa681e12ec6c3615996",
         "scope_gate": "pass",
@@ -181,10 +116,7 @@
         "status": "exact_sha_visual_review_pass_pending_cross_era",
         "generation_id": "dad9a4f8-c4f0-49fd-a338-3ea07b714b61",
         "drive_file_id": "1BSEgVw-kUA7FQ6pXOuIZOmhKaJkAJbue",
-        "dimensions": [
-          1536,
-          1024
-        ],
+        "dimensions": [1536,1024],
         "bytes": 2022715,
         "sha256": "0fc76b9199d5fd6d438f18060a660d1f6e42ba783cb6a97ef88fd98e55279dbd",
         "scope_gate": "pass",
@@ -199,28 +131,29 @@
         "review_file": "art/references/eras/e1_1986/reviews/materials-construction-03-service-architecture/attempt-01-dad9a4f8.json"
       },
       "mechanics-infrastructure/01-assisted-drives": {
-        "status": "blocked_retry_budget_exhausted",
-        "rejected_attempts": 2,
-        "review_directory": "art/references/eras/e1_1986/reviews/mechanics-infrastructure-01-assisted-drives/"
+        "status": "exact_sha_visual_review_pass_pending_cross_era",
+        "generation_id": "6ad1abf6-354c-440b-a6c3-0d66de775bdf",
+        "drive_file_id": "17CUPIXHCrhXJWbCayOOZwIt8gs35rKSf",
+        "dimensions": [1536,1024],
+        "bytes": 1866458,
+        "sha256": "73b6674deab1ca86682f4311de648462bd7eff7cb7f2864b99f93f62704c9df2",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "exact_sha_visual_review": {
+          "verdict": "pass_pending_cross_era",
+          "reviewer": "assistant_self_review_with_user_art_direction_decision",
+          "method": "Exact untouched source was reverified at SHA-256 73b6674deab1ca86682f4311de648462bd7eff7cb7f2864b99f93f62704c9df2 and re-reviewed after PR #69 aligned the machine spec with the E1 era matrix: guards protect dangerous drives while leaving their operating principle visible. Specimen 08 retains a recorded non-blocking motor-like resemblance but satisfies the corrected axial two-hub/service-cover contract. The same Drive file was moved from _rejected to canonical E1_1986 without replacing bytes."
+        },
+        "review_file": "art/references/eras/e1_1986/reviews/mechanics-infrastructure-01-assisted-drives/attempt-02-6ad1abf6.json"
       },
-      "mechanics-infrastructure/02-joints-handling": {
-        "status": "not_started"
-      },
-      "mechanics-infrastructure/03-utilities-routing": {
-        "status": "not_started"
-      },
-      "controls-displays/01-operator-controls": {
-        "status": "not_started"
-      },
-      "controls-displays/02-instruments-displays": {
-        "status": "not_started"
-      },
-      "lighting-signals/01-lamps-fixtures": {
-        "status": "not_started"
-      },
-      "lighting-signals/02-signal-hardware": {
-        "status": "not_started"
-      }
+      "mechanics-infrastructure/02-joints-handling": {"status":"not_started"},
+      "mechanics-infrastructure/03-utilities-routing": {"status":"not_started"},
+      "controls-displays/01-operator-controls": {"status":"not_started"},
+      "controls-displays/02-instruments-displays": {"status":"not_started"},
+      "lighting-signals/01-lamps-fixtures": {"status":"not_started"},
+      "lighting-signals/02-signal-hardware": {"status":"not_started"}
     }
   },
   "approval_gate": {
@@ -233,7 +166,7 @@
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "Use all three materials-construction candidates only as exact-SHA E1 candidates pending the matching E0↔E1 cross-era materials-role review. Resume mechanics-infrastructure/01-assisted-drives from its exact blocked checkpoint in a new interactive turn; do not advance to mechanics-infrastructure/02-joints-handling until 01-assisted-drives gets exact-SHA source PASS. Both rejected assisted-drives outputs are provenance only and must not be used as visual evidence. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
+    "reference_strategy": "Use the three materials-construction candidates and mechanics-infrastructure/01-assisted-drives as exact-SHA E1 candidates pending their matching E0↔E1 cross-era role reviews. Assisted-drives attempt 01 remains rejected provenance only; attempt 02 is the canonical per-sheet candidate after exact-source reassessment against the PR #69 corrected spec. Proceed next to mechanics-infrastructure/02-joints-handling. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use previous broad E1 reference boards.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
