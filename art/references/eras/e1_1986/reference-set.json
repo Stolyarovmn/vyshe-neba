@@ -1,10 +1,10 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "era": "E1",
   "year": 1986,
   "name": "Своя мастерская",
-  "status": "rebuild_required",
-  "approval_context": "Previous broad matrix/elements/applications references are invalid under the canonical atomic-only era reference contract and are not canonical visual evidence.",
+  "status": "generation_ready",
+  "approval_context": "E1 is planned as ten atomic sheet-parts in the same four-role structure as the complete E0 candidate. E0 has 10/10 immutable exact-SHA candidates with per-sheet self-review PASS and is intentionally pending E0↔E1 cross-era role review; therefore E1 generation is the required next step rather than being blocked on an impossible prior E0 approval.",
   "authority": {
     "rules": "art/docs/ERA_DESIGN_MATRIX.md",
     "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
@@ -19,16 +19,19 @@
     "replaced": [
       "ad-hoc hand-built construction with standardized industrial modules",
       "open improvised cable runs with trays, harnesses and organized pipe racks",
-      "primarily manual mechanisms with hydraulics and electromechanical drives"
+      "primarily manual mechanisms with hydraulics and electromechanical drives",
+      "individually fitted controls with grouped repeatable operator modules",
+      "isolated ad-hoc lamps with planned standardized lighting and signal families"
     ],
     "added": [
-      "standardized cabinets, service covers and connectors",
+      "standardized cabinets, service covers, brackets and connectors",
+      "hydraulic and electromechanical drive components with guards",
       "denser red/amber/green status indication",
-      "monochrome and early color CRT hardware where functionally justified",
-      "industrial safety color coding"
+      "monochrome and limited early color CRT hardware where functionally justified",
+      "industrial safety color coding and repeatable utility routing"
     ],
     "why": "The base has matured from a garage prototype into a standardized workshop with repeatable production, maintenance and operating procedures.",
-    "player_signal": "More ordered construction, repeated module language, safety coding, organized utilities and denser but still period-appropriate controls."
+    "player_signal": "More ordered construction, repeated module language, guarded assisted mechanisms, safety coding, organized utilities and denser but still period-appropriate controls."
   },
   "raw_archive": {
     "provider": "google_drive",
@@ -41,17 +44,58 @@
     "controls-displays",
     "lighting-signals"
   ],
+  "sheet_density": {
+    "default_max_specimens_per_sheet": 8,
+    "current_generation_size": [1536, 1024],
+    "preferred_grid": [4, 2],
+    "nominal_cell_before_margins": [384, 512]
+  },
+  "role_plan": [
+    {"role":"materials-construction","sheet":"01-surfaces-stock","prompt":"art/prompts/era_references/e1_1986/materials-construction-01-surfaces-stock.md","specimens":8},
+    {"role":"materials-construction","sheet":"02-joints-repairs","prompt":"art/prompts/era_references/e1_1986/materials-construction-02-joints-repairs.md","specimens":8},
+    {"role":"materials-construction","sheet":"03-service-architecture","prompt":"art/prompts/era_references/e1_1986/materials-construction-03-service-architecture.md","specimens":8},
+    {"role":"mechanics-infrastructure","sheet":"01-assisted-drives","prompt":"art/prompts/era_references/e1_1986/mechanics-infrastructure-01-assisted-drives.md","specimens":8},
+    {"role":"mechanics-infrastructure","sheet":"02-joints-handling","prompt":"art/prompts/era_references/e1_1986/mechanics-infrastructure-02-joints-handling.md","specimens":8},
+    {"role":"mechanics-infrastructure","sheet":"03-utilities-routing","prompt":"art/prompts/era_references/e1_1986/mechanics-infrastructure-03-utilities-routing.md","specimens":8},
+    {"role":"controls-displays","sheet":"01-operator-controls","prompt":"art/prompts/era_references/e1_1986/controls-displays-01-operator-controls.md","specimens":8},
+    {"role":"controls-displays","sheet":"02-instruments-displays","prompt":"art/prompts/era_references/e1_1986/controls-displays-02-instruments-displays.md","specimens":8},
+    {"role":"lighting-signals","sheet":"01-lamps-fixtures","prompt":"art/prompts/era_references/e1_1986/lighting-signals-01-lamps-fixtures.md","specimens":8},
+    {"role":"lighting-signals","sheet":"02-signal-hardware","prompt":"art/prompts/era_references/e1_1986/lighting-signals-02-signal-hardware.md","specimens":8}
+  ],
   "sheets": [],
+  "generation_checkpoint": {
+    "status": "not_started",
+    "production_base_sha": "2687ae4799acd1759ecc206d1149997f4e17ca35",
+    "summary": {
+      "planned_sheet_parts": 10,
+      "exact_sha_visual_review_pass_pending_cross_era": 0,
+      "blocked": 0,
+      "not_started": 10
+    },
+    "sheet_states": {
+      "materials-construction/01-surfaces-stock": {"status":"not_started"},
+      "materials-construction/02-joints-repairs": {"status":"not_started"},
+      "materials-construction/03-service-architecture": {"status":"not_started"},
+      "mechanics-infrastructure/01-assisted-drives": {"status":"not_started"},
+      "mechanics-infrastructure/02-joints-handling": {"status":"not_started"},
+      "mechanics-infrastructure/03-utilities-routing": {"status":"not_started"},
+      "controls-displays/01-operator-controls": {"status":"not_started"},
+      "controls-displays/02-instruments-displays": {"status":"not_started"},
+      "lighting-signals/01-lamps-fixtures": {"status":"not_started"},
+      "lighting-signals/02-signal-hardware": {"status":"not_started"}
+    }
+  },
   "approval_gate": {
-    "scope": "atomic_only_no_whole_objects_or_scenes",
+    "scope": "pending",
     "style": "pending",
     "era": "pending",
+    "sheet_readability": "pending",
     "role_completeness": "pending",
     "cross_era_role_order": "pending"
   },
   "usage": {
     "required_for_future_generation": false,
-    "reference_strategy": "BLOCKED until E0 is approved in the atomic format and all four atomic E1 role sheets are exact-SHA approved. Do not use previous broad reference boards.",
+    "reference_strategy": "Generate the ten planned E1 atomic sheet-parts using this manifest and their exact prompts. Use the complete exact-SHA E0 candidate set only as lineage/comparison evidence for E0↔E1 cross-era review; do not use any previous broad E1 reference boards. E0 remains non-approved until that cross-era review passes.",
     "system_separation": "Physical hardware/materials belong in art; dynamic glow, active screens/data, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
   }
 }
