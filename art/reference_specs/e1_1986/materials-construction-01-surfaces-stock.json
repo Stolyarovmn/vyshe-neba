@@ -21,12 +21,12 @@
     "folder_name": "E1_1986"
   },
   "specimens": [
-    {"id":"01","name":"Factory-painted cold-rolled steel plate","description":"rectangular industrial-gray steel sample with a smooth sprayed enamel finish, clean rolled edges and only light service wear"},
-    {"id":"02","name":"Olive-gray factory-painted steel panel","description":"uniform utilitarian coating with a few small edge chips exposing steel, no joints or fasteners"},
-    {"id":"03","name":"Safety-yellow folded sheet-metal sample","description":"one clean factory bend with a consistent radius, smooth paint, no holes or attached hardware"},
-    {"id":"04","name":"Short galvanized steel angle profile","description":"standardized L-section with uniform thickness and a clean factory-cut end, no holes or fasteners"},
-    {"id":"05","name":"Short anodized aluminium U-channel extrusion","description":"straight repeatable profile with a clean machined end, no attached hardware"},
-    {"id":"06","name":"Short square steel box-section","description":"standardized hollow section with a clean factory-cut end and even gray primer, no fasteners"},
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","description":"rectangular industrial-gray steel sample with a smooth sprayed enamel finish, clean rolled edges and only faint non-corrosive service scuffs; no rust or orange oxidation"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","description":"uniform utilitarian coating with only a few tiny edge chips exposing clean steel; no joints, fasteners, rust or orange oxidation"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","description":"broad safety-yellow rectangular sheet coupon with one narrow 90-degree return flange along one short edge; the broad flat face must dominate; NOT an angle profile and NOT a constant L-section; smooth paint, no holes or attached hardware"},
+    {"id":"04","name":"Short galvanized steel angle profile","description":"short unpainted galvanized equal-leg L-section with two narrow legs of equal width, uniform thickness, zinc-spangle metal finish and a clean factory-cut end; absolutely no yellow paint, no holes or fasteners"},
+    {"id":"05","name":"Short anodized aluminium U-channel extrusion","description":"straight repeatable profile with a clean machined end and clean anodized finish; no attached hardware, rust or orange oxidation"},
+    {"id":"06","name":"Short square steel box-section","description":"standardized hollow section with a clean factory-cut end and even gray primer; no fasteners, rust or orange oxidation"},
     {"id":"07","name":"Molded phenolic / early industrial-plastic spacer block","description":"rectangular dark-brown/black molded block with one clean functional through-bore, no metal inserts"},
     {"id":"08","name":"Molded neoprene vibration pad","description":"thick black rectangular rubber pad with crisp molded edges and shallow functional ribbing, no metal inserts"}
   ],
@@ -36,13 +36,14 @@
     "unlisted specimen classes",
     "baked cast shadows, glow, bloom, rays or temporary FX",
     "welds, bolts, rivets, hinges, brackets, hatches or grilles",
-    "pipes, valves, hoses, cables, connectors, gears, motors, bearings, instruments, switches or lamps"
+    "pipes, valves, hoses, cables, connectors, gears, motors, bearings, instruments, switches or lamps",
+    "visible rust, orange oxidation, heavy chipping, distressed patina or hand-cut scars on any specimen"
   ],
   "era_contract": {
     "character": "standardized factory stock, repeatable dimensions, controlled coatings, clean bends/extrusions and early industrial polymers",
     "required_signals": ["smooth factory coatings","repeatable rolled/folded/extruded geometry","early industrial polymer and rubber stock"],
     "replaced_previous_language": ["rough hand-cut stock","timber spacers","heavy oxidation","crude field fabrication"],
-    "forbidden_regressions": ["wood replacing the phenolic spacer","heavy rust or hand-cut scars as dominant cues","weld beads or fasteners on stock samples"]
+    "forbidden_regressions": ["wood replacing the phenolic spacer","heavy rust or hand-cut scars as dominant cues","weld beads or fasteners on stock samples","cream or beige flat plate replacing the safety-yellow folded sample","yellow-painted angle replacing the unpainted galvanized L-profile"]
   },
   "presentation": {
     "isolated_specimens": true,
