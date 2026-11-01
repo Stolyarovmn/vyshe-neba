@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E1",
+  "year": 1986,
+  "role": "materials-construction",
+  "sheet": "01-surfaces-stock",
+  "title": "standardized surfaces and stock",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [1536, 1024],
+    "layout": [4, 2],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e1_1986/materials-construction-01-surfaces-stock.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1iPan8TlEoR90tHos-o50fkqf9_qzkqmq",
+    "folder_name": "E1_1986"
+  },
+  "specimens": [
+    {"id":"01","name":"Factory-painted cold-rolled steel plate","description":"rectangular industrial-gray steel sample with a smooth sprayed enamel finish, clean rolled edges and only light service wear"},
+    {"id":"02","name":"Olive-gray factory-painted steel panel","description":"uniform utilitarian coating with a few small edge chips exposing steel, no joints or fasteners"},
+    {"id":"03","name":"Safety-yellow folded sheet-metal sample","description":"one clean factory bend with a consistent radius, smooth paint, no holes or attached hardware"},
+    {"id":"04","name":"Short galvanized steel angle profile","description":"standardized L-section with uniform thickness and a clean factory-cut end, no holes or fasteners"},
+    {"id":"05","name":"Short anodized aluminium U-channel extrusion","description":"straight repeatable profile with a clean machined end, no attached hardware"},
+    {"id":"06","name":"Short square steel box-section","description":"standardized hollow section with a clean factory-cut end and even gray primer, no fasteners"},
+    {"id":"07","name":"Molded phenolic / early industrial-plastic spacer block","description":"rectangular dark-brown/black molded block with one clean functional through-bore, no metal inserts"},
+    {"id":"08","name":"Molded neoprene vibration pad","description":"thick black rectangular rubber pad with crisp molded edges and shallow functional ribbing, no metal inserts"}
+  ],
+  "global_forbidden": [
+    "text, letters, numbers, logos or pseudo-writing",
+    "whole machines, complete buildings, rooms or staged scenes",
+    "unlisted specimen classes",
+    "baked cast shadows, glow, bloom, rays or temporary FX",
+    "welds, bolts, rivets, hinges, brackets, hatches or grilles",
+    "pipes, valves, hoses, cables, connectors, gears, motors, bearings, instruments, switches or lamps"
+  ],
+  "era_contract": {
+    "character": "standardized factory stock, repeatable dimensions, controlled coatings, clean bends/extrusions and early industrial polymers",
+    "required_signals": ["smooth factory coatings","repeatable rolled/folded/extruded geometry","early industrial polymer and rubber stock"],
+    "replaced_previous_language": ["rough hand-cut stock","timber spacers","heavy oxidation","crude field fabrication"],
+    "forbidden_regressions": ["wood replacing the phenolic spacer","heavy rust or hand-cut scars as dominant cues","weld beads or fasteners on stock samples"]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

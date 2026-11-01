@@ -1,0 +1,42 @@
+name: Production guard
+
+on:
+  pull_request:
+    branches: [game-production]
+    paths:
+      - 'skills/vyshe-neba-production-guard/**'
+      - 'art/reference_specs/**'
+      - 'art/schemas/production-guard-*.json'
+      - 'art/prompts/era_references/**'
+      - 'tools/art_pipeline/production_guard.py'
+      - 'tools/art_pipeline/tests/test_production_guard.py'
+      - '.github/workflows/production-guard.yml'
+  push:
+    branches: [game-production]
+    paths:
+      - 'skills/vyshe-neba-production-guard/**'
+      - 'art/reference_specs/**'
+      - 'art/schemas/production-guard-*.json'
+      - 'art/prompts/era_references/**'
+      - 'tools/art_pipeline/production_guard.py'
+      - 'tools/art_pipeline/tests/test_production_guard.py'
+      - '.github/workflows/production-guard.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate production-guard specs and prompt drift
+        run: python3 tools/art_pipeline/production_guard.py validate-tree
+      - name: Run production-guard regression tests
+        run: python3 tools/art_pipeline/tests/test_production_guard.py
+      - name: Parse guard JSON schemas
+        run: |
+          python3 -m json.tool art/schemas/production-guard-reference-sheet-spec.schema.json >/dev/null
+          python3 -m json.tool art/schemas/production-guard-source-review.schema.json >/dev/null
