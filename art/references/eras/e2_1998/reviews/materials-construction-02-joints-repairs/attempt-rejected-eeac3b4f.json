@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json",
+  "production_base_sha": "c51dccde260f80063000bd0aba2618341a812a20",
+  "generation_id": "eeac3b4f-2e59-4273-a7a2-ca585d1f018c",
+  "source": {
+    "sha256": "5753617e02248a8fa5c8446ff267ce19b5c12d38d37bc127e5af3ca5c63f09fd",
+    "bytes": 2024168,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1CArBDk0rTbn2EKTJij8AQSB0tv893j75",
+    "drive_url": "https://drive.google.com/file/d/1CArBDk0rTbn2EKTJij8AQSB0tv893j75/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "fail",
+    "no_baked_cast_shadow_or_fx": "pending",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Precision folded chassis corner with captive threaded inserts",
+      "verdict": "fail",
+      "notes": "Expected joint hardware replaced by CRT oscilloscope; wrong canonical role."
+    },
+    {
+      "id": "02",
+      "name": "Flush countersunk aluminium lap joint",
+      "verdict": "fail",
+      "notes": "Expected joint hardware replaced by dual analog gauge module; wrong canonical role."
+    },
+    {
+      "id": "03",
+      "name": "Reinforced captive-thread mounting point",
+      "verdict": "fail",
+      "notes": "Expected joint hardware replaced by digital operator controller; wrong canonical role."
+    },
+    {
+      "id": "04",
+      "name": "Precision interlocking tab-and-slot chassis seam",
+      "verdict": "fail",
+      "notes": "Expected joint hardware replaced by replaceable electronic cassette; wrong canonical role."
+    },
+    {
+      "id": "05",
+      "name": "Removable rack-ear-to-chassis joint",
+      "verdict": "fail",
+      "notes": "Expected joint hardware replaced by diskette drive; wrong canonical role."
+    },
+    {
+      "id": "06",
+      "name": "Precision locating dowel-and-bushing service joint",
+      "verdict": "fail",
+      "notes": "Expected joint hardware replaced by electronics card rack; wrong canonical role."
+    },
+    {
+      "id": "07",
+      "name": "Replaceable precision reinforcement doubler",
+      "verdict": "fail",
+      "notes": "Expected joint hardware replaced by paper trace recorder; wrong canonical role."
+    },
+    {
+      "id": "08",
+      "name": "Rack-rail structural corner node with captive nut strip",
+      "verdict": "fail",
+      "notes": "Expected joint hardware replaced by CRT terminal; wrong canonical role."
+    }
+  ],
+  "reviewer": "ChatGPT visual self-review",
+  "review_method": "Direct inspection of exact generated PNG following complete explicit chat bridge; bytes/size/SHA verified locally and untouched source archived to E2 Drive _rejected",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "All 8 specimens substituted by controls/displays equipment instead of materials/construction joint primitives.",
+    "Repeated response-routing failure: backend output follows a different canonical role despite complete explicit context block.",
+    "Two interactive attempts exhausted; no further generation until role-delivery semantics are resolved."
+  ],
+  "origin_status": "rejected_wrong_role",
+  "next_step": "Verify a literal unchanged canonical request delivery route (or diagnose imagegen context issue) before further production calls. Do not regard spec/guard PASS as visual PASS."
+}
