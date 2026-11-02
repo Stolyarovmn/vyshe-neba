@@ -5,10 +5,7 @@
   "source": {
     "sha256": "b504100b64f10e383950738401196ae6735875bbc1608fac86e51f02e99d8d49",
     "bytes": 1737115,
-    "dimensions": [
-      1536,
-      1024
-    ],
+    "dimensions": [1536, 1024],
     "technical_verdict": "pass",
     "technical_errors": [],
     "drive_file_id": "1wnT6PNHrpkb90DHCzCGhceifnJtNRLXt",
@@ -19,64 +16,67 @@
     "exact_specimen_count": "pass",
     "no_unlisted_specimen_class": "pass",
     "style_family": "pass",
-    "era_language": "pass",
+    "era_language": "fail",
     "sheet_readability": "pass",
     "no_text_or_pseudotext": "pass",
     "no_baked_cast_shadow_or_fx": "pass",
-    "no_previous_era_regression": "pass"
+    "no_previous_era_regression": "fail"
   },
   "specimens": [
     {
       "id": "01",
       "name": "Sealed twin-tube fluorescent ceiling fixture",
       "verdict": "pass",
-      "notes": "Two enclosed fluorescent tube forms behind one sealed prismatic diffuser; off, isolated, no wiring or scenery."
+      "notes": "Two enclosed fluorescent tube forms behind one sealed diffuser; isolated and unlit."
     },
     {
       "id": "02",
       "name": "Slim under-cabinet fluorescent task fixture",
       "verdict": "pass",
-      "notes": "Single slim linear fluorescent task fixture with compact mounting tabs; off and isolated."
+      "notes": "Slim isolated linear task fixture with compact mounting tabs; no surrounding cabinet."
     },
     {
       "id": "03",
       "name": "Articulated halogen machine task lamp",
-      "verdict": "pass",
-      "notes": "Compact articulated halogen task lamp on short arm and pivot base; the prior visible wire-loop defect is absent; no external wiring."
+      "verdict": "fail",
+      "notes": "External wiring is gone, but the source shows a two-link articulated arm with an intermediate elbow; the spec requires one short articulated arm segment and pivot base."
     },
     {
       "id": "04",
       "name": "Sealed rectangular inspection/work lamp",
       "verdict": "pass",
-      "notes": "Single sealed rectangular work lamp with ribbed clear lens, gasketed housing and short adjustable bracket; no glow."
+      "notes": "Sealed rectangular work lamp with ribbed lens and adjustable bracket; no baked glow or projected light."
     },
     {
       "id": "05",
       "name": "Small red LED panel indicator",
-      "verdict": "pass",
-      "notes": "Compact standardized red physical indicator lens/package; unlit and isolated."
+      "verdict": "fail",
+      "notes": "Reads as a large deep prismatic lamp/indicator housing with four-corner fasteners rather than a small late-1990s LED package in a compact panel bezel."
     },
     {
       "id": "06",
       "name": "Small amber LED panel indicator",
-      "verdict": "pass",
-      "notes": "Matching amber indicator from the same compact standardized family; unlit."
+      "verdict": "fail",
+      "notes": "Same oversized deep lamp-housing language as specimen 05; insufficient E2 small-LED progression from E1."
     },
     {
       "id": "07",
       "name": "Small green LED panel indicator",
-      "verdict": "pass",
-      "notes": "Matching green indicator from the same compact standardized family; unlit."
+      "verdict": "fail",
+      "notes": "Same oversized deep lamp-housing language as specimens 05-06; reads closer to E1 indicator hardware than compact E2 LED packaging."
     },
     {
       "id": "08",
       "name": "Six-LED functional status-strip module",
       "verdict": "pass",
-      "notes": "Exactly six physical lenses in two separated red/amber/green groups of three; unlit, no legends."
+      "notes": "Exactly six physical lenses in two separated red/amber/green groups of three; no legends or active glow."
     }
   ],
   "reviewer": "ChatGPT visual reviewer",
-  "review_method": "Direct vision review of the exact SHA-bound untouched PNG against the merged machine spec; source and Google Drive readback byte count/SHA-256 were verified identical.",
-  "final_verdict": "pass",
-  "rejection_reasons": []
+  "review_method": "Second direct vision inspection of the exact SHA-bound untouched PNG against the merged machine spec and E1->E2 replacement contract; corrected a premature PASS recorded before close inspection of arm geometry and indicator scale/language.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Specimen 03 has two articulated arm links instead of the single short arm segment required by the machine spec.",
+    "Specimens 05-07 read as oversized deep lamp-style indicators rather than compact late-1990s LED panel packages, so the E1->E2 lighting progression is not strong enough."
+  ]
 }
