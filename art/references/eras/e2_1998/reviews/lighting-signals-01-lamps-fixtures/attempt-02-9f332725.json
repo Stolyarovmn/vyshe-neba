@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/lighting-signals-01-lamps-fixtures.json",
+  "generation_id": "9f332725-d4b4-41b3-a5da-8af9e2c7c96f",
+  "source": {
+    "sha256": "b504100b64f10e383950738401196ae6735875bbc1608fac86e51f02e99d8d49",
+    "bytes": 1737115,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1wnT6PNHrpkb90DHCzCGhceifnJtNRLXt",
+    "drive_url": "https://drive.google.com/file/d/1wnT6PNHrpkb90DHCzCGhceifnJtNRLXt/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Sealed twin-tube fluorescent ceiling fixture",
+      "verdict": "pass",
+      "notes": "Two enclosed fluorescent tube forms behind one sealed prismatic diffuser; off, isolated, no wiring or scenery."
+    },
+    {
+      "id": "02",
+      "name": "Slim under-cabinet fluorescent task fixture",
+      "verdict": "pass",
+      "notes": "Single slim linear fluorescent task fixture with compact mounting tabs; off and isolated."
+    },
+    {
+      "id": "03",
+      "name": "Articulated halogen machine task lamp",
+      "verdict": "pass",
+      "notes": "Compact articulated halogen task lamp on short arm and pivot base; the prior visible wire-loop defect is absent; no external wiring."
+    },
+    {
+      "id": "04",
+      "name": "Sealed rectangular inspection/work lamp",
+      "verdict": "pass",
+      "notes": "Single sealed rectangular work lamp with ribbed clear lens, gasketed housing and short adjustable bracket; no glow."
+    },
+    {
+      "id": "05",
+      "name": "Small red LED panel indicator",
+      "verdict": "pass",
+      "notes": "Compact standardized red physical indicator lens/package; unlit and isolated."
+    },
+    {
+      "id": "06",
+      "name": "Small amber LED panel indicator",
+      "verdict": "pass",
+      "notes": "Matching amber indicator from the same compact standardized family; unlit."
+    },
+    {
+      "id": "07",
+      "name": "Small green LED panel indicator",
+      "verdict": "pass",
+      "notes": "Matching green indicator from the same compact standardized family; unlit."
+    },
+    {
+      "id": "08",
+      "name": "Six-LED functional status-strip module",
+      "verdict": "pass",
+      "notes": "Exactly six physical lenses in two separated red/amber/green groups of three; unlit, no legends."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Direct vision review of the exact SHA-bound untouched PNG against the merged machine spec; source and Google Drive readback byte count/SHA-256 were verified identical.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
