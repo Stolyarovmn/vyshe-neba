@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json",
+  "generation_id": "630fb3fb-a1a4-4bf9-b593-908b815d616d",
+  "source": {
+    "sha256": "111880c05f72571149db8cbf61017ff2e0dfe6b602373e1bbd4983862d5b92d3",
+    "bytes": 1838921,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1NKRY23uwEZlwfmWk9IuYBAGxZ_4-xout",
+    "drive_url": "https://drive.google.com/file/d/1NKRY23uwEZlwfmWk9IuYBAGxZ_4-xout/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Deep monochrome CRT diagnostic display housing fragment","verdict":"pass","notes":"Deep beige/gray CRT housing with convex blank dark glass and clear case depth."},
+    {"id":"02","name":"Deep color CRT test-monitor housing fragment","verdict":"pass","notes":"Second deep late-1990s CRT hardware family is present with blank curved glass and ventilation."},
+    {"id":"03","name":"Rack-mount plug-in electronics module","verdict":"pass","notes":"Removable rack module has front ventilation, extraction handles and captive hardware without a full rack."},
+    {"id":"04","name":"Replaceable PCB cassette/service module","verdict":"fail","notes":"Cassette is otherwise correct but exposes a visible green PCB/component strip on its top surface; the machine spec explicitly forbids exposed PCB artwork."},
+    {"id":"05","name":"Coax diagnostic connector-panel fragment","verdict":"pass","notes":"Exactly four matching coax/BNC-style sockets are isolated in one small panel fragment."},
+    {"id":"06","name":"Multipin diagnostic service-interface module","verdict":"pass","notes":"Module contains one rectangular multipin connector, one circular multipin connector and two plain mechanical access caps with no cables or text."},
+    {"id":"07","name":"Grouped early-LED status-bar module","verdict":"pass","notes":"Exactly eight small physical red/amber/green lenses are grouped by spacing only and show no active glow."},
+    {"id":"08","name":"Small specialized monochrome LCD readout module","verdict":"pass","notes":"Compact thick-bezel specialized monochrome LCD hardware has a blank/off dark-green window and no controls or text."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 instruments/displays machine spec and canonical style bible; local SHA-256/dimensions/byte count verified and untouched source archived to the E2 rejected Drive folder before retry.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Specimen 04 exposes a visible PCB/component strip, violating the explicit no-exposed-PCB-artwork requirement.",
+    "Source rejected before approval; retry must keep the cassette physically closed while preserving extraction tabs and unlit diagnostic lenses."
+  ]
+}
