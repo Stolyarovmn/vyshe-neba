@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-01-operator-controls.json",
+  "generation_id": "168acc55-387f-4fa5-9682-9e50b2637646",
+  "source": {
+    "sha256": "b293c5af9795dc6e3c8d30571b790dba26f8c5ed0f4e95723f7c861eb31c01f7",
+    "bytes": 2011016,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1jZn3S0wQuXOjQOhjpMqK2BpEbyvlLEJB",
+    "drive_url": "https://drive.google.com/file/d/1jZn3S0wQuXOjQOhjpMqK2BpEbyvlLEJB/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Low-profile rectangular industrial pushbutton","verdict":"fail","notes":"Requested pushbutton absent; output again shows unrelated mechanics hardware."},
+    {"id":"02","name":"Guarded red mushroom emergency-stop","verdict":"fail","notes":"Requested emergency-stop absent; output again shows unrelated mechanics hardware."},
+    {"id":"03","name":"Detented rotary encoder knob","verdict":"fail","notes":"Requested encoder knob absent; output again shows unrelated mechanics hardware."},
+    {"id":"04","name":"Sealed industrial rocker-switch module","verdict":"fail","notes":"Requested rocker switch absent; output again shows unrelated mechanics hardware."},
+    {"id":"05","name":"Twelve-key membrane keypad module","verdict":"fail","notes":"Requested membrane keypad absent; output again shows unrelated mechanics hardware."},
+    {"id":"06","name":"Industrial trackball pointing module","verdict":"fail","notes":"Requested trackball absent; output again shows unrelated mechanics hardware."},
+    {"id":"07","name":"Compact sealed two-axis joystick","verdict":"fail","notes":"Requested joystick absent; output again shows unrelated mechanics hardware."},
+    {"id":"08","name":"Four-key soft-function key strip","verdict":"fail","notes":"Requested soft-function key strip absent; output again shows unrelated mechanics hardware."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 operator-controls machine spec and style bible; dimensions, byte count and SHA-256 verified locally; untouched source archived to the E2 rejected Drive folder. This was the second production-generation attempt in the turn and therefore the retry budget is exhausted.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Reference scope/role failure: generator again returned mechanics-infrastructure components instead of operator-control hardware.",
+    "All eight requested controls-displays specimens are absent.",
+    "Retry budget for this interactive turn exhausted after two wrong-role generations; checkpoint preserved for next turn."
+  ]
+}
