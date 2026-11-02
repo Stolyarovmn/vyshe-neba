@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-01-operator-controls.json",
+  "generation_id": "b3f811e7-dcf7-4962-b9fa-819c0237055a",
+  "source": {
+    "sha256": "e785d9b27eb5c76d9943181d1dae56bf505c04234d47bb5160b42e4a2e9495aa",
+    "bytes": 1587433,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1dJ0IM6EqsBXP2LvEfKOT62B5BUwaFaLn",
+    "drive_url": "https://drive.google.com/file/d/1dJ0IM6EqsBXP2LvEfKOT62B5BUwaFaLn/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Low-profile rectangular industrial pushbutton","verdict":"pass","notes":"Compact rectangular low-profile industrial pushbutton with plain unlit cap and molded bezel; no text or integrated display."},
+    {"id":"02","name":"Guarded red mushroom emergency-stop","verdict":"pass","notes":"Red mushroom emergency-stop is isolated in a compact yellow industrial guard collar with physical reset hardware and no labels."},
+    {"id":"03","name":"Detented rotary encoder knob","verdict":"pass","notes":"Compact ribbed rotary encoder knob uses a standardized bezel and visibly stepped physical detent ring; the simple pointer stripe is not text/numbering and no printed scale or labels are present."},
+    {"id":"04","name":"Sealed industrial rocker-switch module","verdict":"pass","notes":"Single low-profile sealed dark rocker in a molded bezel, with no icon, text, lamp or surrounding panel."},
+    {"id":"05","name":"Twelve-key membrane keypad module","verdict":"pass","notes":"Exactly twelve equal blank key zones are arranged 3×4 in a compact beige/gray module; no legends, display or writing."},
+    {"id":"06","name":"Industrial trackball pointing module","verdict":"pass","notes":"Panel-mount trackball has one dark ball and exactly two blank physical buttons in a sealed bezel; no screen, keyboard or console."},
+    {"id":"07","name":"Compact sealed two-axis joystick","verdict":"pass","notes":"Short dark industrial joystick has molded grip, rubber bellows and compact square mounting bezel with no labels or lights."},
+    {"id":"08","name":"Four-key soft-function key strip","verdict":"pass","notes":"Narrow rack-console-style strip contains exactly four identical blank low-profile keys and no display, labels or LEDs."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 operator-controls machine spec, approved E1 controls lineage and canonical style bible. Local SHA-256, dimensions and byte count were verified; Google Drive metadata confirms the same byte count in the canonical E2_1998 raw folder before acceptance.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
