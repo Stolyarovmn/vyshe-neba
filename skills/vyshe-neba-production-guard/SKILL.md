@@ -67,7 +67,7 @@ python3 tools/art_pipeline/production_guard.py build-request \
 
 The builder appends `art/style_bible.txt` verbatim exactly once.
 
-One call = one sheet-part, one role, one era. Never merge roles, eras or alternatives into one call.
+Default: one call = one sheet-part, one role, one era. Approved exception for specifically blocked era references: `art/docs/ERA_SPECIMEN_COMPOSITION.md` requires one atomic specimen per call and eight immutable raw SHA-bound source reviews before a deterministic composite of the same canonical sheet. Do not use full-sheet builder as the per-specimen prompt. Never mix eras/roles; this route is BLOCKED until its separate docs/tooling PRs merge and combined CI passes.
 
 ### 4. Deliver the full request to conversational imagegen
 
