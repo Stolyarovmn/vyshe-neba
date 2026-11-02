@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json",
+  "production_base_sha": "47f5ccbcba10675be8115cb51e76f36a7a068f2b",
+  "generation_id": "c1ab0c4a-bfe3-4d76-ade2-cd3e0826ee31",
+  "source": {
+    "sha256": "77d82e227df985209adabcef084e5feffb2e4fb1912112094004322f845b78b7",
+    "bytes": 1801480,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1PmY0MDLLx7JsuHw9i0LmsmIFU0lszZv9",
+    "drive_url": "https://drive.google.com/file/d/1PmY0MDLLx7JsuHw9i0LmsmIFU0lszZv9/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pending",
+    "style_family": "pending",
+    "era_language": "pending",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pending"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Precision folded chassis corner with captive threaded inserts",
+      "verdict": "pending",
+      "notes": "Detailed exact-spec visual validation not completed after process-invalid request delivery."
+    },
+    {
+      "id": "02",
+      "name": "Flush countersunk aluminium lap joint",
+      "verdict": "pending",
+      "notes": "Detailed exact-spec visual validation not completed after process-invalid request delivery."
+    },
+    {
+      "id": "03",
+      "name": "Reinforced captive-thread mounting point",
+      "verdict": "pending",
+      "notes": "Detailed exact-spec visual validation not completed after process-invalid request delivery."
+    },
+    {
+      "id": "04",
+      "name": "Precision interlocking tab-and-slot chassis seam",
+      "verdict": "pending",
+      "notes": "Detailed exact-spec visual validation not completed after process-invalid request delivery."
+    },
+    {
+      "id": "05",
+      "name": "Removable rack-ear-to-chassis joint",
+      "verdict": "pending",
+      "notes": "Detailed exact-spec visual validation not completed after process-invalid request delivery."
+    },
+    {
+      "id": "06",
+      "name": "Precision locating dowel-and-bushing service joint",
+      "verdict": "pending",
+      "notes": "Detailed exact-spec visual validation not completed after process-invalid request delivery."
+    },
+    {
+      "id": "07",
+      "name": "Replaceable precision reinforcement doubler",
+      "verdict": "pending",
+      "notes": "Detailed exact-spec visual validation not completed after process-invalid request delivery."
+    },
+    {
+      "id": "08",
+      "name": "Rack-rail structural corner node with captive nut strip",
+      "verdict": "pending",
+      "notes": "Detailed exact-spec visual validation not completed after process-invalid request delivery."
+    }
+  ],
+  "reviewer": "ChatGPT process and visual self-review",
+  "review_method": "Raw PNG exact dimensions/byte count/SHA computed locally, Drive rejected archive confirmed; request-delivery failure observed: image generation was invoked with a shortened descriptive prompt rather than deterministic canonical request.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Production imagegen did not use the verbatim canonical request through a verified interface. Attempt cannot become canonical by retroactively adding the spec.",
+    "Subsequent attempted chat-bridge reproduction deviated from verbatim style bible; halted before another generation call."
+  ],
+  "origin_status": "rejected_process_invalid",
+  "next_step": "Use automated deterministic chat bridge on merged production SHA; verify full unchanged block and pass it as the immediately preceding imagegen context. If interface requires a literal argument, pass exact build-request, not a descriptive summary. New output must be archived, SHA-checked and receive new exact-SHA review."
+}
