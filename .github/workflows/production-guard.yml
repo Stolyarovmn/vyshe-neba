@@ -11,6 +11,9 @@ on:
       - 'tools/art_pipeline/production_guard.py'
       - 'tools/art_pipeline/imagegen_chat_bridge.py'
       - 'tools/art_pipeline/tests/test_production_guard.py'
+      - 'tools/art_pipeline/validate_era_reference_uniqueness.py'
+      - 'tools/art_pipeline/tests/test_validate_era_reference_uniqueness.py'
+      - 'art/references/eras/e2_1998/reviews/inter-sheet-uniqueness-audit.json'
       - '.github/workflows/production-guard.yml'
   push:
     branches: [game-production]
@@ -22,6 +25,9 @@ on:
       - 'tools/art_pipeline/production_guard.py'
       - 'tools/art_pipeline/imagegen_chat_bridge.py'
       - 'tools/art_pipeline/tests/test_production_guard.py'
+      - 'tools/art_pipeline/validate_era_reference_uniqueness.py'
+      - 'tools/art_pipeline/tests/test_validate_era_reference_uniqueness.py'
+      - 'art/references/eras/e2_1998/reviews/inter-sheet-uniqueness-audit.json'
       - '.github/workflows/production-guard.yml'
   workflow_dispatch:
 
@@ -40,6 +46,10 @@ jobs:
         run: python3 -m py_compile tools/art_pipeline/imagegen_chat_bridge.py
       - name: Run production-guard regression tests
         run: python3 tools/art_pipeline/tests/test_production_guard.py
+      - name: Check E2 cross-sheet audit coverage (when merged)
+        run: python3 tools/art_pipeline/validate_era_reference_uniqueness.py --when-present
+      - name: Test E2 uniqueness audit checker
+        run: python3 tools/art_pipeline/tests/test_validate_era_reference_uniqueness.py
       - name: Parse guard JSON schemas
         run: |
           python3 -m json.tool art/schemas/production-guard-reference-sheet-spec.schema.json >/dev/null
