@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json",
+  "generation_id": "e84e9787-b835-4140-a1af-56c8dbf2795b",
+  "source": {
+    "sha256": "9f65ce07e88d20351ad528361c18398587b4d1b750d886e97787aded38187f07",
+    "bytes": 1870312,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1LF1zM7x-JSRakRla_KVcMcz8eH-clj-k",
+    "drive_url": "https://drive.google.com/file/d/1LF1zM7x-JSRakRla_KVcMcz8eH-clj-k/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "fail",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Deep monochrome CRT diagnostic display housing fragment","verdict":"fail","notes":"Red revolving beacon generated instead of a deep blank/off monochrome CRT housing."},
+    {"id":"02","name":"Deep color CRT test-monitor housing fragment","verdict":"fail","notes":"Amber revolving beacon generated instead of the second deep blank/off CRT housing."},
+    {"id":"03","name":"Rack-mount plug-in electronics module","verdict":"fail","notes":"Red/green stack signal light generated instead of a removable rack electronics module."},
+    {"id":"04","name":"Replaceable PCB cassette/service module","verdict":"fail","notes":"Four-lens active signal panel generated instead of the replaceable service cassette."},
+    {"id":"05","name":"Coax diagnostic connector-panel fragment","verdict":"fail","notes":"Horn/siren generated instead of exactly four coax/BNC diagnostic sockets."},
+    {"id":"06","name":"Multipin diagnostic service-interface module","verdict":"fail","notes":"Vented alarm/siren box generated instead of the multipin service-interface module."},
+    {"id":"07","name":"Grouped early-LED status-bar module","verdict":"fail","notes":"Illuminated chevron/arrow signal panel generated instead of eight grouped unlit LED lenses."},
+    {"id":"08","name":"Small specialized monochrome LCD readout module","verdict":"fail","notes":"Windsock generated instead of a blank/off thick-bezel monochrome LCD module."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the pinned E2 controls-displays/02 machine spec and canonical style bible; dimensions, byte count and SHA-256 verified locally; untouched source archived to the E2 rejected Drive folder.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Reference-class failure: all eight requested controls/displays specimens were substituted by lighting/signaling hardware.",
+    "Visible active illumination on several signal devices violates the no-baked-FX gate.",
+    "Repeated wrong-role output persists despite exact deterministic chat-bridge delivery; do not continue identical imagegen retries without changing strategy."
+  ]
+}
