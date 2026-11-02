@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json",
+  "production_base_sha": "c51dccde260f80063000bd0aba2618341a812a20",
+  "generation_id": "02087e4e-c2ab-40f3-88fc-a1924ea09629",
+  "canonical_request_sha256": "c8b09af7a28bc5ef5a174bc40ca34a95f05d32acd827c5fa492dcd002dcc5c77",
+  "source": {
+    "sha256": "bbb3ac5bd7aa9f464258c7bf14d454c0feceb1417aedbd5f51184bd82404f6cc",
+    "bytes": 1849191,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1Ti2zzJ1WpndG5wMVpGe9zfGw1IqBSDpp",
+    "drive_url": "https://drive.google.com/file/d/1Ti2zzJ1WpndG5wMVpGe9zfGw1IqBSDpp/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Precision folded chassis corner with captive threaded inserts",
+      "verdict": "fail",
+      "notes": "Ribbed support bracket with protruding bolt heads; lacks the specified local precision two captive inserts."
+    },
+    {
+      "id": "02",
+      "name": "Flush countersunk aluminium lap joint",
+      "verdict": "fail",
+      "notes": "Generic box-section bolt splice with ordinary external hex heads instead of flush countersunk aluminium lap joint."
+    },
+    {
+      "id": "03",
+      "name": "Reinforced captive-thread mounting point",
+      "verdict": "fail",
+      "notes": "Large generic upright threaded sleeve on base with exposed nuts, not one small formed captive-thread sheet-metal point."
+    },
+    {
+      "id": "04",
+      "name": "Precision interlocking tab-and-slot chassis seam",
+      "verdict": "fail",
+      "notes": "Two plate hinge assembly rather than interlocking tab-and-slot chassis seam."
+    },
+    {
+      "id": "05",
+      "name": "Removable rack-ear-to-chassis joint",
+      "verdict": "fail",
+      "notes": "Panel fragment with large threaded hole, not the rack-ear-to-chassis service joint with two slots."
+    },
+    {
+      "id": "06",
+      "name": "Precision locating dowel-and-bushing service joint",
+      "verdict": "pass",
+      "notes": "Correct category: two locating dowels and matching holes on two separate plates."
+    },
+    {
+      "id": "07",
+      "name": "Replaceable precision reinforcement doubler",
+      "verdict": "fail",
+      "notes": "Turn-handle rotary latch on a square panel rather than replaceable reinforcement doubler with locator/fastener pattern."
+    },
+    {
+      "id": "08",
+      "name": "Rack-rail structural corner node with captive nut strip",
+      "verdict": "fail",
+      "notes": "Rubber tube coupling with two external clamp bands rather than short rack-perforated structural corner node with captive nut strip."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Direct review of untouched image against exact merged E2 machine spec; dimensions and SHA-256 measured locally; uploaded original to Drive _rejected; human-inserted explicit chat context block immediately before imagegen (literal tool prompt remains unavailable).",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "7 of 8 cells substitute another mechanical category; only locating dowel-and-bushing pair #06 passes.",
+    "Repeated same wrong-class failure; interactive max-2 production-generation attempts reached.",
+    "Chat bridge text alone cannot force literal prompt delivery in this imagegen tool; source-level semantic inspection remains authoritative."
+  ],
+  "status": "rejected_noncanonical",
+  "next_step": "Stop identical imagegen retries. Diagnose usable literal prompt delivery or obtain explicit user approval for a redesigned specimen-level generation + deterministic 4x2 composition pipeline; do not change current canonical spec or approved art silently."
+}
