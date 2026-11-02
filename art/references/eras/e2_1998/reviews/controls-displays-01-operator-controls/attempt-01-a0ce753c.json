@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-01-operator-controls.json",
+  "generation_id": "a0ce753c-db83-4826-95aa-eece5634eb92",
+  "source": {
+    "sha256": "337ff16e963ecf9c16d531c2083fb5ca4219daa76255376ad778cf6f8c1e8357",
+    "bytes": 2115738,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1vRe_9lLUY2jFoQaLA4lTgO6s8KItjgcL",
+    "drive_url": "https://drive.google.com/file/d/1vRe_9lLUY2jFoQaLA4lTgO6s8KItjgcL/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Low-profile rectangular industrial pushbutton","verdict":"fail","notes":"Requested operator pushbutton absent; output contains an unrelated slewing/mechanical bearing assembly."},
+    {"id":"02","name":"Guarded red mushroom emergency-stop","verdict":"fail","notes":"Requested emergency-stop absent; output contains an unrelated linear guide assembly."},
+    {"id":"03","name":"Detented rotary encoder knob","verdict":"fail","notes":"Requested encoder knob absent; output contains an unrelated screw/linear actuator assembly."},
+    {"id":"04","name":"Sealed industrial rocker-switch module","verdict":"fail","notes":"Requested rocker switch absent; output contains an unrelated hinge/yoke assembly."},
+    {"id":"05","name":"Twelve-key membrane keypad module","verdict":"fail","notes":"Requested membrane keypad absent; output contains an unrelated rod-end bearing."},
+    {"id":"06","name":"Industrial trackball pointing module","verdict":"fail","notes":"Requested trackball absent; output contains an unrelated universal joint."},
+    {"id":"07","name":"Compact sealed two-axis joystick","verdict":"fail","notes":"Requested joystick absent; output contains an unrelated belt-and-pulley tensioner."},
+    {"id":"08","name":"Four-key soft-function key strip","verdict":"fail","notes":"Requested soft-function key strip absent; output contains an unrelated rack-and-pinion assembly."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 operator-controls machine spec and style bible; dimensions, byte count and SHA-256 verified locally; untouched source archived to the E2 rejected Drive folder before retry.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Reference scope/role failure: all eight generated specimens are mechanics-infrastructure hardware rather than the requested controls-displays operator-input hardware.",
+    "No requested operator-control specimen is present; the result cannot be used as E2 controls-displays evidence."
+  ]
+}
