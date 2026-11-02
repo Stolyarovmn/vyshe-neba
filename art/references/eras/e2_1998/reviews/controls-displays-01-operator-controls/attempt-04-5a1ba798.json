@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-01-operator-controls.json",
+  "generation_id": "5a1ba798-3391-41bb-8e1f-17cba7be9ab6",
+  "source": {
+    "sha256": "b9d6db9a326c54441d5c70ff110c7e6812f568f43e0123edbc8e2cb2e860a1d3",
+    "bytes": 1548413,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1m9FHYLs9_r-UT-2VRNnmH1luu76F4Z1J",
+    "drive_url": "https://drive.google.com/file/d/1m9FHYLs9_r-UT-2VRNnmH1luu76F4Z1J/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "fail",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Low-profile rectangular industrial pushbutton","verdict":"pass","notes":"Requested low-profile rectangular industrial pushbutton is present."},
+    {"id":"02","name":"Guarded red mushroom emergency-stop","verdict":"pass","notes":"Requested guarded red mushroom emergency-stop is present."},
+    {"id":"03","name":"Detented rotary encoder knob","verdict":"pass","notes":"Requested detented rotary encoder knob is present without digits or text."},
+    {"id":"04","name":"Sealed industrial rocker-switch module","verdict":"pass","notes":"Requested sealed rocker switch is present."},
+    {"id":"05","name":"Twelve-key membrane keypad module","verdict":"pass","notes":"Requested blank 3×4 twelve-key keypad is present."},
+    {"id":"06","name":"Industrial trackball pointing module","verdict":"fail","notes":"Trackball hardware is present, but the two buttons contain small pseudo-symbol/mark artifacts, violating the blank/unlabeled and no-pseudotext gate."},
+    {"id":"07","name":"Compact sealed two-axis joystick","verdict":"pass","notes":"Requested sealed joystick is present."},
+    {"id":"08","name":"Four-key soft-function key strip","verdict":"pass","notes":"Requested four-key blank function strip is present."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 operator-controls machine spec and canonical style bible; local SHA-256/dimensions/byte count verified and untouched source archived in the E2 rejected Drive folder.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Trackball button faces contain visible pseudo-symbol/mark artifacts where the machine spec requires plain unlabeled buttons.",
+    "A stronger exact-SHA PASS candidate for the same sheet already exists as attempt 03; this attempt remains rejected provenance only."
+  ]
+}
