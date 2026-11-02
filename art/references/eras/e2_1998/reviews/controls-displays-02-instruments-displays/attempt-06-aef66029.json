@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json",
+  "generation_id": "aef66029-d6e3-49f4-a0d8-59de4e85192e",
+  "source": {
+    "sha256": "9fa87f9d0e3604fee87b8dfcd93a26bc96b29762d4740bddab2eca2baf754920",
+    "bytes": 1673157,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1vr2j5uQ2AB0W8UqsDmTFEAcI1RrTAOBu",
+    "drive_url": "https://drive.google.com/file/d/1vr2j5uQ2AB0W8UqsDmTFEAcI1RrTAOBu/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "fail",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Deep monochrome CRT diagnostic display housing fragment","verdict":"fail","notes":"Twin-tube fluorescent fixture generated instead of a blank/off deep CRT housing."},
+    {"id":"02","name":"Deep color CRT test-monitor housing fragment","verdict":"fail","notes":"Caged industrial lamp generated instead of the second deep CRT hardware family."},
+    {"id":"03","name":"Rack-mount plug-in electronics module","verdict":"fail","notes":"Articulated task lamp generated instead of a removable rack electronics module."},
+    {"id":"04","name":"Replaceable PCB cassette/service module","verdict":"fail","notes":"Pendant/low-bay light generated instead of the replaceable service cassette."},
+    {"id":"05","name":"Coax diagnostic connector-panel fragment","verdict":"fail","notes":"Caged wall light generated instead of exactly four coax/BNC diagnostic sockets."},
+    {"id":"06","name":"Multipin diagnostic service-interface module","verdict":"fail","notes":"Red beacon generated instead of the specified multipin service-interface module."},
+    {"id":"07","name":"Grouped early-LED status-bar module","verdict":"fail","notes":"Dual floodlights generated instead of eight small grouped unlit LED lenses."},
+    {"id":"08","name":"Small specialized monochrome LCD readout module","verdict":"fail","notes":"Rectangular area light generated instead of a blank/off thick-bezel monochrome LCD module."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the pinned E2 instruments/displays machine spec and canonical style bible; SHA-256, byte count and dimensions verified locally; untouched source archived to the E2 rejected Drive folder. This was the second production-generation attempt for this sheet in the current interactive turn.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Reference-class failure: all eight requested controls/displays specimens were substituted by lighting fixtures.",
+    "Visible active illumination/glow violates the no-baked-FX gate.",
+    "Retry budget for this interactive turn is exhausted after two failed production-generation attempts; stop and preserve checkpoint before any further generation."
+  ]
+}
