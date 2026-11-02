@@ -46,8 +46,8 @@ jobs:
         run: python3 -m py_compile tools/art_pipeline/imagegen_chat_bridge.py
       - name: Run production-guard regression tests
         run: python3 tools/art_pipeline/tests/test_production_guard.py
-      - name: Check E2 cross-sheet audit coverage (when merged)
-        run: python3 tools/art_pipeline/validate_era_reference_uniqueness.py --when-present
+      - name: Check E2 cross-sheet audit coverage
+        run: python3 tools/art_pipeline/validate_era_reference_uniqueness.py
       - name: Test E2 uniqueness audit checker
         run: python3 tools/art_pipeline/tests/test_validate_era_reference_uniqueness.py
       - name: Parse guard JSON schemas
