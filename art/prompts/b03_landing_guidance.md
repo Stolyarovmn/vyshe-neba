@@ -6,7 +6,21 @@ Generate **one beacon per call**. The purchased gameplay object places a symmetr
 
 Physical parts: `base` static; `head` physically aims; `lamp` is a state part. Guidance corridor, predicted touchdown point, laser beam/light cone, HUD and safe/unsafe overlays are code-owned and must not be baked into the source PNG.
 
-Each generation is isolated on transparent alpha with complete silhouette and no people, text, labels, logos, scenery or UI. `art/style_bible.txt` is appended verbatim to each generation request.
+The generation is isolated with a complete uncropped silhouette and no people, text, labels, logos, scenery or UI. Source-alpha transport is controlled by the current preflight receipt; `art/style_bible.txt` is appended verbatim to each generation request.
+
+## Source alpha transport — receipt controlled
+
+The default source mode is native transparent alpha. When the current preflight declares `generation_gate.alpha_strategy = opaque_chroma_key`, use the keyed raw-source path defined by `art/docs/SOURCE_ALPHA_TRANSPORT.md` instead:
+
+- render the **entire canvas fully opaque** on one exact flat solid key color from the receipt; for the current E0 recovery pass it is **pure `#FF00FF`**;
+- native transparency must be OFF for that call;
+- background must be perfectly uniform to every canvas edge: no gradient, vignette, checkerboard, floor, scenery, cast shadow, glow, bloom, light cone, color spill or global light field;
+- the physical object must not use the key color;
+- lamp is physically **OFF** in the E0 source: show the lens/material but no emissive appearance;
+- raw PNG is archived untouched and SHA-256 recorded before key removal;
+- deterministic key removal happens only at `source_prepare`; it may not repair projection, geometry, missing parts or baked FX.
+
+Reject the raw source before keying if the key background is non-uniform, if an aura/halo exists around the object, or if any normal source/projection/era gate fails.
 
 ## Silhouette / proportion contract
 
@@ -17,7 +31,7 @@ This is a **tall, narrow landing beacon**, not a surveillance camera, cannon, te
 - The vertical mast/yoke must carry a substantial part of the height. Keep a clearly readable base → mast/yoke → aiming head → lamp hierarchy.
 - The aiming head may project sideways, but it must not dominate the silhouette or become wider than the functional ground stance.
 - Do not solve the design as a large horizontal camera body on short legs.
-- Preserve enough transparent padding for the head to pan/tilt without clipping.
+- Preserve enough padding for the head to pan/tilt without clipping.
 
 ## E0 source gate — required structural read
 
@@ -26,7 +40,7 @@ For **E0 / 1978**, the aiming assembly must read as a small hand-serviceable opt
 - Keep the optical element compact: a small sight/lens/aperture and simple mechanical housing, visibly subordinate to the mast/yoke.
 - Do not use a long rectangular box, long cylindrical barrel, surveillance-camera housing, cannon-like tube or telescope-like body.
 - Keep the mast/yoke visually responsible for most of the beacon height; the head is a compact mechanism attached to it, not the main mass.
-- Keep the physical signal lamp clearly separate from the aiming head. The image may show the lamp glass/material, but illumination/glow is code-owned: no baked halo or light bloom.
+- Keep the physical signal lamp clearly separate from the aiming head. The lamp must read OFF in the E0 source; illumination/glow is code-owned.
 - Avoid decorative loose cabling unless it is mechanically necessary to connect visible parts.
 
 ## Ground projection lock — mandatory
@@ -45,7 +59,7 @@ These numbers are a generation proxy, not a recovered camera fact. The exact app
 
 The source must visibly read as `island_top_3_4`: show clearly readable upper planes on tripod/base hardware, yoke/head, lamp cap, mounting plates and feet; vertical/front faces must be visually subordinate to the top-down 3/4 read. Depth on the ground plane must look compressed rather than like a conventional low isometric/front 3/4 product view.
 
-**Reject at source gate** if the object reads predominantly frontal, side-on or low-angle, even if the request contained the proxy values. A visually lower camera is a source defect and must be regenerated; it must not be delegated to Pixel Snapper, normalize or Aseprite.
+**Reject at source gate** if the object reads predominantly frontal, side-on or low-angle, even if the request contained the proxy values. A visually lower camera is a source defect and must be regenerated; it must not be delegated to key removal, Pixel Snapper, normalize or Aseprite.
 
 Era lineage:
 

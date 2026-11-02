@@ -15,7 +15,7 @@
     "provider": "google_drive",
     "folder_id": "1_mxVuKoZsktUqmxR3TcJzkpO6n-qax79",
     "verified_present": true,
-    "verified_on": "2026-10-30",
+    "verified_on": "2026-11-02",
     "original_must_be_immutable": true,
     "sha256_required_before_processing": true
   },
@@ -72,19 +72,28 @@
     "status": "verified_mapping_semantics_conflict",
     "verified_against_main_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
     "runtime_build_run_id": 41110329403,
-    "reverified_on": "2026-10-30"
+    "reverified_on": "2026-11-02"
   },
   "replacement_reason": {
     "previous_e0_sha256": "1c9ecd76cdd455f97fe9f1d25c7acd6d94523b64a6120438fd360e3112599b11",
     "previous_e0_visible_bbox": [36, 42],
     "qa_result": "fail",
-    "failure_class": "source_geometry_not_processing",
-    "action": "regenerate E0 with a taller mast/yoke and narrower stance before rebuilding E1-E5"
+    "failure_class": "repeated_native_alpha_transport_failure_plus_projection_source_gate",
+    "action": "switch the E0 raw generation transport to an exact opaque #FF00FF chroma key while keeping projection/era/FX gates fail-closed; archive untouched raw before deterministic key removal"
   },
   "generation_gate": {
     "one_asset_per_call": true,
     "one_era_per_call": true,
-    "transparent_background": true,
+    "alpha_strategy": "opaque_chroma_key",
+    "transparent_background": false,
+    "alpha_transport_contract_file": "art/docs/SOURCE_ALPHA_TRANSPORT.md",
+    "source_transport": {
+      "key_color_hex": "#FF00FF",
+      "raw_must_be_fully_opaque": true,
+      "background_must_be_uniform": true,
+      "source_prepare": "ref2game_key",
+      "keying_may_fix_projection_or_baked_fx": false
+    },
     "style_bible_verbatim": true,
     "can_generate_isolated_candidate": true,
     "can_scene_approve": true,

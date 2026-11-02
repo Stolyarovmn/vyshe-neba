@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -109,9 +110,35 @@ def validate(receipt_rel: str) -> list[str]:
                     errors.append(f"camera.{key} does not match projection calibration")
 
     gate = r.get("generation_gate", {})
-    for key in ("one_asset_per_call", "one_era_per_call", "transparent_background", "style_bible_verbatim"):
+    for key in ("one_asset_per_call", "one_era_per_call", "style_bible_verbatim"):
         if gate.get(key) is not True:
             errors.append(f"generation gate {key} is not true")
+
+    alpha_strategy = gate.get("alpha_strategy", "native_transparent")
+    if alpha_strategy == "native_transparent":
+        if gate.get("transparent_background") is not True:
+            errors.append("native_transparent alpha strategy requires transparent_background=true")
+    elif alpha_strategy == "opaque_chroma_key":
+        if gate.get("transparent_background") is not False:
+            errors.append("opaque_chroma_key alpha strategy requires transparent_background=false")
+        contract_rel = gate.get("alpha_transport_contract_file")
+        if not isinstance(contract_rel, str) or not contract_rel or not (ROOT / contract_rel).is_file():
+            errors.append("opaque_chroma_key requires a readable alpha_transport_contract_file")
+        transport = gate.get("source_transport", {})
+        key_hex = transport.get("key_color_hex")
+        if not isinstance(key_hex, str) or re.fullmatch(r"#[0-9A-Fa-f]{6}", key_hex) is None:
+            errors.append("opaque_chroma_key source_transport.key_color_hex must be #RRGGBB")
+        if transport.get("raw_must_be_fully_opaque") is not True:
+            errors.append("opaque_chroma_key requires raw_must_be_fully_opaque=true")
+        if transport.get("background_must_be_uniform") is not True:
+            errors.append("opaque_chroma_key requires background_must_be_uniform=true")
+        if transport.get("source_prepare") != "ref2game_key":
+            errors.append("opaque_chroma_key requires source_prepare=ref2game_key")
+        if transport.get("keying_may_fix_projection_or_baked_fx") is not False:
+            errors.append("keying_may_fix_projection_or_baked_fx must be false")
+    else:
+        errors.append(f"unsupported generation_gate.alpha_strategy: {alpha_strategy!r}")
+
     if gate.get("can_generate_isolated_candidate") is not True:
         errors.append("isolated candidate generation is not allowed by receipt")
     if not isinstance(gate.get("can_promote_to_production"), bool):
