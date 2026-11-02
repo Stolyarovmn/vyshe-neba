@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/mechanics-infrastructure-01-servo-drives.json",
+  "reviewed_spec_commit": "2ff73447eb4fe537e65a226fd2faf1852c1069ea",
+  "generation_id": "a53579b7-0f6a-4f10-af84-201b5b46248b",
+  "source": {
+    "sha256": "f11184a3067db85e4d4cad8edc956f40c71eb657b0171ceb8e6d9075b7279fe1",
+    "bytes": 1738395,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "152BqHNsSoxOccvb3cQ6-0b74JCVMYHD3",
+    "drive_url": "https://drive.google.com/file/d/152BqHNsSoxOccvb3cQ6-0b74JCVMYHD3/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "AC servo motor with rear encoder housing",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "02",
+      "name": "Servo motor with inline planetary gearbox",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "03",
+      "name": "Servo motor with right-angle gear reducer",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "04",
+      "name": "Motorized ballscrew linear actuator",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "05",
+      "name": "Electric rotary actuator with integrated brake",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "06",
+      "name": "Direct-drive torque-motor rotary module",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "07",
+      "name": "Closed-loop voice-coil short-stroke linear actuator",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "08",
+      "name": "Electrohydraulic servo cylinder with position-transducer body",
+      "verdict": "pass",
+      "notes": ""
+    }
+  ],
+  "reviewer": "ChatGPT visual self-review",
+  "review_method": "Direct visual review of complete original PNG and detailed crop against PR-head machine specification; 1536x1024 and original bytes/SHA computed locally; Google Drive `_rejected` upload size verified",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Process-invalid production generation: 4 sheet-parts delivered in one imagegen call; mandatory merged-spec and deterministic validate-spec → build-request / explicit chat-bridge pre-generation evidence absent. Cannot retroactively establish canonical generation provenance.",
+    "Voice-coil copper linear stage at position 07 is physically distinct from the rotary servo motor."
+  ],
+  "origin_status": "rejected_noncanonical_raw_only",
+  "archive_destination": "E2_1998/_rejected"
+}

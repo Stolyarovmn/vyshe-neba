@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json",
+  "reviewed_spec_commit": "2ff73447eb4fe537e65a226fd2faf1852c1069ea",
+  "generation_id": "780f866e-6621-4533-b25f-2a250127a8d9",
+  "source": {
+    "sha256": "8ee9300f946a837db3016f87154273b1ff77ada5a7eefc14d5d5965337f346b0",
+    "bytes": 1718317,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1fLF2T7tmPBfAqxDHoHlf9wsx0jAwzQd-",
+    "drive_url": "https://drive.google.com/file/d/1fLF2T7tmPBfAqxDHoHlf9wsx0jAwzQd-/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Precision folded chassis corner with captive threaded inserts",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "02",
+      "name": "Flush countersunk aluminium lap joint",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "03",
+      "name": "Reinforced captive-thread mounting point",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "04",
+      "name": "Precision interlocking tab-and-slot chassis seam",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "05",
+      "name": "Removable rack-ear-to-chassis joint",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "06",
+      "name": "Precision locating dowel-and-bushing service joint",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "07",
+      "name": "Replaceable precision reinforcement doubler",
+      "verdict": "pass",
+      "notes": ""
+    },
+    {
+      "id": "08",
+      "name": "Rack-rail structural corner node with captive nut strip",
+      "verdict": "pass",
+      "notes": ""
+    }
+  ],
+  "reviewer": "ChatGPT visual self-review",
+  "review_method": "Direct visual review of complete original PNG and detailed crop against PR-head machine specification; 1536x1024 and original bytes/SHA computed locally; Google Drive `_rejected` upload size verified",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Process-invalid production generation: 4 sheet-parts delivered in one imagegen call; mandatory merged-spec and deterministic validate-spec → build-request / explicit chat-bridge pre-generation evidence absent. Cannot retroactively establish canonical generation provenance.",
+    "New dowel/bushing mating plates at position 06 distinguish the prior quarter-turn access closure."
+  ],
+  "origin_status": "rejected_noncanonical_raw_only",
+  "archive_destination": "E2_1998/_rejected"
+}
