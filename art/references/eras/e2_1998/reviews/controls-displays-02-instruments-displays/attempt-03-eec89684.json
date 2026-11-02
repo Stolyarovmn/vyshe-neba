@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json",
+  "generation_id": "eec89684-947b-4b8c-b93a-6783d9b48e91",
+  "source": {
+    "sha256": "a88c74d95023f1596cb523a04e02c178713497f0b825cbd1eef3ca7fbb5ea943",
+    "bytes": 1718008,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1f0OWQ7IuIRuzzngAhzkr01ZEdu8QYy0b",
+    "drive_url": "https://drive.google.com/file/d/1f0OWQ7IuIRuzzngAhzkr01ZEdu8QYy0b/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "fail",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Deep monochrome CRT diagnostic display housing fragment","verdict":"fail","notes":"Analog panel meter generated instead of a deep blank/off CRT housing."},
+    {"id":"02","name":"Deep color CRT test-monitor housing fragment","verdict":"fail","notes":"Round analog gauge generated instead of the second deep blank/off CRT housing."},
+    {"id":"03","name":"Rack-mount plug-in electronics module","verdict":"fail","notes":"Active oscilloscope with waveform and controls generated instead of a rack plug-in electronics module."},
+    {"id":"04","name":"Replaceable PCB cassette/service module","verdict":"fail","notes":"Closed cassette form is present but the required restrained row of unlit diagnostic LED lenses is absent."},
+    {"id":"05","name":"Coax diagnostic connector-panel fragment","verdict":"fail","notes":"Red numerical digital display generated instead of exactly four coax/BNC sockets."},
+    {"id":"06","name":"Multipin diagnostic service-interface module","verdict":"fail","notes":"Dual analog meters generated instead of the required multipin service-interface module."},
+    {"id":"07","name":"Grouped early-LED status-bar module","verdict":"fail","notes":"Active bar-graph display generated rather than eight small unlit LED lenses grouped by spacing."},
+    {"id":"08","name":"Small specialized monochrome LCD readout module","verdict":"fail","notes":"Active radar CRT with screen graphics and buttons generated instead of a blank/off specialized monochrome LCD module."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 instruments/displays machine spec and canonical style bible; SHA-256, byte count and dimensions verified locally; untouched source archived to the E2 rejected Drive folder.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Reference class failure: most requested specimens were substituted with analog gauges or active display instruments.",
+    "Forbidden active screen content, numerical display content and previous-era analog instrumentation appeared.",
+    "Only the atomic 4x2 layout and general pixel-art style passed; the sheet cannot be canonical evidence."
+  ]
+}
