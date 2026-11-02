@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/lighting-signals-02-signal-hardware.json",
+  "generation_id": "103ed2c3-37d3-4ee8-aa78-ce49e5fd61be",
+  "source": {
+    "sha256": "712e8c96e5b6f8b220ce4dcd700c150df7119630f5a86e2eb249f1415559b6a0",
+    "bytes": 1798741,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1xNiNDxjt2RoVrTmoCz7sR2d_8f68wO-J",
+    "drive_url": "https://drive.google.com/file/d/1xNiNDxjt2RoVrTmoCz7sR2d_8f68wO-J/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "fail",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Red xenon strobe beacon",
+      "verdict": "fail",
+      "notes": "Red beacon rendered glowing rather than unlit strobe"
+    },
+    {
+      "id": "02",
+      "name": "Amber xenon strobe beacon",
+      "verdict": "fail",
+      "notes": "Amber beacon replaced by dual green/red signal head"
+    },
+    {
+      "id": "03",
+      "name": "Clear xenon strobe beacon",
+      "verdict": "fail",
+      "notes": "Clear xenon beacon replaced by tri-color stack lamp"
+    },
+    {
+      "id": "04",
+      "name": "Modular three-color stack light",
+      "verdict": "fail",
+      "notes": "Three-color stack replaced by megaphone/siren"
+    },
+    {
+      "id": "05",
+      "name": "Paired rectangular red-and-amber LED warning lamps",
+      "verdict": "fail",
+      "notes": "Paired compact LED warning lamps replaced by relay enclosure"
+    },
+    {
+      "id": "06",
+      "name": "Green hooded LED status lamp",
+      "verdict": "fail",
+      "notes": "Green hooded LED replaced by analog dial with light"
+    },
+    {
+      "id": "07",
+      "name": "Red multi-LED array signal module",
+      "verdict": "fail",
+      "notes": "Red multi-LED array replaced by lever switch"
+    },
+    {
+      "id": "08",
+      "name": "Amber multi-LED array signal module",
+      "verdict": "fail",
+      "notes": "Amber multi-LED array replaced by exposed wired terminal strip"
+    }
+  ],
+  "reviewer": "ChatGPT visual self-review",
+  "review_method": "Direct inspection of generated original against immutable E2 signal-hardware machine spec and approved E1 role; exact PNG size and SHA computed locally; archived rejected original in Drive",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "All eight requested classes substituted or materially altered; mixed lighting-signals and controls-displays hardware",
+    "Visible active illumination contrary to no baked glow/FX",
+    "Two generation attempts exhausted in this interactive turn; stop and harden exact machine contract before retry"
+  ]
+}
