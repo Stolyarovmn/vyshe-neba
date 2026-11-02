@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json",
+  "generation_id": "846023e0-2769-480b-8e0c-332108850a61",
+  "source": {
+    "sha256": "d55dfa7cf729f07f4bcc3aa66c4f725e5a75a70eeb9fa03550eafa1ce94ba6e9",
+    "bytes": 1730216,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1Ysk2HvMrfs1I0v8auMbRP0ox2j406DN-",
+    "drive_url": "https://drive.google.com/file/d/1Ysk2HvMrfs1I0v8auMbRP0ox2j406DN-/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Deep monochrome CRT diagnostic display housing fragment",
+      "verdict": "pass",
+      "notes": "Deep beige/gray CRT housing with convex blank green-gray glass and visible case depth/ventilation; no controls, text or lighting hardware."
+    },
+    {
+      "id": "02",
+      "name": "Deep color CRT test-monitor housing fragment",
+      "verdict": "pass",
+      "notes": "Second visibly deep CRT family with blank dark curved glass and apparatus-grade housing; no screen content or console."
+    },
+    {
+      "id": "03",
+      "name": "Rack-mount plug-in electronics module",
+      "verdict": "pass",
+      "notes": "Single removable vented electronics module with two extraction handles and captive front hardware; no full rack, screen, cable or text."
+    },
+    {
+      "id": "04",
+      "name": "Replaceable PCB cassette/service module",
+      "verdict": "pass",
+      "notes": "Closed slide-in service cassette with two extraction tabs and six small colored diagnostic lenses; no exposed PCB artwork and no active glow."
+    },
+    {
+      "id": "05",
+      "name": "Coax diagnostic connector-panel fragment",
+      "verdict": "pass",
+      "notes": "Small isolated panel fragment with exactly four matching coax/BNC-style sockets; no cables, controls or labels."
+    },
+    {
+      "id": "06",
+      "name": "Multipin diagnostic service-interface module",
+      "verdict": "pass",
+      "notes": "Compact module with one rectangular multipin connector, one circular multipin connector and two capped mechanical test-access points; no screen or lighting substitution."
+    },
+    {
+      "id": "07",
+      "name": "Grouped early-LED status-bar module",
+      "verdict": "pass",
+      "notes": "Narrow diagnostic module with exactly eight small physical lenses grouped 3 red, 2 amber, 3 green; lenses are colored but not emitting glow."
+    },
+    {
+      "id": "08",
+      "name": "Small specialized monochrome LCD readout module",
+      "verdict": "pass",
+      "notes": "Compact thick-bezel early monochrome LCD hardware with blank dark-green window; no digits, text, backlight glow or surrounding instrument."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Direct visual review of the exact untouched 1536x1024 PNG against merged game-production spec 96442a87badf5fe136a8c6abba0fb7e17cd196f0; local SHA-256/byte/dimension verification plus Google Drive raw-file archival/readback metadata.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
