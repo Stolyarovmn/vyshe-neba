@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json",
+  "generation_id": "ad6d0f69-3364-4fe3-8734-94a2474cae53",
+  "source": {
+    "sha256": "b8a9f9a009eddea9a65f14b6a8eb647d28c3b1df8e8b84ba2e79475a2e9b3aa8",
+    "bytes": 1787325,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1zw2zIKdTQSDPDoBnZcVVacmrf6nRcL3-",
+    "drive_url": "https://drive.google.com/file/d/1zw2zIKdTQSDPDoBnZcVVacmrf6nRcL3-/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "fail",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Deep monochrome CRT diagnostic display housing fragment","verdict":"fail","notes":"Analog panel meter generated instead of a deep blank/off monochrome CRT housing."},
+    {"id":"02","name":"Deep color CRT test-monitor housing fragment","verdict":"fail","notes":"Round analog gauge generated instead of the second deep blank/off CRT housing."},
+    {"id":"03","name":"Rack-mount plug-in electronics module","verdict":"fail","notes":"Active oscilloscope with waveform and controls generated instead of a rack plug-in module."},
+    {"id":"04","name":"Replaceable PCB cassette/service module","verdict":"fail","notes":"Closed cassette has no exposed PCB, but the required two extraction tabs plus restrained row of unlit diagnostic LED lenses are missing."},
+    {"id":"05","name":"Coax diagnostic connector-panel fragment","verdict":"fail","notes":"Active red numerical digital readout generated instead of four identical coax/BNC diagnostic sockets."},
+    {"id":"06","name":"Multipin diagnostic service-interface module","verdict":"fail","notes":"Active radar CRT generated instead of the specified multipin service-interface module."},
+    {"id":"07","name":"Grouped early-LED status-bar module","verdict":"fail","notes":"Chart recorder with paper waveform generated instead of eight grouped unlit LED lenses."},
+    {"id":"08","name":"Small specialized monochrome LCD readout module","verdict":"fail","notes":"Active colored bar-graph display generated instead of a blank/off thick-bezel monochrome LCD module."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact untouched PNG visually inspected against the merged E2 instruments/displays machine spec and canonical style bible; SHA-256, byte count and dimensions verified locally; untouched source archived to the E2 rejected Drive folder. This was the second production-generation attempt for this sheet in the current interactive turn.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Reference class failure: seven of eight requested classes were substituted, with specimen 04 also incomplete relative to its contract.",
+    "Forbidden active screen/graph/numerical content and E1-style analog gauges appeared.",
+    "Retry budget for this interactive turn is exhausted after two failed production-generation attempts; checkpoint preserved for the next turn."
+  ]
+}
