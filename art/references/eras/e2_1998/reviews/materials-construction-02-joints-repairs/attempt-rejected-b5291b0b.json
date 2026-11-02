@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json",
+  "production_base_sha": "c51dccde260f80063000bd0aba2618341a812a20",
+  "generation_id": "b5291b0b-b622-4c65-a5ad-325b8ae049ac",
+  "source": {
+    "sha256": "b893e682a3b4990077f863d5688780a7d84018d43e31f1cbb0b98c6b4abda749",
+    "bytes": 1955584,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1_HKdLHI9enPf4BT7gogBTeX6hw5fGYti",
+    "drive_url": "https://drive.google.com/file/d/1_HKdLHI9enPf4BT7gogBTeX6hw5fGYti/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Precision folded chassis corner with captive threaded inserts",
+      "verdict": "fail",
+      "notes": "A structural L-bracket with inserts but prominent unrequested ribs; geometry not exact."
+    },
+    {
+      "id": "02",
+      "name": "Flush countersunk aluminium lap joint",
+      "verdict": "pass",
+      "notes": "Lap joint with retained screws; broadly correct."
+    },
+    {
+      "id": "03",
+      "name": "Reinforced captive-thread mounting point",
+      "verdict": "fail",
+      "notes": "Dowel registration pair substituted for reinforced threaded mounting point."
+    },
+    {
+      "id": "04",
+      "name": "Precision interlocking tab-and-slot chassis seam",
+      "verdict": "fail",
+      "notes": "Extruded channel/rail in place of interlocking tab-and-slot seam."
+    },
+    {
+      "id": "05",
+      "name": "Removable rack-ear-to-chassis joint",
+      "verdict": "fail",
+      "notes": "Red-handled toggle-clamp mechanism substituted for local rack-ear joint."
+    },
+    {
+      "id": "06",
+      "name": "Precision locating dowel-and-bushing service joint",
+      "verdict": "fail",
+      "notes": "Ordinary hinge substituted for specified separable dowel-and-bushing service joint."
+    },
+    {
+      "id": "07",
+      "name": "Replaceable precision reinforcement doubler",
+      "verdict": "fail",
+      "notes": "Fragment with threaded boss but not requested precisely patterned reinforcement doubler."
+    },
+    {
+      "id": "08",
+      "name": "Rack-rail structural corner node with captive nut strip",
+      "verdict": "fail",
+      "notes": "Unstructured bolted repair patch instead of rack-rail corner node with captive nut strip."
+    }
+  ],
+  "reviewer": "ChatGPT direct visual reviewer",
+  "review_method": "Direct review of untouched PNG against pinned machine spec; SHA-256 and dimensions computed locally; original uploaded unchanged to Drive _rejected.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Specimens 03–08 contain substitutions including generic rail, lever clamp, hinge and repair patch; exact allowed class plan not followed.",
+    "Conversational imagegen invoked without an audited exact chat bridge immediately preceding this call; request-delivery gate cannot be claimed PASS."
+  ],
+  "status": "rejected_noncanonical",
+  "next_step": "Do not reuse this PNG for canonical E2; first ensure exact deterministic chat bridge is verifiable and delivered, then one isolated generation and exact-SHA review."
+}
