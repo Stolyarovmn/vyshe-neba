@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/lighting-signals-01-lamps-fixtures.json",
+  "generation_id": "ff99c0d3-c776-46f3-95d6-dc59a93e5ed2",
+  "source": {
+    "sha256": "9bc8fed3621c40199194364b4fbe19ef7a5baf2114bbb2699a271b87aa1c8f17",
+    "bytes": 1651257,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "16UKIAOMj1l030aDTycovRcl5OOK9IE2z",
+    "drive_url": "https://drive.google.com/file/d/16UKIAOMj1l030aDTycovRcl5OOK9IE2z/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "fail",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {"id":"01","name":"Sealed twin-tube fluorescent ceiling fixture","verdict":"pass","notes":"Matches the sealed twin-tube fluorescent fixture class; switched-off appearance with no projected light."},
+    {"id":"02","name":"Slim under-cabinet fluorescent task fixture","verdict":"pass","notes":"Matches the slim linear task-light housing with mounting tabs and no surrounding cabinet."},
+    {"id":"03","name":"Articulated halogen machine task lamp","verdict":"fail","notes":"A separate black cable/wiring loop is visibly attached to the articulated lamp. The canonical sheet spec globally forbids wiring, so this specimen is source-invalid despite the lamp geometry itself matching."},
+    {"id":"04","name":"Sealed rectangular inspection/work lamp","verdict":"pass","notes":"Matches sealed rectangular work-light housing with ribbed lens and adjustable bracket; no active light pool."},
+    {"id":"05","name":"Small red LED panel indicator","verdict":"pass","notes":"Red physical indicator package in standardized bezel; unlit and isolated."},
+    {"id":"06","name":"Small amber LED panel indicator","verdict":"pass","notes":"Amber matching-family indicator package; unlit and isolated."},
+    {"id":"07","name":"Small green LED panel indicator","verdict":"pass","notes":"Green matching-family indicator package; unlit and isolated."},
+    {"id":"08","name":"Six-LED functional status-strip module","verdict":"pass","notes":"Exactly six lenses in two separated groups of three using red/amber/green lens colors; no text or active glow."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Direct vision review of the exact untouched PNG against the merged E2 lighting-signals/01 machine spec; technical dimensions/bytes/SHA-256 computed from the source PNG and the original archived to the E2 rejected Drive folder.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Specimen 03 includes visible cable/wiring, which is explicitly forbidden by the canonical machine spec."
+  ]
+}
