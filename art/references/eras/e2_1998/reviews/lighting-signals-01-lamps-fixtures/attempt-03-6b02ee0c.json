@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/lighting-signals-01-lamps-fixtures.json",
+  "generation_id": "6b02ee0c-6d82-4ae7-8361-1e3a6cb89caf",
+  "source": {
+    "sha256": "1e7a2a5131ed5999f8a35900caec3aada4802be6f09bc10b2608a6a9c180857e",
+    "bytes": 1653983,
+    "dimensions": [1536, 1024],
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1gl0Y7pPys6mm9UGncnqD7Dws6yztUhpk",
+    "drive_url": "https://drive.google.com/file/d/1gl0Y7pPys6mm9UGncnqD7Dws6yztUhpk/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "fail",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "fail"
+  },
+  "specimens": [
+    {"id":"01","name":"Sealed twin-tube fluorescent ceiling fixture","verdict":"pass","notes":"Requested sealed twin-tube fixture, off and isolated."},
+    {"id":"02","name":"Slim under-cabinet fluorescent task fixture","verdict":"pass","notes":"Requested slim task fixture, off and isolated."},
+    {"id":"03","name":"Articulated halogen machine task lamp","verdict":"pass","notes":"One rigid arm segment between base pivot and head pivot; no external wiring."},
+    {"id":"04","name":"Sealed rectangular inspection/work lamp","verdict":"pass","notes":"Requested sealed rectangular work lamp, off and isolated."},
+    {"id":"05","name":"Small red LED panel indicator","verdict":"fail","notes":"Body reads as a large deep square lamp-style indicator rather than a small shallow late-1990s LED package."},
+    {"id":"06","name":"Small amber LED panel indicator","verdict":"fail","notes":"Body reads as a large deep square lamp-style indicator rather than a small shallow late-1990s LED package."},
+    {"id":"07","name":"Small green LED panel indicator","verdict":"fail","notes":"Body reads as a large deep square lamp-style indicator rather than a small shallow late-1990s LED package."},
+    {"id":"08","name":"Six-LED functional status-strip module","verdict":"pass","notes":"Exactly six unlit lenses in two separated groups of three; no text."}
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Direct vision review of the exact untouched PNG against the merged machine spec after a retry targeting the previously recorded arm/indicator defects.",
+  "final_verdict": "fail",
+  "rejection_reasons": [
+    "Specimens 05-07 remain too large and deep, reading as E1-style lamp indicator housings instead of small shallow E2 LED packages."
+  ]
+}
