@@ -1,0 +1,505 @@
+{
+  "schema_version": 1,
+  "kind": "manual_era_reference_uniqueness_audit",
+  "era": "E2",
+  "year": 1998,
+  "production_base_sha": "3416412b9b39e796a9cd85944df4401384afc097",
+  "scope": "all ten machine specs, 80 planned specimens, 45 sheet-pairs; text/spec-based semantic review, NOT all 10 exact-source PNG comparison",
+  "prior_exact_sha_candidate_policy": "Previously accepted source SHA and original Drive provenance remain immutable. Every changed machine spec invalidates reuse of any earlier visual PASS based on the old spec for that sheet; visual source must be generated under merged new spec and undergo a fresh exact-SHA structured review. Do not overwrite old approved evidence, invent test results or claim canonical completion.",
+  "pairs": [
+    {
+      "a": 1,
+      "b": 2,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 1,
+      "b": 3,
+      "review": {
+        "pair": [
+          1,
+          3
+        ],
+        "severity": "low",
+        "comparison": [
+          "01.05 flat punched perforation stock",
+          "03.02 captive-mounted formed perforation service bay"
+        ],
+        "decision": "retain",
+        "why": "uncut flat stock vs assembled folded/removable ventilating service fragment have distinct physical and functional scopes"
+      }
+    },
+    {
+      "a": 1,
+      "b": 4,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 1,
+      "b": 5,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 1,
+      "b": 6,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 1,
+      "b": 7,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 1,
+      "b": 8,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 1,
+      "b": 9,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 1,
+      "b": 10,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 2,
+      "b": 3,
+      "review": {
+        "pair": [
+          2,
+          3
+        ],
+        "severity": "blocking_before",
+        "comparison": [
+          "02.06 captive quarter-turn service joint",
+          "03.01 gasketed quarter-turn service-panel edge"
+        ],
+        "decision": "replace 02.06",
+        "why": "duplicate quarter-turn closure; new 02.06 is a separate locating dowel/bushing alignment joint"
+      }
+    },
+    {
+      "a": 2,
+      "b": 4,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 2,
+      "b": 5,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 2,
+      "b": 6,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 2,
+      "b": 7,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 2,
+      "b": 8,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 2,
+      "b": 9,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 2,
+      "b": 10,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 3,
+      "b": 4,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 3,
+      "b": 5,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 3,
+      "b": 6,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 3,
+      "b": 7,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 3,
+      "b": 8,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 3,
+      "b": 9,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 3,
+      "b": 10,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 4,
+      "b": 5,
+      "review": {
+        "pair": [
+          4,
+          5
+        ],
+        "severity": "low",
+        "comparison": [
+          "04.06 motorized torque/feedback rotary drive",
+          "05.08 bearing-and-index-lock guide"
+        ],
+        "decision": "retain",
+        "why": "electric motor drive provides torque; guide-and-lock module supports/indexes without propulsion"
+      }
+    },
+    {
+      "a": 4,
+      "b": 6,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 4,
+      "b": 7,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 4,
+      "b": 8,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 4,
+      "b": 9,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 4,
+      "b": 10,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 5,
+      "b": 6,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 5,
+      "b": 7,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 5,
+      "b": 8,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 5,
+      "b": 9,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 5,
+      "b": 10,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 6,
+      "b": 7,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 6,
+      "b": 8,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 6,
+      "b": 9,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 6,
+      "b": 10,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 7,
+      "b": 8,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 7,
+      "b": 9,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 7,
+      "b": 10,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 8,
+      "b": 9,
+      "review": {
+        "pair": [
+          8,
+          9
+        ],
+        "severity": "blocking_before",
+        "comparison": [
+          "08.07 grouped small LED status bar",
+          "09.08 six-LED status strip"
+        ],
+        "decision": "replace 08.07",
+        "why": "both show grouped LEDs; new 08.07 is a separate removable diagnostic media interface"
+      }
+    },
+    {
+      "a": 8,
+      "b": 10,
+      "review": {
+        "severity": "none_identified_at_spec_level",
+        "decision": "retain",
+        "why": "No further substantive cross-sheet overlap identified by manual text-spec review; this is not an automatic visual proof"
+      }
+    },
+    {
+      "a": 9,
+      "b": 10,
+      "review": {
+        "pair": [
+          9,
+          10
+        ],
+        "severity": "blocking_before",
+        "comparison": [
+          "09.05-09.08 grouped/single LEDs",
+          "10.05 paired arrays; 10.06 single hooded green LED; 10.07-08 arrays"
+        ],
+        "decision": "revise 10 in PR #86",
+        "why": "concrete signal-emitter families overly repeat indicator family; replace 10.05/10.06/10.08 in existing independent PR #86"
+      }
+    }
+  ],
+  "within_sheet": [
+    {
+      "sheet": 2,
+      "collision": "02.01 vs 02.03 captive threaded hardware",
+      "assessment": "related technology but distinct corner/inserts vs reinforced local threaded point; retain with visual distinction required"
+    },
+    {
+      "sheet": 3,
+      "collision": "03.04 vs 03.08 gasketed anodized service frame",
+      "assessment": "service mullion wall join vs independent 90-degree frame corner; retain with visual distinction required"
+    },
+    {
+      "sheet": 4,
+      "collision": "04.01 vs 04.07 conventional motors with rear sensor",
+      "assessment": "blocking; change 04.07 to short-stroke voice-coil closed-loop actuator"
+    },
+    {
+      "sheet": 5,
+      "collision": "05.01 vs 05.02 spherical bearings",
+      "assessment": "rod end vs clevis cartridge, distinct joint purposes; retain"
+    },
+    {
+      "sheet": 10,
+      "collision": "10.01-03 three-color xenon family; 10.05/07/08 arrays",
+      "assessment": "the three dome colors are intentional standardized family variants (allowed); replace repeated LED warning module classes 05/06/08 in #86"
+    }
+  ],
+  "changes": [
+    {
+      "spec": "art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json",
+      "old": "Captive quarter-turn service-panel flange joint",
+      "replacement": "Precision locating dowel-and-bushing service joint"
+    },
+    {
+      "spec": "art/reference_specs/e2_1998/mechanics-infrastructure-01-servo-drives.json",
+      "old": "Brushless spindle/drive motor with resolver housing",
+      "replacement": "Closed-loop voice-coil short-stroke linear actuator"
+    },
+    {
+      "spec": "art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json",
+      "old": "Grouped early-LED status-bar module",
+      "replacement": "Removable 3.5-inch diagnostic diskette-drive service insert"
+    }
+  ],
+  "external_dependent_pr": "https://github.com/Stolyarovmn/vyshe-neba/pull/86",
+  "no_changes_to_originals": true,
+  "source_approval_status": "pending_for_modified_specs",
+  "blind_order_era_review": "pending",
+  "tool_limitations": "A semantic collision cannot be proven automatically from names or text alone; manual review and exact-source visual comparison still required."
+}
