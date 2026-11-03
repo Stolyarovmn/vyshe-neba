@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "asset_id": "B01",
+  "asset": "weather_complex",
+  "era": "E0",
+  "year": 1978,
+  "review_kind": "exact_sha_source_projection_review",
+  "reviewer": "assistant_self_review",
+  "source_gate": "FAIL",
+  "source_integrity": "PASS",
+  "source": {
+    "source_sha256": "02bf3b102e870f1bebc6c826246d4e658d2f9a38abaa0bca8c8a82db9b2bd542",
+    "generation_id": "943ecfd0-1d0b-4fd2-9ff4-1ac5882c134a",
+    "drive_file_id": "1pZnJVdKaLbdGO80jMbS_POP4eIrYMMzI",
+    "dimensions": [
+      1024,
+      1536
+    ],
+    "bytes": 1819367
+  },
+  "prior_runtime": {
+    "sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c",
+    "dimensions": [
+      96,
+      122
+    ],
+    "main_commit_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721"
+  },
+  "projection_reference": {
+    "sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+    "dimensions": [
+      1916,
+      821
+    ],
+    "source": "art/gen/environment/start_island_hd.png",
+    "actual_camera_angle": "UNKNOWN",
+    "proxy_elevation_degrees": 73.44,
+    "proxy_tilt_from_topdown_degrees": 16.56
+  },
+  "source_gate_checks": {
+    "identity": "PASS",
+    "era_e0": "PASS",
+    "engineering_parts": "PASS",
+    "alpha": "NO_AUTOMATIC_FAILURE_ALPHA_MAX_254_VISIBLE_COMPOSITES_CHECKED",
+    "projection": "FAIL_LOWER_FRONT_SIDE_3_4",
+    "visually_apparent_defect": "Analog indicator/front-facing side surfaces dominate; upper planes of mount, feet and instrument do not read like the exact near-top-down approved island.",
+    "processing_repair_possible": false,
+    "source_original_immutable": true
+  },
+  "scene_evidence": {
+    "ci_run_id": 41618326943,
+    "ci_url": "https://github.com/Stolyarovmn/vyshe-neba/actions/runs/41618326943",
+    "ci_result": "success",
+    "artifact_id": 13222820734,
+    "artifact_name": "b01-e0-exact-island-scene-evidence",
+    "scope": "technical SHA-bound island/runtime composite only, not visual approval",
+    "land_mask": "PASS_208_OF_208_SAMPLES",
+    "legacy_layout_anchor_px": [
+      1000,
+      350
+    ],
+    "legacy_layout_footprint_px": [
+      100,
+      28
+    ],
+    "legacy_layout_sprite_px": [
+      142,
+      180
+    ],
+    "map_editor_approved_placement": "UNKNOWN",
+    "contact_and_occlusion": "PENDING"
+  },
+  "review_limits": [
+    "This is assistant self-review FAIL, not a user rejection or approval.",
+    "Visual projection FAIL is source-specific; it does not invalidate archived bytes or historical runtime SHA.",
+    "Map Editor final placement remains UNKNOWN; no new placement numbers are asserted."
+  ],
+  "gate_decision": {
+    "regeneration_justified_by_source_fail": true,
+    "can_promote_this_source": false,
+    "can_publish_runtime": false,
+    "exact_request_and_attached_reference_images_required": true,
+    "user_approval_of_future_candidate_required": true
+  },
+  "next_step": "On a reviewed preflight/config branch, run deterministic builder and validator; preserve exact request digest, verify all attached visual PNGs and actual delivery. Do NOT invoke imagegen from unmerged or otherwise unauthorized prerequisites."
+}
