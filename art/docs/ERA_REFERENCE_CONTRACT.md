@@ -134,7 +134,7 @@ If the reviewer cannot explain a physical manufacturing/mechanical/interface/lig
 
 ## Generation contract
 
-- Default: one image-generation call = **one sheet-part of one role for one era**. Explicitly authorized, source-blocked sheets may use [ERA_SPECIMEN_COMPOSITION.md](ERA_SPECIMEN_COMPOSITION.md): one call = ONE specimen, and deterministic code assembles the SAME canonical sheet-part from eight individually exact-SHA reviewed raw sources. The composite is DERIVED, never a generator original, and still requires full-sheet and cross-era review.
+- One image-generation call = **one sheet-part of one role for one era**.
 - Never generate several eras in one call.
 - Never mix several canonical roles in one call.
 - Never force an entire role onto one image when its specimens would become too small; create additional sheet-parts instead.
