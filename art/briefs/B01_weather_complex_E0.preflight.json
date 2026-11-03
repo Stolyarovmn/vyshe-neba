@@ -29,9 +29,11 @@
     ],
     "drive_file_id": "1pZnJVdKaLbdGO80jMbS_POP4eIrYMMzI",
     "source_integrity": "reverified",
-    "camera_source_gate": "PENDING_EXACT_ISLAND_SCENE_REVIEW",
+    "camera_source_gate": "FAIL_EXACT_SHA_PROJECTION_SCENE_SELF_REVIEW",
     "archive_input_png_staged_in_repo": false,
-    "processing_output_in_runtime_sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c"
+    "processing_output_in_runtime_sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c",
+    "source_review_record": "art/qa/placeables/base/weather_complex/e0_1978.source_review.json",
+    "reuse_decision": "REJECT_EXISTING_SOURCE_FOR_NEW_CAMERA_FAMILY_ONLY"
   },
   "approved_era_reference_set": {
     "path": "art/references/eras/e0_1978/reference-set.json",
@@ -239,22 +241,34 @@
     "one_era_per_call": true,
     "transparent_background": true,
     "style_bible_verbatim": true,
-    "can_generate_isolated_candidate": false,
+    "can_generate_isolated_candidate": true,
     "can_scene_approve": true,
     "can_promote_to_production": false,
     "can_publish_runtime": false
   },
   "blocked_stages": [
-    "generation_until_exact_old_source_SHA_bound_visual_island_scene_gate_explicitly_requires_replacement_and_validates_full_imagegen_ref_delivery",
-    "generation_until_missing_source_transport_is_staged_and_exact_canonical_request_sha_and_bridge_are_verified",
-    "promotion_until_new_or_reused_exact_candidate_auto_QA_sha_bound_user_approval_and_scene_QA",
-    "runtime_publication_until_explicit_B01_export_mapping_and_semantics_integration_review"
+    "imagegen_invocation_until_all_prerequisite_config_receipt_changes_are_merged_and_current_shas_reverified",
+    "imagegen_invocation_until_full_canonical_request_is_built_has_exact_sha_and_is_delivered_literally_by_the_approved_chat_bridge",
+    "imagegen_invocation_until_ten_approved_E0_atomic_PNGs_and_exact_island_image_are_attached_as_real_verified_visual_inputs",
+    "processing_until_new_original_is_untouched_archived_with_Drive_readback_and_source_gate_PASS",
+    "production_promotion_until_auto_QA_user_exact_SHA_visual_approval_and_scene_QA",
+    "runtime_publication_until_B01_export_mapping_and_gameplay_semantic_conflict_are_resolved"
   ],
   "checkpoint": {
     "issue": "https://github.com/Stolyarovmn/vyshe-neba/issues/93",
     "prior_brief_pr": "https://github.com/Stolyarovmn/vyshe-neba/pull/94",
     "source_regeneration_attempts_this_pass": 0,
     "source_review_status": "PENDING",
-    "next_step": "Perform exact-island scene composite and Map Editor validation of recovered E0 source; if FAIL, flip can_generate_isolated_candidate only after proper tracked review, then run validate_generation_preflight.py/build_generation_request.py and exact attached-image bridge."
+    "next_step": "Run canonical validate_generation_preflight.py and build_generation_request.py on exact combined feature branch; verify literal request digest and real input PNGs. Do not invoke imagegen until merged prerequisites and tool-level input delivery are proven."
+  },
+  "generation_authorization": {
+    "reason": "Documented source projection FAIL on exactly archived E0 image, see source_review_record",
+    "preflight_scope": "ISOLATED_REPLACEMENT_SOURCE_ONLY",
+    "existing_original_preserved": true,
+    "exact_request_validation": "PENDING_CANONICAL_BUILDER_EXECUTION",
+    "actual_visual_reference_png_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
+    "exact_island_image_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
+    "invocation_status": "BLOCKED_UNTIL_MERGED_CONFIG_AND_FULL_LITERALLY_DELIVERED_IMAGES",
+    "archive_before_processing": true
   }
 }
