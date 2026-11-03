@@ -1,0 +1,50 @@
+name: B01 E0 exact-island scene evidence
+
+on:
+  pull_request:
+    branches: [game-production]
+    paths:
+      - 'tools/art_pipeline/qa_b01_e0_scene.py'
+      - '.github/workflows/b01-e0-island-scene.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scene-evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned raster tooling
+        run: |
+          python3 -m venv "$RUNNER_TEMP/b01-venv"
+          "$RUNNER_TEMP/b01-venv/bin/pip" install 'Pillow==11.3.0'
+      - name: Pin and retrieve current main E0 runtime bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          MAIN_SHA="af80ce810fbdc5088cfa01d8a193f94ddbcd2721"
+          mkdir -p "$RUNNER_TEMP/b01-scene/inputs"
+          git fetch --no-tags --depth=1 origin "$MAIN_SHA"
+          git show "$MAIN_SHA:game/assets/eras/e0-1978/base/weather-complex.png" > "$RUNNER_TEMP/b01-scene/inputs/runtime_weather_e0.png"
+          cp art/gen/environment/start_island_hd.png "$RUNNER_TEMP/b01-scene/inputs/island_exact_approved.png"
+      - name: SHA-bound composite and mask evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/b01-venv/bin/python" tools/art_pipeline/qa_b01_e0_scene.py \
+            --island "$RUNNER_TEMP/b01-scene/inputs/island_exact_approved.png" \
+            --sprite "$RUNNER_TEMP/b01-scene/inputs/runtime_weather_e0.png" \
+            --layout art/placeables/BASE_ISLAND_LAYOUT.json \
+            --land-mask art/gen/environment/start_island_hd.land.json \
+            --output-dir "$RUNNER_TEMP/b01-scene"
+      - name: Preserve SHA-bound evidence without declaring visual PASS
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b01-e0-exact-island-scene-evidence
+          path: ${{ runner.temp }}/b01-scene/
+          if-no-files-found: warn
+          retention-days: 30
