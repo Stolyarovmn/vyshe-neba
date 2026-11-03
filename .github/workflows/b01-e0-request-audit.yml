@@ -1,0 +1,92 @@
+name: B01 E0 deterministic generation request audit
+
+on:
+  pull_request:
+    branches:
+      - art/b01-e0-preflight-config-20261103
+    paths:
+      - '.github/workflows/b01-e0-request-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-request:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate B01 source fail and generation preflight
+        run: |
+          python3 tools/art_pipeline/validate_generation_preflight.py art/briefs/B01_weather_complex_E0.preflight.json
+      - name: Build exact canonical E0 request (no imagegen)
+        run: |
+          mkdir -p "$RUNNER_TEMP/b01-request-audit"
+          python3 tools/art_pipeline/build_generation_request.py \
+            --receipt art/briefs/B01_weather_complex_E0.preflight.json \
+            --output "$RUNNER_TEMP/b01-request-audit/request.txt"
+      - name: Audit style, era references, source failure, and SHA
+        run: |
+          python3 - "$RUNNER_TEMP/b01-request-audit" <<'PY'
+          from pathlib import Path
+          import json, hashlib, sys
+          out=Path(sys.argv[1])
+          receipt=json.loads(Path("art/briefs/B01_weather_complex_E0.preflight.json").read_text())
+          review=json.loads(Path("art/qa/placeables/base/weather_complex/e0_1978.source_review.json").read_text())
+          refset=json.loads(Path("art/references/eras/e0_1978/reference-set.json").read_text())
+          config=json.loads(Path("art/placeables/PIPELINE_CONFIG.json").read_text())
+          calibration=json.loads(Path("art/gen/environment/start_island_hd.projection.json").read_text())
+          req=(out/"request.txt").read_bytes()
+          style=Path("art/style_bible.txt").read_bytes()
+          prompt=Path(receipt["prompt_file"]).read_bytes()
+          assert req.count(style)==1, "style bible should appear byte-for-byte once"
+          assert prompt.count(style)==0, "source prompt must not embed bible"
+          assert b"Asset: B01 / weather_complex" in req
+          assert b"Era: E0 / 1978" in req
+          assert b"Scope: exactly ONE complete isolated asset" in req
+          assert b"73.44 degrees elevation" in req
+          assert b"ground-circle compression 0.958515" in req
+          assert config["assets"]["B01"]["pixel_size"]==15
+          assert config["assets"]["B01"]["canvas"]==[96,122]
+          assert config["assets"]["B01"]["registration"]==[48,118]
+          assert receipt["generation_gate"]["can_generate_isolated_candidate"] is True
+          assert receipt["generation_gate"]["can_promote_to_production"] is False
+          assert receipt["generation_gate"]["can_publish_runtime"] is False
+          assert review["source_gate"]=="FAIL"
+          assert review["source"]["source_sha256"]==receipt["existing_source"]["source_sha256"]
+          assert receipt["existing_source"]["camera_source_gate"].startswith("FAIL_")
+          assert calibration["reference_sha256"]==receipt["camera"]["current_hd_reference_sha256"]
+          actual_refs=receipt["approved_era_reference_set"]["parts"]
+          assert len(actual_refs)==10
+          for ref in actual_refs:
+              record=refset["generation_checkpoint"]["sheet_states"][ref["role"]+"/"+ref["sheet"]]
+              for key in ("sha256","bytes","drive_file_id","dimensions"):
+                  assert ref[key]==record[key], (ref["role"],ref["sheet"],key)
+              assert record["exact_sha_visual_review"]["verdict"]=="pass"
+          assert receipt["generation_authorization"]["actual_visual_reference_png_delivery"]=="PENDING_TOOL_LEVEL_VERIFICATION"
+          assert receipt["generation_authorization"]["invocation_status"].startswith("BLOCKED_")
+          sha=hashlib.sha256(req).hexdigest()
+          evidence={
+              "status":"PASS_DETERMINISTIC_REQUEST_ONLY",
+              "generation_invocation":"BLOCKED_PENDING_MERGED_PR_AND_ACTUAL_IMAGE_DELIVERY",
+              "source_fail_bound_sha256":review["source"]["source_sha256"],
+              "request_sha256":sha,
+              "request_bytes":len(req),
+              "canonical_style_bible_sha256":hashlib.sha256(style).hexdigest(),
+              "reference_count":len(actual_refs),
+              "approved_island_sha256":calibration["reference_sha256"],
+              "reference_manifest":actual_refs,
+              "limitations":["Reference PNG bytes not fetched or passed to imagegen by this CI workflow.","No generation, new source, Drive upload, QA or user approval is inferred."],
+          }
+          (out/"audit.json").write_text(json.dumps(evidence,indent=2)+"\n")
+          print(f"PASS: canonical B01 request SHA256={sha}; style appears once; 10 SHA-bound refs in manifest")
+          print("BLOCKED: imagegen invocation until merged source contract and actual visual input delivery")
+          PY
+      - name: Upload immutable audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: b01-e0-canonical-request-audit
+          path: ${{ runner.temp }}/b01-request-audit/
+          retention-days: 30
+          if-no-files-found: error
