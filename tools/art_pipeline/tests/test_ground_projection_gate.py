@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import verify_visual_gate as gate
@@ -19,7 +21,9 @@ class GroundProjectionGateTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.candidate = Path(self.tmp.name)
         (self.candidate / "evidence").mkdir()
-        self.png = b"\x89PNG\r\n\x1a\nnot-a-valid-render-but-valid-signature"
+        raw = io.BytesIO()
+        Image.new("RGBA", (8, 8), (220, 200, 170, 255)).save(raw, format="PNG")
+        self.png = raw.getvalue()
         (self.candidate / "evidence/scene.png").write_bytes(self.png)
         self.editor = b'{"weather":{"anchor":[1000,350]}}'
         (self.candidate / "evidence/editor.json").write_bytes(self.editor)
@@ -104,6 +108,18 @@ class GroundProjectionGateTests(unittest.TestCase):
                 self.review["scene_projection"]["checks"][name] = "pending"
                 self.assertIn(name, " ".join(self.errors()))
                 self.review["scene_projection"]["checks"][name] = "pass"
+
+    def test_scene_png_signature_only_with_correct_sha_is_rejected(self):
+        invalid = b"\x89PNG\r\n\x1a\nnot-a-decodable-image"
+        (self.candidate / "evidence/scene.png").write_bytes(invalid)
+        self.review["scene_projection"]["scene_png_sha256"] = hashlib.sha256(invalid).hexdigest()
+        self.assertIn("undecodable", " ".join(self.errors()))
+
+    def test_editor_json_with_correct_sha_but_corrupted_body_is_rejected(self):
+        invalid = b'not valid json'
+        (self.candidate / "evidence/editor.json").write_bytes(invalid)
+        self.review["scene_projection"]["map_editor_sha256"] = hashlib.sha256(invalid).hexdigest()
+        self.assertIn("cannot be decoded", " ".join(self.errors()))
 
     def test_scene_png_sha_mismatch_is_rejected(self):
         (self.candidate / "evidence/scene.png").write_bytes(b"changed")
