@@ -14,7 +14,7 @@ from pathlib import Path
 from verify_visual_gate import verify_island, verify_png_bytes
 
 PNG_SIG = b"\x89PNG\r\n\x1a\n"
-CHECKS = ("identity", "engineering_parts", "era", "projection_match", "land_contact", "readability")
+CHECKS = ("identity", "engineering_parts", "era", "projection_match", "base_grounding_visual", "readability")
 
 
 def file_sha(path: Path) -> str:
@@ -37,6 +37,8 @@ def verify_source_review(source: Path, review_path: Path, expected_sha: str,
     review = json.loads(review_path.read_text(encoding="utf-8"))
     if review.get("source_gate") != "PASS":
         errors.append("source_gate must be explicit PASS (FAIL/PENDING blocks processing)")
+    if review.get("placement_scope") != "TEST_ONLY_NON_AUTHORITATIVE":
+        errors.append("source review: preview must be explicitly TEST_ONLY_NON_AUTHORITATIVE; no Map Editor coordinates are required")
     if review.get("source_sha256") != actual:
         errors.append("source review SHA does not match original image bytes")
     if review.get("island_sha256") != island_sha:

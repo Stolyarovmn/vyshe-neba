@@ -14,7 +14,7 @@ from pathlib import Path
 from PIL import Image, UnidentifiedImageError
 
 ROOT = Path(__file__).resolve().parents[2]
-SCENE_CHECKS = ("projection_match", "contact_points", "land_mask", "occlusion", "gameplay_scale")
+SCENE_CHECKS = ("projection_match", "base_grounding_visual", "silhouette_readability", "era_style_match", "gameplay_scale")
 
 
 def sha256(path: Path) -> str:
@@ -51,13 +51,6 @@ def _evidence_file(candidate_dir: Path, relative: str, digest: str, kind: str) -
         problem = verify_png_bytes(path)
         if problem:
             return f"{kind}: {problem}"
-    if kind == "map_editor_json":
-        try:
-            record = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-            return f"{kind}: evidence cannot be decoded as JSON: {type(exc).__name__}"
-        if not isinstance(record, dict) or not record:
-            return f"{kind}: expected a nonempty JSON object"
     return None
 
 
@@ -73,14 +66,17 @@ def verify_ground_scene(
       "island_sha256":"...", "actual_camera_angle":"UNKNOWN",
       "elevation_proxy_deg":73.44, "tilt_proxy_deg":16.56,
       "ground_compression_proxy":0.958515,
-      "scene_png":"evidence/e0_scene.png", "scene_png_sha256":"...",
-      "map_editor_json":"evidence/editor.json", "map_editor_sha256":"...",
-      "map_editor_approved_by_user":true, "reviewer":"...", "approval_evidence":"...",
-      "checks":{"projection_match":"pass","contact_points":"pass",
-                "land_mask":"pass","occlusion":"pass","gameplay_scale":"pass"}
+      "scene_png":"evidence/e0_test_only_composite.png", "scene_png_sha256":"...",
+      "placement_scope":"TEST_ONLY_NON_AUTHORITATIVE",
+      "reviewer":"...", "approval_evidence":"...",
+      "checks":{"projection_match":"pass","base_grounding_visual":"pass",
+                "silhouette_readability":"pass","era_style_match":"pass",
+                "gameplay_scale":"pass"}
     }
     A machine cannot interpret visual correctness, only verify these declarations
-    and their exact-SHA-bound raster/file inputs. Never auto-fill them.
+    and their exact-SHA-bound raster/file inputs. The sample composite checks
+    visual compatibility ONLY: it is not a saved/approved map position.
+    Never auto-fill approval fields.
     """
     x = verdict.get("scene_projection")
     if not isinstance(x, dict):
@@ -105,8 +101,8 @@ def verify_ground_scene(
     for name in SCENE_CHECKS:
         if checks.get(name) != "pass":
             problems.append(f"scene_projection.checks.{name} must be explicitly pass")
-    if x.get("map_editor_approved_by_user") is not True:
-        problems.append("scene_projection: exact Map Editor user approval required")
+    if x.get("placement_scope") != "TEST_ONLY_NON_AUTHORITATIVE":
+        problems.append("scene_projection: illustrative composite must have placement_scope TEST_ONLY_NON_AUTHORITATIVE")
     if not isinstance(x.get("reviewer"), str) or not x["reviewer"].strip():
         problems.append("scene_projection: reviewer identity missing")
     if not isinstance(x.get("approval_evidence"), str) or not x["approval_evidence"].strip():
@@ -126,7 +122,6 @@ def verify_ground_scene(
 
     for kind, path_key, digest_key in (
         ("scene_png", "scene_png", "scene_png_sha256"),
-        ("map_editor_json", "map_editor_json", "map_editor_sha256"),
     ):
         err = _evidence_file(candidate_dir, x.get(path_key), x.get(digest_key), "scene_png" if kind == "scene_png" else kind)
         if err:
@@ -200,7 +195,8 @@ def main() -> None:
     print(json.dumps({
         "asset_id": manifest["asset_id"],
         "visual_gate": "approved",
-        "ground_projection_scene_gate": "evidence_verified" if ground else "not_applicable",
+        "ground_projection_visual_gate": "evidence_verified" if ground else "not_applicable",
+        "map_editor_placement_gate": "PENDING_SEPARATE_USER_APPROVAL" if ground else "not_applicable",
         "camera_angle": "UNKNOWN" if ground else "not_applicable",
         "review_sha256": sha256(review_path),
         "files": [{"stem": x["stem"], "sha256": x["sha256"]} for x in manifest["files"]]

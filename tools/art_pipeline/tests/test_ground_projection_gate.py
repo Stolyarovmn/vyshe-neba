@@ -51,9 +51,7 @@ class GroundProjectionGateTests(unittest.TestCase):
                 "ground_compression_proxy": 0.958515,
                 "scene_png": "evidence/scene.png",
                 "scene_png_sha256": hashlib.sha256(self.png).hexdigest(),
-                "map_editor_json": "evidence/editor.json",
-                "map_editor_sha256": hashlib.sha256(self.editor).hexdigest(),
-                "map_editor_approved_by_user": True,
+                "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
                 "reviewer": "user with exact image SHA approval",
                 "approval_evidence": "https://example.invalid/review-record",
                 "checks": dict.fromkeys(gate.SCENE_CHECKS, "pass"),
@@ -115,23 +113,28 @@ class GroundProjectionGateTests(unittest.TestCase):
         self.review["scene_projection"]["scene_png_sha256"] = hashlib.sha256(invalid).hexdigest()
         self.assertIn("undecodable", " ".join(self.errors()))
 
-    def test_editor_json_with_correct_sha_but_corrupted_body_is_rejected(self):
-        invalid = b'not valid json'
-        (self.candidate / "evidence/editor.json").write_bytes(invalid)
-        self.review["scene_projection"]["map_editor_sha256"] = hashlib.sha256(invalid).hexdigest()
-        self.assertIn("cannot be decoded", " ".join(self.errors()))
+    def test_merged_contract_keeps_map_editor_approval_separate(self):
+        root = Path(__file__).resolve().parents[3]
+        contract = (root / "art/docs/PRODUCTION_CONTRACT_V2.md").read_text(encoding="utf-8")
+        self.assertIn("Actual placement is a separate, later user-owned Map Editor gate", contract)
+        self.assertIn("Missing Map Editor JSON must **not** block source review", contract)
+
+    def test_map_editor_data_is_not_part_of_art_visual_gate(self):
+        self.assertEqual([], self.errors())
+        (self.candidate / "evidence/editor.json").unlink()
+        self.assertEqual([], self.errors())
 
     def test_scene_png_sha_mismatch_is_rejected(self):
         (self.candidate / "evidence/scene.png").write_bytes(b"changed")
         self.assertIn("wrong evidence SHA", " ".join(self.errors()))
 
-    def test_missing_map_editor_approval_is_rejected(self):
-        self.review["scene_projection"]["map_editor_approved_by_user"] = False
-        self.assertIn("Map Editor", " ".join(self.errors()))
+    def test_test_only_marker_is_mandatory(self):
+        self.review["scene_projection"]["placement_scope"] = "PENDING"
+        self.assertIn("TEST_ONLY_NON_AUTHORITATIVE", " ".join(self.errors()))
 
-    def test_missing_map_editor_bytes_are_rejected(self):
-        (self.candidate / "evidence/editor.json").unlink()
-        self.assertIn("missing evidence file", " ".join(self.errors()))
+    def test_final_placement_claim_is_rejected_in_visual_gate(self):
+        self.review["scene_projection"]["placement_scope"] = "MAP_EDITOR_APPROVED"
+        self.assertIn("TEST_ONLY_NON_AUTHORITATIVE", " ".join(self.errors()))
 
     def test_scene_path_traversal_is_rejected(self):
         self.review["scene_projection"]["scene_png"] = "../external.png"
