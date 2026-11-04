@@ -1,0 +1,42 @@
+name: Ground projection source and scene gate tests
+
+on:
+  pull_request:
+    branches: [game-production]
+    paths:
+      - 'tools/art_pipeline/verify_visual_gate.py'
+      - 'tools/art_pipeline/verify_ground_source_gate.py'
+      - 'tools/art_pipeline/process_asset.py'
+      - 'tools/art_pipeline/promote_asset.py'
+      - 'tools/art_pipeline/tests/test_ground_projection_gate.py'
+      - 'tools/art_pipeline/tests/test_ground_source_gate.py'
+      - '.github/workflows/ground-projection-gate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  projection-gates:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Pillow for actual PNG decoder checks
+        run: python3 -m pip install --user 'Pillow==11.3.0'
+      - name: Compile ground projection validator
+        run: |
+          python3 -m py_compile \
+            tools/art_pipeline/verify_visual_gate.py \
+            tools/art_pipeline/verify_ground_source_gate.py \
+            tools/art_pipeline/process_asset.py \
+            tools/art_pipeline/promote_asset.py \
+            tools/art_pipeline/tests/test_ground_projection_gate.py \
+            tools/art_pipeline/tests/test_ground_source_gate.py
+      - name: Run fail-closed source and scene projection regression cases
+        run: |
+          python3 -m unittest discover \
+            -s tools/art_pipeline/tests \
+            -p 'test_ground_*_gate.py' -v
+      - name: Check no runtime source was touched
+        run: |
+          python3 tools/art_pipeline/validate_production_contract.py

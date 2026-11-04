@@ -111,6 +111,26 @@ def main():
             source_stat={'source_sha256':sha(source),'source_meta_sha256':maybe_sha(meta_path) if meta_path else None,'source_gen_id':meta.get('source_gen_id'),'source_original_sha256':meta.get('source_sha256') or meta.get('source_original_sha256')}
             source_fp=fingerprint({'step':'source_identity','asset':a.asset,'stem':stem,'adapter':cfg['adapter'],'source':source_stat}); upstream(tracker,meta,source_fp)
 
+            # Ground-source projection is an actual pre-processing gate, not a
+            # flag in the generation prompt. Do this even with --resume.
+            if cfg.get('zone') == 'base':
+                original_sha = meta.get('source_sha256') or meta.get('source_original_sha256')
+                if not original_sha:
+                    raise SystemExit(f'SOURCE_PROJECTION_GATE_BLOCKED: {stem} missing original SHA provenance')
+                if cfg['adapter'] == 'presnap_png':
+                    raw_original = source
+                else:
+                    original_rel = meta.get('original_png_file')
+                    if not original_rel:
+                        raise SystemExit(f'SOURCE_PROJECTION_GATE_BLOCKED: {stem} indexed transport requires actual original_png_file')
+                    raw_original = (repo / original_rel).resolve()
+                    if not raw_original.is_relative_to(repo):
+                        raise SystemExit('SOURCE_PROJECTION_GATE_BLOCKED: original PNG path escapes production tree')
+                source_review = repo / 'art/qa/placeables/base' / cfg['asset'] / f'{stem}.source_review.json'
+                run(sys.executable, repo/'tools/art_pipeline/verify_ground_source_gate.py',
+                    '--source', raw_original, '--review', source_review,
+                    '--expected-source-sha', original_sha, '--repo-root', repo)
+
             presnap=work/(f'{stem}_presnap_grid.png' if cfg['adapter']=='presnap_png' else f'{stem}_presnap.png')
             fp=fingerprint({'step':'source_prepare','source':source_stat,'adapter':cfg['adapter'],'transport_scale':cfg.get('transport_scale',1),'canvas':cfg['canvas'],'pixel_size':pixel_size,'decoder_sha256':maybe_sha(decoder)})
             execute(tracker,'source_prepare',fp,[presnap],lambda:prepare_source(repo,cfg,stem,work,source),a.resume)

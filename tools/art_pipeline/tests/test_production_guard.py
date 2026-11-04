@@ -125,6 +125,58 @@ class ProductionGuardTests(unittest.TestCase):
             self.assertEqual("fail", report["technical_verdict"])
             self.assertTrue(report["technical_errors"])
 
+    def test_era_reference_source_tolerance_is_one_pixel_per_axis(self):
+        value = self.load_spec()
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "reference.png"
+            for width, height in ((1536, 1024), (1535, 1024), (1537, 1024),
+                                  (1536, 1023), (1536, 1025), (1535, 1023), (1537, 1025)):
+                make_png(path, width, height)
+                report = pg.verify_source(value, path)
+                self.assertEqual("pass", report["technical_verdict"], (width, height))
+                self.assertEqual([width - 1536, height - 1024], report["dimension_delta_px"])
+                self.assertEqual(1, report["dimension_tolerance_px"])
+                self.assertEqual([], report["technical_errors"])
+            for width, height in ((1534, 1024), (1538, 1024), (1536, 1022),
+                                  (1536, 1026), (1534, 1022)):
+                make_png(path, width, height)
+                report = pg.verify_source(value, path)
+                self.assertEqual("fail", report["technical_verdict"], (width, height))
+                self.assertTrue(report["technical_errors"])
+
+    def test_reference_tolerance_never_applies_to_other_asset_kinds(self):
+        value = self.load_spec()
+        self.assertTrue(pg.source_dimensions_allowed(value, [1535, 1024]))
+        value["kind"] = "game_asset"
+        self.assertEqual(0, pg.dimension_tolerance_px(value))
+        self.assertFalse(pg.source_dimensions_allowed(value, [1535, 1024]))
+        self.assertTrue(pg.source_dimensions_allowed(value, [1536, 1024]))
+
+    def test_one_pixel_review_requires_exact_deviation_provenance(self):
+        value = self.load_spec()
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "reference.png"
+            make_png(path, 1535, 1024)
+            report = pg.verify_source(value, path)
+            review = pg.review_template(value, report, str(SPEC_PATH), "generation-id",
+                                        "immutable-drive-id", "https://drive.google.com/file/d/immutable-drive-id/view")
+            for key in review["global_gates"]:
+                review["global_gates"][key] = "pass"
+            for specimen in review["specimens"]:
+                specimen["verdict"] = "pass"
+            review["reviewer"] = "explicit reviewer"
+            review["review_method"] = "SHA-bound visual review of untouched source"
+            review["final_verdict"] = "pass"
+            self.assertEqual([], pg.validate_review(value, review, path))
+            review["source"].pop("dimension_delta_px")
+            self.assertTrue(any("dimension_delta_px" in e for e in pg.validate_review(value, review, path)))
+            review["source"]["dimension_delta_px"] = [-1, 0]
+            review["source"]["sha256"] = "f" * 64
+            self.assertTrue(any("exact source sha256" in e for e in pg.validate_review(value, review, path)))
+            review["source"]["sha256"] = report["sha256"]
+            review["source"]["drive_file_id"] = ""
+            self.assertTrue(any("Drive provenance" in e for e in pg.validate_review(value, review, path)))
+
     def test_review_fail_closed(self):
         value = self.load_spec()
         source = {"sha256":"a"*64,"bytes":123,"dimensions":[1536,1024],"technical_verdict":"pass","technical_errors":[],"drive_file_id":"drive","drive_url":"https://drive.google.com/file/d/drive/view"}

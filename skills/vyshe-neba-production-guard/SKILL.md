@@ -67,7 +67,7 @@ python3 tools/art_pipeline/production_guard.py build-request \
 
 The builder appends `art/style_bible.txt` verbatim exactly once.
 
-Default: one call = one sheet-part, one role, one era. Approved exception for specifically blocked era references: `art/docs/ERA_SPECIMEN_COMPOSITION.md` requires one atomic specimen per call and eight immutable raw SHA-bound source reviews before a deterministic composite of the same canonical sheet. Do not use full-sheet builder as the per-specimen prompt. Never mix eras/roles; this route is BLOCKED until its separate docs/tooling PRs merge and combined CI passes.
+One call = one sheet-part, one role, one era. Never merge roles, eras or alternatives into one call.
 
 ### 4. Deliver the full request to conversational imagegen
 
@@ -104,7 +104,7 @@ This bridge makes request delivery auditable and closes the observed “short co
 Immediately after every attempt, including a rejection:
 
 1. keep the untouched returned PNG;
-2. verify exact dimensions/byte count/SHA-256 against the spec:
+2. verify actual dimensions versus the planned spec size (E0–E5 era-reference sheets alone permit ±1 px per axis), original byte count and exact SHA-256:
 
 ```bash
 python3 tools/art_pipeline/production_guard.py verify-source \
@@ -115,7 +115,7 @@ python3 tools/art_pipeline/production_guard.py verify-source \
 4. if the source is rejected, move it to `_rejected` without changing bytes;
 5. do not crop, resize, recolor, quantize or run Pixel Snapper before archival/provenance.
 
-A dimension mismatch is a technical source failure even if the image looks good.
+For E0–E5 era-reference sheets only, source width and height may each differ from the planned value by at most 1 pixel; the guard records the signed per-axis delta and tolerance in source/review provenance. An offset of 2+ pixels on either axis is a technical source failure even if the image looks good. Every other source type remains strict. Preserve untouched original bytes, without padding, cropping or resizing.
 
 ### 6. Create a structured visual review
 
@@ -151,7 +151,7 @@ python3 tools/art_pipeline/production_guard.py validate-review \
   <spec.json> /tmp/source-review.json --image <untouched.png>
 ```
 
-Approval is impossible while **any** gate/specimen is `fail` or `pending`, while the exact SHA/dimensions differ, or while Drive provenance is missing.
+Approval is impossible while **any** gate/specimen is `fail` or `pending`, while the source SHA or byte count differs, when actual dimensions exceed the era-reference ±1 px allowance or its recorded signed deltas are missing/incorrect, or while Drive provenance is missing. Exact raw dimensions remain mandatory in metadata and are never silently changed.
 
 If rejected, record concrete rejection reasons and stop before destructive processing. A source-era/scope/composition defect is never repaired downstream by Pixel Snapper, normalization or Aseprite.
 

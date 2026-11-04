@@ -16,7 +16,7 @@ Era references are a reusable visual-engineering vocabulary, not whole-object co
 3. `controls-displays`
 4. `lighting-signals`
 
-Each role may contain **multiple exact-SHA sheet-parts** when needed to keep atomic specimens large and readable. These sheet-parts belong to the same role and the same canonical set; they are not versions or alternative reference schemes. Default density is at most 8 specimens per sheet-part, with fewer allowed for more complex hardware. Exception: specifically authorized blocked sheets can use the deterministic [single specimen composition workflow](../../docs/ERA_SPECIMEN_COMPOSITION.md), which creates the SAME canonical sheet from individually archived/reviewed source PNGs; no parallel reference versions.
+Each role may contain **multiple exact-SHA sheet-parts** when needed to keep atomic specimens large and readable. These sheet-parts belong to the same role and the same canonical set; they are not versions or alternative reference schemes. Default density is at most 8 specimens per sheet-part, with fewer allowed for more complex hardware.
 
 Whole buildings, vehicles, radars, cranes, launch complexes, base scenes and `applications` boards are forbidden as canonical era references. Architecture/silhouette language is shown through construction fragments, joints, facade/panel connections, structural profiles and service details rather than complete buildings.
 
