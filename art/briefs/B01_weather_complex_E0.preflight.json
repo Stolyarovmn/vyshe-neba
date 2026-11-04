@@ -6,7 +6,7 @@
   "era": "E0",
   "year": 1978,
   "generation_kind": "existing_source_review_before_optional_isolated_anchor_replacement",
-  "contract_base_sha": "2cfffb42bdce0d9b5e5ef1e3eee398ba2ebab6fc",
+  "contract_base_sha": "22814df1c66e409064fa1ac81e90b91faee7fa35",
   "runtime_main_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
   "brief_file": "art/briefs/B01_weather_complex_E0.md",
   "prompt_file": "art/prompts/b01_weather_complex_e0.md",
@@ -20,20 +20,22 @@
     "sha256_required_before_processing": true
   },
   "existing_source": {
-    "generation_id": "943ecfd0-1d0b-4fd2-9ff4-1ac5882c134a",
-    "source_sha256": "02bf3b102e870f1bebc6c826246d4e658d2f9a38abaa0bca8c8a82db9b2bd542",
-    "size_bytes": 1819367,
+    "generation_id": "6fa4da36-3eac-4e72-b843-9e90e014e4d1",
+    "source_sha256": "98084e7dc6668c2f499eb477dc64f7ee199c6da6713d8679471675363c39d491",
+    "size_bytes": 853153,
     "dimensions": [
-      1024,
-      1536
+      1254,
+      1254
     ],
-    "drive_file_id": "1pZnJVdKaLbdGO80jMbS_POP4eIrYMMzI",
-    "source_integrity": "reverified",
-    "camera_source_gate": "FAIL_EXACT_SHA_PROJECTION_SCENE_SELF_REVIEW",
-    "archive_input_png_staged_in_repo": false,
-    "processing_output_in_runtime_sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c",
+    "drive_file_id": "1wWMDxj52TM7mt8aHUIYFEOgGw6AVLQ9Y",
+    "source_integrity": "reverified_local_and_drive_size",
+    "camera_source_gate": "FAIL_QUALITATIVE_ISLAND_PROJECTION_SELF_REVIEW",
     "source_review_record": "art/qa/placeables/base/weather_complex/e0_1978.source_review.json",
-    "reuse_decision": "REJECT_EXISTING_SOURCE_FOR_NEW_CAMERA_FAMILY_ONLY"
+    "reuse_decision": "REJECT_CURRENT_SOURCE_FOR_PROJECTION",
+    "archive_input_png_staged_in_repo": false,
+    "literal_generation_request_sha256": "UNKNOWN",
+    "all_reference_png_tool_inputs_delivered": "UNVERIFIED",
+    "historic_approved_runtime_sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c"
   },
   "approved_era_reference_set": {
     "path": "art/references/eras/e0_1978/reference-set.json",
@@ -189,7 +191,7 @@
   "camera": {
     "family": "island_top_3_4",
     "projection_angle": "UNKNOWN",
-    "projection_review": "pending_existing_source_scene_and_map_editor_review",
+    "projection_review": "FAIL_SOURCE_EXACT_SHA_98084e7d_ASSISTANT_VISUAL_REVIEW",
     "projection_calibration_file": "art/gen/environment/start_island_hd.projection.json",
     "generation_elevation_proxy_deg": 73.44,
     "generation_tilt_from_top_down_proxy_deg": 16.56,
@@ -201,7 +203,7 @@
     "current_hd_reference_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
     "current_hd_reference_runtime_git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
     "current_hd_reference_approved_on": "2026-10-30T14:33:35Z",
-    "map_editor_final_placement": "UNKNOWN",
+    "map_editor_final_placement": "PENDING_SEPARATE_USER_GATE_NOT_REQUIRED_FOR_ART",
     "legacy_layout_anchor_px": [
       1000,
       350
@@ -258,17 +260,30 @@
     "issue": "https://github.com/Stolyarovmn/vyshe-neba/issues/93",
     "prior_brief_pr": "https://github.com/Stolyarovmn/vyshe-neba/pull/94",
     "source_regeneration_attempts_this_pass": 0,
-    "source_review_status": "PENDING",
-    "next_step": "Run canonical validate_generation_preflight.py and build_generation_request.py on exact combined feature branch; verify literal request digest and real input PNGs. Do not invoke imagegen until merged prerequisites and tool-level input delivery are proven."
+    "source_review_status": "FAIL_EXACT_SHA_CURRENT_ORIGINAL_ASSISTANT_SELF_REVIEW",
+    "next_step": "Refresh deterministic preflight/request and bridge on exact PR #97 source FAIL and current AGENTS; do not invoke imagegen without real verified E0 PNG/approved island inputs; no pixel processing of rejected source. Map Editor approval is a separate later gate.",
+    "last_reviewed_source_sha256": "98084e7dc6668c2f499eb477dc64f7ee199c6da6713d8679471675363c39d491",
+    "active_game_production_head_sha_at_review": "22814df1c66e409064fa1ac81e90b91faee7fa35"
   },
   "generation_authorization": {
-    "reason": "Documented source projection FAIL on exactly archived E0 image, see source_review_record",
+    "reason": "The exact current image 98084e7d... (generation 6fa4da36) failed visual camera-family review against approved island; see source_review_record.",
     "preflight_scope": "ISOLATED_REPLACEMENT_SOURCE_ONLY",
     "existing_original_preserved": true,
-    "exact_request_validation": "PENDING_CANONICAL_BUILDER_EXECUTION",
+    "exact_request_validation": "INVALIDATED_BY_B01_E0_PROMPT_CHANGE_MUST_REBUILD",
     "actual_visual_reference_png_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
     "exact_island_image_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
-    "invocation_status": "BLOCKED_UNTIL_MERGED_CONFIG_AND_FULL_LITERALLY_DELIVERED_IMAGES",
-    "archive_before_processing": true
-  }
+    "invocation_status": "BLOCKED_UNMERGED_B01_CONFIG_AND_UNVERIFIED_LITERAL_REQUEST_AND_IMAGE_INPUTS",
+    "archive_before_processing": true,
+    "last_generated_request_sha256": "UNKNOWN_NOT_BUILT_AFTER_PROMPT_CORRECTION",
+    "last_prompt_git_blob_sha1": "a19192b557a9d93a7616bd9e9f58185367518afd"
+  },
+  "prior_sources": [
+    {
+      "generation_id": "943ecfd0-1d0b-4fd2-9ff4-1ac5882c134a",
+      "source_sha256": "02bf3b102e870f1bebc6c826246d4e658d2f9a38abaa0bca8c8a82db9b2bd542",
+      "drive_file_id": "1pZnJVdKaLbdGO80jMbS_POP4eIrYMMzI",
+      "review": "FAIL_QUALITATIVE_PROJECTION",
+      "replaced_as_active_source_record": true
+    }
+  ]
 }
