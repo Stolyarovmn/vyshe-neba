@@ -9,22 +9,22 @@
   "source_gate": "FAIL",
   "source_integrity": "PASS",
   "source": {
-    "source_sha256": "02bf3b102e870f1bebc6c826246d4e658d2f9a38abaa0bca8c8a82db9b2bd542",
-    "generation_id": "943ecfd0-1d0b-4fd2-9ff4-1ac5882c134a",
-    "drive_file_id": "1pZnJVdKaLbdGO80jMbS_POP4eIrYMMzI",
+    "source_sha256": "98084e7dc6668c2f499eb477dc64f7ee199c6da6713d8679471675363c39d491",
+    "generation_id": "6fa4da36-3eac-4e72-b843-9e90e014e4d1",
+    "drive_file_id": "1wWMDxj52TM7mt8aHUIYFEOgGw6AVLQ9Y",
+    "drive_url": "https://drive.google.com/file/d/1wWMDxj52TM7mt8aHUIYFEOgGw6AVLQ9Y/view?usp=drivesdk",
     "dimensions": [
-      1024,
-      1536
+      1254,
+      1254
     ],
-    "bytes": 1819367
-  },
-  "prior_runtime": {
-    "sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c",
-    "dimensions": [
-      96,
-      122
+    "bytes": 853153,
+    "alpha_extrema": [
+      0,
+      255
     ],
-    "main_commit_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721"
+    "source_original_immutable": true,
+    "literal_generation_request_sha256": "UNKNOWN",
+    "all_exact_era_png_tool_input_receipt": "UNVERIFIED"
   },
   "projection_reference": {
     "sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
@@ -33,54 +33,55 @@
       821
     ],
     "source": "art/gen/environment/start_island_hd.png",
+    "camera_family": "island_top_3_4",
     "actual_camera_angle": "UNKNOWN",
-    "proxy_elevation_degrees": 73.44,
-    "proxy_tilt_from_topdown_degrees": 16.56
+    "elevation_proxy_deg": 73.44,
+    "tilt_proxy_deg": 16.56,
+    "ground_compression_proxy": 0.958515,
+    "proxy_only_not_numeric_source_camera_measurement": true
   },
-  "source_gate_checks": {
-    "identity": "PASS",
-    "era_e0": "PASS",
-    "engineering_parts": "PASS",
-    "alpha": "NO_AUTOMATIC_FAILURE_ALPHA_MAX_254_VISIBLE_COMPOSITES_CHECKED",
-    "projection": "FAIL_LOWER_FRONT_SIDE_3_4",
-    "visually_apparent_defect": "Analog indicator/front-facing side surfaces dominate; upper planes of mount, feet and instrument do not read like the exact near-top-down approved island.",
-    "processing_repair_possible": false,
-    "source_original_immutable": true
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "identity": "pass",
+    "engineering_parts": "pass",
+    "era": "pass",
+    "readability": "pass_at_test_only_display_scale",
+    "projection_match": "fail",
+    "base_grounding_visual": "pending_geometry_correction"
   },
-  "scene_evidence": {
-    "ci_run_id": 41618326943,
-    "ci_url": "https://github.com/Stolyarovmn/vyshe-neba/actions/runs/41618326943",
-    "ci_result": "success",
-    "artifact_id": 13222820734,
-    "artifact_name": "b01-e0-exact-island-scene-evidence",
-    "scope": "technical SHA-bound island/runtime composite only, not visual approval",
-    "land_mask": "PASS_208_OF_208_SAMPLES",
-    "legacy_layout_anchor_px": [
-      1000,
-      350
-    ],
-    "legacy_layout_footprint_px": [
-      100,
-      28
-    ],
-    "legacy_layout_sprite_px": [
-      142,
-      180
-    ],
-    "map_editor_approved_placement": "UNKNOWN",
-    "contact_and_occlusion": "PENDING"
+  "visual_reason": {
+    "status": "FAIL_QUALITATIVE_PROJECTION_INCOMPATIBILITY",
+    "observed": "The four-corner base is designed to read as a roughly square horizontal plate but its top plane is strongly foreshortened front-to-back compared with the nearly overhead approved island. The analog dial is presented with a dominant near-frontal face. Together the object reads lower/steeper-front-side than the island-top-3/4 camera family.",
+    "uncertainty": "No actual source 3D angle inferred; island 73.44° equivalent is a ground-circle proxy only. No claim that any specific numeric 3D angle was measured on the sprite.",
+    "corrective_target": "Preserve E0 engineering parts, top wind vane, side cup-anemometer, inactive red light on tube, two distinct sensor power leads, bolted base and all user-approved mechanical corrections, but redraw the whole object in the more top-down approved-island camera: more visible true top planes and shallower apparent vertical instrument face. Do not geometrically shear/stretch the flattened original as a substitute for perspective correction.",
+    "fix_via_pixel_snapper": false
   },
-  "review_limits": [
-    "This is assistant self-review FAIL, not a user rejection or approval.",
-    "Visual projection FAIL is source-specific; it does not invalidate archived bytes or historical runtime SHA.",
-    "Map Editor final placement remains UNKNOWN; no new placement numbers are asserted."
-  ],
+  "source_evidence": {
+    "reference_qa_bundle_drive_id": "1XgHK-ij0TuNFI8_EkpLbLR7Q7fbfgSLG",
+    "qa_bundle_url": "https://drive.google.com/file/d/1XgHK-ij0TuNFI8_EkpLbLR7Q7fbfgSLG/view?usp=drivesdk",
+    "qa_bundle_sha256": "f6ea1802c26a30a1dd889ee83520fb34b886a09d7d12e279e2f926b62a011e27",
+    "exact_island_composite_sha256": "a598ab5795da092872a889244b1c1b47b7ee770b0b52f81a5e8221e946fdfd32",
+    "preview_sha256": "1ff8bcc831d1c47015370168937f5c014408455d99dbc7a6167c88668f7cf0c7",
+    "review_source": "assistant visual inspection of exact original and verified TEST_ONLY composite",
+    "map_editor_placement": "SEPARATE_LATER_GATE"
+  },
+  "prior_reviewed_source": {
+    "source_sha256": "02bf3b102e870f1bebc6c826246d4e658d2f9a38abaa0bca8c8a82db9b2bd542",
+    "drive_file_id": "1pZnJVdKaLbdGO80jMbS_POP4eIrYMMzI",
+    "generation_id": "943ecfd0-1d0b-4fd2-9ff4-1ac5882c134a",
+    "previous_verdict": "FAIL",
+    "previous_visual_reason": "Analog indicator/front-facing side surfaces dominate; upper planes of mount, feet and instrument do not read like the exact near-top-down approved island."
+  },
   "gate_decision": {
-    "regeneration_justified_by_source_fail": true,
-    "can_promote_this_source": false,
-    "can_publish_runtime": false,
-    "exact_request_and_attached_reference_images_required": true,
-    "user_approval_of_future_candidate_required": true
+    "use_as_new_source": false,
+    "source_acceptance": "REJECT_CURRENT_CAMERA_FAMILY",
+    "auto_qa": "NOT_RUN",
+    "imagegen_edit": "NOT_RUN_IN_THIS_TASK",
+    "processing": "BLOCKED_BY_SOURCE_FAIL",
+    "production_promotion": "BLOCKED",
+    "runtime_publication": "BLOCKED",
+    "user_exact_sha_approval": "NOT_GIVEN",
+    "no_map_editor_placement_requirement_for_art": true
   },
-  "next_step": "On a reviewed preflight/config branch, run deterministic builder and validator; preserve exact request digest, verify all attached visual PNGs and actual delivery. Do NOT invoke imagegen from unmerged or otherwise unauthorized prerequisites."
+  "next_step": "Do not process or promote source 98084e7d; produce a replacement with camera corrected in the canonical isolated E0 request and complete original archival + actual PNG reference delivery. Keep B01-specific config/preflight PR unmerged until updated base is reviewed; no automatic merge."
 }
