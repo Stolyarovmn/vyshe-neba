@@ -126,7 +126,9 @@ Measured ground-circle proxy:
 
 This is generation control only. Exact reference appearance wins. A generated source must still pass visual projection review; a low/front-side result is rejected even if the request contained the proxy.
 
-For every ground candidate: verify `BASE_ISLAND_LAYOUT.json`, scale conversion, anchor, footprint, contact, occlusion, land mask and real-scale/reduced-zoom composite. Do not bake cast shadow.
+For every ground source/candidate, **asset visual/projection QA** checks its exact SHA against the approved HD-island appearance: perspective/top planes, period materials, physical base/contact plausibility, silhouette and readability at representative normal/reduced gameplay zoom. Use a SHA-bound illustrative composite on the exact approved island, but mark its placement **TEST_ONLY / NON_AUTHORITATIVE**. A test location must not be treated as approved coordinates, final scale, land-mask permission or occlusion approval. Do not bake cast shadow.
+
+**Actual placement is a separate, later user-owned Map Editor gate.** The user will place the approved art and approve the saved Map Editor JSON/record. Only **then** verify actual anchor, displayed dimensions, footprint vs land mask, interaction with terrain/objects, occlusion and spatial scene behavior against those exact editor settings. Before that, final placement is `UNKNOWN/PENDING`, not `FAIL` for the source/art candidate. Missing Map Editor JSON must **not** block source review, candidate visual approval or production-art promotion; placement remains blocked for later map/runtime integration only. Do not back-fill editorial coordinates from legacy `BASE_ISLAND_LAYOUT.json` or claim final scene integration.
 
 ## 6. Physics, animation and causal signals
 

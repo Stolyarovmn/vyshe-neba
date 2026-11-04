@@ -12,7 +12,7 @@ Before **every** production image generation:
 4. Create/update the asset brief from `ASSET_BRIEF_TEMPLATE.md`. Unknown facts remain `UNKNOWN`; critical missing facts become `BLOCKED`.
 5. Resolve the selected era through `ERA_DESIGN_MATRIX.md`. Record all applicable axes: manufacturing, materials, drive, interface, lighting, infrastructure, autonomy/service, silhouette/architecture. For E1–E5 record the transition from the previous approved era: at least 3 changed axes and at least 2 preserved family traits when physically possible.
 6. If `art/references/eras/<era>/reference-set.json` exists with approved status, read it before generation, verify the listed SHA-256/Drive provenance, and use all applicable sheets by their declared roles together with the era matrix and asset-specific brief. Generated lettering/pseudo-text inside a reference sheet is non-authoritative. Transfer era language, not literal object identity.
-7. Confirm exactly one asset **or** one part sheet per imagegen call and exactly one era per anchor-generation call. Narrow authorized migration for blocked era-reference sheets: `ERA_SPECIMEN_COMPOSITION.md` allows exactly ONE atomic specimen per call, eight raw Drive/SHA-bound approvals and deterministic assembly of the SAME canonical 4×2 sheet. Remains BLOCKED until separate docs/tooling merges and exact CI.
+7. Confirm exactly one asset **or** one part sheet per imagegen call and exactly one era per anchor-generation call.
 8. Confirm the Drive archive destination exists before generation. The untouched raw generation must be archived there before destructive processing.
 9. When a preflight receipt exists, run `validate_generation_preflight.py`, then build the actual request with `build_generation_request.py`. The builder appends `art/style_bible.txt` verbatim exactly once and binds ground assets to the approved island projection evidence. Do not manually paraphrase or re-order the canonical request.
 10. Confirm the canonical asset prompt contains enough era-specific evidence to enforce the matrix. A prompt that only says `more modern`, `more futuristic`, `add cyan`, `add hologram` or similar is insufficient and blocks generation.
@@ -73,7 +73,9 @@ Production generation uses rounded control values **73.44° elevation / 16.56° 
 
 **Important:** supplying the numeric proxy does not prove the generator obeyed it. Source review must reject a result that visually reads lower/front-side or otherwise fails to match the island's visible top planes/depth compression. If the exact reference and the numeric proxy appear to disagree, the SHA-bound reference wins.
 
-Scene approval still requires a real-scale composite: anchor, footprint, contact, occlusion, land mask, normal/reduced zoom and relevant scene states. LP and island pixels are different coordinate spaces.
+For **asset visual/projection QA**, inspect an exact-SHA composite with the approved HD island at a clearly marked **TEST_ONLY** placement. Check perspective, visible upper faces, causal construction, physical ground-base plausibility, sprite silhouette and readability at normal/reduced zoom. Do **not** claim this approves the test coordinates or a Map Editor position. The source/candidate may receive exact-SHA visual approval and be promoted to production art without a saved Map Editor JSON.
+
+**Final map placement is a separate future gate** after the user arranges the sprites in Map Editor: require the user-approved editor JSON/record before checking actual anchor, display scale, land mask, occlusion, collision/contacts and scene behavior. Until the editor output exists, record `placement=PENDING` without making it a blocker to sprite artwork production. LP and island pixels are different coordinate spaces.
 
 ## 3. Generation → immutable raw source
 
