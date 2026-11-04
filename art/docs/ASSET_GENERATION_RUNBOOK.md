@@ -73,7 +73,9 @@ Production generation uses rounded control values **73.44° elevation / 16.56° 
 
 **Important:** supplying the numeric proxy does not prove the generator obeyed it. Source review must reject a result that visually reads lower/front-side or otherwise fails to match the island's visible top planes/depth compression. If the exact reference and the numeric proxy appear to disagree, the SHA-bound reference wins.
 
-Scene approval still requires a real-scale composite: anchor, footprint, contact, occlusion, land mask, normal/reduced zoom and relevant scene states. LP and island pixels are different coordinate spaces.
+For **asset visual/projection QA**, inspect an exact-SHA composite with the approved HD island at a clearly marked **TEST_ONLY** placement. Check perspective, visible upper faces, causal construction, physical ground-base plausibility, sprite silhouette and readability at normal/reduced zoom. Do **not** claim this approves the test coordinates or a Map Editor position. The source/candidate may receive exact-SHA visual approval and be promoted to production art without a saved Map Editor JSON.
+
+**Final map placement is a separate future gate** after the user arranges the sprites in Map Editor: require the user-approved editor JSON/record before checking actual anchor, display scale, land mask, occlusion, collision/contacts and scene behavior. Until the editor output exists, record `placement=PENDING` without making it a blocker to sprite artwork production. LP and island pixels are different coordinate spaces.
 
 ## 3. Generation → immutable raw source
 
