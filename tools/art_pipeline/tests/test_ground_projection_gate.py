@@ -113,6 +113,12 @@ class GroundProjectionGateTests(unittest.TestCase):
         self.review["scene_projection"]["scene_png_sha256"] = hashlib.sha256(invalid).hexdigest()
         self.assertIn("undecodable", " ".join(self.errors()))
 
+    def test_merged_contract_keeps_map_editor_approval_separate(self):
+        root = Path(__file__).resolve().parents[3]
+        contract = (root / "art/docs/PRODUCTION_CONTRACT_V2.md").read_text(encoding="utf-8")
+        self.assertIn("Actual placement is a separate, later user-owned Map Editor gate", contract)
+        self.assertIn("Missing Map Editor JSON must **not** block source review", contract)
+
     def test_map_editor_data_is_not_part_of_art_visual_gate(self):
         self.assertEqual([], self.errors())
         (self.candidate / "evidence/editor.json").unlink()
