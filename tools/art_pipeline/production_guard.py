@@ -20,6 +20,7 @@ YEARS = {f"E{i}": year for i, year in enumerate((1978, 1986, 1998, 2015, 2035, 2
 ROLES = {"materials-construction", "mechanics-infrastructure", "controls-displays", "lighting-signals"}
 STYLE_BIBLE = "art/style_bible.txt"
 MAX_SPECIMENS = 8
+ERA_REFERENCE_SOURCE_TOLERANCE_PX = 1
 PASS, FAIL, PENDING = "pass", "fail", "pending"
 VERDICTS = {PASS, FAIL, PENDING}
 
@@ -154,18 +155,42 @@ def png_info(path: Path) -> tuple[int, int, int, str]:
     return width, height, len(data), hashlib.sha256(data).hexdigest()
 
 
+def dimension_tolerance_px(spec: dict[str, Any]) -> int:
+    """Only E0-E5 atomic era-reference sheets permit a one-pixel source deviation per axis."""
+    return ERA_REFERENCE_SOURCE_TOLERANCE_PX if spec.get("kind") == "era_reference_sheet" and spec.get("era") in YEARS else 0
+
+
+def source_dimensions_allowed(spec: dict[str, Any], actual: Any) -> bool:
+    expected = spec.get("generation", {}).get("size")
+    if not (isinstance(expected, list) and len(expected) == 2 and
+            isinstance(actual, (list, tuple)) and len(actual) == 2):
+        return False
+    if not all(type(x) is int and x > 0 for x in (*expected, *actual)):
+        return False
+    limit = dimension_tolerance_px(spec)
+    return all(abs(a - e) <= limit for a, e in zip(actual, expected))
+
+
 def verify_source(spec: dict[str, Any], image_path: Path) -> dict[str, Any]:
     errors = validate_spec(spec)
     if errors: raise GuardError("cannot verify source against invalid spec:\n" + "\n".join(errors))
     width, height, byte_count, sha256 = png_info(image_path)
     expected = spec["generation"]["size"]
-    technical_errors = [] if [width, height] == expected else [f"source dimensions {width}x{height} do not match planned {expected[0]}x{expected[1]}"]
-    return {"image": str(image_path), "sha256": sha256, "bytes": byte_count, "dimensions": [width, height], "planned_dimensions": expected, "technical_verdict": PASS if not technical_errors else FAIL, "technical_errors": technical_errors}
+    actual = [width, height]
+    tolerance = dimension_tolerance_px(spec)
+    delta = [width - expected[0], height - expected[1]]
+    technical_errors = [] if source_dimensions_allowed(spec, actual) else [
+        f"source dimensions {width}x{height} exceed planned {expected[0]}x{expected[1]} tolerance ±{tolerance}px per axis"
+    ]
+    return {"image": str(image_path), "sha256": sha256, "bytes": byte_count,
+            "dimensions": actual, "planned_dimensions": expected,
+            "dimension_delta_px": delta, "dimension_tolerance_px": tolerance,
+            "technical_verdict": PASS if not technical_errors else FAIL, "technical_errors": technical_errors}
 
 
 def review_template(spec: dict[str, Any], report: dict[str, Any], spec_path: str, generation_id: str, drive_file_id: str, drive_url: str) -> dict[str, Any]:
     return {"schema_version": 1, "spec_file": spec_path, "generation_id": generation_id,
-            "source": {"sha256": report["sha256"], "bytes": report["bytes"], "dimensions": report["dimensions"], "technical_verdict": report["technical_verdict"], "technical_errors": report["technical_errors"], "drive_file_id": drive_file_id, "drive_url": drive_url},
+            "source": {"sha256": report["sha256"], "bytes": report["bytes"], "dimensions": report["dimensions"], "dimension_delta_px": report["dimension_delta_px"], "dimension_tolerance_px": report["dimension_tolerance_px"], "technical_verdict": report["technical_verdict"], "technical_errors": report["technical_errors"], "drive_file_id": drive_file_id, "drive_url": drive_url},
             "global_gates": {k: PENDING for k in ("scope_atomic_only","exact_specimen_count","no_unlisted_specimen_class","style_family","era_language","sheet_readability","no_text_or_pseudotext","no_baked_cast_shadow_or_fx","no_previous_era_regression")},
             "specimens": [{"id": x["id"], "name": x["name"], "verdict": PENDING, "notes": ""} for x in spec["specimens"]],
             "reviewer": "UNKNOWN", "review_method": "UNKNOWN", "final_verdict": PENDING, "rejection_reasons": []}
@@ -176,7 +201,16 @@ def validate_review(spec: dict[str, Any], review: dict[str, Any], image_path: Pa
     source = review.get("source") if isinstance(review.get("source"), dict) else {}
     sha = source.get("sha256")
     if not isinstance(sha, str) or len(sha) != 64 or any(c not in "0123456789abcdef" for c in sha.lower()): e.append("review source.sha256 must be 64 hex characters")
-    if source.get("dimensions") != spec.get("generation", {}).get("size"): e.append("review source dimensions do not match spec generation size")
+    actual_dimensions = source.get("dimensions")
+    expected_dimensions = spec.get("generation", {}).get("size")
+    if not source_dimensions_allowed(spec, actual_dimensions):
+        e.append("review source dimensions exceed allowed source tolerance")
+    elif actual_dimensions != expected_dimensions:
+        expected_delta = [a - b for a, b in zip(actual_dimensions, expected_dimensions)]
+        if source.get("dimension_delta_px") != expected_delta:
+            e.append("review source.dimension_delta_px must record the exact deviation")
+        if source.get("dimension_tolerance_px") != dimension_tolerance_px(spec):
+            e.append("review source.dimension_tolerance_px must record the applicable tolerance")
     if not isinstance(source.get("bytes"), int) or source.get("bytes", 0) <= 0: e.append("review source.bytes must be positive")
     if not nonempty(source.get("drive_file_id")) or not nonempty(source.get("drive_url")): e.append("Drive provenance is incomplete")
     if source.get("technical_verdict") != PASS or source.get("technical_errors") not in ([], None): e.append("technical source verification is not pass")

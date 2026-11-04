@@ -38,6 +38,8 @@ Reference usefulness has priority over packing density.
 - For the current 1536×1024 generation size, the preferred 8-specimen layout is **4×2**: nominal cells are about **384×512 px before margins**. This is the current planning control, not a guarantee about future generator output sizes.
 - Do not shrink specimens merely to keep a role on one image. Split the role across additional sheet-parts instead.
 - Every sheet-part has its own exact prompt, generation ID when available, untouched Drive original, SHA-256 and approval verdict.
+- **Source-size tolerance for era-reference sheets E0–E5 only:** `generation.size` remains the planned target (currently 1536×1024). An untouched generated PNG may deviate by **at most ±1 pixel independently in width and height**, provided all specimens remain isolated, legible and correctly classified. Record the actual dimensions, per-axis signed delta, planned dimensions, full byte size, exact SHA-256 and Drive provenance. A deviation of 2+ pixels in either axis is a technical FAIL. Do not resize, pad, crop, silently normalize or replace the raw original to obtain PASS.
+- This tolerance does **not** apply to runtime game assets, world sprites, placeables, pivots, alpha, scene QA, or any non-era-reference source gate. Dimension tolerance cannot waive semantic visual review, exact-SHA approval, prompt provenance, or cross-era gates.
 
 ### 1. materials-construction
 
