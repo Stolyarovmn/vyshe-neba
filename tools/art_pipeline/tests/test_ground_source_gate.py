@@ -39,6 +39,7 @@ class GroundSourceTests(unittest.TestCase):
         }
         self.review = {
             "source_gate": "PASS",
+            "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
             "source_sha256": self.source_sha,
             "island_sha256": self.island_sha,
             "actual_camera_angle": "UNKNOWN",
@@ -64,6 +65,14 @@ class GroundSourceTests(unittest.TestCase):
 
     def test_wrong_raw_original_sha_fails(self):
         self.assertIn("machine provenance", " ".join(self.errors("a" * 64)))
+
+    def test_missing_test_only_marker_fails_closed(self):
+        self.review.pop("placement_scope")
+        self.assertIn("TEST_ONLY_NON_AUTHORITATIVE", " ".join(self.errors()))
+
+    def test_source_preview_cannot_claim_final_map_placement(self):
+        self.review["placement_scope"] = "MAP_EDITOR_APPROVED"
+        self.assertIn("TEST_ONLY_NON_AUTHORITATIVE", " ".join(self.errors()))
 
     def test_source_fail_cannot_enter_pixel_snapper(self):
         self.review["source_gate"] = "FAIL"
