@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from PIL import Image, UnidentifiedImageError
 
 ROOT = Path(__file__).resolve().parents[2]
 SCENE_CHECKS = ("projection_match", "contact_points", "land_mask", "occlusion", "gameplay_scale")
@@ -18,6 +19,22 @@ SCENE_CHECKS = ("projection_match", "contact_points", "land_mask", "occlusion", 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def verify_png_bytes(path: Path) -> str | None:
+    """Decode the entire PNG; checking only its magic bytes is not enough."""
+    try:
+        with Image.open(path) as image:
+            if image.format != "PNG":
+                return "evidence is not a PNG image"
+            image.verify()
+        with Image.open(path) as image:
+            image.load()
+            if image.width <= 0 or image.height <= 0:
+                return "evidence PNG dimensions are invalid"
+    except (OSError, ValueError, SyntaxError, UnidentifiedImageError) as exc:
+        return f"evidence PNG is corrupt or undecodable: {type(exc).__name__}"
+    return None
 
 
 def _evidence_file(candidate_dir: Path, relative: str, digest: str, kind: str) -> str | None:
@@ -30,8 +47,17 @@ def _evidence_file(candidate_dir: Path, relative: str, digest: str, kind: str) -
         return f"{kind}: missing evidence file {relative}"
     if sha256(path) != digest:
         return f"{kind}: wrong evidence SHA-256 {relative}"
-    if kind == "scene_png" and not path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
-        return f"{kind}: evidence is not PNG"
+    if kind == "scene_png":
+        problem = verify_png_bytes(path)
+        if problem:
+            return f"{kind}: {problem}"
+    if kind == "map_editor_json":
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            return f"{kind}: evidence cannot be decoded as JSON: {type(exc).__name__}"
+        if not isinstance(record, dict) or not record:
+            return f"{kind}: expected a nonempty JSON object"
     return None
 
 
