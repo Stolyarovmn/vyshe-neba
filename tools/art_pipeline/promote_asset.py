@@ -80,6 +80,10 @@ def main():
         raise SystemExit("candidate-manifest.json missing")
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    # Never let a forged candidate-manifest.json suppress the mandatory ground
+    # projection evidence gate by changing its production_dir / asset identity.
+    if manifest.get("asset_id") != a.asset or manifest.get("production_dir") != cfg["production_dir"]:
+        raise SystemExit("PROMOTION_BLOCKED: candidate identity/production_dir differs from machine config")
     hashes = [(x["stem"], x["sha256"]) for x in manifest["files"]]
     assert_pre_promotion_gates(cfg, state_dir, a.asset)
 
