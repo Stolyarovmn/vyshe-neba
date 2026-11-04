@@ -21,6 +21,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Install pinned Pillow for actual PNG decoder checks
+        run: python3 -m pip install --user 'Pillow==11.3.0'
       - name: Compile ground projection validator
         run: |
           python3 -m py_compile \
