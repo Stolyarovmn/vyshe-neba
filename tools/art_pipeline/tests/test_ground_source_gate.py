@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from PIL import Image
 
 TOOLS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLS))
@@ -20,10 +22,14 @@ class GroundSourceTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         p = Path(self.tmp.name)
         self.source = p / "original.png"
-        self.source.write_bytes(gate.PNG_SIG + b"source bytes")
+        raw = io.BytesIO()
+        Image.new("RGBA", (8, 8), (140, 130, 120, 255)).save(raw, format="PNG")
+        self.source.write_bytes(raw.getvalue())
         self.review_file = p / "review.json"
         self.preview = p / "preview.png"
-        self.preview.write_bytes(gate.PNG_SIG + b"scene evidence")
+        raw = io.BytesIO()
+        Image.new("RGBA", (10, 10), (80, 90, 100, 255)).save(raw, format="PNG")
+        self.preview.write_bytes(raw.getvalue())
         self.source_sha = gate.file_sha(self.source)
         self.island_sha = "e" * 64
         self.proxy = {
@@ -89,6 +95,18 @@ class GroundSourceTests(unittest.TestCase):
     def test_missing_visual_projection_pass_fails(self):
         self.review["checks"]["projection_match"] = "pending"
         self.assertIn("projection_match", " ".join(self.errors()))
+
+    def test_source_fake_png_magic_with_matching_sha_blocks(self):
+        invalid = gate.PNG_SIG + b"invalid source payload"
+        self.source.write_bytes(invalid)
+        self.review["source_sha256"] = gate.file_sha(self.source)
+        self.assertIn("fails decoding", " ".join(self.errors(gate.file_sha(self.source))))
+
+    def test_preview_fake_png_magic_with_matching_sha_blocks(self):
+        invalid = gate.PNG_SIG + b"invalid preview payload"
+        self.preview.write_bytes(invalid)
+        self.review["scene_preview_sha256"] = gate.file_sha(self.preview)
+        self.assertIn("not a valid PNG", " ".join(self.errors()))
 
     def test_evidence_sha_changed_fails(self):
         self.preview.write_bytes(gate.PNG_SIG + b"corrupted")
