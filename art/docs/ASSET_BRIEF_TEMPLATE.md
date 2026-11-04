@@ -31,8 +31,9 @@
 - Camera family: `island_top_3_4 | interior | aircraft_side | other`
 - Projection angle: `UNKNOWN` до измерения; evidence (плоскости, сравнение): `<...>`
 - World space / LP / px conversion: `<...>`
-- Layout key, anchor, footprint, visible bbox, sprite_px, layers, occlusion: `<...>`
-- Gameplay-size, reduced zoom, portrait scene screenshots: `<...>`
+- Asset-local registration, visible bbox and provisional legacy layout constraints (if known): `<...>`. These are NOT final Map Editor settings.
+- Visual projection QA: approved island SHA + `TEST_ONLY` composite + normal/reduced zoom, physical grounding and readability: `<...>`
+- Actual placement approval (separate, later user Map Editor gate): editor JSON/record SHA, anchor, displayed scale, footprint, land mask and occlusion: `UNKNOWN/PENDING until user saves/approves`.
 - Runtime logical name / path / consumer / fallback: `<...>`
 - E0–E5 mapping и размер/registration: `<...>`
 - Отклонения от утверждённого reference: `<...>`
