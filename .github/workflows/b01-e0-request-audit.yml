@@ -6,6 +6,10 @@ on:
       - art/b01-e0-preflight-config-20261103
     paths:
       - '.github/workflows/b01-e0-request-audit.yml'
+      - 'art/briefs/B01_weather_complex_E0.preflight.json'
+      - 'art/prompts/b01_weather_complex_e0.md'
+      - 'art/qa/placeables/base/weather_complex/e0_1978.source_review.json'
+      - 'tools/art_pipeline/asset_imagegen_chat_bridge.py'
   workflow_dispatch:
 
 permissions:
@@ -47,6 +51,9 @@ jobs:
           assert b"Scope: exactly ONE complete isolated asset" in req
           assert b"73.44 degrees elevation" in req
           assert b"ground-circle compression 0.958515" in req
+          assert b"RIGHT-SIDE horizontal arm" in req
+          assert b"VERY TOP" in req
+          assert b"warning lamp" in req
           assert config["assets"]["B01"]["pixel_size"]==15
           assert config["assets"]["B01"]["canvas"]==[96,122]
           assert config["assets"]["B01"]["registration"]==[48,118]
