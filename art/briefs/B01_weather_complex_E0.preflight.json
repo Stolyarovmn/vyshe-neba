@@ -1,0 +1,293 @@
+{
+  "schema_version": 1,
+  "asset_id": "B01",
+  "slug": "weather_complex",
+  "asset_type": "base",
+  "era": "E0",
+  "year": 1978,
+  "generation_kind": "existing_source_review_before_optional_isolated_anchor_replacement",
+  "contract_base_sha": "51a6bdc39d76532a24b2ec24ad227054d013bf66",
+  "runtime_main_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
+  "brief_file": "art/briefs/B01_weather_complex_E0.md",
+  "prompt_file": "art/prompts/b01_weather_complex_e0.md",
+  "style_bible_file": "art/style_bible.txt",
+  "source_archive": {
+    "provider": "google_drive",
+    "folder_id": "14v5ev_BCpRTOlLhbELSfdVshzoDJeZ8S",
+    "verified_present": true,
+    "verified_on": "2026-11-03",
+    "original_must_be_immutable": true,
+    "sha256_required_before_processing": true
+  },
+  "existing_source": {
+    "generation_id": "6fa4da36-3eac-4e72-b843-9e90e014e4d1",
+    "source_sha256": "98084e7dc6668c2f499eb477dc64f7ee199c6da6713d8679471675363c39d491",
+    "size_bytes": 853153,
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "drive_file_id": "1wWMDxj52TM7mt8aHUIYFEOgGw6AVLQ9Y",
+    "source_integrity": "reverified_local_and_drive_size",
+    "camera_source_gate": "FAIL_QUALITATIVE_ISLAND_PROJECTION_SELF_REVIEW",
+    "source_review_record": "art/qa/placeables/base/weather_complex/e0_1978.source_review.json",
+    "reuse_decision": "REJECT_CURRENT_SOURCE_FOR_PROJECTION",
+    "archive_input_png_staged_in_repo": false,
+    "literal_generation_request_sha256": "UNKNOWN",
+    "all_reference_png_tool_inputs_delivered": "UNVERIFIED",
+    "historic_approved_runtime_sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c"
+  },
+  "approved_era_reference_set": {
+    "path": "art/references/eras/e0_1978/reference-set.json",
+    "status": "approved_visual_reference_set",
+    "real_png_bytes_verified": true,
+    "actual_imagegen_attachments_delivered": false,
+    "parts": [
+      {
+        "role": "materials-construction",
+        "sheet": "01-surfaces-stock",
+        "drive_file_id": "1s48mIZAYL8OHuWrSoFVYeDfBEKRjHe7p",
+        "sha256": "5d49bfa8e8561972226862a70c251e57ad42b0a8fa6242b7649f58868b3c5aee",
+        "bytes": 1918587,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      },
+      {
+        "role": "materials-construction",
+        "sheet": "02-joints-repairs",
+        "drive_file_id": "1fgWpNCIIiQNUzzHQ9SZpm6RZlLCTy6u7",
+        "sha256": "6efe2f5e3a2f0951456a486c2cc5b435da761603e79a2a72e9cb003d109a899d",
+        "bytes": 2052480,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      },
+      {
+        "role": "materials-construction",
+        "sheet": "03-service-architecture",
+        "drive_file_id": "19aMUG1St8IMwsDL8YNryYteAS3Jm7vBG",
+        "sha256": "d4407f9e4ac9bcbf48bc1360d3c2d490550d51e2779203c4976769d80d623040",
+        "bytes": 2069454,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      },
+      {
+        "role": "mechanics-infrastructure",
+        "sheet": "01-manual-drives",
+        "drive_file_id": "1Tk39RYHgSjhuXzMblMPNFM5I7ELdudpg",
+        "sha256": "36c52034690af8c1d78221bfe3d849cec175363ac41318b13c144b8c41ad9a46",
+        "bytes": 1803619,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      },
+      {
+        "role": "mechanics-infrastructure",
+        "sheet": "02-joints-lifting",
+        "drive_file_id": "18TAG8V_GQ8IxLeHHv16UX8ElzpDthDZ-",
+        "sha256": "aae9bf1771a4039e8cc58970bea6cbf0d83b97056c601368c858a3a3bc14f374",
+        "bytes": 1924364,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      },
+      {
+        "role": "mechanics-infrastructure",
+        "sheet": "03-utilities-cabling",
+        "drive_file_id": "1qrUV-hawpalHG0jikOn1RO9ESYJUpxeO",
+        "sha256": "9302dee8e3dc7983d0ff3869504ade2e5adcda5d1eac218f173ea96d5762ffbf",
+        "bytes": 1802792,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      },
+      {
+        "role": "controls-displays",
+        "sheet": "01-operator-controls",
+        "drive_file_id": "1sJXrlZ3oTyMmbH_wUnRmBziund6Z_q9R",
+        "sha256": "75013d529f538f0fb38844c4228f9d000f9590cb2a36c433aa5d8abeef0aed08",
+        "bytes": 1855906,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      },
+      {
+        "role": "controls-displays",
+        "sheet": "02-instruments-displays",
+        "drive_file_id": "17dpiW0dVZeiVzw_d06F-rZLmuMaS9EYW",
+        "sha256": "12d2b12960eca24ba2fc3a916c015feefb6d340672d130f737202e721a89cd72",
+        "bytes": 1937139,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      },
+      {
+        "role": "lighting-signals",
+        "sheet": "01-lamps-fixtures",
+        "drive_file_id": "1CyGXroexCBg3ORLsHeWl8WGGVoHzfRrq",
+        "sha256": "4a6d2436c3468d106425933f1640ddbff1cfdb538a81e74070f926cae7d27103",
+        "bytes": 1886546,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      },
+      {
+        "role": "lighting-signals",
+        "sheet": "02-signal-hardware",
+        "drive_file_id": "1aMbNH0TiDfeMaOVKkiZnLu3u87x0opIA",
+        "sha256": "cbf1c6c37c9537d9ba257aa6e95769e312920a5bd5be30a2ff0c76ed6ec87c78",
+        "bytes": 1875610,
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "approval_from_reference_set": "pass"
+      }
+    ]
+  },
+  "machine_pipeline": {
+    "configured": true,
+    "pipeline_config_version": 3,
+    "adapter": "presnap_png",
+    "transport_source_png_materialized": false,
+    "canvas": [
+      96,
+      122
+    ],
+    "registration": [
+      48,
+      118
+    ],
+    "pixel_size": 15,
+    "colors": 32,
+    "pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+    "aseprite_version": "1.3.18.6",
+    "qa_minimums_from_processor_defaults": {
+      "min_coverage": 0.01,
+      "min_bbox_fraction": 0.25
+    },
+    "family_pixel_size_evidence": "All six legacy E0-E5 art/gen/placeables/base/weather_complex/eN_YEAR.pipeline.json specify 15; existing E0 runtime binary SHA matches recorded final; do not rescale eras independently."
+  },
+  "camera": {
+    "family": "island_top_3_4",
+    "projection_angle": "UNKNOWN",
+    "projection_review": "FAIL_SOURCE_EXACT_SHA_98084e7d_ASSISTANT_VISUAL_REVIEW",
+    "projection_calibration_file": "art/gen/environment/start_island_hd.projection.json",
+    "generation_elevation_proxy_deg": 73.44,
+    "generation_tilt_from_top_down_proxy_deg": 16.56,
+    "ground_plane_compression_target": 0.958515,
+    "current_hd_reference_meta": "art/gen/environment/start_island_hd.meta.json",
+    "current_hd_approval_record": "art/gen/environment/start_island_hd.approval.json",
+    "current_hd_reference_status": "approved_by_user",
+    "current_hd_approved_by_user": true,
+    "current_hd_reference_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+    "current_hd_reference_runtime_git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
+    "current_hd_reference_approved_on": "2026-10-30T14:33:35Z",
+    "map_editor_final_placement": "PENDING_SEPARATE_USER_GATE_NOT_REQUIRED_FOR_ART",
+    "legacy_layout_anchor_px": [
+      1000,
+      350
+    ],
+    "legacy_layout_size_px": [
+      142,
+      180
+    ],
+    "legacy_layout_footprint_px": [
+      100,
+      28
+    ]
+  },
+  "runtime_contract": {
+    "asset_key": "weather",
+    "logical_name_pattern": "bld_weather_<year>",
+    "consumer": "game/src/render/manifest.js::buildingSpriteName -> game/src/render/buildings.js::drawBuilding -> game/src/render/hub.js",
+    "profile_level_source": "profile.buildings.weather",
+    "runtime_target_pattern": "game/assets/eras/e<era>-<year>/base/weather-complex.png",
+    "verified_e0_existing_target": {
+      "era": "E0",
+      "year": 1978,
+      "path": "game/assets/eras/e0-1978/base/weather-complex.png",
+      "git_blob_sha1": "f288f04a04ae95889cbc2aefee1218f6d435b95c",
+      "sha256": "f49c5e6a80d2301013f8a69b669210f0f4cd752248c915a832f203c45630661c"
+    },
+    "mapping_status": "verified_E0_target_and_consumer_other_eras_not_rechecked_here",
+    "gameplay_semantics_status": "CONFLICT_WITH_PRODUCTION_MANIFEST",
+    "current_runtime_semantics": "forecast accuracy and stormBonus through game/src/data/buildings.js",
+    "production_manifest_target": "two predetermined launch weather windows, one optional switch, no reroll",
+    "export_mapping_status": "B01_absent_from_art/runtime/RUNTIME_EXPORTS.json",
+    "status": "verified_mapping_semantics_conflict",
+    "verified_against_main_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721"
+  },
+  "generation_gate": {
+    "one_asset_per_call": true,
+    "one_era_per_call": true,
+    "transparent_background": true,
+    "style_bible_verbatim": true,
+    "can_generate_isolated_candidate": true,
+    "can_scene_approve": true,
+    "can_promote_to_production": false,
+    "can_publish_runtime": false
+  },
+  "blocked_stages": [
+    "imagegen_invocation_until_all_prerequisite_config_receipt_changes_are_merged_and_current_shas_reverified",
+    "imagegen_invocation_until_full_canonical_request_is_built_has_exact_sha_and_is_delivered_literally_by_the_approved_chat_bridge",
+    "imagegen_invocation_until_ten_approved_E0_atomic_PNGs_and_exact_island_image_are_attached_as_real_verified_visual_inputs",
+    "processing_until_new_original_is_untouched_archived_with_Drive_readback_and_source_gate_PASS",
+    "production_promotion_until_auto_QA_user_exact_SHA_visual_approval_and_scene_QA",
+    "runtime_publication_until_B01_export_mapping_and_gameplay_semantic_conflict_are_resolved"
+  ],
+  "checkpoint": {
+    "issue": "https://github.com/Stolyarovmn/vyshe-neba/issues/93",
+    "prior_brief_pr": "https://github.com/Stolyarovmn/vyshe-neba/pull/94",
+    "source_regeneration_attempts_this_pass": 0,
+    "source_review_status": "FAIL_QUALITATIVE_PROJECTION_BY_ASSISTANT_REVIEW_ONLY",
+    "next_step": "Run exact request/bridge audit on updated B01 E0 source-Fail prompt and production base; archive result SHA and verify real 11 PNG attachments; do not process source FAIL, do not auto-promote/publish.",
+    "last_reviewed_source_sha256": "98084e7dc6668c2f499eb477dc64f7ee199c6da6713d8679471675363c39d491",
+    "active_game_production_head_sha_at_review": "51a6bdc39d76532a24b2ec24ad227054d013bf66",
+    "current_branch_sync_commit": "4b738a6de98aa5db74761f10503a598e3d09098a",
+    "map_editor_placement_approval": "SEPARATE_LATER_GATE"
+  },
+  "generation_authorization": {
+    "reason": "The exact current image 98084e7d... (generation 6fa4da36) failed visual camera-family review against approved island; see source_review_record.",
+    "preflight_scope": "ISOLATED_REPLACEMENT_SOURCE_ONLY",
+    "existing_original_preserved": true,
+    "exact_request_validation": "PENDING_LATEST_BRANCH_CANONICAL_CI_AUDIT",
+    "actual_visual_reference_png_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
+    "exact_island_image_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
+    "invocation_status": "BLOCKED_UNMERGED_B01_CONFIG_AND_UNVERIFIED_IMAGEGEN_IMAGE_DELIVERY",
+    "archive_before_processing": true,
+    "last_generated_request_sha256": "UNKNOWN_NOT_BUILT_AFTER_PROMPT_CORRECTION",
+    "last_prompt_git_blob_sha1": "a19192b557a9d93a7616bd9e9f58185367518afd",
+    "actual_imagegen_delivery": "UNVERIFIED",
+    "map_editor_dependency_for_source": "NOT_REQUIRED"
+  },
+  "prior_sources": [
+    {
+      "generation_id": "943ecfd0-1d0b-4fd2-9ff4-1ac5882c134a",
+      "source_sha256": "02bf3b102e870f1bebc6c826246d4e658d2f9a38abaa0bca8c8a82db9b2bd542",
+      "drive_file_id": "1pZnJVdKaLbdGO80jMbS_POP4eIrYMMzI",
+      "review": "FAIL_QUALITATIVE_PROJECTION",
+      "replaced_as_active_source_record": true
+    }
+  ]
+}
