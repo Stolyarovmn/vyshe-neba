@@ -6,7 +6,7 @@
   "era": "E0",
   "year": 1978,
   "generation_kind": "existing_source_review_before_optional_isolated_anchor_replacement",
-  "contract_base_sha": "2cfffb42bdce0d9b5e5ef1e3eee398ba2ebab6fc",
+  "contract_base_sha": "22814df1c66e409064fa1ac81e90b91faee7fa35",
   "runtime_main_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
   "brief_file": "art/briefs/B01_weather_complex_E0.md",
   "prompt_file": "art/prompts/b01_weather_complex_e0.md",
@@ -191,7 +191,7 @@
   "camera": {
     "family": "island_top_3_4",
     "projection_angle": "UNKNOWN",
-    "projection_review": "pending_existing_source_scene_and_map_editor_review",
+    "projection_review": "FAIL_SOURCE_EXACT_SHA_98084e7d_ASSISTANT_VISUAL_REVIEW",
     "projection_calibration_file": "art/gen/environment/start_island_hd.projection.json",
     "generation_elevation_proxy_deg": 73.44,
     "generation_tilt_from_top_down_proxy_deg": 16.56,
@@ -203,7 +203,7 @@
     "current_hd_reference_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
     "current_hd_reference_runtime_git_blob_sha1": "382ab3fb2906152e2bc2a2616d794192904e7d68",
     "current_hd_reference_approved_on": "2026-10-30T14:33:35Z",
-    "map_editor_final_placement": "UNKNOWN",
+    "map_editor_final_placement": "PENDING_SEPARATE_USER_GATE_NOT_REQUIRED_FOR_ART",
     "legacy_layout_anchor_px": [
       1000,
       350
@@ -261,9 +261,9 @@
     "prior_brief_pr": "https://github.com/Stolyarovmn/vyshe-neba/pull/94",
     "source_regeneration_attempts_this_pass": 0,
     "source_review_status": "FAIL_EXACT_SHA_CURRENT_ORIGINAL_ASSISTANT_SELF_REVIEW",
-    "next_step": "Rebase stacked B01 PR onto latest merged game-production; rerun canonical validator and deterministic request builder after current prompt change; do not imagegen until actual 10 approved reference PNGs plus island and exact literal prompt delivery are verified. Existing current source has exact-SHA projection FAIL, so no Pixel Snapper.",
+    "next_step": "Refresh deterministic preflight/request and bridge on exact PR #97 source FAIL and current AGENTS; do not invoke imagegen without real verified E0 PNG/approved island inputs; no pixel processing of rejected source. Map Editor approval is a separate later gate.",
     "last_reviewed_source_sha256": "98084e7dc6668c2f499eb477dc64f7ee199c6da6713d8679471675363c39d491",
-    "active_game_production_head_sha_at_review": "58860c62ee3f0e35083a8da5e80c01e51bccdd78"
+    "active_game_production_head_sha_at_review": "22814df1c66e409064fa1ac81e90b91faee7fa35"
   },
   "generation_authorization": {
     "reason": "The exact current image 98084e7d... (generation 6fa4da36) failed visual camera-family review against approved island; see source_review_record.",
@@ -272,7 +272,7 @@
     "exact_request_validation": "INVALIDATED_BY_B01_E0_PROMPT_CHANGE_MUST_REBUILD",
     "actual_visual_reference_png_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
     "exact_island_image_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
-    "invocation_status": "BLOCKED_PENDING_UPDATED_BASE_FULL_LITERAL_REQUEST_AND_VERIFIED_IMAGE_INPUT_DELIVERY",
+    "invocation_status": "BLOCKED_UNMERGED_B01_CONFIG_AND_UNVERIFIED_LITERAL_REQUEST_AND_IMAGE_INPUTS",
     "archive_before_processing": true,
     "last_generated_request_sha256": "UNKNOWN_NOT_BUILT_AFTER_PROMPT_CORRECTION",
     "last_prompt_git_blob_sha1": "a19192b557a9d93a7616bd9e9f58185367518afd"
