@@ -11,7 +11,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from verify_visual_gate import verify_island
+from verify_visual_gate import verify_island, verify_png_bytes
 
 PNG_SIG = b"\x89PNG\r\n\x1a\n"
 CHECKS = ("identity", "engineering_parts", "era", "projection_match", "land_contact", "readability")
@@ -24,8 +24,11 @@ def file_sha(path: Path) -> str:
 def verify_source_review(source: Path, review_path: Path, expected_sha: str,
                          island_sha: str, proxy: dict) -> list[str]:
     errors = []
-    if not source.is_file() or not source.read_bytes().startswith(PNG_SIG):
-        return ["source: original PNG bytes missing or not PNG"]
+    if not source.is_file():
+        return ["source: original PNG bytes missing"]
+    invalid = verify_png_bytes(source)
+    if invalid:
+        return [f"source: original is not PNG or fails decoding: {invalid}"]
     actual = file_sha(source)
     if actual != expected_sha:
         errors.append("source: original SHA does not match machine provenance")
@@ -68,8 +71,10 @@ def verify_source_review(source: Path, review_path: Path, expected_sha: str,
             errors.append("source preview PNG missing")
         elif file_sha(preview) != preview_sha:
             errors.append("source preview PNG SHA mismatch")
-        elif not preview.read_bytes().startswith(PNG_SIG):
-            errors.append("source preview evidence is not PNG")
+        else:
+            png_error = verify_png_bytes(preview)
+            if png_error:
+                errors.append(f"source preview evidence is not a valid PNG: {png_error}")
     return errors
 
 
