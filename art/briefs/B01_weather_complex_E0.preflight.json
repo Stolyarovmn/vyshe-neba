@@ -6,7 +6,7 @@
   "era": "E0",
   "year": 1978,
   "generation_kind": "existing_source_review_before_optional_isolated_anchor_replacement",
-  "contract_base_sha": "22814df1c66e409064fa1ac81e90b91faee7fa35",
+  "contract_base_sha": "e5c53a0542416010020d191c106545218a9b82b4",
   "runtime_main_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
   "brief_file": "art/briefs/B01_weather_complex_E0.md",
   "prompt_file": "art/prompts/b01_weather_complex_e0.md",
@@ -260,10 +260,12 @@
     "issue": "https://github.com/Stolyarovmn/vyshe-neba/issues/93",
     "prior_brief_pr": "https://github.com/Stolyarovmn/vyshe-neba/pull/94",
     "source_regeneration_attempts_this_pass": 0,
-    "source_review_status": "FAIL_EXACT_SHA_CURRENT_ORIGINAL_ASSISTANT_SELF_REVIEW",
-    "next_step": "Refresh deterministic preflight/request and bridge on exact PR #97 source FAIL and current AGENTS; do not invoke imagegen without real verified E0 PNG/approved island inputs; no pixel processing of rejected source. Map Editor approval is a separate later gate.",
+    "source_review_status": "FAIL_QUALITATIVE_PROJECTION_BY_ASSISTANT_REVIEW_ONLY",
+    "next_step": "B01 source 98084e7d has exact-SHA assistant projection FAIL: no Pixel Snapper. Run canonical B01 E0 preflight and current deterministic full request on this synchronized feature branch; validate real reference-image delivery before replacement generation. Map Editor location is an independent later gate, not a source or art-candidate prerequisite. Never promote absent exact-SHA visual review.",
     "last_reviewed_source_sha256": "98084e7dc6668c2f499eb477dc64f7ee199c6da6713d8679471675363c39d491",
-    "active_game_production_head_sha_at_review": "22814df1c66e409064fa1ac81e90b91faee7fa35"
+    "active_game_production_head_sha_at_review": "22814df1c66e409064fa1ac81e90b91faee7fa35",
+    "current_branch_sync_commit": "4b738a6de98aa5db74761f10503a598e3d09098a",
+    "map_editor_placement_approval": "SEPARATE_LATER_GATE"
   },
   "generation_authorization": {
     "reason": "The exact current image 98084e7d... (generation 6fa4da36) failed visual camera-family review against approved island; see source_review_record.",
@@ -272,10 +274,12 @@
     "exact_request_validation": "INVALIDATED_BY_B01_E0_PROMPT_CHANGE_MUST_REBUILD",
     "actual_visual_reference_png_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
     "exact_island_image_delivery": "PENDING_TOOL_LEVEL_VERIFICATION",
-    "invocation_status": "BLOCKED_UNMERGED_B01_CONFIG_AND_UNVERIFIED_LITERAL_REQUEST_AND_IMAGE_INPUTS",
+    "invocation_status": "BLOCKED_UNTIL_PREREQUISITES_MERGED_AND_FULL_CANONICAL_REQUEST_PLUS_REAL_11_REFERENCE_IMAGES_VERIFIED",
     "archive_before_processing": true,
     "last_generated_request_sha256": "UNKNOWN_NOT_BUILT_AFTER_PROMPT_CORRECTION",
-    "last_prompt_git_blob_sha1": "a19192b557a9d93a7616bd9e9f58185367518afd"
+    "last_prompt_git_blob_sha1": "a19192b557a9d93a7616bd9e9f58185367518afd",
+    "actual_imagegen_delivery": "UNVERIFIED",
+    "map_editor_dependency_for_source": "NOT_REQUIRED"
   },
   "prior_sources": [
     {
