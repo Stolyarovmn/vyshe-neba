@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "record_type": "user_authorized_missing_generation_id_exception",
+  "decision_date": "2026-11-05",
+  "scope": {
+    "era": "E2",
+    "year": 1998,
+    "role": "lighting-signals",
+    "sheet": "01-lamps-fixtures",
+    "source_sha256": "e4b5a850a5d8956f51e9facd1aead296b8e0112fd81b389cdd321c4434739db0",
+    "drive_file_id": "1QslGnYWse8mJxVb_59WFafAA20pOvnvX",
+    "drive_url": "https://drive.google.com/file/d/1QslGnYWse8mJxVb_59WFafAA20pOvnvX/view",
+    "review_file": "art/references/eras/e2_1998/reviews/lighting-signals-01-lamps-fixtures/review-exactsha-e4b5a850a5d8.json"
+  },
+  "reason": "The user explicitly accepted the already reviewed E2 lighting/01 visual reference despite the original image generation tool not independently confirming a generation ID. This field is unavailable; filename-derived IDs are not accepted as generator metadata.",
+  "user_instruction_summary_ru": "Лист №9 принять, отсутствие независимо подтверждённого generation ID пропустить.",
+  "source_evidence": {
+    "png_bytes": 1684966,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "source_verified_sha256": "e4b5a850a5d8956f51e9facd1aead296b8e0112fd81b389cdd321c4434739db0",
+    "original_drive_readback": "pass",
+    "canonical_spec_and_prompt": "pass",
+    "official_source_and_structured_review": "pass",
+    "visual_specimens_pass": 8,
+    "cross_era_role_order": "pass"
+  },
+  "generation_id": "UNKNOWN_UNCONFIRMED",
+  "generation_id_verified": false,
+  "waiver_decision": "accepted_missing_optional_id_for_this_exact_sha_only",
+  "contract_basis": "art/docs/ERA_REFERENCE_CONTRACT.md: Every sheet-part has its own exact prompt, generation ID when available, untouched Drive original, SHA-256 and approval verdict.",
+  "safety_limits": {
+    "no_invented_id": true,
+    "no_original_mutation": true,
+    "no_generic_waiver": true,
+    "prompt_delivery_provenance_remains_unknown": true,
+    "canonical_e2_approval_not_granted": true
+  },
+  "pr_number": 106
+}

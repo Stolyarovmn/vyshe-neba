@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "purpose": "full E1 (1986) to E2 (1998) cross-era role ordering review",
+  "reference_set_generation": "e2_1998",
+  "reviewer": "ChatGPT image reviewer 2026-11-05",
+  "review_method": "Exact-SHA E1 and E2 originals, role-by-role 10+10 sheet visual inspection plus comparison montages; physical technological ordering, not palette-only.",
+  "e1_canonical_reference_status": "approved_visual_reference_set",
+  "e2_pinned_production_sha": "d13e3d0bfae45365b079ffd10ceffbaca13c89f3",
+  "e1_sheet_count": 10,
+  "e2_sheet_count": 10,
+  "roles": [
+    {
+      "role": "materials-construction",
+      "e1_approved_originals": [
+        {
+          "sheet": "01-surfaces-stock",
+          "sha256": "78cf0a9246d4baf709a39f05346d133ec133e15a125b8d70d078492acfca4f88",
+          "drive_file_id": "1FHJwBhAStLnU9WFA8Jr7G7QKUUEGI9a5"
+        },
+        {
+          "sheet": "02-joints-repairs",
+          "sha256": "44fc852936e7e7de808341c732bdd1241b9cf31924679fa681e12ec6c3615996",
+          "drive_file_id": "1-iSY6iJyTlU-FAcErdWdPdvLvDuaL-kQ"
+        },
+        {
+          "sheet": "03-service-architecture",
+          "sha256": "0fc76b9199d5fd6d438f18060a660d1f6e42ba783cb6a97ef88fd98e55279dbd",
+          "drive_file_id": "1BSEgVw-kUA7FQ6pXOuIZOmhKaJkAJbue"
+        }
+      ],
+      "e2_reviewed_originals": [
+        {
+          "sheet": "01-surfaces-stock",
+          "sha256": "7b49d0a3a8a85cd70482f5f3af6fd9a3948dcfe0c43f43f8e9e274c525984cad",
+          "drive_file_id": "1BzA8xC4iU3NwxuMnkcjykFZz5TOml83_"
+        },
+        {
+          "sheet": "02-joints-repairs",
+          "sha256": "9851beb216da184b42213950cb1c8c5ab2319f918dd593eb992ce3c7647078bd",
+          "drive_file_id": "1DH7vTJrUv9aCBKEAHMevfyrcUg6vDFfy"
+        },
+        {
+          "sheet": "03-service-architecture",
+          "sha256": "c1fa2b491d19e8d8a490fc6f94c12f5bfffc3780fc6f45dc0b3725321906736c",
+          "drive_file_id": "1ew39Apxn6Y3HNr1Y39zD-pN70mUIbf3v"
+        }
+      ],
+      "physical_e1": "Standard workshop steel panels, galvanized structural sections, lap plates, welded and bolted joints, simple bulkhead and louvers.",
+      "physical_e2": "Cleaner beige-gray electronics polymer and anodized aluminium, captured inserts and flush countersunk/precision location joints, removable chassis seams and rack/service frames.",
+      "ordering_rationale": "E1 1986 -> E2 1998: precision rack-service construction and reproducible mounting replace heavier workshop fabrication.",
+      "role_order_e1_then_e2": "pass",
+      "comparison_completeness": "all matching sheet-parts for this role, 8 specimens per sheet",
+      "notes": "E2 cross-era visual ordering judged from physical engineering/material/interface cues; source SHA bound. Not proof of original generator request attestation."
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "e1_approved_originals": [
+        {
+          "sheet": "01-assisted-drives",
+          "sha256": "796426ef8d9dfd9310e76fed57d0a8ed49e8a725c5b65002264901643dcefc43",
+          "drive_file_id": "1SzP2HSrH0odAtbOJjNOLepIA-JYQGjpY"
+        },
+        {
+          "sheet": "02-joints-handling",
+          "sha256": "f3bbea342883e5549d55e5f84a9357fb8ef2a72ae1e08cd6abadb2f52efa3a9c",
+          "drive_file_id": "1RhIQ0wkyhKCYi_-vg_HI1C_i-nQ1bA-q"
+        },
+        {
+          "sheet": "03-utilities-routing",
+          "sha256": "1e539ab19e6725e7922dd76619d2cc90b66b665bff85ea758fed110c8cbc905f",
+          "drive_file_id": "16SEdFu3oZO7iihFcsE0B0ndJAbequL79"
+        }
+      ],
+      "e2_reviewed_originals": [
+        {
+          "sheet": "01-servo-drives",
+          "sha256": "26cfe43548ac4854498f17473901fab8600c8f486e0aae121d1616b343466208",
+          "drive_file_id": "1V_p6ZkJIcTDD_zkDVrRv1Y48S51guuGA"
+        },
+        {
+          "sheet": "02-precision-joints-handling",
+          "sha256": "9ac402ff2ecfeccff9309a8dab9c128fe654feb17c5420fb4848f23e956965d0",
+          "drive_file_id": "1hgl5VxzwHMjlZ5zK5bi9CN8ygpfDerBl"
+        },
+        {
+          "sheet": "03-diagnostic-utilities-routing",
+          "sha256": "bc224cbc8592d4991abb49b0535badb47220777bd2405f493c372ec3abb78f58",
+          "drive_file_id": "1qsUm48_0ICJZxEs7eLEQmeD7Gfgu2HWA"
+        }
+      ],
+      "physical_e1": "Standard electric induction motors, guarded gears, hydraulics, winches, simple bearings, large pipe unions and open harness routing.",
+      "physical_e2": "Feedback-controlled servo/encoder drives, compact planetary and right-angle reducers, motorized linear actuators, tight guided assemblies, sealed diagnostic connector and cable systems.",
+      "ordering_rationale": "E1 1986 -> E2 1998: closed-loop precision servo/diagnostic infrastructure is a physical increase in sophistication, not recoloring.",
+      "role_order_e1_then_e2": "pass",
+      "comparison_completeness": "all matching sheet-parts for this role, 8 specimens per sheet",
+      "notes": "E2 cross-era visual ordering judged from physical engineering/material/interface cues; source SHA bound. Not proof of original generator request attestation."
+    },
+    {
+      "role": "controls-displays",
+      "e1_approved_originals": [
+        {
+          "sheet": "01-operator-controls",
+          "sha256": "b721848d7c4bb6b8505a8bf3a626122b85aa3c4118d80fb0db08cc01057169f0",
+          "drive_file_id": "16i5HUVBF_MSwx0lf6L6jmb804A3a59mI"
+        },
+        {
+          "sheet": "02-instruments-displays",
+          "sha256": "c2f5fe587978b15bdfa26a88fdaa9f0d3fe0408b7628aa1a7dc8a06c11caf6f4",
+          "drive_file_id": "107Omc5miJe_zsXUVAxq8eZzTYG2Tvy-T"
+        }
+      ],
+      "e2_reviewed_originals": [
+        {
+          "sheet": "01-operator-controls",
+          "sha256": "e785d9b27eb5c76d9943181d1dae56bf505c04234d47bb5160b42e4a2e9495aa",
+          "drive_file_id": "1dJ0IM6EqsBXP2LvEfKOT62B5BUwaFaLn"
+        },
+        {
+          "sheet": "02-instruments-displays",
+          "sha256": "94a20b5286fddf040d26aa1a9b8c659ae442be823305fbb2eb94003ef24823f1",
+          "drive_file_id": "1FMqh2eLU8EPJEqZ3mBid-GnvWVweXUeu"
+        }
+      ],
+      "physical_e1": "Relatively sparse physical pushbuttons/joystick/switches and prominently analog gauges; two isolated CRT display fragments as minority diagnostic tech.",
+      "physical_e2": "More compact repeatable operator modules, keypad/trackball, deepened CRT hardware, rack electronics with extractors, multipin/coax service ports, diskette media and specialized LCD as minority.",
+      "ordering_rationale": "E1 1986 -> E2 1998: denser electronics/service-module instrumentation, retaining physical controls but adding replaceable diagnostics.",
+      "role_order_e1_then_e2": "pass",
+      "comparison_completeness": "all matching sheet-parts for this role, 8 specimens per sheet",
+      "notes": "E2 cross-era visual ordering judged from physical engineering/material/interface cues; source SHA bound. Not proof of original generator request attestation."
+    },
+    {
+      "role": "lighting-signals",
+      "e1_approved_originals": [
+        {
+          "sheet": "01-lamps-fixtures",
+          "sha256": "b1c1d26c05fd677903056ca96a0d4faa85a7446ee16fe6f9799e1c719bcb7bcc",
+          "drive_file_id": "1aqQGYLOvO2Fxw4hMIySTguB6CpsZX8WB"
+        },
+        {
+          "sheet": "02-signal-hardware",
+          "sha256": "b74b4c65c01278aef0ab67cfed6893f3ecfeac187a9575c827697b1bec79a5fd",
+          "drive_file_id": "1TFxz8dbRA9vHbdBVZ3HLUIY3YViLZgpj"
+        }
+      ],
+      "e2_reviewed_originals": [
+        {
+          "sheet": "01-lamps-fixtures",
+          "sha256": "e4b5a850a5d8956f51e9facd1aead296b8e0112fd81b389cdd321c4434739db0",
+          "drive_file_id": "1QslGnYWse8mJxVb_59WFafAA20pOvnvX"
+        },
+        {
+          "sheet": "02-signal-hardware",
+          "sha256": "7af32ccae49d3a274d6bf28ca7a79b92fc90abd4b29996a0bdb255e8bb7e3ef8",
+          "drive_file_id": "1N_hTKw9Tp4yD1oUJd9h0XI_3HIaPlixJ"
+        }
+      ],
+      "physical_e1": "Bulkier incandescent-style indicator housings, early passive prismatic lenses, rotary beacons, cage/bulkhead work lights and conventional warning fixtures.",
+      "physical_e2": "Neutral sealed fluorescent test-center fixtures and much smaller shallow red/amber/green LED indicators, xenon strobe hardware, electromechanical fault flag and dense LED arrays/annulus.",
+      "ordering_rationale": "E1 1986 -> E2 1998: distinct shrink in panel indicator hardware and a visible shift from rotating/prismatic lamps to electronic strobe/LED signal modules.",
+      "role_order_e1_then_e2": "pass",
+      "comparison_completeness": "all matching sheet-parts for this role, 8 specimens per sheet",
+      "notes": "E2 cross-era visual ordering judged from physical engineering/material/interface cues; source SHA bound. Not proof of original generator request attestation."
+    }
+  ],
+  "all_four_role_order_visual_verdict": "pass",
+  "source_and_structured_review_cli_result": "pass 10/10 with exact raw --image",
+  "remaining_provenance_gates": {
+    "generator_request_delivery": "UNKNOWN for multiple source attempts; deterministic request rebuild hashes do not independently prove what generator received",
+    "sheet_09_generation_id": "UNKNOWN_UNCONFIRMED, candidate_v3 filename is not independent generator metadata",
+    "sheet_08_drive_state": "RECONCILED/PASS: exact same immutable source was moved from historic E2/_rejected to E2 root; Drive ID, SHA-256, byte count and dimensions unchanged."
+  },
+  "full_e2_canonical_promotion_approval": "pending on generation request provenance and independently unverified source #9 generation ID; archive #8 gate closed"
+}

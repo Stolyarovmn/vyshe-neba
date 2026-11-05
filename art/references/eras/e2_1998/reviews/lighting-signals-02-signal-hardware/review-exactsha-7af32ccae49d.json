@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/lighting-signals-02-signal-hardware.json",
+  "generation_id": "6973c433-8cc2-4057-b356-7525f416c1aa",
+  "source": {
+    "sha256": "7af32ccae49d3a274d6bf28ca7a79b92fc90abd4b29996a0bdb255e8bb7e3ef8",
+    "bytes": 1676695,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1N_hTKw9Tp4yD1oUJd9h0XI_3HIaPlixJ",
+    "drive_url": "https://drive.google.com/file/d/1N_hTKw9Tp4yD1oUJd9h0XI_3HIaPlixJ/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Red xenon strobe beacon",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 1 (Red xenon strobe beacon), matched to canonical machine spec."
+    },
+    {
+      "id": "02",
+      "name": "Amber xenon strobe beacon",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 2 (Amber xenon strobe beacon), matched to canonical machine spec."
+    },
+    {
+      "id": "03",
+      "name": "Clear xenon strobe beacon",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 3 (Clear xenon strobe beacon), matched to canonical machine spec."
+    },
+    {
+      "id": "04",
+      "name": "Modular three-color stack light",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 4 (Modular three-color stack light), matched to canonical machine spec."
+    },
+    {
+      "id": "05",
+      "name": "Sealed wedge-shaped amber directional LED hazard marker",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 5 (Sealed wedge-shaped amber directional LED hazard marker), matched to canonical machine spec."
+    },
+    {
+      "id": "06",
+      "name": "Bistable electromechanical fault-flag indicator cartridge",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 6 (Bistable electromechanical fault-flag indicator cartridge), matched to canonical machine spec."
+    },
+    {
+      "id": "07",
+      "name": "Red multi-LED array signal module",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 7 (Red multi-LED array signal module), matched to canonical machine spec."
+    },
+    {
+      "id": "08",
+      "name": "Annular amber multi-LED obstruction-marker head",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 8 (Annular amber multi-LED obstruction-marker head), matched to canonical machine spec."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer, 2026-11-05",
+  "review_method": "Direct visual inspection of exact-SHA originals and E1/E2 same-role montage; earlier user feedback incorporated.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "provenance_extensions": {
+    "generator_request_sha256": "d84b774cf84460e6d23a8b9bce220b501d43d04a2aae5c76d2cf855250c0b759",
+    "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
+    "generation_id_verified": true,
+    "notes": ""
+  }
+}

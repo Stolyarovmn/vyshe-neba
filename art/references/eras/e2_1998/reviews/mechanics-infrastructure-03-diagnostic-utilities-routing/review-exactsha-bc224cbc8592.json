@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/mechanics-infrastructure-03-diagnostic-utilities-routing.json",
+  "generation_id": "621e62ae-3aab-49ce-ba2a-2005c87d3448",
+  "source": {
+    "sha256": "bc224cbc8592d4991abb49b0535badb47220777bd2405f493c372ec3abb78f58",
+    "bytes": 1795734,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1qsUm48_0ICJZxEs7eLEQmeD7Gfgu2HWA",
+    "drive_url": "https://drive.google.com/file/d/1qsUm48_0ICJZxEs7eLEQmeD7Gfgu2HWA/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Slotted wiring-duct segment with routed harness",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 1 (Slotted wiring-duct segment with routed harness), matched to canonical machine spec."
+    },
+    {
+      "id": "02",
+      "name": "Braided multi-core harness branch with heat-shrink breakout",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 2 (Braided multi-core harness branch with heat-shrink breakout), matched to canonical machine spec."
+    },
+    {
+      "id": "03",
+      "name": "Shielded coaxial diagnostic cable segment",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 3 (Shielded coaxial diagnostic cable segment), matched to canonical machine spec."
+    },
+    {
+      "id": "04",
+      "name": "Circular multipin bayonet connector pair with short tails",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 4 (Circular multipin bayonet connector pair with short tails), matched to canonical machine spec."
+    },
+    {
+      "id": "05",
+      "name": "Grouped sealed cable-gland bulkhead pass-through",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 5 (Grouped sealed cable-gland bulkhead pass-through), matched to canonical machine spec."
+    },
+    {
+      "id": "06",
+      "name": "Stainless instrumentation-tubing elbow and compression union",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 6 (Stainless instrumentation-tubing elbow and compression union), matched to canonical machine spec."
+    },
+    {
+      "id": "07",
+      "name": "Crimped service hose with quick-disconnect coupling",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 7 (Crimped service hose with quick-disconnect coupling), matched to canonical machine spec."
+    },
+    {
+      "id": "08",
+      "name": "Compact solenoid manifold with dedicated diagnostic/test ports",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 8 (Compact solenoid manifold with dedicated diagnostic/test ports), matched to canonical machine spec."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer, 2026-11-05",
+  "review_method": "Direct visual inspection of exact-SHA originals and E1/E2 same-role montage; earlier user feedback incorporated.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "provenance_extensions": {
+    "generator_request_sha256": "1cd4f9d1151060f2abec19b2870d28a8c9b669e9b243076cb439a0c2be3cc50c",
+    "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
+    "generation_id_verified": true,
+    "notes": ""
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-03-service-architecture.json",
+  "generation_id": "b4d266e4-2382-4117-aa72-d17411c062f1",
+  "source": {
+    "sha256": "c1fa2b491d19e8d8a490fc6f94c12f5bfffc3780fc6f45dc0b3725321906736c",
+    "bytes": 1884394,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1ew39Apxn6Y3HNr1Y39zD-pN70mUIbf3v",
+    "drive_url": "https://drive.google.com/file/d/1ew39Apxn6Y3HNr1Y39zD-pN70mUIbf3v/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Flush gasketed electronics service-panel edge",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 1 (Flush gasketed electronics service-panel edge), matched to canonical machine spec."
+    },
+    {
+      "id": "02",
+      "name": "Removable perforated equipment-bay ventilation panel fragment",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 2 (Removable perforated equipment-bay ventilation panel fragment), matched to canonical machine spec."
+    },
+    {
+      "id": "03",
+      "name": "Replaceable formed-louver cassette fragment",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 3 (Replaceable formed-louver cassette fragment), matched to canonical machine spec."
+    },
+    {
+      "id": "04",
+      "name": "Insulated wall-panel to anodized service-frame connection",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 4 (Insulated wall-panel to anodized service-frame connection), matched to canonical machine spec."
+    },
+    {
+      "id": "05",
+      "name": "Raised technical-floor panel on adjustable pedestal head",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 5 (Raised technical-floor panel on adjustable pedestal head), matched to canonical machine spec."
+    },
+    {
+      "id": "06",
+      "name": "Removable service-trench cover edge fragment",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 6 (Removable service-trench cover edge fragment), matched to canonical machine spec."
+    },
+    {
+      "id": "07",
+      "name": "Precision equipment plinth-to-floor isolation interface",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 7 (Precision equipment plinth-to-floor isolation interface), matched to canonical machine spec."
+    },
+    {
+      "id": "08",
+      "name": "Anodized partition/service-frame corner with replaceable gasket",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 8 (Anodized partition/service-frame corner with replaceable gasket), matched to canonical machine spec."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer, 2026-11-05",
+  "review_method": "Direct visual inspection of exact-SHA originals and E1/E2 same-role montage; earlier user feedback incorporated.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "provenance_extensions": {
+    "generator_request_sha256": "6b3aed4358b4b3a8863beb90bb14b0b407621479805b874967f70b22bc707b8a",
+    "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
+    "generation_id_verified": true,
+    "notes": ""
+  }
+}

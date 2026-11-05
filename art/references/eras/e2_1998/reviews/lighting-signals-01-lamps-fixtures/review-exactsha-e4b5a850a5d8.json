@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/lighting-signals-01-lamps-fixtures.json",
+  "generation_id": "UNKNOWN_UNCONFIRMED",
+  "source": {
+    "sha256": "e4b5a850a5d8956f51e9facd1aead296b8e0112fd81b389cdd321c4434739db0",
+    "bytes": 1684966,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1QslGnYWse8mJxVb_59WFafAA20pOvnvX",
+    "drive_url": "https://drive.google.com/file/d/1QslGnYWse8mJxVb_59WFafAA20pOvnvX/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Sealed twin-tube fluorescent ceiling fixture",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 1 (Sealed twin-tube fluorescent ceiling fixture), matched to canonical machine spec."
+    },
+    {
+      "id": "02",
+      "name": "Slim under-cabinet fluorescent task fixture",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 2 (Slim under-cabinet fluorescent task fixture), matched to canonical machine spec."
+    },
+    {
+      "id": "03",
+      "name": "Articulated halogen machine task lamp",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 3 (Articulated halogen machine task lamp), matched to canonical machine spec."
+    },
+    {
+      "id": "04",
+      "name": "Sealed rectangular inspection/work lamp",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 4 (Sealed rectangular inspection/work lamp), matched to canonical machine spec."
+    },
+    {
+      "id": "05",
+      "name": "Small red LED panel indicator",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 5 (Small red LED panel indicator), matched to canonical machine spec."
+    },
+    {
+      "id": "06",
+      "name": "Small amber LED panel indicator",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 6 (Small amber LED panel indicator), matched to canonical machine spec."
+    },
+    {
+      "id": "07",
+      "name": "Small green LED panel indicator",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 7 (Small green LED panel indicator), matched to canonical machine spec."
+    },
+    {
+      "id": "08",
+      "name": "Six-LED functional status-strip module",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 8 (Six-LED functional status-strip module), matched to canonical machine spec."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer, 2026-11-05",
+  "review_method": "Direct visual inspection of exact-SHA originals and E1/E2 same-role montage; earlier user feedback incorporated.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "provenance_extensions": {
+    "generator_request_sha256": "ff825d22e23501babde9628fe10c9c5ce19efd6e709925043e397a50e7688c71",
+    "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
+    "generation_id_verified": false,
+    "notes": "Independent imagegen generation ID not available. User accepted omission only for this exact Drive-backed source SHA. Do not invent metadata; image source, guard and cross-era gates remain PASS, original prompt-delivery attestation UNKNOWN.",
+    "generation_id_waiver": {
+      "status": "user_accepted_missing_optional_id",
+      "record": "art/references/eras/e2_1998/reviews/lighting-signals-01-lamps-fixtures/waiver-missing-generation-id-e4b5a850a5d8.json",
+      "source_sha256": "e4b5a850a5d8956f51e9facd1aead296b8e0112fd81b389cdd321c4434739db0",
+      "scope": "only E2 lighting-signals/01-lamps-fixtures",
+      "generation_id_verified": false
+    }
+  }
+}

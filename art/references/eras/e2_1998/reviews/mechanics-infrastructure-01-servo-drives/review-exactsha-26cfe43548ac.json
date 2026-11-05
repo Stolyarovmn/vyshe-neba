@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/mechanics-infrastructure-01-servo-drives.json",
+  "generation_id": "5301dcfc-afc7-4f9c-9500-ea70ad4ecb41",
+  "source": {
+    "sha256": "26cfe43548ac4854498f17473901fab8600c8f486e0aae121d1616b343466208",
+    "bytes": 1733562,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1V_p6ZkJIcTDD_zkDVrRv1Y48S51guuGA",
+    "drive_url": "https://drive.google.com/file/d/1V_p6ZkJIcTDD_zkDVrRv1Y48S51guuGA/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "AC servo motor with rear encoder housing",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 1 (AC servo motor with rear encoder housing), matched to canonical machine spec."
+    },
+    {
+      "id": "02",
+      "name": "Servo motor with inline planetary gearbox",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 2 (Servo motor with inline planetary gearbox), matched to canonical machine spec."
+    },
+    {
+      "id": "03",
+      "name": "Servo motor with right-angle gear reducer",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 3 (Servo motor with right-angle gear reducer), matched to canonical machine spec."
+    },
+    {
+      "id": "04",
+      "name": "Motorized ballscrew linear actuator",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 4 (Motorized ballscrew linear actuator), matched to canonical machine spec."
+    },
+    {
+      "id": "05",
+      "name": "Electric rotary actuator with integrated brake",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 5 (Electric rotary actuator with integrated brake), matched to canonical machine spec."
+    },
+    {
+      "id": "06",
+      "name": "Direct-drive torque-motor rotary module",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 6 (Direct-drive torque-motor rotary module), matched to canonical machine spec."
+    },
+    {
+      "id": "07",
+      "name": "Closed-loop voice-coil short-stroke linear actuator",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 7 (Closed-loop voice-coil short-stroke linear actuator), matched to canonical machine spec."
+    },
+    {
+      "id": "08",
+      "name": "Electrohydraulic servo cylinder with position-transducer body",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 8 (Electrohydraulic servo cylinder with position-transducer body), matched to canonical machine spec."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer, 2026-11-05",
+  "review_method": "Direct visual inspection of exact-SHA originals and E1/E2 same-role montage; earlier user feedback incorporated.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "provenance_extensions": {
+    "generator_request_sha256": "fcbe134f02cb8b97bfc1e6bbb14252bb1512d7997e701112170b145b1393ebe5",
+    "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
+    "generation_id_verified": true,
+    "notes": ""
+  }
+}
