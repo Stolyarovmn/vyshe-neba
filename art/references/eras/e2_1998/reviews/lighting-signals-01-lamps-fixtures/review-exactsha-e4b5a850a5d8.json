@@ -88,6 +88,13 @@
     "generator_request_sha256": "ff825d22e23501babde9628fe10c9c5ce19efd6e709925043e397a50e7688c71",
     "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
     "generation_id_verified": false,
-    "notes": "#9 generation ID not independently confirmed"
+    "notes": "Independent imagegen generation ID not available. User accepted omission only for this exact Drive-backed source SHA. Do not invent metadata; image source, guard and cross-era gates remain PASS, original prompt-delivery attestation UNKNOWN.",
+    "generation_id_waiver": {
+      "status": "user_accepted_missing_optional_id",
+      "record": "art/references/eras/e2_1998/reviews/lighting-signals-01-lamps-fixtures/waiver-missing-generation-id-e4b5a850a5d8.json",
+      "source_sha256": "e4b5a850a5d8956f51e9facd1aead296b8e0112fd81b389cdd321c4434739db0",
+      "scope": "only E2 lighting-signals/01-lamps-fixtures",
+      "generation_id_verified": false
+    }
   }
 }
