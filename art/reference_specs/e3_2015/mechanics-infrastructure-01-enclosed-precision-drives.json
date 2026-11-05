@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E3",
+  "year": 2015,
+  "role": "mechanics-infrastructure",
+  "sheet": "01-enclosed-precision-drives",
+  "title": "sealed modular drive mechanisms and servo service parts",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e3_2015/mechanics-infrastructure-01-enclosed-precision-drives.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1rgb5bx72J8oDu3Tyo93-FeewJ87dm_fJ",
+    "folder_name": "E3_2015"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Sealed precision servo cartridge",
+      "description": "TOP ROW CELL 1 ONLY. ONE compact sealed servo motor cartridge, smooth off-white cylindrical body with flat square mounting flange and one short output shaft, subtle service connector. Motor only; no gearbox, no exposed fins or wires."
+    },
+    {
+      "id": "02",
+      "name": "Inline planetary reducer module",
+      "description": "TOP ROW CELL 2 ONLY. ONE short stand-alone compact precision planetary reduction gearbox, squat graphite-and-metal barrel with circular mounting flange, one short output shaft and small input coupling socket. No attached motor or encoder."
+    },
+    {
+      "id": "03",
+      "name": "Electromechanical linear actuator",
+      "description": "TOP ROW CELL 3 ONLY. ONE compact electric linear actuator with an enclosed rectangular motor body and a short straight guarded rod protruding through a protective sleeve. No external hydraulic hoses, no mounting frame or long rail."
+    },
+    {
+      "id": "04",
+      "name": "Enclosed belt-drive cassette",
+      "description": "TOP ROW CELL 4 ONLY. ONE short flattened rectangular enclosed drive cassette with a small open cutaway exposing one continuous toothed belt loop around exactly two pulleys, practical bearing supports and a short input shaft. No external motor or long transport mechanism."
+    },
+    {
+      "id": "05",
+      "name": "Brake-clutch shaft cartridge",
+      "description": "BOTTOM ROW CELL 1 ONLY. ONE short circular mechanical brake/clutch cartridge with a single central through shaft and a small square inspection port in its side. Indicate stacked friction plates within the port; no motor or gear teeth."
+    },
+    {
+      "id": "06",
+      "name": "Servo encoder rear endcap",
+      "description": "BOTTOM ROW CELL 2 ONLY. ONE shallow flat disc-shaped servo feedback encoder endcap with a recessed keyed feedback connector on its edge and three small mounting holes. Show the back cap only: no motor body or shaft, no separate plugs."
+    },
+    {
+      "id": "07",
+      "name": "Rotary actuator output yoke",
+      "description": "BOTTOM ROW CELL 3 ONLY. ONE short forked rotary actuator output yoke with a central pivot and two visible mechanical hard-stop lugs against the mating fixed collar. No whole actuator, no linear rod or loose pieces."
+    },
+    {
+      "id": "08",
+      "name": "Servo thermal jacket",
+      "description": "BOTTOM ROW CELL 4 ONLY. ONE hollow cylindrical split cooling jacket sleeve for fitting around a servo motor, with two small coolant inlet/outlet ports on one side and a visible internal annular coolant passage in a small cutaway. No motor inside, no hoses, no shaft."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, numbers, logos or pseudo-writing",
+    "any ninth specimen, extra loose fragment, repeated, merged, substituted or omitted specimen",
+    "whole building, vehicle, radar, crane, launch complex, control room, scene or finished gameplay asset",
+    "photorealistic CAD/PBR render, airbrushed gradient or photographic materials",
+    "baked cast/contact shadows, glow, rays, motion blur or active FX",
+    "E2 exposed finned motor-and-gearbox assemblies, oversized hydraulic cylinders and dense external wiring",
+    "E4 autonomous robotics, E5 holograms and levitation",
+    "any independent components not listed in the eight items"
+  ],
+  "era_contract": {
+    "character": "E3 2015 modular spaceport precision mechanics: compact serviceable sealed cartridges, protected motion, physically plausible interfaces and cooling, manufactured off-white aluminium and graphite housings. HD pixel-art game art, not a photographic industrial catalog.",
+    "required_signals": [
+      "eight physically distinct mechanisms, clearly isolated and shown large in the assigned cell",
+      "sealed motor, reducer, protected linear actuator and enclosed belt drive convey different mechanical functions",
+      "brake, encoder endcap, rotary yoke and coolant jacket are visibly distinct partial service components, not repeated complete motors",
+      "real shafts, mounts, clear fluid port function and readable mechanical stops where specified",
+      "quiet modern modular construction with upper-left lighting and exact style bible"
+    ],
+    "replaced_previous_language": [
+      "E2 large exposed finned motor-and-reducer assemblies replaced by compact sealed servo cartridge and separate modular reducer",
+      "E2 exposed moving belt, leadscrew or hydraulic actuator language replaced by guarded linear actuator and enclosed belt cassette",
+      "E2 cable-heavy discrete service hardware replaced by protected encoder and integrated cooling jacket interfaces"
+    ],
+    "forbidden_regressions": [
+      "bulky exposed E2 finned motor assemblies repeated across cells",
+      "eight near-identical motor cylinders with identical shafts and flange plates",
+      "motors combined into complete machines or scenery",
+      "unexplained cyan glow, futuristic levitation or color-only era change"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}
