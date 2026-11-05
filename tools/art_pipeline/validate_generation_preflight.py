@@ -59,21 +59,32 @@ def validate(receipt_rel: str) -> list[str]:
         errors.append("SHA-256-before-processing gate missing")
 
     machine = r.get("machine_pipeline", {})
-    if machine.get("configured") is not True:
-        errors.append("asset is not machine-configured")
-    pipeline_cfg, pipeline_error = load_json("art/placeables/PIPELINE_CONFIG.json")
-    if pipeline_error:
-        errors.append(pipeline_error)
+    source_only = r.get("generation_kind") == "first_isolated_e0_source"
+    if source_only:
+        if era != "E0":
+            errors.append("first_isolated_e0_source requires E0")
+        gate = r.get("generation_gate", {})
+        for key in ("can_scene_approve", "can_promote_to_production", "can_publish_runtime"):
+            if gate.get(key) is not False:
+                errors.append(f"source-only receipt must explicitly close {key}")
+        if machine.get("configured") is not False:
+            errors.append("source-only receipt must mark processing as unconfigured")
     else:
-        assert pipeline_cfg is not None
-        if machine.get("pipeline_config_version") != pipeline_cfg.get("version"):
-            errors.append("receipt machine_pipeline.pipeline_config_version does not match PIPELINE_CONFIG.json")
-    for key in ("canvas", "registration"):
-        value = machine.get(key)
-        if not isinstance(value, list) or len(value) != 2 or not all(isinstance(v, int) for v in value):
-            errors.append(f"invalid machine_pipeline.{key}")
-    if not isinstance(machine.get("pixel_size"), int) or machine.get("pixel_size", 0) <= 0:
-        errors.append("pixel_size must be a measured positive integer")
+        if machine.get("configured") is not True:
+            errors.append("asset is not machine-configured")
+        pipeline_cfg, pipeline_error = load_json("art/placeables/PIPELINE_CONFIG.json")
+        if pipeline_error:
+            errors.append(pipeline_error)
+        else:
+            assert pipeline_cfg is not None
+            if machine.get("pipeline_config_version") != pipeline_cfg.get("version"):
+                errors.append("receipt machine_pipeline.pipeline_config_version does not match PIPELINE_CONFIG.json")
+        for key in ("canvas", "registration"):
+            value = machine.get(key)
+            if not isinstance(value, list) or len(value) != 2 or not all(isinstance(v, int) for v in value):
+                errors.append(f"invalid machine_pipeline.{key}")
+        if not isinstance(machine.get("pixel_size"), int) or machine.get("pixel_size", 0) <= 0:
+            errors.append("pixel_size must be a measured positive integer")
 
     camera = r.get("camera", {})
     if camera.get("family") != "island_top_3_4":
