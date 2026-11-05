@@ -88,6 +88,7 @@
     "generator_request_sha256": "6e23f57ef8711d4ebcdaf29701bd81308b7fb13559f598839514650d0ed24c65",
     "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
     "generation_id_verified": true,
-    "notes": "#8 originally in E2/_rejected pending reclassification; source now passes ±1px rule"
+    "notes": "#8 originally in E2/_rejected pending reclassification; source now passes ±1px rule",
+    "source_archive_status": "RECONCILED: unchanged original in Drive E2 root; moved from historical _rejected after ±1px rule approval; source ID/SHA/size match."
   }
 }

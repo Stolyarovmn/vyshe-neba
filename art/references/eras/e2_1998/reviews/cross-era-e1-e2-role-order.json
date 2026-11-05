@@ -167,7 +167,7 @@
   "remaining_provenance_gates": {
     "generator_request_delivery": "UNKNOWN for multiple source attempts; deterministic request rebuild hashes do not independently prove what generator received",
     "sheet_09_generation_id": "UNKNOWN_UNCONFIRMED, candidate_v3 filename is not independent generator metadata",
-    "sheet_08_drive_state": "Formerly rejected due 1px width issue; source now passes tolerance but Drive file remains under _rejected; review must explicitly reconcile archive classification"
+    "sheet_08_drive_state": "RECONCILED/PASS: exact same immutable source was moved from historic E2/_rejected to E2 root; Drive ID, SHA-256, byte count and dimensions unchanged."
   },
-  "full_e2_canonical_promotion_approval": "pending until remaining provenance gates resolved"
+  "full_e2_canonical_promotion_approval": "pending on generation request provenance and independently unverified source #9 generation ID; archive #8 gate closed"
 }
