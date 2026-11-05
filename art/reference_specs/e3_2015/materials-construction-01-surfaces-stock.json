@@ -40,7 +40,7 @@
     {
       "id": "03",
       "name": "Moulded glass-fibre service-cover corner",
-      "description": "TOP ROW CELL 3 ONLY. ONE fragment cut from the CORNER OF A THIN MOULDED GLASS-FIBRE SERVICE COVER. The broad shallow off-white cover skin must be the dominant area, with a short rounded return flange along two edges and a shallow moulded rib. Two small captive fastening seats lie in the thin flange. Show a partial shell, not a whole cover. NO standalone L-bracket, clevis, upright mounting bracket, thick structural gusset or isolated fastener block."
+      "description": "TOP ROW CELL 3 ONLY. ONE fragment cut from the CORNER OF A THIN MOULDED GLASS-FIBRE SERVICE COVER. The broad shallow off-white cover skin must be the dominant area, with a short rounded return flange along two edges and a shallow moulded rib. Two small captive fastening seats lie in the thin flange. Show a partial shell, not a whole cover. NO standalone L-bracket, clevis, upright mounting bracket, thick structural gusset or isolated fastener block. EXACTLY TWO fastening seats total: one on each flange edge. Do not add a third hole, screw, recess or fastening seat anywhere on this specimen."
     },
     {
       "id": "04",
@@ -85,7 +85,8 @@
       "separate carbon-fibre laminate, glass-fibre moulded cover, honeycomb core and solid-core sandwich edge without visual duplication",
       "repeatably machined/extruded interfaces, clean edges and practical replaceable mounting",
       "distinct functional elastomer seals and polymer snap-fit extrusions rather than E2 isolation pads",
-      "cohesive stylized HD pixel art governed by the complete verbatim style_bible"
+      "cohesive stylized HD pixel art governed by the complete verbatim style_bible",
+      "Use the supplied prior sheet as the edit target: preserve cells 1, 2, 4, 5, 6, 7 and 8 and the overall layout, style and background; correct only the cover fragment in cell 3 to contain exactly two fastening seats"
     ],
     "replaced_previous_language": [
       "E2 precision-painted steel electronic plate replaced by structural aluminium sandwich-panel edge",
