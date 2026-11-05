@@ -111,7 +111,7 @@ MC = passive material/construction only; MI = actuation/utility hardware, not co
 - CD11 Sunlight-readable flat instrument insert — anti-glare
 - CD12 Touch digitizer/glass layer stack — blank section
 - CD13 Fanless controller front I/O — ports and heat fins
-- CD14 Reflective instrument display insert — blank matte face
+- CD14 Round digital pressure gauge head — recessed display and threaded pressure inlet
 - CD15 Tablet dock contact socket — no tablet
 - CD16 Flat display backlight guide — small optical edge
 
