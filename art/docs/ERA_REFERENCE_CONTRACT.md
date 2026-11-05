@@ -142,6 +142,14 @@ If the reviewer cannot explain a physical manufacturing/mechanical/interface/lig
 - Never force an entire role onto one image when its specimens would become too small; create additional sheet-parts instead.
 - Each sheet-part prompt must enumerate the allowed specimens explicitly and say that **nothing not listed may be generated**.
 - The applicable sheet-part prompt is combined with `art/style_bible.txt` **verbatim exactly once**.
+
+### ImageGen request evidence for E3 and later
+
+1. Run `production_guard.py validate-spec` and `build-request` for the sheet-part. Preserve the full UTF-8 request and record its SHA-256 together with the production commit and spec path.
+2. Pass the complete request string verbatim in the built-in ImageGen tool's explicit `prompt` argument. If the tool cannot accept the complete argument, stop and record the attempt as blocked. Chat context alone does not establish which text was passed to the tool.
+3. Retain the invocation record with the request SHA-256, tool name, and any generation or request ID actually returned, labeled by type. If an ID is unavailable, record that explicitly. Bind the record to the untouched returned PNG by its SHA-256 and Drive ID. A request hash alone records the prepared text. The invocation record establishes submission at the tool boundary.
+4. Run `verify-source` and `validate-review --image` on the exact PNG and complete the cross-era review under the existing gates. Tool submission evidence does not establish internal prompt handling or visual compliance. Apply this rule prospectively and keep historical evidence gaps recorded.
+
 - Keep examples visually separated and non-overlapping.
 - Use one neutral background; no scenery.
 - Do not request or accept title bars, era/year labels, captions, numbered sections, legends, UI/dashboard framing or four-quadrant layouts. Unlabeled material/value swatches are allowed where the role requires them.
