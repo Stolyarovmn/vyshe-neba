@@ -40,7 +40,7 @@
     {
       "id": "03",
       "name": "Harmonic-drive joint module",
-      "description": "TOP ROW CELL 3 ONLY. ONE compact harmonic-drive joint module with a large cutaway. Show a prominent oval-shaped central wave-generator bearing; immediately around it a thin continuous FLEXIBLE TOOTHED RING must deform into the SAME oval shape. The teeth on this thin oval ring visibly engage a larger FIXED CIRCULAR outer toothed ring ONLY at its left and right ends, leaving a small gap between the teeth at top and bottom. The flexible oval ring and circular outer ring are distinct physical parts. No simple circular spur gear, no motor, no robot."
+      "description": "TOP ROW CELL 3 ONLY. ONE cutaway harmonic-drive joint: round stationary outer ring has inward-pointing teeth; a thin flexible toothed ring surrounds an oval wave generator. Make the long axis of the oval horizontal. At the LEFT and RIGHT ends visibly CLOSE THE GAP so the outward teeth of the oval ring INTERLOCK WITH and TOUCH the inward teeth of the fixed circular ring. At TOP and BOTTOM leave clear gaps between the two toothed rings. Both pairs of teeth must visibly mesh at their contact points, not simply approach each other. One integral joint assembly; no motor or robotic arm."
     },
     {
       "id": "04",
@@ -87,7 +87,7 @@
       "tool coupler, isolator foot, sensor-ready clevis and leadscrew carriage must each show its causal mechanical interface",
       "no entire robot, vehicle or facility; only short serviceable components",
       "style bible verbatim with upper-left lighting and deliberate pixel clusters",
-      "Edit the supplied sheet: correct ONLY the crossed roller bearing in cell 1 and the harmonic-drive joint in cell 3 of the top row; preserve the other six specimen appearances and layout."
+      "Edit the supplied sheet: correct ONLY the harmonic-drive joint in top-row cell 3 so both left and right ends of the oval flexible toothed ring visibly mesh with the stationary circular toothed ring; preserve the other seven specimen appearances and layout."
     ],
     "replaced_previous_language": [
       "E2 exposed joint bearings and simple roller carts evolve into preloaded crossed-roller bearings and sealed recirculating guide cartridges",
