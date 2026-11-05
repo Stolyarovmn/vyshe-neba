@@ -1,0 +1,26 @@
+E3 / 2015 — materials-construction — 03-service-architecture / modular service architecture construction fragments
+
+Generate ONE E3-only atomic specimen field containing EXACTLY the 8 specimens listed below and NOTHING ELSE.
+
+LAYOUT: 1536×1024 landscape, 4×2 grid, 8 large isolated specimens, one specimen per cell, generous empty spacing, neutral background, no labels or captions.
+
+ALLOWED SPECIMENS — exactly these 8:
+1. Facade rainscreen cassette section — TOP ROW CELL 1 ONLY. ONE small cutaway cross-section of an off-white modular facade cladding cassette. Show its bent panel edge, a distinct ventilation gap and a short rear clip rail with one engaged clip; only a short fragment, no whole facade.
+2. Passive ventilation louver cover — TOP ROW CELL 2 ONLY. ONE shallow rectangular passive ventilation cover fragment with three or four fixed parallel sloped vanes in a slim off-white frame, no fan, filter cartridge, moving mechanism or wall.
+3. Structural glass-to-frame corner — TOP ROW CELL 3 ONLY. ONE short corner fragment of a thick clear physical glass panel bonded into an anodized aluminium frame, show a continuous dark structural adhesive edge and visible glass thickness; no entire window, no curtain-wall facade.
+4. Recessed service-door jamb — TOP ROW CELL 4 ONLY. ONE short recessed metal door jamb cross-section with a return flange, a dark continuous weather seal and the short mating edge of the service panel; no entire door, handle, hinges or building.
+5. Flush floor raceway cover — BOTTOM ROW CELL 1 ONLY. ONE short cross-section of a flush floor raceway: a flat removable metal cover seated level with the adjoining floor fragment in a passive retaining channel; no cables, no moving cable carrier.
+6. Modular roof-wall seam — BOTTOM ROW CELL 2 ONLY. ONE small right-angle roof-to-wall joint fragment, with an overlapping folded metal flashing and a visible downward-facing drainage lip; no roof, wall section or building as a whole.
+7. Raised-floor support pedestal — BOTTOM ROW CELL 3 ONLY. ONE adjustable metal support pedestal with a threaded adjustment stem, a base foot and ONE partial raised-floor tile corner resting on its top plate; no extra tools or furniture.
+8. Composite-metal threshold section — BOTTOM ROW CELL 4 ONLY. ONE short cutaway threshold where a composite floor edge meets a profiled aluminium threshold, with one dark insulating isolation pad between different materials; no complete doorway or loose pieces.
+
+DO NOT GENERATE ANYTHING NOT LISTED ABOVE. text, labels, letters, numbers, logos or pseudo-writing; any ninth specimen, extra fragment, repeated object class, substituted, merged or omitted specimen; whole building, room, facade, vehicle, spacecraft, radar, machinery, control panel, catalog application board or staged scene; baked cast/contact shadows, studio-product shadows, glow, bloom, rays, live display graphics or temporary FX; photorealistic PBR material-catalog rendering, rendered CAD/studio 3D look, photographic materials or filtered 3D render; generic smooth image devoid of intentional HD pixel-art clusters, missing dark chromatic selective outlines or continuous-airbrush gradients; motors, buttons, standalone connectors, lights, dashboards or any other role's standalone hardware; E2 beige rack and dense external wiring, E4 curtain-wall structures, E5 transparent holograms and levitation; repeat specimens from E3 sheets 01 or 02, complete buildings, whole doors or windows, active fans, cables, moving carriers or utility modules.
+
+E3 visual character: E3 / 2015 modular spaceport service architecture: quiet, clean, replaceable panel interfaces in engineered composites and anodized aluminium with physically functional seals, drainage, clips and support. Render as cohesive HD pixel-art fragments, not complete buildings or photorealistic catalog items.
+REQUIRED ERA SIGNALS: eight physically distinct service architecture fragments with practical attachment, load paths, ventilation and service access; short partial sections only; an element may include its necessary mating material but no complete structure; controlled off-white and graphite tones and selective chromatic outlines in the verbatim style bible; E3 modern modular fabrication and serviceability, distinct from E2 rack-test equipment.
+REPLACED PREVIOUS-ERA LANGUAGE: E2 utilitarian sheet-metal rack and exposed vents give way to replaceable modular exterior cladding and flush service interfaces; E2 ordinary fastened sheet construction gives way to clip-mounted rainscreen, sealed jamb and drained roof seam; E2 exposed infrastructure paths give way to flush passive floor raceway cover without depicting moving cable carrier.
+FORBIDDEN REGRESSION: E2 laboratory cabinet hardware as main vocabulary; E4 glass curtain-wall architecture or whole buildings; repeated generic panel corners with indistinguishable functions; photorealistic architectural rendering, glowing glass or application scenes.
+
+PRESENTATION: isolated physical specimens only; examples must not overlap; one neutral background; no title bar, era/year text, captions, numbered labels, legend, UI/dashboard frame or scenery; no baked cast shadow, glow, bloom, rays or other temporary FX.
+
+The generation request MUST append `art/style_bible.txt` verbatim exactly once. Do not paraphrase it.
