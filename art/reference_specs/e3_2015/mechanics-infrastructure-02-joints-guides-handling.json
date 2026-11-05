@@ -30,7 +30,7 @@
     {
       "id": "01",
       "name": "Cross-roller bearing block",
-      "description": "TOP ROW CELL 1 ONLY. ONE compact square cross-roller bearing block with central bore. In a generous section cutaway show successive cylindrical rollers along the circular race alternating orientations at RIGHT ANGLES: one roller slants /, its adjacent roller slants \\, next roller /, and so on. Alternate roller axes by 90 degrees; no parallel-only roller cluster and no loose pieces."
+      "description": "TOP ROW CELL 1 ONLY. ONE cross-roller bearing block with a large circular bore. Cut away a wide wedge of the race to show FOUR LARGE SHORT CYLINDRICAL ROLLERS side by side, with their cylinder long axes alternating in visibly distinct directions: first diagonal /, second diagonal backslash, third /, fourth backslash. Every adjacent pair meets at 90 degrees, forming a clear alternating criss-cross race, no parallel-only rows. No loose pieces."
     },
     {
       "id": "02",
@@ -40,7 +40,7 @@
     {
       "id": "03",
       "name": "Harmonic-drive joint module",
-      "description": "TOP ROW CELL 3 ONLY. ONE short sealed harmonic-drive joint with a large explanatory physical cutaway integrated into the housing. Show an unmistakably ELLIPTICAL oval inner wave generator and a THIN FLEXIBLE toothed cup hugging the oval, meshing with the fixed circular outer spline at two opposite points. The oval deformation and tooth engagement must be visible and physically legible. No simple circular spur gear, no motor or robotic arm."
+      "description": "TOP ROW CELL 3 ONLY. ONE compact harmonic-drive joint module with a large cutaway. Show a prominent oval-shaped central wave-generator bearing; immediately around it a thin continuous FLEXIBLE TOOTHED RING must deform into the SAME oval shape. The teeth on this thin oval ring visibly engage a larger FIXED CIRCULAR outer toothed ring ONLY at its left and right ends, leaving a small gap between the teeth at top and bottom. The flexible oval ring and circular outer ring are distinct physical parts. No simple circular spur gear, no motor, no robot."
     },
     {
       "id": "04",
@@ -87,7 +87,7 @@
       "tool coupler, isolator foot, sensor-ready clevis and leadscrew carriage must each show its causal mechanical interface",
       "no entire robot, vehicle or facility; only short serviceable components",
       "style bible verbatim with upper-left lighting and deliberate pixel clusters",
-      "Edit the supplied sheet: change only top row cells 1 and 3 and bottom row cell 1 to correct the bearing, harmonic joint and joined coupler; keep the appearance, positions and style of the other five cells."
+      "Edit the supplied sheet: correct ONLY the crossed roller bearing in cell 1 and the harmonic-drive joint in cell 3 of the top row; preserve the other six specimen appearances and layout."
     ],
     "replaced_previous_language": [
       "E2 exposed joint bearings and simple roller carts evolve into preloaded crossed-roller bearings and sealed recirculating guide cartridges",
