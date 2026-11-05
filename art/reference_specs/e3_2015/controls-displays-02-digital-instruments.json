@@ -54,8 +54,8 @@
     },
     {
       "id": "06",
-      "name": "Flat display mounting hinge",
-      "description": "BOTTOM ROW CELL 2 ONLY. One compact isolated metal mounting hinge bracket with two short leaves, pivot barrel and mounting holes. No screen attached."
+      "name": "Reflective instrument display insert",
+      "description": "BOTTOM ROW CELL 2 ONLY. One isolated low-profile rectangular reflective instrument display insert: blank light gray matte viewing surface in a thin dark gasket and warm off-white shallow bezel, two small integral side mounting ears. Pale opaque paper-like face visibly different from the dark LCD, charcoal anti-glare glass and transparent optical plate. Unpowered. No content, symbols, letters, hinge or bracket."
     },
     {
       "id": "07",
@@ -82,7 +82,8 @@
     "required_signals": [
       "Eight isolated examples in the exact 4-by-2 order",
       "LCD bezel, ribbon-tail strip, matte square insert, laminated stack and optical plate must have distinct silhouettes and material cues",
-      "All optical components unpowered"
+      "All optical components unpowered",
+      "Edit the supplied sheet only in bottom-row cell 2, replacing the hinge entirely with the reflective instrument display. Preserve the seven other specimens and the grid, scale, background and visual style."
     ],
     "replaced_previous_language": [
       "Preserve modular field-service hardware",
