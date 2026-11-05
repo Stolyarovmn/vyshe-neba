@@ -60,7 +60,7 @@
     {
       "id": "07",
       "name": "Rotary actuator output yoke",
-      "description": "BOTTOM ROW CELL 3 ONLY. ONE short forked rotary actuator output yoke with a central pivot and two visible mechanical hard-stop lugs against the mating fixed collar. No whole actuator, no linear rod or loose pieces."
+      "description": "BOTTOM ROW CELL 3 ONLY. ONE compact forked rotary actuator output yoke on a central rotating circular collar and a stationary mounting ring. The ROTATING collar has ONE unmistakable solid radial metal stop-lug projecting OUTWARD from its edge. The STATIONARY ring carries TWO fixed raised metal stop-blocks on opposite sides of that moving lug, spaced along the arc. Show the moving lug physically TOUCHING one fixed stop-block, while the other block remains clearly separated on the other side; it must be obvious that the lug strikes either stop as the yoke turns and limits rotation. Same physical assembly, no extra loose pieces, no linear rod, no whole actuator."
     },
     {
       "id": "08",
@@ -85,7 +85,8 @@
       "sealed motor, reducer, protected linear actuator and enclosed belt drive convey different mechanical functions",
       "brake, encoder endcap, rotary yoke and coolant jacket are visibly distinct partial service components, not repeated complete motors",
       "real shafts, mounts, clear fluid port function and readable mechanical stops where specified",
-      "quiet modern modular construction with upper-left lighting and exact style bible"
+      "quiet modern modular construction with upper-left lighting and exact style bible",
+      "Edit the supplied source sheet: preserve the appearance, positions and style of the other seven cells; correct only cell 7 to show a rotating lug touching one of two fixed mechanical stop blocks."
     ],
     "replaced_previous_language": [
       "E2 large exposed finned motor-and-reducer assemblies replaced by compact sealed servo cartridge and separate modular reducer",
