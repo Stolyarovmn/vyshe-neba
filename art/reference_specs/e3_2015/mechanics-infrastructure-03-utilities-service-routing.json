@@ -30,7 +30,7 @@
     {
       "id": "01",
       "name": "Blind-mate connector pair",
-      "description": "TOP ROW CELL 1 ONLY. ONE blind-mate electrical connector PAIR shown with its two complementary halves side by side and slightly separated within this same single cell, clearly revealing protected contacts, self-aligning guide pins and mating openings. Both halves belong to one connector pair, with no cable tails or other separate accessories. Keep the two housings visibly distinct; do not fuse or overlap their contact faces."
+      "description": "TOP ROW CELL 1 ONLY. ONE blind-mate electrical connector PAIR: two complementary rectangular halves side by side with a clear narrow gap, their mating faces visible and distinct. The LEFT half has exactly NINE small protruding male contact pins arranged in a 3-by-3 grid, plus TWO large rounded guide pins at top and bottom. The RIGHT half has exactly NINE matching RECESSED DARK FEMALE SOCKET HOLES arranged in the same 3-by-3 pattern, plus TWO larger corresponding recessed guide holes aligned to receive the two guide pins. Both halves belong to one connector pair. Show sockets as dark holes, not gold protruding pins. No cable tails, no extra loose parts. Do not fuse or overlap the two halves."
     },
     {
       "id": "02",
@@ -87,7 +87,8 @@
       "moving cable carrier is enclosed; no exposed wire bundle; passive floor cover is not a cable chain",
       "cooling plate, filter receiver and sealed diagnostic flap have visibly different physical functions",
       "upper-left illumination, deliberate pixel clusters and exact style bible",
-      "The blind-mate connector pair may be shown separated within its cell so both mating faces, contacts and guide pins are readable; the pair counts as one planned example."
+      "The blind-mate connector pair may be shown separated within its cell so both mating faces, contacts and guide pins are readable; the pair counts as one planned example.",
+      "Edit the supplied first-version sheet: change ONLY the first cell connector so the two separated halves have exactly matched 3-by-3 male/female electrical contacts and two matching guide pins and guide holes. Preserve the other seven specimen appearances and layout."
     ],
     "replaced_previous_language": [
       "E2 external harnesses and exposed trays transition to protected short enclosed cable carriers and sealed panel feedthrough",
