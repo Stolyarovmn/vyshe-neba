@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E3",
+  "year": 2015,
+  "role": "materials-construction",
+  "sheet": "01-surfaces-stock",
+  "title": "modular spaceport construction materials and stock",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e3_2015/materials-construction-01-surfaces-stock.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1rgb5bx72J8oDu3Tyo93-FeewJ87dm_fJ",
+    "folder_name": "E3_2015"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Aluminium sandwich-panel perimeter edge",
+      "description": "TOP ROW CELL 1 ONLY. ONE short modern aerospace panel edge with smooth off-white aluminium face skins, a rigid solid structural core, clean replaceable extruded aluminium perimeter profile and a readable layered cut edge. No open honeycomb cells (reserved for cell 6), no foam-catalog texture, no full wall or service hatch."
+    },
+    {
+      "id": "02",
+      "name": "Carbon-fibre laminate cutaway coupon",
+      "description": "TOP ROW CELL 2 ONLY. ONE short rectangular carbon-fibre reinforced composite coupon, matte graphite twill face, several visibly stacked structural laminate plies at the cut end; clean aerospace-fabrication sample, not a vehicle shell or polymer trim."
+    },
+    {
+      "id": "03",
+      "name": "Moulded glass-fibre service-cover corner",
+      "description": "TOP ROW CELL 3 ONLY. ONE off-white glass-fibre-reinforced polymer cover CORNER fragment, shallow moulded rib, precise rounded flange and two integrated captive fastening seats; distinguish clearly from cell 1 panel-stock edge and from cell 5 extruded trim; no whole cover."
+    },
+    {
+      "id": "04",
+      "name": "Powder-coated folded graphite sheet corner",
+      "description": "TOP ROW CELL 4 ONLY. ONE dark-graphite powder-coated metal folded corner fragment with uniform industrial sheet thickness, single measured bend radius and broad quiet planes; not a full electronics chassis, not a bracket collection, no E2 beige rack."
+    },
+    {
+      "id": "05",
+      "name": "Off-white snap-fit engineering-polymer extrusion",
+      "description": "BOTTOM ROW CELL 1 ONLY. ONE short light off-white polymer trim PROFILE with an open cut end showing distinctive interior support webs, two functional snap-fit retaining lips and a matching assembly groove; not a cover shell or another aluminium panel."
+    },
+    {
+      "id": "06",
+      "name": "Honeycomb-core bonded sandwich panel coupon",
+      "description": "BOTTOM ROW CELL 2 ONLY. ONE short panel cross-section with clearly OPEN repeating hexagonal aluminium honeycomb cells between two thin bonded face sheets; unmistakable honeycomb structure, distinct from cell 1 SOLID-core panel."
+    },
+    {
+      "id": "07",
+      "name": "Anodized aluminium T-slot structural profile",
+      "description": "BOTTOM ROW CELL 3 ONLY. ONE short precision extruded aluminium structural profile length, unmistakable undercut T-slot mounting geometry and clean visible end face; no full rack, no machine rail and no separate fasteners."
+    },
+    {
+      "id": "08",
+      "name": "Elastomeric environmental compression edge seal",
+      "description": "BOTTOM ROW CELL 4 ONLY. ONE short dark charcoal EPDM/silicone weather seal extrusion showing two independently legible flexible compression lips, hollow sealing chambers and a fixed retention foot for mating groove; no separate rubber pads or mechanical components."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, letters, numbers, logos or pseudo-writing",
+    "any ninth specimen, extra fragment, repeated object class, substituted, merged or omitted specimen",
+    "whole building, room, facade, vehicle, spacecraft, radar, machinery, control panel, catalog application board or staged scene",
+    "baked cast/contact shadows, studio-product shadows, glow, bloom, rays, live display graphics or temporary FX",
+    "photorealistic PBR material-catalog rendering, rendered CAD/studio 3D look, photographic materials or filtered 3D render",
+    "generic smooth image devoid of intentional HD pixel-art clusters, missing dark chromatic selective outlines or continuous-airbrush gradients",
+    "motors, buttons, standalone connectors, lights, dashboards or any other role's standalone hardware",
+    "E2 beige rack and dense external wiring, E4 curtain-wall structures, E5 transparent holograms and levitation"
+  ],
+  "era_contract": {
+    "character": "E3 2015 modern spaceport construction vocabulary: serviceable modular composite stock, anodized aluminium and engineered polymers, clean replaceable sections and calm off-white/graphite faces; all physically serviceable but distinctly less boxy and cluttered than E2 1998",
+    "required_signals": [
+      "clear manufacturing replacement from E2 test-equipment sheet metal to modular aerospace sandwich/composite materials",
+      "separate carbon-fibre laminate, glass-fibre moulded cover, honeycomb core and solid-core sandwich edge without visual duplication",
+      "repeatably machined/extruded interfaces, clean edges and practical replaceable mounting",
+      "distinct functional elastomer seals and polymer snap-fit extrusions rather than E2 isolation pads",
+      "cohesive stylized HD pixel art governed by the complete verbatim style_bible"
+    ],
+    "replaced_previous_language": [
+      "E2 precision-painted steel electronic plate replaced by structural aluminium sandwich-panel edge",
+      "E2 beige-gray ABS test-equipment panel replaced by load-bearing carbon-fibre laminate coupon",
+      "E2 aluminium instrument faceplate replaced by glass-fibre moulded service-cover corner",
+      "E2 dense folded electronics chassis fragment replaced by clean single-radius graphite structural folded panel",
+      "E2 perforated ventilation sheet replaced by off-white modular snap-fit polymer trim",
+      "E2 rack mounting profile replaced by functional bonded honeycomb-core panel vocabulary",
+      "E2 nylon support block replaced by T-slot structural extrusion",
+      "E2 die-cut isolator pad replaced by continuous double-lip environmental seal"
+    ],
+    "forbidden_regressions": [
+      "beige CRT/rack laboratory look or bulky 1998 control-cabinet pieces",
+      "generic thin painted steel plate, single rib plastic faceplate, ventilated coupon or loose neoprene rectangle standing in for the E3 specimens",
+      "photorealistic product-catalog imagery instead of the style bible",
+      "cleaner E2 by recolor alone without composite/modular physical replacements"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}
