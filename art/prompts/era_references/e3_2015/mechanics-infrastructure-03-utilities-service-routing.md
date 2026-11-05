@@ -1,0 +1,26 @@
+E3 / 2015 — mechanics-infrastructure — 03-utilities-service-routing / protected service routing and modular utility interfaces
+
+Generate ONE E3-only atomic specimen field containing EXACTLY the 8 specimens listed below and NOTHING ELSE.
+
+LAYOUT: 1536×1024 landscape, 4×2 grid, 8 large isolated specimens, one specimen per cell, generous empty spacing, neutral background, no labels or captions.
+
+ALLOWED SPECIMENS — exactly these 8:
+1. Blind-mate connector pair — TOP ROW CELL 1 ONLY. ONE partially mated pair of compact rectangular blind-mate electrical connector halves with rounded self-aligning guide pins, recessed protected contacts and integral flanges, no cable tails or loose pieces.
+2. Panel cable feedthrough — TOP ROW CELL 2 ONLY. ONE metal bulkhead cable feedthrough in a short thin panel fragment, with hexagonal compression gland and one short dark cable passing through the center. No connector plug, no second gland.
+3. Enclosed moving cable chain — TOP ROW CELL 3 ONLY. ONE short curved segment of moving cable carrier with linked protective closed covers and a short guide channel under the bottom run; no exposed wires, no floor raceway or complete machine.
+4. Replaceable service manifold — TOP ROW CELL 4 ONLY. ONE compact removable fluid distribution manifold block with three visibly different keyed capped fluid connection ports and integral mounting flange. No hoses, no solenoid valves, no electrical connectors.
+5. Dry-break hose coupler — BOTTOM ROW CELL 1 ONLY. ONE coupled dry-break fluid hose coupling, two mated cylindrical halves with locking collar and visible mechanical safety interlock tab. Include only a short hose stub at one end, no detached parts.
+6. Liquid-cooling cold plate — BOTTOM ROW CELL 2 ONLY. ONE small rectangular metal cooling cold plate with a corner cutaway revealing internal meandering fluid channel, two distinct fluid ports at the edge and a flat mounting face. No coolant glow, no hoses or electronic device.
+7. Filter-cassette receiver — BOTTOM ROW CELL 3 ONLY. ONE compact rectangular receiver frame with a partly inserted removable ribbed filter cartridge and a simple retention latch. It is a serviceable mount, not a wall louver, no fan or extra cartridge.
+8. Digital service port access cover — BOTTOM ROW CELL 4 ONLY. ONE small sealed physical access cover with a captive hinged flap open on a short mounting plate, revealing a single recessed empty diagnostic socket, gasket and small latch. No text, display, cable or entire control panel.
+
+DO NOT GENERATE ANYTHING NOT LISTED ABOVE. text, labels, numbers, logos or pseudo-writing; ninth specimen, extra independent parts, repeated, merged, substituted or omitted specimen; whole building, vehicle, radar, crane, robot, launch complex, room, scene or finished gameplay asset; photorealistic CAD/PBR render, airbrushing or photographic material; baked cast/contact shadows, glow, rays, motion blur or active FX; unlisted servo motors, rail carriages, gears, screens, active lights or complete machinery; E2 dense exposed wiring harnesses, bulky solenoids and large individual brass valve assemblies; E4 autonomous robots, E5 holograms and levitation; any additional independent unlisted specimen.
+
+E3 visual character: E3 / 2015 modular spaceport utilities: protected, compact serviceable interfaces and internal cable routing, with keyed replaceable fluid hardware, off-white aluminium and graphite polymer. Finished cohesive HD pixel art.
+REQUIRED ERA SIGNALS: eight distinctly different isolated hardware examples, one per specified cell; connector and feedthrough distinguished from fluid coupler and manifold by physical interfaces; moving cable carrier is enclosed; no exposed wire bundle; passive floor cover is not a cable chain; cooling plate, filter receiver and sealed diagnostic flap have visibly different physical functions; upper-left illumination, deliberate pixel clusters and exact style bible.
+REPLACED PREVIOUS-ERA LANGUAGE: E2 external harnesses and exposed trays transition to protected short enclosed cable carriers and sealed panel feedthrough; E2 discrete screwed round connectors transition to recessed keyed blind-mate modular connectors; E2 bulky exposed valves and utility manifolds transition to keyed replaceable service blocks and leak-safe couplings.
+FORBIDDEN REGRESSION: dense colored exposed wiring, loose patch cables and E2 diagnostic rack fragments; duplicate round hose connectors or identical housing blocks; glow-only or color-only era change; photorealistic product catalogs and whole scenes.
+
+PRESENTATION: isolated physical specimens only; examples must not overlap; one neutral background; no title bar, era/year text, captions, numbered labels, legend, UI/dashboard frame or scenery; no baked cast shadow, glow, bloom, rays or other temporary FX.
+
+The generation request MUST append `art/style_bible.txt` verbatim exactly once. Do not paraphrase it.
