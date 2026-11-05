@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E3",
+  "year": 2015,
+  "role": "materials-construction",
+  "sheet": "03-service-architecture",
+  "title": "modular service architecture construction fragments",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e3_2015/materials-construction-03-service-architecture.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1rgb5bx72J8oDu3Tyo93-FeewJ87dm_fJ",
+    "folder_name": "E3_2015"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Facade rainscreen cassette section",
+      "description": "TOP ROW CELL 1 ONLY. ONE small cutaway cross-section of an off-white modular facade cladding cassette. Show its bent panel edge, a distinct ventilation gap and a short rear clip rail with one engaged clip; only a short fragment, no whole facade."
+    },
+    {
+      "id": "02",
+      "name": "Passive ventilation louver cover",
+      "description": "TOP ROW CELL 2 ONLY. ONE shallow rectangular passive ventilation cover fragment with three or four fixed parallel sloped vanes in a slim off-white frame, no fan, filter cartridge, moving mechanism or wall."
+    },
+    {
+      "id": "03",
+      "name": "Structural glass-to-frame corner",
+      "description": "TOP ROW CELL 3 ONLY. ONE short corner fragment of a thick clear physical glass panel bonded into an anodized aluminium frame, show a continuous dark structural adhesive edge and visible glass thickness; no entire window, no curtain-wall facade."
+    },
+    {
+      "id": "04",
+      "name": "Recessed service-door jamb",
+      "description": "TOP ROW CELL 4 ONLY. ONE short recessed metal door jamb cross-section with a return flange, a dark continuous weather seal and the short mating edge of the service panel; no entire door, handle, hinges or building."
+    },
+    {
+      "id": "05",
+      "name": "Flush floor raceway cover",
+      "description": "BOTTOM ROW CELL 1 ONLY. ONE short cross-section of a flush floor raceway: a flat removable metal cover seated level with the adjoining floor fragment in a passive retaining channel; no cables, no moving cable carrier."
+    },
+    {
+      "id": "06",
+      "name": "Modular roof-wall seam",
+      "description": "BOTTOM ROW CELL 2 ONLY. ONE small right-angle roof-to-wall joint fragment, with an overlapping folded metal flashing and a visible downward-facing drainage lip; no roof, wall section or building as a whole."
+    },
+    {
+      "id": "07",
+      "name": "Raised-floor support pedestal",
+      "description": "BOTTOM ROW CELL 3 ONLY. ONE adjustable metal support pedestal with a threaded adjustment stem, a base foot and ONE partial raised-floor tile corner resting on its top plate; no extra tools or furniture."
+    },
+    {
+      "id": "08",
+      "name": "Composite-metal threshold section",
+      "description": "BOTTOM ROW CELL 4 ONLY. ONE short cutaway threshold where a composite floor edge meets a profiled aluminium threshold, with one dark insulating isolation pad between different materials; no complete doorway or loose pieces."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, letters, numbers, logos or pseudo-writing",
+    "any ninth specimen, extra fragment, repeated object class, substituted, merged or omitted specimen",
+    "whole building, room, facade, vehicle, spacecraft, radar, machinery, control panel, catalog application board or staged scene",
+    "baked cast/contact shadows, studio-product shadows, glow, bloom, rays, live display graphics or temporary FX",
+    "photorealistic PBR material-catalog rendering, rendered CAD/studio 3D look, photographic materials or filtered 3D render",
+    "generic smooth image devoid of intentional HD pixel-art clusters, missing dark chromatic selective outlines or continuous-airbrush gradients",
+    "motors, buttons, standalone connectors, lights, dashboards or any other role's standalone hardware",
+    "E2 beige rack and dense external wiring, E4 curtain-wall structures, E5 transparent holograms and levitation",
+    "repeat specimens from E3 sheets 01 or 02, complete buildings, whole doors or windows, active fans, cables, moving carriers or utility modules"
+  ],
+  "era_contract": {
+    "character": "E3 / 2015 modular spaceport service architecture: quiet, clean, replaceable panel interfaces in engineered composites and anodized aluminium with physically functional seals, drainage, clips and support. Render as cohesive HD pixel-art fragments, not complete buildings or photorealistic catalog items.",
+    "required_signals": [
+      "eight physically distinct service architecture fragments with practical attachment, load paths, ventilation and service access",
+      "short partial sections only; an element may include its necessary mating material but no complete structure",
+      "controlled off-white and graphite tones and selective chromatic outlines in the verbatim style bible",
+      "E3 modern modular fabrication and serviceability, distinct from E2 rack-test equipment"
+    ],
+    "replaced_previous_language": [
+      "E2 utilitarian sheet-metal rack and exposed vents give way to replaceable modular exterior cladding and flush service interfaces",
+      "E2 ordinary fastened sheet construction gives way to clip-mounted rainscreen, sealed jamb and drained roof seam",
+      "E2 exposed infrastructure paths give way to flush passive floor raceway cover without depicting moving cable carrier"
+    ],
+    "forbidden_regressions": [
+      "E2 laboratory cabinet hardware as main vocabulary",
+      "E4 glass curtain-wall architecture or whole buildings",
+      "repeated generic panel corners with indistinguishable functions",
+      "photorealistic architectural rendering, glowing glass or application scenes"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}
