@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json",
+  "generation_id": "a7fa418d-edf1-4cfc-9727-61ffad9e45a9",
+  "source": {
+    "sha256": "94a20b5286fddf040d26aa1a9b8c659ae442be823305fbb2eb94003ef24823f1",
+    "bytes": 1801199,
+    "dimensions": [
+      1535,
+      1024
+    ],
+    "dimension_delta_px": [
+      -1,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1FMqh2eLU8EPJEqZ3mBid-GnvWVweXUeu",
+    "drive_url": "https://drive.google.com/file/d/1FMqh2eLU8EPJEqZ3mBid-GnvWVweXUeu/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Deep monochrome CRT diagnostic display housing fragment",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 1 (Deep monochrome CRT diagnostic display housing fragment), matched to canonical machine spec."
+    },
+    {
+      "id": "02",
+      "name": "Deep color CRT test-monitor housing fragment",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 2 (Deep color CRT test-monitor housing fragment), matched to canonical machine spec."
+    },
+    {
+      "id": "03",
+      "name": "Rack-mount plug-in electronics module",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 3 (Rack-mount plug-in electronics module), matched to canonical machine spec."
+    },
+    {
+      "id": "04",
+      "name": "Replaceable PCB cassette/service module",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 4 (Replaceable PCB cassette/service module), matched to canonical machine spec."
+    },
+    {
+      "id": "05",
+      "name": "Coax diagnostic connector-panel fragment",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 5 (Coax diagnostic connector-panel fragment), matched to canonical machine spec."
+    },
+    {
+      "id": "06",
+      "name": "Multipin diagnostic service-interface module",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 6 (Multipin diagnostic service-interface module), matched to canonical machine spec."
+    },
+    {
+      "id": "07",
+      "name": "Removable 3.5-inch diagnostic diskette-drive service insert",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 7 (Removable 3.5-inch diagnostic diskette-drive service insert), matched to canonical machine spec."
+    },
+    {
+      "id": "08",
+      "name": "Small specialized monochrome LCD readout module",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 8 (Small specialized monochrome LCD readout module), matched to canonical machine spec."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer, 2026-11-05",
+  "review_method": "Direct visual inspection of exact-SHA originals and E1/E2 same-role montage; earlier user feedback incorporated.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "provenance_extensions": {
+    "generator_request_sha256": "6e23f57ef8711d4ebcdaf29701bd81308b7fb13559f598839514650d0ed24c65",
+    "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
+    "generation_id_verified": true,
+    "notes": "#8 originally in E2/_rejected pending reclassification; source now passes ±1px rule"
+  }
+}

@@ -1,1 +1,570 @@
-{"schema_version":2,"era":"E2","year":1998,"name":"Испытательный центр","status":"rebuild_required","approval_context":"Previous broad matrix/elements/applications references and same-style correction boards are invalid under the canonical atomic-only era reference contract and are not canonical visual evidence. E0 and E1 are approved lineage evidence. All ten E2 atomic machine specs/prompts are now prepared from the approved E1 role structure and E2 Design Matrix; the first guarded E2 source has immutable Drive-backed exact-SHA structured visual-review PASS. E2 remains rebuild_required until every required sheet-part passes exact-SHA review and the complete E1↔E2 role-order gate passes.","authority":{"rules":"art/docs/ERA_DESIGN_MATRIX.md","reference_contract":"art/docs/ERA_REFERENCE_CONTRACT.md","style":"art/style_bible.txt","previous_era_reference":"art/references/eras/e1_1986/reference-set.json","anchor_era_reference":"art/references/eras/e0_1978/reference-set.json"},"transition_from_e1":{"preserved":["industrial serviceability and standardized safety language","physical electromechanical construction with readable maintenance access"],"replaced":["E1 workshop-centric modules with denser rack-based test/diagnostic electronics","primarily hydraulic/electromotor emphasis with motorized servo and motor-reducer systems","mixed industrial surfaces with stronger beige/gray technical-plastic and aluminium laboratory language","basic organized trays with more explicit routed harnesses, connectors and diagnostic cabling"],"added":["bulky CRT diagnostic hardware and deep housings","electronic racks, ventilation grilles and replaceable electronics modules","denser grouped early LED indication and test instrumentation","specialized diagnostic connectors and service interfaces"],"why":"The base has matured from a standardized workshop into a dedicated aerospace test center where diagnostics, instrumentation and motorized control are first-class infrastructure.","player_signal":"More electronics, deeper CRT hardware, dense routed cabling, diagnostic connectors and visibly motorized/servo components; E2 is technically busier than cleaner E3."},"raw_archive":{"provider":"google_drive","folder_id":"10zBY-Einty7p9wbHZCDuQxQ-FqQnd5RE","folder_name":"E2_1998","rejected_folder_id":"1JbPCR1OjxlQji6AZnplUeq-wvdpTPTim"},"required_roles":["materials-construction","mechanics-infrastructure","controls-displays","lighting-signals"],"sheet_density":{"default_max_specimens_per_sheet":8,"current_generation_size":[1536,1024],"preferred_grid":[4,2],"nominal_cell_before_margins":[384,512]},"planned_sheets":[{"role":"materials-construction","sheet":"01-surfaces-stock","spec":"art/reference_specs/e2_1998/materials-construction-01-surfaces-stock.json","prompt":"art/prompts/era_references/e2_1998/materials-construction-01-surfaces-stock.md","specimens":8,"status":"exact_sha_visual_review_pass"},{"role":"materials-construction","sheet":"02-joints-repairs","spec":"art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json","prompt":"art/prompts/era_references/e2_1998/materials-construction-02-joints-repairs.md","specimens":8,"status":"spec_ready_generation_pending"},{"role":"materials-construction","sheet":"03-service-architecture","spec":"art/reference_specs/e2_1998/materials-construction-03-service-architecture.json","prompt":"art/prompts/era_references/e2_1998/materials-construction-03-service-architecture.md","specimens":8,"status":"spec_ready_generation_pending"},{"role":"mechanics-infrastructure","sheet":"01-servo-drives","spec":"art/reference_specs/e2_1998/mechanics-infrastructure-01-servo-drives.json","prompt":"art/prompts/era_references/e2_1998/mechanics-infrastructure-01-servo-drives.md","specimens":8,"status":"spec_ready_generation_pending"},{"role":"mechanics-infrastructure","sheet":"02-precision-joints-handling","spec":"art/reference_specs/e2_1998/mechanics-infrastructure-02-precision-joints-handling.json","prompt":"art/prompts/era_references/e2_1998/mechanics-infrastructure-02-precision-joints-handling.md","specimens":8,"status":"spec_ready_generation_pending"},{"role":"mechanics-infrastructure","sheet":"03-diagnostic-utilities-routing","spec":"art/reference_specs/e2_1998/mechanics-infrastructure-03-diagnostic-utilities-routing.json","prompt":"art/prompts/era_references/e2_1998/mechanics-infrastructure-03-diagnostic-utilities-routing.md","specimens":8,"status":"spec_ready_generation_pending"},{"role":"controls-displays","sheet":"01-operator-controls","spec":"art/reference_specs/e2_1998/controls-displays-01-operator-controls.json","prompt":"art/prompts/era_references/e2_1998/controls-displays-01-operator-controls.md","specimens":8,"status":"spec_ready_generation_pending"},{"role":"controls-displays","sheet":"02-instruments-displays","spec":"art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json","prompt":"art/prompts/era_references/e2_1998/controls-displays-02-instruments-displays.md","specimens":8,"status":"spec_ready_generation_pending"},{"role":"lighting-signals","sheet":"01-lamps-fixtures","spec":"art/reference_specs/e2_1998/lighting-signals-01-lamps-fixtures.json","prompt":"art/prompts/era_references/e2_1998/lighting-signals-01-lamps-fixtures.md","specimens":8,"status":"spec_ready_generation_pending"},{"role":"lighting-signals","sheet":"02-signal-hardware","spec":"art/reference_specs/e2_1998/lighting-signals-02-signal-hardware.json","prompt":"art/prompts/era_references/e2_1998/lighting-signals-02-signal-hardware.md","specimens":8,"status":"spec_ready_generation_pending"}],"sheets":[],"generation_checkpoint":{"status":"rebuild_required_all_specs_ready_first_exact_sha_candidate_pass","production_base_sha":"c436ec53c5975cd5fba48a2b1bf8d1bd29785139","current_sheet":"materials-construction/02-joints-repairs","summary":{"planned_sheet_parts":10,"guarded_sheet_specs_ready":10,"canonical_exact_sha_candidates":1,"spec_ready_generation_pending":9,"archived_rejected_pre_spec_attempts":1},"rejected_attempts":{"materials-construction/01-surfaces-stock":[{"generation_id":"c5ae2857-4d1a-45dd-a7b1-0b14aaad2fa2","sha256":"8c95558ab5f43908b0024679822ce25860f6dd14cb05e9e9aeb0e3fba441213d","bytes":1448929,"dimensions":[1536,1024],"drive_file_id":"1Bhp4Ha1IehXWfgNO_uSWcSxZng5kUVcZ","review_file":"art/references/eras/e2_1998/reviews/materials-construction-01-surfaces-stock/attempt-00-c5ae2857.json","reason":"Generated before the E2 machine spec and production_guard request/chat-bridge existed. Visually useful but process-invalid; archived as rejected provenance and forbidden as canonical visual evidence."}]},"next_step":"After this documentation PR is merged, generate materials-construction/02-joints-repairs from its machine spec through validate-spec → build-request/chat-bridge → imagegen → verify-source → Drive archive → structured review; then continue the remaining pending sheets in planned order.","sheet_states":{"materials-construction/01-surfaces-stock":{"status":"exact_sha_visual_review_pass","generation_id":"f0a1cbd4-18bb-4a1f-8542-db63a31fc13f","drive_file_id":"1BzA8xC4iU3NwxuMnkcjykFZz5TOml83_","dimensions":[1536,1024],"bytes":1654749,"sha256":"7b49d0a3a8a85cd70482f5f3af6fd9a3948dcfe0c43f43f8e9e274c525984cad","scope_gate":"pass","style_family":"pass","era":"pass","sheet_readability":"pass","review_file":"art/references/eras/e2_1998/reviews/materials-construction-01-surfaces-stock/attempt-01-f0a1cbd4.json","exact_sha_visual_review":{"verdict":"pass","reviewer":"ChatGPT visual reviewer","method":"Exact-SHA untouched source archived in Drive; Drive readback bytes matched source SHA-256; structured per-sheet review passed all global and specimen gates."}},"materials-construction/02-joints-repairs":{"status":"spec_ready_generation_pending","spec":"art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json","prompt":"art/prompts/era_references/e2_1998/materials-construction-02-joints-repairs.md"},"materials-construction/03-service-architecture":{"status":"spec_ready_generation_pending","spec":"art/reference_specs/e2_1998/materials-construction-03-service-architecture.json","prompt":"art/prompts/era_references/e2_1998/materials-construction-03-service-architecture.md"},"mechanics-infrastructure/01-servo-drives":{"status":"spec_ready_generation_pending","spec":"art/reference_specs/e2_1998/mechanics-infrastructure-01-servo-drives.json","prompt":"art/prompts/era_references/e2_1998/mechanics-infrastructure-01-servo-drives.md"},"mechanics-infrastructure/02-precision-joints-handling":{"status":"spec_ready_generation_pending","spec":"art/reference_specs/e2_1998/mechanics-infrastructure-02-precision-joints-handling.json","prompt":"art/prompts/era_references/e2_1998/mechanics-infrastructure-02-precision-joints-handling.md"},"mechanics-infrastructure/03-diagnostic-utilities-routing":{"status":"spec_ready_generation_pending","spec":"art/reference_specs/e2_1998/mechanics-infrastructure-03-diagnostic-utilities-routing.json","prompt":"art/prompts/era_references/e2_1998/mechanics-infrastructure-03-diagnostic-utilities-routing.md"},"controls-displays/01-operator-controls":{"status":"spec_ready_generation_pending","spec":"art/reference_specs/e2_1998/controls-displays-01-operator-controls.json","prompt":"art/prompts/era_references/e2_1998/controls-displays-01-operator-controls.md"},"controls-displays/02-instruments-displays":{"status":"spec_ready_generation_pending","spec":"art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json","prompt":"art/prompts/era_references/e2_1998/controls-displays-02-instruments-displays.md"},"lighting-signals/01-lamps-fixtures":{"status":"spec_ready_generation_pending","spec":"art/reference_specs/e2_1998/lighting-signals-01-lamps-fixtures.json","prompt":"art/prompts/era_references/e2_1998/lighting-signals-01-lamps-fixtures.md"},"lighting-signals/02-signal-hardware":{"status":"spec_ready_generation_pending","spec":"art/reference_specs/e2_1998/lighting-signals-02-signal-hardware.json","prompt":"art/prompts/era_references/e2_1998/lighting-signals-02-signal-hardware.md"}}},"approval_gate":{"scope":"pending","style":"pending","era":"pending","role_completeness":"pending","cross_era_role_order":"pending"},"usage":{"required_for_future_generation":false,"reference_strategy":"E0 and E1 are approved atomic lineage evidence. E2 remains BLOCKED as canonical visual evidence until every required E2 sheet-part is complete, exact-SHA reviewed and the E1↔E2 cross-era role-order gate passes. The ten prepared E2 machine specs are generation contracts, not approved visual evidence. Previous broad reference boards, PR #45 correction boards and the archived pre-spec rejected attempt must not be used as canonical visual evidence.","system_separation":"Physical hardware/materials belong in art; active screen data, glow, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."}}
+{
+  "schema_version": 2,
+  "era": "E2",
+  "year": 1998,
+  "name": "Испытательный центр",
+  "status": "rebuild_required",
+  "approval_context": "E2 source generation complete: all 10 exact Drive-backed originals passed technical and structured visual review via pinned production_guard, and 4/4 E1↔E2 full-role visual ordering comparisons passed on 2026-11-05. Canonical E2 approval remains blocked on unconfirmed generator prompt-delivery provenance, independently unverified generation ID for lighting #9, and archive classification of the formerly rejected controls #8. Not yet canonical visual evidence.",
+  "authority": {
+    "rules": "art/docs/ERA_DESIGN_MATRIX.md",
+    "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
+    "style": "art/style_bible.txt",
+    "previous_era_reference": "art/references/eras/e1_1986/reference-set.json",
+    "anchor_era_reference": "art/references/eras/e0_1978/reference-set.json"
+  },
+  "transition_from_e1": {
+    "preserved": [
+      "industrial serviceability and standardized safety language",
+      "physical electromechanical construction with readable maintenance access"
+    ],
+    "replaced": [
+      "E1 workshop-centric modules with denser rack-based test/diagnostic electronics",
+      "primarily hydraulic/electromotor emphasis with motorized servo and motor-reducer systems",
+      "mixed industrial surfaces with stronger beige/gray technical-plastic and aluminium laboratory language",
+      "basic organized trays with more explicit routed harnesses, connectors and diagnostic cabling"
+    ],
+    "added": [
+      "bulky CRT diagnostic hardware and deep housings",
+      "electronic racks, ventilation grilles and replaceable electronics modules",
+      "denser grouped early LED indication and test instrumentation",
+      "specialized diagnostic connectors and service interfaces"
+    ],
+    "why": "The base has matured from a standardized workshop into a dedicated aerospace test center where diagnostics, instrumentation and motorized control are first-class infrastructure.",
+    "player_signal": "More electronics, deeper CRT hardware, dense routed cabling, diagnostic connectors and visibly motorized/servo components; E2 is technically busier than cleaner E3."
+  },
+  "raw_archive": {
+    "provider": "google_drive",
+    "folder_id": "10zBY-Einty7p9wbHZCDuQxQ-FqQnd5RE",
+    "folder_name": "E2_1998",
+    "rejected_folder_id": "1JbPCR1OjxlQji6AZnplUeq-wvdpTPTim"
+  },
+  "required_roles": [
+    "materials-construction",
+    "mechanics-infrastructure",
+    "controls-displays",
+    "lighting-signals"
+  ],
+  "sheet_density": {
+    "default_max_specimens_per_sheet": 8,
+    "current_generation_size": [
+      1536,
+      1024
+    ],
+    "preferred_grid": [
+      4,
+      2
+    ],
+    "nominal_cell_before_margins": [
+      384,
+      512
+    ]
+  },
+  "planned_sheets": [
+    {
+      "role": "materials-construction",
+      "sheet": "01-surfaces-stock",
+      "spec": "art/reference_specs/e2_1998/materials-construction-01-surfaces-stock.json",
+      "prompt": "art/prompts/era_references/e2_1998/materials-construction-01-surfaces-stock.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "02-joints-repairs",
+      "spec": "art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json",
+      "prompt": "art/prompts/era_references/e2_1998/materials-construction-02-joints-repairs.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "03-service-architecture",
+      "spec": "art/reference_specs/e2_1998/materials-construction-03-service-architecture.json",
+      "prompt": "art/prompts/era_references/e2_1998/materials-construction-03-service-architecture.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "01-servo-drives",
+      "spec": "art/reference_specs/e2_1998/mechanics-infrastructure-01-servo-drives.json",
+      "prompt": "art/prompts/era_references/e2_1998/mechanics-infrastructure-01-servo-drives.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "02-precision-joints-handling",
+      "spec": "art/reference_specs/e2_1998/mechanics-infrastructure-02-precision-joints-handling.json",
+      "prompt": "art/prompts/era_references/e2_1998/mechanics-infrastructure-02-precision-joints-handling.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "03-diagnostic-utilities-routing",
+      "spec": "art/reference_specs/e2_1998/mechanics-infrastructure-03-diagnostic-utilities-routing.json",
+      "prompt": "art/prompts/era_references/e2_1998/mechanics-infrastructure-03-diagnostic-utilities-routing.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "01-operator-controls",
+      "spec": "art/reference_specs/e2_1998/controls-displays-01-operator-controls.json",
+      "prompt": "art/prompts/era_references/e2_1998/controls-displays-01-operator-controls.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "02-instruments-displays",
+      "spec": "art/reference_specs/e2_1998/controls-displays-02-instruments-displays.json",
+      "prompt": "art/prompts/era_references/e2_1998/controls-displays-02-instruments-displays.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "01-lamps-fixtures",
+      "spec": "art/reference_specs/e2_1998/lighting-signals-01-lamps-fixtures.json",
+      "prompt": "art/prompts/era_references/e2_1998/lighting-signals-01-lamps-fixtures.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "02-signal-hardware",
+      "spec": "art/reference_specs/e2_1998/lighting-signals-02-signal-hardware.json",
+      "prompt": "art/prompts/era_references/e2_1998/lighting-signals-02-signal-hardware.md",
+      "specimens": 8,
+      "status": "exact_sha_visual_review_pass"
+    }
+  ],
+  "sheets": [
+    {
+      "role": "materials-construction",
+      "sheet": "01-surfaces-stock",
+      "sha256": "7b49d0a3a8a85cd70482f5f3af6fd9a3948dcfe0c43f43f8e9e274c525984cad",
+      "drive_file_id": "1BzA8xC4iU3NwxuMnkcjykFZz5TOml83_",
+      "review_file": "art/references/eras/e2_1998/reviews/materials-construction-01-surfaces-stock/attempt-01-f0a1cbd4.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "02-joints-repairs",
+      "sha256": "9851beb216da184b42213950cb1c8c5ab2319f918dd593eb992ce3c7647078bd",
+      "drive_file_id": "1DH7vTJrUv9aCBKEAHMevfyrcUg6vDFfy",
+      "review_file": "art/references/eras/e2_1998/reviews/materials-construction-02-joints-repairs/review-exactsha-9851beb216da.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "03-service-architecture",
+      "sha256": "c1fa2b491d19e8d8a490fc6f94c12f5bfffc3780fc6f45dc0b3725321906736c",
+      "drive_file_id": "1ew39Apxn6Y3HNr1Y39zD-pN70mUIbf3v",
+      "review_file": "art/references/eras/e2_1998/reviews/materials-construction-03-service-architecture/review-exactsha-c1fa2b491d19.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "01-servo-drives",
+      "sha256": "26cfe43548ac4854498f17473901fab8600c8f486e0aae121d1616b343466208",
+      "drive_file_id": "1V_p6ZkJIcTDD_zkDVrRv1Y48S51guuGA",
+      "review_file": "art/references/eras/e2_1998/reviews/mechanics-infrastructure-01-servo-drives/review-exactsha-26cfe43548ac.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "02-precision-joints-handling",
+      "sha256": "9ac402ff2ecfeccff9309a8dab9c128fe654feb17c5420fb4848f23e956965d0",
+      "drive_file_id": "1hgl5VxzwHMjlZ5zK5bi9CN8ygpfDerBl",
+      "review_file": "art/references/eras/e2_1998/reviews/mechanics-infrastructure-02-precision-joints-handling/review-exactsha-9ac402ff2ecf.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "03-diagnostic-utilities-routing",
+      "sha256": "bc224cbc8592d4991abb49b0535badb47220777bd2405f493c372ec3abb78f58",
+      "drive_file_id": "1qsUm48_0ICJZxEs7eLEQmeD7Gfgu2HWA",
+      "review_file": "art/references/eras/e2_1998/reviews/mechanics-infrastructure-03-diagnostic-utilities-routing/review-exactsha-bc224cbc8592.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "01-operator-controls",
+      "sha256": "e785d9b27eb5c76d9943181d1dae56bf505c04234d47bb5160b42e4a2e9495aa",
+      "drive_file_id": "1dJ0IM6EqsBXP2LvEfKOT62B5BUwaFaLn",
+      "review_file": "art/references/eras/e2_1998/reviews/controls-displays-01-operator-controls/review-exactsha-e785d9b27eb5.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "02-instruments-displays",
+      "sha256": "94a20b5286fddf040d26aa1a9b8c659ae442be823305fbb2eb94003ef24823f1",
+      "drive_file_id": "1FMqh2eLU8EPJEqZ3mBid-GnvWVweXUeu",
+      "review_file": "art/references/eras/e2_1998/reviews/controls-displays-02-instruments-displays/review-exactsha-94a20b5286fd.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "01-lamps-fixtures",
+      "sha256": "e4b5a850a5d8956f51e9facd1aead296b8e0112fd81b389cdd321c4434739db0",
+      "drive_file_id": "1QslGnYWse8mJxVb_59WFafAA20pOvnvX",
+      "review_file": "art/references/eras/e2_1998/reviews/lighting-signals-01-lamps-fixtures/review-exactsha-e4b5a850a5d8.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "02-signal-hardware",
+      "sha256": "7af32ccae49d3a274d6bf28ca7a79b92fc90abd4b29996a0bdb255e8bb7e3ef8",
+      "drive_file_id": "1N_hTKw9Tp4yD1oUJd9h0XI_3HIaPlixJ",
+      "review_file": "art/references/eras/e2_1998/reviews/lighting-signals-02-signal-hardware/review-exactsha-7af32ccae49d.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": false
+    }
+  ],
+  "generation_checkpoint": {
+    "status": "ten_exact_sha_visual_reviews_pass_provenance_pending",
+    "production_base_sha": "d13e3d0bfae45365b079ffd10ceffbaca13c89f3",
+    "current_sheet": "materials-construction/02-joints-repairs",
+    "summary": {
+      "planned_sheet_parts": 10,
+      "guarded_sheet_specs_ready": 10,
+      "exact_sha_source_review_pass": 10,
+      "full_role_visual_order_pass": 4,
+      "canonical_approved_set": 0,
+      "previously_approved_sheet_parts_retained": 1,
+      "source_prompt_provenance_pending": true
+    },
+    "rejected_attempts": {
+      "materials-construction/01-surfaces-stock": [
+        {
+          "generation_id": "c5ae2857-4d1a-45dd-a7b1-0b14aaad2fa2",
+          "sha256": "8c95558ab5f43908b0024679822ce25860f6dd14cb05e9e9aeb0e3fba441213d",
+          "bytes": 1448929,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "drive_file_id": "1Bhp4Ha1IehXWfgNO_uSWcSxZng5kUVcZ",
+          "review_file": "art/references/eras/e2_1998/reviews/materials-construction-01-surfaces-stock/attempt-00-c5ae2857.json",
+          "reason": "Generated before the E2 machine spec and production_guard request/chat-bridge existed. Visually useful but process-invalid; archived as rejected provenance and forbidden as canonical visual evidence."
+        }
+      ]
+    },
+    "next_step": "Recover original generator request provenance and sheet #9 real generation ID; reconcile #8 Drive archive status; then canonical E2 approval in a distinct user-approved step.",
+    "sheet_states": {
+      "materials-construction/01-surfaces-stock": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "f0a1cbd4-18bb-4a1f-8542-db63a31fc13f",
+        "drive_file_id": "1BzA8xC4iU3NwxuMnkcjykFZz5TOml83_",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "bytes": 1654749,
+        "sha256": "7b49d0a3a8a85cd70482f5f3af6fd9a3948dcfe0c43f43f8e9e274c525984cad",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/materials-construction-01-surfaces-stock/attempt-01-f0a1cbd4.json",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT visual reviewer",
+          "method": "Exact-SHA untouched source archived in Drive; Drive readback bytes matched source SHA-256; structured per-sheet review passed all global and specimen gates."
+        }
+      },
+      "materials-construction/02-joints-repairs": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "fe2f37f2-c4c1-419e-aa43-a5251c924b25",
+        "generation_id_verified": true,
+        "drive_file_id": "1DH7vTJrUv9aCBKEAHMevfyrcUg6vDFfy",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "dimension_delta_px": [
+          0,
+          0
+        ],
+        "bytes": 1787889,
+        "sha256": "9851beb216da184b42213950cb1c8c5ab2319f918dd593eb992ce3c7647078bd",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/materials-construction-02-joints-repairs/review-exactsha-9851beb216da.json",
+        "generator_request_sha256": "c8b09af7a28bc5ef5a174bc40ca34a95f05d32acd827c5fa492dcd002dcc5c77",
+        "generator_request_delivery_proven": "unknown",
+        "production_promotion_status": "pending",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT exact-source visual reviewer, 2026-11-05",
+          "method": "Pinned official production_guard validate-review --image PASS, complete E1/E2 role visual comparison. See structured report."
+        }
+      },
+      "materials-construction/03-service-architecture": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "b4d266e4-2382-4117-aa72-d17411c062f1",
+        "generation_id_verified": true,
+        "drive_file_id": "1ew39Apxn6Y3HNr1Y39zD-pN70mUIbf3v",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "dimension_delta_px": [
+          0,
+          0
+        ],
+        "bytes": 1884394,
+        "sha256": "c1fa2b491d19e8d8a490fc6f94c12f5bfffc3780fc6f45dc0b3725321906736c",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/materials-construction-03-service-architecture/review-exactsha-c1fa2b491d19.json",
+        "generator_request_sha256": "6b3aed4358b4b3a8863beb90bb14b0b407621479805b874967f70b22bc707b8a",
+        "generator_request_delivery_proven": "unknown",
+        "production_promotion_status": "pending",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT exact-source visual reviewer, 2026-11-05",
+          "method": "Pinned official production_guard validate-review --image PASS, complete E1/E2 role visual comparison. See structured report."
+        }
+      },
+      "mechanics-infrastructure/01-servo-drives": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "5301dcfc-afc7-4f9c-9500-ea70ad4ecb41",
+        "generation_id_verified": true,
+        "drive_file_id": "1V_p6ZkJIcTDD_zkDVrRv1Y48S51guuGA",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "dimension_delta_px": [
+          0,
+          0
+        ],
+        "bytes": 1733562,
+        "sha256": "26cfe43548ac4854498f17473901fab8600c8f486e0aae121d1616b343466208",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/mechanics-infrastructure-01-servo-drives/review-exactsha-26cfe43548ac.json",
+        "generator_request_sha256": "fcbe134f02cb8b97bfc1e6bbb14252bb1512d7997e701112170b145b1393ebe5",
+        "generator_request_delivery_proven": "unknown",
+        "production_promotion_status": "pending",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT exact-source visual reviewer, 2026-11-05",
+          "method": "Pinned official production_guard validate-review --image PASS, complete E1/E2 role visual comparison. See structured report."
+        }
+      },
+      "mechanics-infrastructure/02-precision-joints-handling": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "cfc9bca0-3aa7-4df3-9f64-181ac2d21f4f",
+        "generation_id_verified": true,
+        "drive_file_id": "1hgl5VxzwHMjlZ5zK5bi9CN8ygpfDerBl",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "dimension_delta_px": [
+          0,
+          0
+        ],
+        "bytes": 1671254,
+        "sha256": "9ac402ff2ecfeccff9309a8dab9c128fe654feb17c5420fb4848f23e956965d0",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/mechanics-infrastructure-02-precision-joints-handling/review-exactsha-9ac402ff2ecf.json",
+        "generator_request_sha256": "d990cfcf5114bf82d60b2533507994992d1655f34ba045eb793600577717ea18",
+        "generator_request_delivery_proven": "unknown",
+        "production_promotion_status": "pending",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT exact-source visual reviewer, 2026-11-05",
+          "method": "Pinned official production_guard validate-review --image PASS, complete E1/E2 role visual comparison. See structured report."
+        }
+      },
+      "mechanics-infrastructure/03-diagnostic-utilities-routing": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "621e62ae-3aab-49ce-ba2a-2005c87d3448",
+        "generation_id_verified": true,
+        "drive_file_id": "1qsUm48_0ICJZxEs7eLEQmeD7Gfgu2HWA",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "dimension_delta_px": [
+          0,
+          0
+        ],
+        "bytes": 1795734,
+        "sha256": "bc224cbc8592d4991abb49b0535badb47220777bd2405f493c372ec3abb78f58",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/mechanics-infrastructure-03-diagnostic-utilities-routing/review-exactsha-bc224cbc8592.json",
+        "generator_request_sha256": "1cd4f9d1151060f2abec19b2870d28a8c9b669e9b243076cb439a0c2be3cc50c",
+        "generator_request_delivery_proven": "unknown",
+        "production_promotion_status": "pending",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT exact-source visual reviewer, 2026-11-05",
+          "method": "Pinned official production_guard validate-review --image PASS, complete E1/E2 role visual comparison. See structured report."
+        }
+      },
+      "controls-displays/01-operator-controls": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "b3f811e7-dcf7-4962-b9fa-819c0237055a",
+        "generation_id_verified": true,
+        "drive_file_id": "1dJ0IM6EqsBXP2LvEfKOT62B5BUwaFaLn",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "dimension_delta_px": [
+          0,
+          0
+        ],
+        "bytes": 1587433,
+        "sha256": "e785d9b27eb5c76d9943181d1dae56bf505c04234d47bb5160b42e4a2e9495aa",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/controls-displays-01-operator-controls/review-exactsha-e785d9b27eb5.json",
+        "generator_request_sha256": "8df44b1ebd12367f3e88fb843cf30d7b36eb680e8aadbabce6085aef8b35c1b9",
+        "generator_request_delivery_proven": "unknown",
+        "production_promotion_status": "pending",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT exact-source visual reviewer, 2026-11-05",
+          "method": "Pinned official production_guard validate-review --image PASS, complete E1/E2 role visual comparison. See structured report."
+        }
+      },
+      "controls-displays/02-instruments-displays": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "a7fa418d-edf1-4cfc-9727-61ffad9e45a9",
+        "generation_id_verified": true,
+        "drive_file_id": "1FMqh2eLU8EPJEqZ3mBid-GnvWVweXUeu",
+        "dimensions": [
+          1535,
+          1024
+        ],
+        "dimension_delta_px": [
+          -1,
+          0
+        ],
+        "bytes": 1801199,
+        "sha256": "94a20b5286fddf040d26aa1a9b8c659ae442be823305fbb2eb94003ef24823f1",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/controls-displays-02-instruments-displays/review-exactsha-94a20b5286fd.json",
+        "generator_request_sha256": "6e23f57ef8711d4ebcdaf29701bd81308b7fb13559f598839514650d0ed24c65",
+        "generator_request_delivery_proven": "unknown",
+        "production_promotion_status": "pending",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT exact-source visual reviewer, 2026-11-05",
+          "method": "Pinned official production_guard validate-review --image PASS, complete E1/E2 role visual comparison. See structured report."
+        },
+        "source_archive_note": "Historical _rejected archive from pre-PR#103 one-pixel size failure; now passes ±1px guard, needs explicit archive reclassification."
+      },
+      "lighting-signals/01-lamps-fixtures": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "UNKNOWN_UNCONFIRMED",
+        "generation_id_verified": false,
+        "drive_file_id": "1QslGnYWse8mJxVb_59WFafAA20pOvnvX",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "dimension_delta_px": [
+          0,
+          0
+        ],
+        "bytes": 1684966,
+        "sha256": "e4b5a850a5d8956f51e9facd1aead296b8e0112fd81b389cdd321c4434739db0",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/lighting-signals-01-lamps-fixtures/review-exactsha-e4b5a850a5d8.json",
+        "generator_request_sha256": "ff825d22e23501babde9628fe10c9c5ce19efd6e709925043e397a50e7688c71",
+        "generator_request_delivery_proven": "unknown",
+        "production_promotion_status": "pending",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT exact-source visual reviewer, 2026-11-05",
+          "method": "Pinned official production_guard validate-review --image PASS, complete E1/E2 role visual comparison. See structured report."
+        },
+        "generation_id_note": "Generator ID not independently confirmed; filename candidate_v3 and user local QA are not generator metadata."
+      },
+      "lighting-signals/02-signal-hardware": {
+        "status": "exact_sha_visual_review_pass",
+        "generation_id": "6973c433-8cc2-4057-b356-7525f416c1aa",
+        "generation_id_verified": true,
+        "drive_file_id": "1N_hTKw9Tp4yD1oUJd9h0XI_3HIaPlixJ",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "dimension_delta_px": [
+          0,
+          0
+        ],
+        "bytes": 1676695,
+        "sha256": "7af32ccae49d3a274d6bf28ca7a79b92fc90abd4b29996a0bdb255e8bb7e3ef8",
+        "scope_gate": "pass",
+        "style_family": "pass",
+        "era": "pass",
+        "sheet_readability": "pass",
+        "review_file": "art/references/eras/e2_1998/reviews/lighting-signals-02-signal-hardware/review-exactsha-7af32ccae49d.json",
+        "generator_request_sha256": "d84b774cf84460e6d23a8b9bce220b501d43d04a2aae5c76d2cf855250c0b759",
+        "generator_request_delivery_proven": "unknown",
+        "production_promotion_status": "pending",
+        "exact_sha_visual_review": {
+          "verdict": "pass",
+          "reviewer": "ChatGPT exact-source visual reviewer, 2026-11-05",
+          "method": "Pinned official production_guard validate-review --image PASS, complete E1/E2 role visual comparison. See structured report."
+        }
+      }
+    }
+  },
+  "approval_gate": {
+    "scope": "pass_all_10_exact_sha_reviews",
+    "style": "pass_all_10_exact_sha_reviews",
+    "era": "pass_all_10_exact_sha_reviews",
+    "sheet_readability": "pass_all_10_exact_sha_reviews",
+    "role_completeness": "pass_all_four_roles",
+    "cross_era_role_order": "pass_e1_e2_all_four_roles",
+    "generator_request_provenance": "pending",
+    "archive_classification": "pending_controls_displays_02",
+    "canonical_set_approval": "pending"
+  },
+  "usage": {
+    "required_for_future_generation": false,
+    "reference_strategy": "E2 is a reviewed but NOT YET CANONICAL visual reference set. E1 remains approved lineage while original generation provenance and #8 archive status are reconciled; source QA and 4-role E1↔E2 review PASS do not override the pending canonical approval gate.",
+    "system_separation": "Physical hardware/materials belong in art; active screen data, glow, motion, sparks, fields and temporary FX remain code-owned unless explicitly scoped otherwise."
+  },
+  "cross_era_review_file": "art/references/eras/e2_1998/reviews/cross-era-e1-e2-role-order.json"
+}

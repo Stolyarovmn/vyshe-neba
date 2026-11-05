@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/materials-construction-02-joints-repairs.json",
+  "generation_id": "fe2f37f2-c4c1-419e-aa43-a5251c924b25",
+  "source": {
+    "sha256": "9851beb216da184b42213950cb1c8c5ab2319f918dd593eb992ce3c7647078bd",
+    "bytes": 1787889,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1DH7vTJrUv9aCBKEAHMevfyrcUg6vDFfy",
+    "drive_url": "https://drive.google.com/file/d/1DH7vTJrUv9aCBKEAHMevfyrcUg6vDFfy/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Precision folded chassis corner with captive threaded inserts",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 1 (Precision folded chassis corner with captive threaded inserts), matched to canonical machine spec."
+    },
+    {
+      "id": "02",
+      "name": "Flush countersunk aluminium lap joint",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 2 (Flush countersunk aluminium lap joint), matched to canonical machine spec."
+    },
+    {
+      "id": "03",
+      "name": "Reinforced captive-thread mounting point",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 3 (Reinforced captive-thread mounting point), matched to canonical machine spec."
+    },
+    {
+      "id": "04",
+      "name": "Precision interlocking tab-and-slot chassis seam",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 4 (Precision interlocking tab-and-slot chassis seam), matched to canonical machine spec."
+    },
+    {
+      "id": "05",
+      "name": "Removable rack-ear-to-chassis joint",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 5 (Removable rack-ear-to-chassis joint), matched to canonical machine spec."
+    },
+    {
+      "id": "06",
+      "name": "Precision locating dowel-and-bushing service joint",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 6 (Precision locating dowel-and-bushing service joint), matched to canonical machine spec."
+    },
+    {
+      "id": "07",
+      "name": "Replaceable precision reinforcement doubler",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 7 (Replaceable precision reinforcement doubler), matched to canonical machine spec."
+    },
+    {
+      "id": "08",
+      "name": "Rack-rail structural corner node with captive nut strip",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 8 (Rack-rail structural corner node with captive nut strip), matched to canonical machine spec."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer, 2026-11-05",
+  "review_method": "Direct visual inspection of exact-SHA originals and E1/E2 same-role montage; earlier user feedback incorporated.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "provenance_extensions": {
+    "generator_request_sha256": "c8b09af7a28bc5ef5a174bc40ca34a95f05d32acd827c5fa492dcd002dcc5c77",
+    "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
+    "generation_id_verified": true,
+    "notes": ""
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e2_1998/mechanics-infrastructure-02-precision-joints-handling.json",
+  "generation_id": "cfc9bca0-3aa7-4df3-9f64-181ac2d21f4f",
+  "source": {
+    "sha256": "9ac402ff2ecfeccff9309a8dab9c128fe654feb17c5420fb4848f23e956965d0",
+    "bytes": 1671254,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1hgl5VxzwHMjlZ5zK5bi9CN8ygpfDerBl",
+    "drive_url": "https://drive.google.com/file/d/1hgl5VxzwHMjlZ5zK5bi9CN8ygpfDerBl/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Maintenance-free spherical rod-end bearing",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 1 (Maintenance-free spherical rod-end bearing), matched to canonical machine spec."
+    },
+    {
+      "id": "02",
+      "name": "Clevis joint with spherical-bearing cartridge",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 2 (Clevis joint with spherical-bearing cartridge), matched to canonical machine spec."
+    },
+    {
+      "id": "03",
+      "name": "Recirculating linear-guide carriage on short rail",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 3 (Recirculating linear-guide carriage on short rail), matched to canonical machine spec."
+    },
+    {
+      "id": "04",
+      "name": "Preloaded sealed guide-roller carriage",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 4 (Preloaded sealed guide-roller carriage), matched to canonical machine spec."
+    },
+    {
+      "id": "05",
+      "name": "Electric wire-rope winch with encoder/brake module",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 5 (Electric wire-rope winch with encoder/brake module), matched to canonical machine spec."
+    },
+    {
+      "id": "06",
+      "name": "Electric chain-hoist module with limit-switch housings",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 6 (Electric chain-hoist module with limit-switch housings), matched to canonical machine spec."
+    },
+    {
+      "id": "07",
+      "name": "Gas-spring counterbalance strut with ball-joint ends",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 7 (Gas-spring counterbalance strut with ball-joint ends), matched to canonical machine spec."
+    },
+    {
+      "id": "08",
+      "name": "Compact rotary indexing bearing-and-lock module",
+      "verdict": "pass",
+      "notes": "Direct exact-SHA visual review: correct physical specimen and grid cell 8 (Compact rotary indexing bearing-and-lock module), matched to canonical machine spec."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer, 2026-11-05",
+  "review_method": "Direct visual inspection of exact-SHA originals and E1/E2 same-role montage; earlier user feedback incorporated.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "provenance_extensions": {
+    "generator_request_sha256": "d990cfcf5114bf82d60b2533507994992d1655f34ba045eb793600577717ea18",
+    "literal_request_delivery": "UNKNOWN; deterministic request digest is not proof of actual generator delivery",
+    "generation_id_verified": true,
+    "notes": ""
+  }
+}
