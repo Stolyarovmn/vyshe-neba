@@ -1,0 +1,48 @@
+{
+  "camera": {
+    "projection_angle": "UNKNOWN",
+    "generation_elevation_proxy_deg": 73.44,
+    "family": "island_top_3_4",
+    "projection_calibration_file": "art/gen/environment/start_island_hd.projection.json",
+    "ground_plane_compression_target": 0.958515,
+    "generation_tilt_from_top_down_proxy_deg": 16.56,
+    "current_hd_reference_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997"
+  },
+  "brief_file": "art/briefs/B02_tracking_radar_E0.md",
+  "asset_id": "B02",
+  "year": 1978,
+  "slug": "tracking_radar",
+  "source_archive": {
+    "original_must_be_immutable": true,
+    "sha256_required_before_processing": true,
+    "verified_present": true,
+    "provider": "google_drive",
+    "folder_id": "1CHm6Htn-ujhWBOpfKX97PubGJGYE2qFl"
+  },
+  "schema_version": 1,
+  "style_bible_file": "art/style_bible.txt",
+  "runtime_contract": {
+    "status": "blocked_missing_target"
+  },
+  "prompt_file": "art/prompts/b02_tracking_radar.md",
+  "generation_gate": {
+    "can_generate_isolated_candidate": true,
+    "one_asset_per_call": true,
+    "can_promote_to_production": false,
+    "style_bible_verbatim": true,
+    "one_era_per_call": true,
+    "can_publish_runtime": false,
+    "transparent_background": true,
+    "can_scene_approve": false
+  },
+  "era": "E0",
+  "machine_pipeline": {
+    "configured": false,
+    "colors": 32,
+    "registration": null,
+    "pipeline_config_version": 3,
+    "canvas": null,
+    "pixel_size": null
+  },
+  "generation_kind": "first_isolated_e0_source"
+}

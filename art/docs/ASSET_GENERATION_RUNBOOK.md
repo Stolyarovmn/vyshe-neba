@@ -172,3 +172,7 @@ Always re-pin current branch heads before acting. Dated evidence below is not a 
 - current `main` has no `game/test` directory, so runtime workflow is a manifest/build/checksum gate, not a full B03 gameplay regression suite.
 
 The old production-side runtime `game-ci.yml` is not part of `game-production`. Runtime build assumptions must stay in the clean `main` tree.
+
+### Первый исходник E0 до настройки обработки
+
+Если для семейства нет принятого исходника и параметры обработки определяются после его проверки, receipt может указать generation_kind = first_isolated_e0_source. В этом режиме machine_pipeline.configured должен быть false, а разрешения проверки сцены, продвижения и публикации должны быть явно закрыты. После приёмки исходника нужно измерить параметры обработки и перейти на обычную проверку. Остальные требования к входным материалам и архивированию действуют на обеих стадиях.
