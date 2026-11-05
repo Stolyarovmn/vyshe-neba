@@ -30,7 +30,7 @@
     {
       "id": "01",
       "name": "Captive quarter-turn fastener",
-      "description": "TOP ROW CELL 1 ONLY. ONE flush-mounted quarter-turn captive fastener through a SMALL thin panel fragment, clearly visible slotted turn head and flat retaining washer; show retention in panel, no loose separate screws or whole hatch."
+      "description": "TOP ROW CELL 1 ONLY. ONE quarter-turn captive fastener installed in ONE small thin off-white panel fragment, shown as a clear physical partial CUTAWAY in slight three-quarter view: retain the slotted turn head and its flush washer on the upper face, expose the same fastener shaft through the panel, and show ONE small metal retaining circlip fitted around the shaft in a groove immediately BELOW the underside of the panel. The circlip must be visibly wider than the panel hole so the shaft cannot withdraw upward; it stays attached, not a loose extra object. Show the panel upper and underside clearly in the same single specimen. No exploded view, no separate spare fastener, no whole hatch."
     },
     {
       "id": "02",
@@ -85,7 +85,8 @@
       "eight different passive joint and repair constructions, clear load paths and serviceable interfaces",
       "composite bonded stepped scarf and potted sandwich insert visibly distinct from bolted metal splice",
       "clean modular edges and local mounting fragments only, no complete assemblies",
-      "cohesive HD pixel art following the complete verbatim style bible"
+      "cohesive HD pixel art following the complete verbatim style bible",
+      "Edit the supplied source sheet: retain the appearance, positions, style and background of the other seven cells, and change only cell 1 to expose the captive retaining circlip beneath the panel."
     ],
     "replaced_previous_language": [
       "E2 visible simple folded sheet-metal and threaded inserts supplemented by bonded composite scarf and potted sandwich inserts",
