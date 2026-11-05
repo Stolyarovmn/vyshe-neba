@@ -30,7 +30,7 @@
     {
       "id": "01",
       "name": "Cross-roller bearing block",
-      "description": "TOP ROW CELL 1 ONLY. ONE compact square preloaded bearing block with a central circular bore and a partial cutaway revealing alternating perpendicular crossed rollers in a circular race, not a plain ball bearing or whole drive."
+      "description": "TOP ROW CELL 1 ONLY. ONE compact square cross-roller bearing block with central bore. In a generous section cutaway show successive cylindrical rollers along the circular race alternating orientations at RIGHT ANGLES: one roller slants /, its adjacent roller slants \\, next roller /, and so on. Alternate roller axes by 90 degrees; no parallel-only roller cluster and no loose pieces."
     },
     {
       "id": "02",
@@ -40,7 +40,7 @@
     {
       "id": "03",
       "name": "Harmonic-drive joint module",
-      "description": "TOP ROW CELL 3 ONLY. ONE short sealed annular harmonic-drive joint with a stationary outer housing, central output flange and a small section cutaway revealing flexible toothed spline and elliptical wave generator; no separate motor or robotic arm."
+      "description": "TOP ROW CELL 3 ONLY. ONE short sealed harmonic-drive joint with a large explanatory physical cutaway integrated into the housing. Show an unmistakably ELLIPTICAL oval inner wave generator and a THIN FLEXIBLE toothed cup hugging the oval, meshing with the fixed circular outer spline at two opposite points. The oval deformation and tooth engagement must be visible and physically legible. No simple circular spur gear, no motor or robotic arm."
     },
     {
       "id": "04",
@@ -50,7 +50,7 @@
     {
       "id": "05",
       "name": "Quick-fit tool coupler",
-      "description": "BOTTOM ROW CELL 1 ONLY. ONE compact round quick-fit mechanical tool coupler: two aligned mating discs partially engaged, with a clearly visible rotating bayonet locking ring and three lock lugs. No separate tool, gripper or actuator."
+      "description": "BOTTOM ROW CELL 1 ONLY. ONE compact round quick-fit mechanical tool coupler made of TWO coaxial mating discs IN PHYSICAL CONTACT, partly engaged at the rim, with a visible rotary bayonet locking ring and three locking lugs entering matching slots. Both discs touch and form one joined assembly, NO gap, NO exploded view, no separate tool or loose piece."
     },
     {
       "id": "06",
@@ -86,7 +86,8 @@
       "bearing, roller carriage, harmonic joint and telescopic slide must have different silhouettes and visible working geometry",
       "tool coupler, isolator foot, sensor-ready clevis and leadscrew carriage must each show its causal mechanical interface",
       "no entire robot, vehicle or facility; only short serviceable components",
-      "style bible verbatim with upper-left lighting and deliberate pixel clusters"
+      "style bible verbatim with upper-left lighting and deliberate pixel clusters",
+      "Edit the supplied sheet: change only top row cells 1 and 3 and bottom row cell 1 to correct the bearing, harmonic joint and joined coupler; keep the appearance, positions and style of the other five cells."
     ],
     "replaced_previous_language": [
       "E2 exposed joint bearings and simple roller carts evolve into preloaded crossed-roller bearings and sealed recirculating guide cartridges",
