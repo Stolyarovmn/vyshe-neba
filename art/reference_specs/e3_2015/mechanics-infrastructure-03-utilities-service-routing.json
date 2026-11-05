@@ -30,7 +30,7 @@
     {
       "id": "01",
       "name": "Blind-mate connector pair",
-      "description": "TOP ROW CELL 1 ONLY. ONE compact blind-mate electrical connector pair with TWO aligned rectangular halves in PHYSICAL CONTACT, partially engaged: guide pins from one half enter matching guide holes in the other half and the front edges overlap slightly, leaving a narrow seam but NO empty gap between the housings. Show recessed protected contacts within a small cutaway if necessary. No cable tails, no fully detached or floating half, no loose pieces."
+      "description": "TOP ROW CELL 1 ONLY. ONE blind-mate electrical connector PAIR shown with its two complementary halves side by side and slightly separated within this same single cell, clearly revealing protected contacts, self-aligning guide pins and mating openings. Both halves belong to one connector pair, with no cable tails or other separate accessories. Keep the two housings visibly distinct; do not fuse or overlap their contact faces."
     },
     {
       "id": "02",
@@ -87,7 +87,7 @@
       "moving cable carrier is enclosed; no exposed wire bundle; passive floor cover is not a cable chain",
       "cooling plate, filter receiver and sealed diagnostic flap have visibly different physical functions",
       "upper-left illumination, deliberate pixel clusters and exact style bible",
-      "Edit the supplied sheet: change ONLY the first cell so that the two aligned connector halves touch and the guide pins enter their mating holes. Preserve the appearance, positions and style of the other seven cells."
+      "The blind-mate connector pair may be shown separated within its cell so both mating faces, contacts and guide pins are readable; the pair counts as one planned example."
     ],
     "replaced_previous_language": [
       "E2 external harnesses and exposed trays transition to protected short enclosed cable carriers and sealed panel feedthrough",
