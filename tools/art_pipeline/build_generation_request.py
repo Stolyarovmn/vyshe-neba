@@ -120,6 +120,9 @@ def main() -> int:
         "Attach the exact approved island PNG as the camera reference. Match the visible top and side planes of comparable ground objects. "
         "Show the top of the grounded base clearly and keep the exposed vertical wall consistent with the island. "
         "Do not confuse the tilt of a moving part with the camera elevation. Avoid a frontal product view.\n"
+        "Make the physical load path readable: continuous members where the design is one piece, visible fasteners, welds, or through-mounts at real connections. "
+        "Keep pivot axes and supports mechanically coherent. Match the ground-facing geometry to the reference, without reverse perspective taper. "
+        "Use a silhouette and mechanism specific to the selected era; exclude neighboring-era features that could change its identity.\n"
         + (
             "For native transparency, keep solid material interiors opaque and empty space transparent. Avoid a colored or translucent fringe.\n"
             if gate.get("alpha_strategy", "native_transparent") == "native_transparent"
