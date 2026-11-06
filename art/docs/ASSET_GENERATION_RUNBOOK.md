@@ -87,6 +87,8 @@ Immediately after every production generation attempt, including a rejected one:
 4. record generation ID, Drive file ID/URL, SHA-256, size, era, prompt/preflight evidence and verdict;
 5. move meaningful rejected originals to the asset `_rejected` folder when present, preserving exact bytes.
 
+For native-alpha sources, run `python tools/art_pipeline/inspect_sprite_alpha.py <original.png> --preview <alpha-check.png>` and inspect both backgrounds at gameplay scale. The script samples the interior separately from edges. Intermediate alpha alone does not establish visible show-through. Reject visible contamination or unwanted translucency using the preview and interior evidence together. Enforce exact binary alpha on the processed sprite via `qa_sprite.py`. Apply the separate transport rules to opaque chroma-key sources.
+
 Reject at **source gate** if subject, era, camera/projection family, parts, silhouette, era-language or exclusions are wrong. A source geometry/projection/era defect is not repaired by Pixel Snapper or normalization.
 
 ## 4. Placeable machine pipeline

@@ -103,7 +103,15 @@ def main() -> int:
         "This numeric value is an orthographic-equivalent control derived from the approved island reference, NOT a claim about its original 3D camera. "
         "Match the exact approved island reference visually; if the numeric proxy and the reference appearance differ, the reference wins.\n"
         f"Projection calibration: {calibration_rel}; reference SHA-256: {calibration.get('reference_sha256')}\n"
-        f"Projection review: {camera.get('projection_review', 'UNKNOWN')}\n"
+        "Attach the exact approved island PNG as the camera reference. Match the visible top and side planes of comparable ground objects. "
+        "Show the top of the grounded base clearly and keep the exposed vertical wall consistent with the island. "
+        "Do not confuse the tilt of a moving part with the camera elevation. Avoid a frontal product view.\n"
+        + (
+            "For native transparency, keep solid material interiors opaque and empty space transparent. Avoid a colored or translucent fringe.\n"
+            if gate.get("alpha_strategy", "native_transparent") == "native_transparent"
+            else ""
+        )
+        + f"Projection review: {camera.get('projection_review', 'UNKNOWN')}\n"
         "This call creates source art only. Scene approval, production promotion, runtime publication, runtime integration, rig/FX and game tests are separate gates.\n"
     )
 
