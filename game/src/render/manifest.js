@@ -358,7 +358,7 @@ export const BUILDING_ANCHORS = {
   fuel: { zone: 'fuel_east', anchors: [[870, 470]], size: [160, 82], footprint: [138, 26] },
   logistics: { zone: 'logistics_east', anchors: [[1200, 470]], size: [141, 125], footprint: [121, 30] },
   factory: { zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34] },
-  weather: { zone: 'command_north', anchors: [[1000, 350]], size: [142, 180], footprint: [100, 28] },
+  weather: { zone: 'command_north', anchors: [[1000, 350]], size: [143, 171], footprint: [100, 28] },
   control: { zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34] },
   radar: { zone: 'command_north', anchors: [[798, 174]], size: [150, 88], footprint: [92, 24] },
   energy: { zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30] },
