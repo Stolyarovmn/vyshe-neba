@@ -11,6 +11,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from PIL import Image
+
 from verify_visual_gate import verify_island, verify_png_bytes
 
 PNG_SIG = b"\x89PNG\r\n\x1a\n"
@@ -80,10 +82,39 @@ def verify_source_review(source: Path, review_path: Path, expected_sha: str,
     return errors
 
 
+def verify_alpha_transport(source: Path, gate: dict) -> list[str]:
+    strategy = gate.get("alpha_strategy", "native_transparent")
+    with Image.open(source) as image:
+        rgba = image.convert("RGBA")
+        alpha = rgba.getchannel("A")
+        low, high = alpha.getextrema()
+        width, height = rgba.size
+        boundary = (
+            rgba.crop((0, 0, width, 1)),
+            rgba.crop((0, height - 1, width, height)),
+            rgba.crop((0, 0, 1, height)),
+            rgba.crop((width - 1, 0, width, height)),
+        )
+        if strategy == "native_transparent":
+            if low != 0 or high < 128 or any(edge.getchannel("A").getextrema()[1] >= 128 for edge in boundary):
+                return ["native alpha requires transparent background and a visible silhouette clear of the canvas boundary"]
+            return []
+        if strategy == "opaque_chroma_key":
+            color = gate["source_transport"]["key_color_hex"].lstrip("#")
+            key = tuple(bytes.fromhex(color)) + (255,)
+            if low != 255 or any(edge.getcolors(1) != [(edge.width * edge.height, key)] for edge in boundary):
+                return ["chroma key requires a fully opaque PNG with the exact key color around the canvas boundary"]
+            if rgba.getcolors(1) == [(width * height, key)]:
+                return ["chroma key source contains no visible object"]
+            return []
+    return [f"unknown source alpha strategy: {strategy}"]
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--source", required=True)
     p.add_argument("--review", required=True)
+    p.add_argument("--preflight", type=Path, help="Generation receipt defining raw alpha transport")
     p.add_argument("--expected-source-sha", required=True)
     p.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[2]))
     args = p.parse_args()
@@ -91,6 +122,9 @@ def main() -> None:
     island_sha, proxy = verify_island(Path(args.repo_root).resolve())
     errors = verify_source_review(Path(args.source).resolve(), Path(args.review).resolve(),
                                   args.expected_source_sha, island_sha, proxy)
+    if not errors and args.preflight:
+        receipt = json.loads(args.preflight.read_text(encoding="utf-8"))
+        errors = verify_alpha_transport(Path(args.source), receipt["generation_gate"])
     if errors:
         raise SystemExit("SOURCE_PROJECTION_GATE_BLOCKED: " + "; ".join(errors))
     print(json.dumps({

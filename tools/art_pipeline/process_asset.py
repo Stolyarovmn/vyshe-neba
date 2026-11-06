@@ -134,9 +134,11 @@ def main():
                     if not raw_original.is_relative_to(repo):
                         raise SystemExit('SOURCE_PROJECTION_GATE_BLOCKED: original PNG path escapes production tree')
                 source_review = repo / 'art/qa/placeables/base' / cfg['asset'] / f'{stem}.source_review.json'
+                receipt = repo / 'art/briefs' / f"{a.asset}_{cfg['asset']}_{era['era']}.preflight.json"
+                transport_args = ['--preflight', receipt] if receipt.is_file() else []
                 run(sys.executable, repo/'tools/art_pipeline/verify_ground_source_gate.py',
                     '--source', raw_original, '--review', source_review,
-                    '--expected-source-sha', original_sha, '--repo-root', repo)
+                    '--expected-source-sha', original_sha, '--repo-root', repo, *transport_args)
 
             presnap=work/(f'{stem}_presnap_grid.png' if cfg['adapter']=='presnap_png' else f'{stem}_presnap.png')
             fp=fingerprint({'step':'source_prepare','source':source_stat,'adapter':cfg['adapter'],'transport_scale':cfg.get('transport_scale',1),'canvas':cfg['canvas'],'pixel_size':pixel_size,'decoder_sha256':maybe_sha(decoder)})
