@@ -1,0 +1,35 @@
+{
+  "era": "E0",
+  "status": "approved_static_anchor",
+  "pixel_snapper": {
+    "colors": 32,
+    "pixel_size": 11
+  },
+  "year": 1978,
+  "visual_review": {
+    "method": "exact indexed export composited on approved island",
+    "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+    "reviewer": "assistant_self_review",
+    "verdict": "pass"
+  },
+  "final_sha256": "1d69c1ccdbe4d66aba5b7ad100f1ae01fdf87ac6a28d279995755b325c5ded35",
+  "asset_id": "B02",
+  "source_sha256": "92340771b6b0d5ce95fd58290c6d09e4f8f4603aa81d1568cafdad009d1c0654",
+  "source_drive_id": "13sepr8KzljyuO-KbdMV9O0IsGEZTCkzI",
+  "aseprite": {
+    "color_mode": "indexed",
+    "dithering": "none"
+  },
+  "runtime_status": "blocked_missing_target",
+  "normalize": {
+    "alpha_threshold": 128,
+    "canvas": [
+      134,
+      118
+    ],
+    "registration": [
+      67,
+      116
+    ]
+  }
+}
