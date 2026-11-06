@@ -17,6 +17,8 @@ export const CAMERA_TUNING = {
   lookAheadSeconds: 0.35,
   maxShake: 5, // ед. мира при trauma = 1
   traumaDecay: 1.5,
+  kickShake: 2, // ед. мира при толчке kick = 1 (близкий пролёт мимо помехи: слабый короткий толчок)
+  kickDecay: 4, // 1/с: толчок затухает за ~0,25 с
   horizontalSpeed: 30, // ед./с: выше этой горизонтальной скорости якорь уезжает к центру
   rumbleShake: 0.35, // доля maxShake от постоянной вибрации двигателя
 };
@@ -49,6 +51,7 @@ export function createCamera() {
     zoom: 1,
     blend: 0,
     trauma: 0,
+    kick: 0,
     rumble: 0,
     time: 0,
     shakeX: 0,
@@ -66,6 +69,7 @@ export function createCamera() {
       camera.x = target.x + look.x;
       camera.y = target.y + look.y;
       camera.trauma = 0;
+      camera.kick = 0;
       camera.shakeX = 0;
       camera.shakeY = 0;
     },
@@ -85,6 +89,7 @@ export function createCamera() {
       camera.x = damp(camera.x, target.x + look.x, CAMERA_TUNING.followX, dt);
       camera.y = damp(camera.y, target.y + look.y, CAMERA_TUNING.followY, dt);
       camera.trauma = camera.reduceMotion ? 0 : Math.max(0, camera.trauma - CAMERA_TUNING.traumaDecay * dt);
+      camera.kick = camera.reduceMotion ? 0 : Math.max(0, camera.kick - CAMERA_TUNING.kickDecay * dt);
       updateShake(camera);
     },
 
@@ -92,6 +97,12 @@ export function createCamera() {
     addTrauma(amount) {
       if (camera.reduceMotion) return;
       camera.trauma = clamp(camera.trauma + amount, 0, 1);
+    },
+
+    /** Короткий слабый толчок (0..1), затухает за ~0,25 с, не складывается с trauma. При reduceMotion игнорируется. */
+    addKick(amount) {
+      if (camera.reduceMotion) return;
+      camera.kick = clamp(Math.max(camera.kick, amount), 0, 1);
     },
 
     /** Постоянная вибрация (тяга, перегрев) 0..1; не складывается и не затухает сама. */
@@ -102,6 +113,7 @@ export function createCamera() {
     reset() {
       camera.ready = false;
       camera.trauma = 0;
+      camera.kick = 0;
       camera.rumble = 0;
       camera.shakeX = 0;
       camera.shakeY = 0;
@@ -145,12 +157,13 @@ function lookOffset(target, layout, zoom) {
 
 function updateShake(camera) {
   const level = Math.max(camera.trauma * camera.trauma, camera.rumble * camera.rumble * CAMERA_TUNING.rumbleShake);
-  if (camera.reduceMotion || level <= 0) {
+  const kick = camera.kick * CAMERA_TUNING.kickShake;
+  if (camera.reduceMotion || (level <= 0 && kick <= 0)) {
     camera.shakeX = 0;
     camera.shakeY = 0;
     return;
   }
-  const power = level * CAMERA_TUNING.maxShake;
+  const power = Math.max(level * CAMERA_TUNING.maxShake, kick);
   camera.shakeX = wobble(camera.time, 1) * power;
   camera.shakeY = wobble(camera.time, 2) * power;
 }

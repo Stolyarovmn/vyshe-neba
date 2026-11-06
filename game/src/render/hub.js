@@ -82,7 +82,12 @@ export function createHub(painter, shared) {
     { x: 27, y: 21, rate: 5, drift: 1 },
     { x: 0, y: 60, rate: 3, drift: 0 },
   ];
-  const mistVent = [{ x: 56, y: 22, rate: 8, drift: 2 }];
+  // водяная взвесь у сопел охлаждения: сопла башни справа и на две трети высоты, поэтому точка считается по якорю постройки
+  const mistVent = (() => {
+    const spec = BUILDING_ANCHORS.deluge;
+    const [wx, wy] = islandToWorld(spec.anchors[0][0], spec.anchors[0][1]);
+    return [{ x: wx + spec.size[0] * ISLAND.unitsPerPx * 0.3, y: wy - spec.size[1] * ISLAND.unitsPerPx * 0.35, rate: 8, drift: 2 }];
+  })();
 
   /** Рамки хранятся по идентификатору key#n: у парных построек (маяки) их несколько, и ракета между ними остаётся доступной. */
   function rectFor(key, index) {

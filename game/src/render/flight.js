@@ -14,8 +14,10 @@ import { drawLaunchMount, drawPadRing } from './launchpad.js';
 import { drawObjects, drawObjectsFront, drawRadarMarks, warmRings } from './objects.js';
 import { createRingFx } from './rings.js';
 import { drawMagnetField } from './magnet.js';
+import { createProximity } from './proximity.js';
 import {
-  drawFlash, drawLandingZone, drawPadPointer, drawPredict, drawSpeedLines, drawTransferWarp, landingZoneAlpha,
+  SHADOW_RANGE, drawFlash, drawFlatShadow, drawLandingZone, drawPadPointer, drawPredict, drawSpeedLines, drawTransferWarp,
+  groundMarkAlpha, heightAboveGround, landingBeamAlpha, landingZoneAlpha, shadowGeometry,
 } from './overlays.js';
 import { PALETTE_VARIANT, PARTICLE, createParticles } from './particles.js';
 import {
@@ -55,10 +57,12 @@ export function createFlightRenderer(painter, shared) {
   const view = createView();
   const mapView = createMapView();
   const groundTr = { s: 1, ox: 0, oy: 0 };
+  const shadowBox = { dx: 0, dy: 0, rx: 0, ry: 0 };
   const particles = createParticles(900);
   const fx = createScreenFx();
   const ringFx = createRingFx();
   const sceneInfo = { body: 'earth' };
+  const proximity = createProximity();
   const rng = createRng(0x51f7);
   const pose = createRocketPose();
   const pieces = makePieces();
@@ -100,6 +104,7 @@ export function createFlightRenderer(painter, shared) {
     fx.flash = 0;
     fx.slowmo = 0;
     ringFx.clear();
+    proximity.reset();
     const era = flight && flight.cfg ? clamp(flight.cfg.era | 0, 0, 5) : null;
     if (era !== null) {
       env.era = era;
@@ -383,19 +388,23 @@ export function createFlightRenderer(painter, shared) {
    */
   function drawEarthGround(ctx, flight, profile, time) {
     const altitude = Math.max(0, flight.alt ?? -flight.y);
+    const height = heightAboveGround(flight);
     const seaAlpha = 1 - smoothstep(900, 3000, altitude);
     if (seaAlpha <= 0.01) return;
     groundTransform(groundTr, altitude, view.S, view.sy(flight.y), view.ax, view.camX);
     mapView.set(groundTr.ox, groundTr.oy, groundTr.s, view.devW, view.devH);
-    const landAlpha = 1 - smoothstep(450, 2400, altitude);
+    // остров растворяется в море и дымке к 6-8 км (550-800 ед.)
+    const landAlpha = 1 - smoothstep(550, 800, altitude);
     const previous = ctx.globalAlpha;
     ctx.globalAlpha = previous * seaAlpha;
     drawSea(ctx, mapView, time, mood, smoothstep(120, 1400, altitude) * 0.8, HAZE_COLOR);
     if (landAlpha > 0.01) {
       ctx.globalAlpha = previous * landAlpha;
       drawIslandHd(ctx, painter, mapView);
-      const shadow = 0.42 * (1 - smoothstep(0, 500, altitude));
-      drawGroundShadow(ctx, mapView, flight.x + 7 + altitude * 0.04, 6 + altitude * 0.03, 17 + altitude * 0.02, 9 + altitude * 0.012, shadow);
+      // тень видна только ниже shadowRange (400 м), размер и смещение соответствуют высоте 1:1
+      const shadow = groundMarkAlpha(height, flight.shadowRange ?? SHADOW_RANGE, 0.42);
+      const g = shadowGeometry(height, shadowBox);
+      drawGroundShadow(ctx, mapView, flight.x + g.dx, g.dy, g.rx, g.ry, shadow);
       drawLaunchMount(ctx, mapView, state.era, time);
       if (profile) drawPlacedBuildings(ctx, painter, mapView, profile, time, null);
     }
@@ -444,6 +453,10 @@ export function createFlightRenderer(painter, shared) {
     state.lastTime = time;
 
     fillPose(flight, dt);
+    // близкий пролёт мимо помехи без удара: слабый короткий толчок камеры (reduceMotion его гасит)
+    proximity.update(flight, flight.objects, dt, (strength) => {
+      if (!state.reduce) camera.addKick(strength);
+    });
     updateCamera(flight, dt, layout, state.reduce);
     view.set(camera, layout, world.px, devW, devH);
     weatherMood(flight.weather, mood);
@@ -486,16 +499,18 @@ export function createFlightRenderer(painter, shared) {
 
     const pad = flight.pad;
     const zone = landingZoneAlpha(flight);
-    if (pad && zone > 0.01) {
+    const beam = landingBeamAlpha(flight);
+    if (pad && (zone > 0.01 || beam > 0.01)) {
       const ok = !!(flight.landing && flight.landing.ok) && Math.abs(flight.x - pad.x) <= pad.half;
       if (body === 'earth') {
-        const ringAlpha = zone * (1 - smoothstep(450, 2400, flight.alt ?? 0));
-        drawPadRing(ctx, mapView, pad, !!pad.lit, ok, time, ringAlpha);
+        // посадочный маркер на острове: то же правило, что у тени (виден ниже 400 м) и растворяется вместе с островом
+        drawPadRing(ctx, mapView, pad, !!pad.lit, ok, time, zone * (1 - smoothstep(550, 800, flight.alt ?? 0)));
       } else {
-        drawLandingZone(ctx, view, pad, !!pad.lit, ok, time, flight.alt, zone);
+        drawLandingZone(ctx, view, pad, !!pad.lit, ok, time, flight.alt, zone, beam);
       }
       drawPadPointer(ctx, view, pad, view.ay, time);
     }
+    if (body !== 'earth') drawFlatShadow(ctx, view, flight);
     const clouds = cloudsFor(flight, camAlt);
     const flashPower = clamp((mood.flash || 0) / 0.08, 0, 1);
     drawCloudField(ctx, painter, view, clouds, 0, time, flashPower, mood.wind);
@@ -505,7 +520,7 @@ export function createFlightRenderer(painter, shared) {
     );
     drawObjects(ctx, painter, view, flight.objects, state.era, time, ringFx, sceneInfo);
     drawRadarMarks(ctx, view, flight.objects, time, anchorDev);
-    drawMagnetField(ctx, painter, view, flight, state.era, time, state.reduce);
+    drawMagnetField(ctx, view, flight, time, state.reduce);
 
     particles.draw(ctx, view, 0);
     drawPieces(ctx);
@@ -537,6 +552,7 @@ export function createFlightRenderer(painter, shared) {
     particles,
     fx,
     ringFx,
+    proximity,
     pose,
     view,
 

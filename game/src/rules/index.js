@@ -1,6 +1,7 @@
 // Single entry point of the rules package. All functions are pure and never mutate their arguments.
 
 export { getPartState, buyPart, getBuildingState, buyBuilding, partPrice, buildingPrice } from './purchases.js';
+export { getNextSteps, kmText } from './next-steps.js';
 export { getEraState, advanceEra, countBuildingsAtLevel } from './eras.js';
 export { powerBalance, deriveBase } from './base.js';
 export { deriveRocket, makeFlightConfig, resolveConsumables } from './rocket.js';

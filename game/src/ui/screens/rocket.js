@@ -180,7 +180,7 @@ function drawNodes(app, kit, L, G, st) {
     kit.line(r.side < 0 ? r.x + r.w : r.x, r.y + r.h / 2, mark.x, mark.y, on ? c.amber : c.steel2, { dash: true });
     kit.rect(Math.round(mark.x - cc), Math.round(mark.y - cc), cc * 2, cc * 2, on ? c.amberLight : c.steel3);
 
-    const clicked = kit.button(`part-${id}`, r, { variant: on ? 'cardOn' : 'card', iconSize: Math.round(r.w * 0.52), icon: partIcon(id), tip: partShort(app, id), badge: upgradable ? '!' : undefined, iconColor: ps.level ? c.text : c.textMute });
+    const clicked = kit.button(`part-${id}`, r, { variant: on ? 'cardOn' : 'card', iconSize: Math.round(r.w * 0.52), icon: partIcon(id), tip: partShort(app, id), badge: upgradable ? '!' : undefined, badgePulse: true, iconColor: ps.level ? c.text : c.textMute });
     if (clicked) st.selected = on ? null : id;
     const n = ps.level ? String(ps.level) : '–';
     kit.drawText(n, r.x + r.w / 2, r.y + r.h - cc * 5, { size: kit.fs(11), color: kit.readable(ps.level ? c.amberLight : c.textMute, kit.frameMid(on ? 'cardOn' : 'card')), align: 'center', shadow: true });

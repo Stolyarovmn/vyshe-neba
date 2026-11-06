@@ -3,7 +3,7 @@
 import { BUILDING_KEYS, ERAS } from '../data/index.js';
 import { MAX_ERA } from '../data/economy.js';
 import { emptyAward } from './purchases.js';
-import { produce } from './common.js';
+import { coinsText, produce } from './common.js';
 import { applyProgress } from './progress.js';
 
 function milestoneItem(profile, item) {
@@ -52,7 +52,7 @@ export function getEraState(profile) {
   const items = advance.milestone.items.map((item) => milestoneItem(profile, item));
   const built = countBuildingsAtLevel(profile, advance.buildings.level);
   state.conditions = [
-    { kind: 'coins', ok: profile.coins >= advance.coins, have: profile.coins, need: advance.coins, text: `Нужно ${advance.coins} монет` },
+    { kind: 'coins', ok: profile.coins >= advance.coins, have: profile.coins, need: advance.coins, text: `Нужно ${coinsText(advance.coins)}` },
     { kind: 'data', ok: profile.data >= advance.data, have: profile.data, need: advance.data, text: `Нужно ${advance.data} данных` },
     { kind: 'milestone', ok: items.every((item) => item.ok), items, text: advance.milestone.text },
     {

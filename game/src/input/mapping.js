@@ -39,11 +39,22 @@ export function applyDeadzone(v, dz = 0.12) {
   return Math.sign(v) * Math.min(1, (a - dz) / (1 - dz));
 }
 
-/** Диск наклона: смещение пальца от центра по горизонтали → -1..1. */
-export function discTilt(x, disc, sensitivity = 1) {
-  const raw = (x - disc.cx) / (disc.r * 0.78);
-  return clamp(applyDeadzone(raw, 0.08) * sensitivity, -1, 1);
+/**
+ * Наклон жестом: относительное перетаскивание в любом месте экрана. dx — смещение пальца по X от точки касания (px);
+ * steer = { dead, range }: мёртвая зона и смещение, при котором наклон достигает максимума. Чувствительность — из настроек («ДИСК»).
+ */
+export function steerTilt(dx, steer, sensitivity = 1) {
+  const dead = steer?.dead ?? STEER_DEAD;
+  const range = Math.max(dead + 1, steer?.range ?? 80);
+  const a = Math.abs(dx);
+  if (a <= dead) return 0;
+  return clamp(Math.sign(dx) * Math.min(1, (a - dead) / (range - dead)) * sensitivity, -1, 1);
 }
+
+/** Мёртвая зона жеста наклона, px. */
+export const STEER_DEAD = 6;
+/** Доля ширины экрана, на которой наклон достигает максимума. */
+export const STEER_RANGE_SHARE = 0.18;
 
 /** Рычаг тяги: положение пальца по вертикали → 0..1 (верх = полная тяга). */
 export function leverValue(y, lever, inset = 10) {
@@ -52,7 +63,10 @@ export function leverValue(y, lever, inset = 10) {
   return clamp(1 - (y - top) / span, 0, 1);
 }
 
-/** Какая касательная зона под пальцем; допускаем небольшой запас вокруг. */
+/**
+ * Какая касательная зона под пальцем; допускаем небольшой запас вокруг. Кнопки и рычаг тяги — свои роли;
+ * любое другое место экрана — жест наклона ('steer').
+ */
 export function hitTouchRegion(x, y, hud, slop = 6) {
   if (!hud) return null;
   // когда сенсорные элементы скрыты (ПК с мышью), ими управляет только интерфейс
@@ -64,9 +78,7 @@ export function hitTouchRegion(x, y, hud, slop = 6) {
   }
   const l = hud.lever;
   if (l && x >= l.x - slop * 2 && x < l.x + l.w + slop * 2 && y >= l.y - slop * 2 && y < l.y + l.h + slop * 2) return 'lever';
-  const d = hud.disc;
-  if (d && Math.hypot(x - d.cx, y - d.cy) <= d.r * 1.3) return 'disc';
-  return null;
+  return 'steer';
 }
 
 /**

@@ -657,14 +657,29 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
   }
 
   /** Красный квадратик-значок с цифрой или «!» в углу кнопки. */
-  function badge(cx, cy, label) {
+  function badge(cx, cy, label, pulse = false) {
     const c = S.th.c;
     const size = fs(11);
     const s = String(label);
     const cc = cell();
     const w = Math.max(cc * 7, text.measure(s, size) + cc * 3);
     const h = cc * 7;
-    nine('danger', cx - w / 2, cy - h / 2, w, h);
+    const x0 = Math.round(cx - w / 2);
+    const y0 = Math.round(cy - h / 2);
+    if (pulse) {
+      // пульсация: от отметки расходится рамка из клеток и гаснет; при «меньше движения» — постоянное свечение
+      const ctx = S.ctx;
+      const prev = ctx.globalAlpha;
+      const phase = S.settings.reduceMotion ? 0.35 : (S.time * 1.3) % 1;
+      const e = Math.round(phase * cc * 5) + cc;
+      ctx.globalAlpha = prev * (1 - phase) * 0.9;
+      rect(x0 - e, y0 - e, w + e * 2, cc, c.amberLight);
+      rect(x0 - e, y0 + h + e - cc, w + e * 2, cc, c.amberLight);
+      rect(x0 - e, y0 - e, cc, h + e * 2, c.amberLight);
+      rect(x0 + w + e - cc, y0 - e, cc, h + e * 2, c.amberLight);
+      ctx.globalAlpha = prev;
+    }
+    nine(pulse && !S.settings.reduceMotion && Math.floor(S.time * 2.6) % 2 === 0 ? 'warn' : 'danger', x0, y0, w, h);
     drawText(s, cx, cy, { size, color: c.white, align: 'center' });
   }
 
@@ -847,7 +862,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
   function plate(x, y, w, h, iconName, value, color) {
     const cc = cell();
     nine('raised', x, y, w, h);
-    const iw = Math.round(h * 0.82); // ширина области значка
+    const iw = Math.round(Math.min(h * 0.82, w * 0.3)); // ширина области значка: в узкой табличке уступает место числу
     const scr = { x: x + iw - cc * 2, y: y + cc * 3, w: w - iw - cc, h: h - cc * 6 };
     icon(iconName, x + iw * 0.5 - cc, y + h / 2, Math.round(h * 0.62), color);
     const size = Math.round(h * 0.34);
@@ -976,7 +991,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     if (sub) drawText(sub, o.align === 'left' ? startX : cx, cy + size * 0.85, { size: Math.max(9, Math.round(size * 0.7)), color: dim ? c.textMute : labelColor, align: o.align === 'left' ? 'left' : 'center', maxWidth: body.w - pad * 2, box: body });
     if (locked) icon('lock', body.x + body.w - iconSize * 0.75, body.y + iconSize * 0.75, Math.round(iconSize * 0.9), c.amber);
     if (o.lamp) lamp(body.x + body.w - cc * 5, body.y + cc * 5, cc * 5, o.lamp === true ? c.green : o.lamp, !dim);
-    if (badgeText !== undefined && badgeText !== null && badgeText !== false) badge(body.x + body.w - cc * 2, body.y + cc * 2, badgeText);
+    if (badgeText !== undefined && badgeText !== null && badgeText !== false) badge(body.x + body.w - cc * 2, body.y + cc * 2, badgeText, !!o.badgePulse);
     if (S.focusVisible && S.focusId === id) focusRing(r);
     if (S.clicked === id) {
       if (disabled || locked) {
