@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E4",
+  "year": 2035,
+  "role": "mechanics-infrastructure",
+  "sheet": "03-automated-utilities",
+  "title": "Automated media power and data transfer",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e4_2035/mechanics-infrastructure-03-automated-utilities.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "specimens": [
+    {
+      "id": "E4-06-01",
+      "name": "Recessed power comb",
+      "description": "TOP ROW CELL 1 ONLY. One isolated atomic fragment. Unmated flat sprung block with wide recessed conductive blades accessible only through one rectangular slit; no pins."
+    },
+    {
+      "id": "E4-06-02",
+      "name": "Dual coolant face coupling",
+      "description": "TOP ROW CELL 2 ONLY. One isolated atomic fragment. Mated cutaway, two unequal oval bores, one separating wall, pushers hold both shutoff discs visibly off their seats."
+    },
+    {
+      "id": "E4-06-03",
+      "name": "Vacuum service bell",
+      "description": "TOP ROW CELL 3 ONLY. Horizontal-axis SIDE SECTION. LEFT: small vacuum tube. MIDDLE: bell flares outward from small tube to wide end on RIGHT. RIGHT: flat vertical pale bulkhead plate extending beyond both wide bell edges. Two dark compressed rubber beads on the wide bell rim directly touch the LEFT face of plate, one above and one below. One centered axial through-hole in plate, shown in section. No plate on the narrow end."
+    },
+    {
+      "id": "E4-06-04",
+      "name": "Optical data feedthrough",
+      "description": "TOP ROW CELL 4 ONLY. One unmated D-shaped keyed optical nose, facing viewer. Cross-section like a capital D with one straight vertical edge on left and one continuous semicircular curved edge on right. Exactly two recessed glass windows and one perimeter seal follow D outline. No octagon, no pins."
+    },
+    {
+      "id": "E4-06-05",
+      "name": "Leak witness annulus",
+      "description": "BOTTOM ROW CELL 1 ONLY. One isolated atomic fragment. One double-wall tube crossing one bulkhead; cutaway shows annular collection cavity and single radial witness outlet."
+    },
+    {
+      "id": "E4-06-06",
+      "name": "Spiral rotary ribbon",
+      "description": "BOTTOM ROW CELL 2 ONLY. Completely discard old double-band geometry. Copy the single thin amber open spiral trajectory from the second input, including exactly two visibly separate endpoint clamps and the entire unbranched line between them. Render that trajectory as ONE flexible ribbon on edge in a dark shallow rotary tray. No additional gold path anywhere in this cell. Leave negative space between turns. Match pixel art of sheet."
+    },
+    {
+      "id": "E4-06-07",
+      "name": "Closed branch spool",
+      "description": "BOTTOM ROW CELL 3 ONLY. One isolated atomic fragment. Cutaway of transverse spool, solid land physically occludes both passage windows, no complete valve bank."
+    },
+    {
+      "id": "E4-06-08",
+      "name": "Slit lubrication septum",
+      "description": "BOTTOM ROW CELL 4 ONLY. One isolated atomic fragment. Stepped socket with closed visible slit membrane and one captive blunt dosing cannula tip retracted across a clear gap, no loose parts."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, logos, pseudo-writing",
+    "extra items, whole robot, whole machine, scene",
+    "glow, rays, baked shadows or holograms",
+    "photorealism or smooth CAD render"
+  ],
+  "era_contract": {
+    "character": "Edit first input only at R2C2. Second image is a literal geometry guide for that cell only. Preserve all other seven specimens, including the two silver coolant pistons.",
+    "required_signals": [
+      "clear visible states and distinct silhouettes",
+      "two glass data windows",
+      "clean HD pixel art"
+    ],
+    "replaced_previous_language": [
+      "manual E3 service lines evolve into recessed autonomous transfer interfaces"
+    ],
+    "forbidden_regressions": [
+      "E3 drive modules copied as-is",
+      "full mechanisms or levitation"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

@@ -1,0 +1,26 @@
+E4 / 2035 — materials-construction — 02-joints-repairs / One-sided robotic assembly and repair joints
+
+Generate ONE E4-only atomic specimen field containing EXACTLY the 8 specimens listed below and NOTHING ELSE.
+
+LAYOUT: 1536×1024 landscape, 4×2 grid, 8 large isolated specimens, one specimen per cell, generous empty spacing, neutral background, no labels or captions.
+
+ALLOWED SPECIMENS — exactly these 8:
+1. Captive wedge lock with inspection glass — TOP ROW CELL 1 ONLY. One compact transverse wedge panel lock viewed through a single flat clear glass inspection window. Show one unmistakable hooked wedge tooth on the right, mechanically overlapping the back of a short raised metal bridge. Make the tooth and bridge contrasting metal values so the overlap and contact are visible through the glass. Flush heel at left. No loose parts.
+2. Induction-welded thermoplastic lap — TOP ROW CELL 2 ONLY. One closed stepped lap cross-section with shoulders seated and a thin embedded perforated induction susceptor visible along the faying surface. No external wires or stepped adhesive scarf.
+3. Open ball-to-V datum — TOP ROW CELL 3 ONLY. One sphere attached to one cropped mounting pad, seated in a V groove on another cropped pad. Sphere touches both sloped faces; clear gap beneath. No pin, socket or glass suspension.
+4. Upset blind threaded insert — TOP ROW CELL 4 ONLY. One blind rivet nut in a thin horizontal sheet, near frontal cutaway. Small threaded bore, hex neck seated tightly in sheet, thin head above. DIRECTLY below sheet the same sleeve buckles outward into two clearly visible fat lateral lobes that touch and clamp the UNDERSIDE of the sheet. No separate lower cup, no air gap at contact, no potted core.
+5. Pull-release bond seam — BOTTOM ROW CELL 1 ONLY. One very low dark opaque asymmetrical triangular repair overlay bonded to a light substrate. Both are fully opaque; NO GLASS. A tiny flat woven closed pull-loop exits horizontally from the thin adhesive line at the narrow tip. Overlay is shallow, broad and angular; loop much smaller than overlay. No long transparent tongue or pane.
+6. Flat living hinge — BOTTOM ROW CELL 2 ONLY. One short asymmetric polypropylene living hinge shown end-on: left thick panel edge horizontal, right thick panel edge tilted upward 45 degrees, joined at adjacent tips by an extremely short and THIN flexible polymer crease. The crease is thinner than one fifth of the panels and tucked at the vertex. No arch, hump, omega fold, barrel, pin or metallic membrane.
+7. Expanding spline seam — BOTTOM ROW CELL 3 ONLY. One assembled straight seam cross-section with two opposed panel edges and a captive longitudinal mushroom spline spreading two seal lips. Show the mushroom head wedged between both lips. No flat transverse wedge lock or passive corner gasket.
+8. Spent crush link — BOTTOM ROW CELL 4 ONLY. One short metallic sacrificial strip between two mounting ears, permanently folded at exactly two weakened necks, visibly continuous. Show sharp plastic creases, no spring, fracture or abrasion strip.
+
+DO NOT GENERATE ANYTHING NOT LISTED ABOVE. text, labels, letters, numbers, logos or pseudo-writing; any ninth specimen, extra fragment, repeated object class, substituted, merged or omitted specimen; whole building, room, facade, vehicle, spacecraft, radar, machinery, control panel, catalog application board or staged scene; baked cast/contact shadows, studio-product shadows, glow, bloom, rays, live display graphics or temporary FX; photorealistic PBR material-catalog rendering, rendered CAD/studio 3D look, photographic materials or filtered 3D render; generic smooth image devoid of intentional HD pixel-art clusters, missing dark chromatic selective outlines or continuous-airbrush gradients; motors, buttons, standalone connectors, lights, dashboards or any other role's standalone hardware; E2 beige rack and dense external wiring, E4 curtain-wall structures, E5 transparent holograms and levitation; E3 quarter-turn fasteners, conventional hinge barrels, loose hardware, E5 holograms and levitation.
+
+E4 visual character: TARGETED EDIT OF FIRST INPUT ONLY. Redraw R1C1, R1C4, R2C1, R2C2. Preserve R1C2, R1C3, R2C3, R2C4 in form, size, orientation, state and position. Preserve the grid and neutral background. Other inputs are lineage only.
+REQUIRED ERA SIGNALS: one glass inspection window integrated into the wedge lock only; distinct one-sided fastening and planar alignment mechanisms; visible physical seating and service states; quiet off-white and graphite HD pixel-art family.
+REPLACED PREVIOUS-ERA LANGUAGE: quarter-turn head replaced by a transverse wedge with a locked-state witness; bonded scarf replaced by a stepped induction weld; cylindrical dowel replaced by an open ball-V datum; potted insert replaced by a sheet upset insert; pinned hinge replaced by continuous flexure.
+FORBIDDEN REGRESSION: recolored E3 joint; extra loose parts or whole assemblies; baked light or spatial display.
+
+PRESENTATION: isolated physical specimens only; examples must not overlap; one neutral background; no title bar, era/year text, captions, numbered labels, legend, UI/dashboard frame or scenery; no baked cast shadow, glow, bloom, rays or other temporary FX.
+
+The generation request MUST append `art/style_bible.txt` verbatim exactly once. Do not paraphrase it.

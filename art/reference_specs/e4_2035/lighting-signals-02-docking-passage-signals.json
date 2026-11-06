@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E4",
+  "year": 2035,
+  "role": "lighting-signals",
+  "sheet": "02-docking-passage-signals",
+  "title": "Docking and autonomous passage signals",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e4_2035/lighting-signals-02-docking-passage-signals.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "specimens": [
+    {
+      "id": "E4-10-01",
+      "name": "Split closure witness",
+      "description": "TOP ROW CELL 1 ONLY. One isolated unpowered physical specimen. Two short mating optical tips in direct butt contact forming one flush uninterrupted output edge, distinct seam visible. No emitter shoe."
+    },
+    {
+      "id": "E4-10-02",
+      "name": "Angular sector indicator",
+      "description": "TOP ROW CELL 2 ONLY. One isolated unpowered physical specimen. Single triangular aperture with vertical opaque louvers restricting viewing angle. No chevron."
+    },
+    {
+      "id": "E4-10-03",
+      "name": "Passive retroreflective marker",
+      "description": "TOP ROW CELL 3 ONLY. One passive wedge block with a SQUARE exposed front face, seen nearly head-on; wedge taper is behind the square face and visible on right side only. On the square face show a complete THREE BY THREE array: three whole cavities across, three whole cavities down, exactly NINE uncropped corner-cube cavities. Each cavity is a deep trihedral concave reflector with three planar faces and one deep vertex. Clear dark dividers. No triangular outer frame, missing cells, emitter or lettering."
+    },
+    {
+      "id": "E4-10-04",
+      "name": "Bidirectional signal splitter",
+      "description": "TOP ROW CELL 4 ONLY. One isolated unpowered physical specimen. Short gabled optic with two opposed output faces separated by one opaque crest."
+    },
+    {
+      "id": "E4-10-05",
+      "name": "Latch travel optical window",
+      "description": "BOTTOM ROW CELL 1 ONLY. One lock witness in three-quarter cutaway. Show dark stepped slider and its single deep notch directly aligned with a narrow rectangular window in front plate; cut off top corner of plate so both notch and window edges are visible, with one straight unobstructed opening through them. No blank lens or pivot."
+    },
+    {
+      "id": "E4-10-06",
+      "name": "Fan warning optic",
+      "description": "BOTTOM ROW CELL 2 ONLY. One isolated unpowered physical specimen. One low curved lens segment with clearly radiating ribs for horizontal pulse distribution. No flash."
+    },
+    {
+      "id": "E4-10-07",
+      "name": "Guard status light guide",
+      "description": "BOTTOM ROW CELL 3 ONLY. One isolated unpowered physical specimen. One hard guide turning around a short guard edge with two offset outlets on different planes, retaining shoulder engaged."
+    },
+    {
+      "id": "E4-10-08",
+      "name": "Passive clearance flag",
+      "description": "BOTTOM ROW CELL 4 ONLY. Open oblique cutaway of short dark pocket containing one half-disc flag in stowed state. Its straight opaque matte chord is flush with pocket opening. Behind chord, show the reflective semicircular rim entirely BELOW the pocket rim through a side cutaway. Show single pivot at one end of chord. Nothing curved protrudes above pocket."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, logos, pseudo-writing",
+    "extra items, whole robot, whole machine, scene",
+    "glow, rays, baked shadows or holograms",
+    "photorealism or smooth CAD render"
+  ],
+  "era_contract": {
+    "character": "Edit only R1C3 of first input. Preserve all other seven specimens in shape, size, position, state and orientation.",
+    "required_signals": [
+      "distinct directional optical geometry",
+      "mechanical states visibly verifiable",
+      "unpowered optics"
+    ],
+    "replaced_previous_language": [
+      "E3 standalone status pucks give way to position-linked optical witnesses"
+    ],
+    "forbidden_regressions": [
+      "generic light fixture catalog",
+      "ornamental glowing lines or holograms"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

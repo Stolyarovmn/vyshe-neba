@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/lighting-signals-01-task-architectural-optics.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "20882231848a28b5533c1802349d5db7672ef8f324bb4ac21a8eff44e291bbb1",
+    "bytes": 1788098,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1ec8uJE7fe5LJCyqzH-YRxLi75PQeRiyi",
+    "drive_url": "https://drive.google.com/file/d/1ec8uJE7fe5LJCyqzH-YRxLi75PQeRiyi/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-09-01",
+      "name": "Glass edge light injector",
+      "verdict": "pass",
+      "notes": "Плоский стеклянный торец прилегает к башмаку через прослойку."
+    },
+    {
+      "id": "E4-09-02",
+      "name": "Deep overhead cutoff grid",
+      "verdict": "pass",
+      "notes": "Глубокие прямые каналы."
+    },
+    {
+      "id": "E4-09-03",
+      "name": "Rail side-light prism",
+      "verdict": "pass",
+      "notes": "Видны косая грань и шип."
+    },
+    {
+      "id": "E4-09-04",
+      "name": "Inspection slit aperture",
+      "verdict": "pass",
+      "notes": "Одна узкая тёмная щель."
+    },
+    {
+      "id": "E4-09-05",
+      "name": "Near-field edge diffuser",
+      "verdict": "pass",
+      "notes": "Матовая вогнутая поверхность и непрозрачный уступ."
+    },
+    {
+      "id": "E4-09-06",
+      "name": "Step side-light outlet",
+      "verdict": "pass",
+      "notes": "Глухая фасция и утопленный вывод снизу."
+    },
+    {
+      "id": "E4-09-07",
+      "name": "Wall bounce reflector",
+      "verdict": "pass",
+      "notes": "Открытый отражающий лепесток."
+    },
+    {
+      "id": "E4-09-08",
+      "name": "Task light shutter",
+      "verdict": "pass",
+      "notes": "Ось открыта, лопатка закрывает апертуру."
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Сверка восьми ячеек и четырёх защищённых деталей с первой версией",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

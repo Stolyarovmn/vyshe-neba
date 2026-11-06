@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E4",
+  "year": 2035,
+  "role": "mechanics-infrastructure",
+  "sheet": "02-robot-handling",
+  "title": "Autonomous handling, calibration and guidance",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e4_2035/mechanics-infrastructure-02-robot-handling.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "specimens": [
+    {
+      "id": "E4-05-01",
+      "name": "Adaptive jaw shoe",
+      "description": "TOP ROW CELL 1 ONLY. A single straight solid gripper finger bar above a small stepped test block. Exactly two compact swivel shoes hang downward from adjacent pivots on the SAME underside of that ONE bar. Left shoe lies flat against lower step, right tilted shoe rests against the sloped higher step. Both press DOWN. No C frame, opposing jaws or second finger."
+    },
+    {
+      "id": "E4-05-02",
+      "name": "Floating docking nose",
+      "description": "TOP ROW CELL 2 ONLY. A tapered floating docking nose enters the cropped rectangular inlet obliquely. Its tip is physically touching the LOWER inside wall, with a wide obvious empty gap to the upper wall. Lower diagonal spring visibly compressed with tight coils, upper diagonal spring stretched with wide coil gaps. Keep one narrow unlit recessed LED diffuser on stationary inlet edge. No electrical pins."
+    },
+    {
+      "id": "E4-05-03",
+      "name": "Calibration sphere",
+      "description": "TOP ROW CELL 3 ONLY. One atomic fragment. one complete precision sphere on a slender stalk with three distinct exposed mounting feet all seated on one small datum plate. No V groove."
+    },
+    {
+      "id": "E4-05-04",
+      "name": "Contact probe",
+      "description": "TOP ROW CELL 4 ONLY. One atomic fragment. one angled stylus in a short round socket, visibly tilted at its collar with a wedge shaped clearance on one side. No antenna or sphere on a pedestal."
+    },
+    {
+      "id": "E4-05-05",
+      "name": "Fail safe cassette hook",
+      "description": "BOTTOM ROW CELL 1 ONLY. One atomic fragment. one hooked nose physically under a small lifting eye bridge, separate captive safety keeper visibly shuts the exit. No second hook or bayonet."
+    },
+    {
+      "id": "E4-05-06",
+      "name": "Wheel quadrature pickup",
+      "description": "BOTTOM ROW CELL 2 ONLY. One atomic fragment. one cropped curved rim with through slots and one stationary two-window optical pickup. Show a through slot in one window and a solid tooth blocking the other. No complete wheel."
+    },
+    {
+      "id": "E4-05-07",
+      "name": "Spring loaded rail guide roller",
+      "description": "BOTTOM ROW CELL 3 ONLY. One atomic fragment. one roller on a short pivot arm touching the vertical side of one short rail, visibly compressed spring behind arm. No long rail or carriage."
+    },
+    {
+      "id": "E4-05-08",
+      "name": "Collision breakaway wrist",
+      "description": "BOTTOM ROW CELL 4 ONLY. One atomic fragment. one three-lobed joint on cropped mating base, exactly one lobe lifted out of its seat, visible wedge shaped gap at that lobe and other side still seated. No plugs or wiring."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, logos, pseudo-writing",
+    "extra items, whole robot, whole machine, scene",
+    "glow, rays, baked shadows or holograms",
+    "photorealism or smooth CAD render"
+  ],
+  "era_contract": {
+    "character": "Edit first input only in R1C1 and R1C2. Preserve other six cells in geometry, size, placement, orientation and physical state.",
+    "required_signals": [
+      "clear physical contact or clearance at every interface",
+      "one unlit functional LED segment at docking inlet only",
+      "eight isolated and visibly distinct silhouettes"
+    ],
+    "replaced_previous_language": [
+      "E3 passive rails and manually coupled tools evolve into autonomous alignment, calibration and fail-safe gripping"
+    ],
+    "forbidden_regressions": [
+      "E3 drive modules copied as-is",
+      "full mechanisms or levitation"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

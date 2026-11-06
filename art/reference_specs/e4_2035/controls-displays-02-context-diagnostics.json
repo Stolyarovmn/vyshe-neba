@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E4",
+  "year": 2035,
+  "role": "controls-displays",
+  "sheet": "02-context-diagnostics",
+  "title": "Contextual displays and diagnostic standards",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e4_2035/controls-displays-02-context-diagnostics.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "specimens": [
+    {
+      "id": "E4-08-01",
+      "name": "Transparent segment display",
+      "description": "TOP ROW CELL 1 ONLY. One isolated physical fragment. Broad flat clear glass fragment, three empty electrode zones near edge, short flex tail. Separate thin unlit diffuser inset in bottom lip, no graphics."
+    },
+    {
+      "id": "E4-08-02",
+      "name": "Bistable state display",
+      "description": "TOP ROW CELL 2 ONLY. One isolated physical fragment. Opaque matte asymmetric display fragment, side contacts, one retained dark rectangular segment on pale face, no lettering."
+    },
+    {
+      "id": "E4-08-03",
+      "name": "Curved touch strip",
+      "description": "TOP ROW CELL 3 ONLY. One isolated physical fragment. Narrow convex glass arc with one mounting tab, three distinct electrode pads exposed at cut edge only."
+    },
+    {
+      "id": "E4-08-04",
+      "name": "Camera depth standard",
+      "description": "TOP ROW CELL 4 ONLY. One isolated physical fragment. One solid terraced gauge with three visibly offset matte planar depth faces, no lens or print."
+    },
+    {
+      "id": "E4-08-05",
+      "name": "Focus mask",
+      "description": "BOTTOM ROW CELL 1 ONLY. One isolated physical fragment. One thin flat plate with exactly three groups of through-slits at distinct pitches. Visible background through slits."
+    },
+    {
+      "id": "E4-08-06",
+      "name": "Pressure zero reference",
+      "description": "BOTTOM ROW CELL 2 ONLY. One open cross-section of a pressure-zero reference slide. Show one straight unobstructed horizontal dark hollow channel from the LEFT threaded port through the visible rectangular hole in a perpendicular slide to the RIGHT threaded port. The ends and center of this same empty channel visibly touch with no walls blocking it. Use contrasting metal for slide. No illumination or arrows."
+    },
+    {
+      "id": "E4-08-07",
+      "name": "Thermal reference target",
+      "description": "BOTTOM ROW CELL 3 ONLY. One isolated physical fragment. One wedge holder with two opaque flat ceramic targets separated by a deep isolation gap, no emitters."
+    },
+    {
+      "id": "E4-08-08",
+      "name": "Camera alignment slider",
+      "description": "BOTTOM ROW CELL 4 ONLY. A short clear glass slider visibly inside a separate opaque metal U frame. One central etched notch in glass, exactly halfway between two raised metal reference lugs attached to the opaque frame behind glass. Show a visible seam and clearance between glass and fixed rail. Lugs must not touch or sit on glass. No text or numbers."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, logos, pseudo-writing",
+    "extra items, whole robot, whole machine, scene",
+    "glow, rays, baked shadows or holograms",
+    "photorealism or smooth CAD render"
+  ],
+  "era_contract": {
+    "character": "Edit first input only in R2C2 and R2C4. Preserve six other specimens in shape size position and state.",
+    "required_signals": [
+      "distinct transparent, bistable and curved interfaces",
+      "one unlit physical priority diffuser in first cell",
+      "visible diagnostics geometry without text"
+    ],
+    "replaced_previous_language": [
+      "separate E3 LCD modules evolve into context-specific embedded interfaces and physical calibration"
+    ],
+    "forbidden_regressions": [
+      "generic control dashboard",
+      "holography or glowing effects"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

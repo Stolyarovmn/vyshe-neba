@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E4",
+  "year": 2035,
+  "role": "controls-displays",
+  "sheet": "01-local-override",
+  "title": "Local override and safety controls",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e4_2035/controls-displays-01-local-override.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "specimens": [
+    {
+      "id": "E4-07-01",
+      "name": "Three-position enabling bail",
+      "description": "TOP ROW CELL 1 ONLY. Side cutaway of short horizontal handgrip stub with a narrow spring-loaded squeeze bail underneath, raised halfway towards the fixed grip, with a small clearly visible gap to a solid stop directly above bail. Show fixed grip and movable bail as separate parallel forms. No suitcase handle or floor plate."
+    },
+    {
+      "id": "E4-07-02",
+      "name": "Emergency pull bar",
+      "description": "TOP ROW CELL 2 ONLY. One isolated physical fragment. Broad bar pulled out on two guides and visibly retained by one latch."
+    },
+    {
+      "id": "E4-07-03",
+      "name": "Gated mode selector",
+      "description": "TOP ROW CELL 3 ONLY. One short horizontal J-shaped gate in a small plate; selector stem visibly sits in short side pocket at right. Broad lowered collar physically overlaps the narrow throat out of the pocket. No rotary knob or circular dial."
+    },
+    {
+      "id": "E4-07-04",
+      "name": "Isometric nudge key",
+      "description": "TOP ROW CELL 4 ONLY. One solid seamless four-lobed graphite thumb pad on one narrow central elastomer pedestal, seen low and obliquely. Left and right lobes both visibly overhang the base by equal height, with the background visible in two clearly open equal clearances below them. One pad, no separate buttons."
+    },
+    {
+      "id": "E4-07-05",
+      "name": "Authorization token pocket",
+      "description": "BOTTOM ROW CELL 1 ONLY. One isolated physical fragment. Asymmetric shallow pocket with flush seated token and captive tooth over its notch."
+    },
+    {
+      "id": "E4-07-06",
+      "name": "Pneumatic service request pad",
+      "description": "BOTTOM ROW CELL 2 ONLY. One isolated physical fragment. One depressed oval membrane inside a rigid rim, with short lateral air passage in cutaway."
+    },
+    {
+      "id": "E4-07-07",
+      "name": "Mechanical handover witness",
+      "description": "BOTTOM ROW CELL 3 ONLY. One isolated physical fragment. Two apertures in one short housing, flip vane standing edge-on in one and obscuring the other, no text or lights."
+    },
+    {
+      "id": "E4-07-08",
+      "name": "Confirmation interlock guard",
+      "description": "BOTTOM ROW CELL 4 ONLY. A single lowered metal crossbar directly blocks the center of one glass confirmation pad. Expose an obvious cylindrical hinge pin on the LEFT end, and on the RIGHT end show a downward hooked foot seated inside a clearly visible U-notch in the frame. Three-quarter cutaway. Glass and thin edge electrode remain visible around crossbar."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, logos, pseudo-writing",
+    "extra items, whole robot, whole machine, scene",
+    "glow, rays, baked shadows or holograms",
+    "photorealism or smooth CAD render"
+  ],
+  "era_contract": {
+    "character": "Edit first input, only R1C4 and R2C4. Preserve the other six cells in geometry, scale, placement and physical state.",
+    "required_signals": [
+      "distinct physical controls and visible state evidence",
+      "neutral background and coherent HD pixel art"
+    ],
+    "replaced_previous_language": [
+      "generic E3 switchgear gives way to explicit local authorization and controlled override"
+    ],
+    "forbidden_regressions": [
+      "generic control dashboard",
+      "holography or glowing effects"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

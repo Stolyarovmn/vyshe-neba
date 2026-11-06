@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E4",
+  "year": 2035,
+  "role": "mechanics-infrastructure",
+  "sheet": "01-robot-actuation",
+  "title": "Robot actuation and mechanical feedback",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e4_2035/mechanics-infrastructure-01-robot-actuation.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "specimens": [
+    {
+      "id": "E4-04-01",
+      "name": "Hollow direct-drive motor",
+      "description": "TOP ROW CELL 1 ONLY. One atomic fragment. annular cutaway with large open bore and visible air gap between segmented stator and rotor. No shaft or gearbox."
+    },
+    {
+      "id": "E4-04-02",
+      "name": "Torque-sensing spoke",
+      "description": "TOP ROW CELL 2 ONLY. One atomic fragment. single sector with one visibly bent radial flexure and two offset mechanical witness marks. No complete ring."
+    },
+    {
+      "id": "E4-04-03",
+      "name": "Linear motor carriage",
+      "description": "TOP ROW CELL 3 ONLY. One atomic fragment. short magnetic rail with one side-guided carriage shifted off its stop, exposing magnet row at one end. No screw."
+    },
+    {
+      "id": "E4-04-04",
+      "name": "Cam compression follower",
+      "description": "TOP ROW CELL 4 ONLY. One cam follower assembly, front view. Cam below roller: unmistakable pointed cam nose is at twelve o clock, directed VERTICALLY UP and exactly centered under roller axis. Its single highest tip touches the lowest point of the roller, with no gap and no flank contact. Show displaced plunger above roller with exposed travel band. No second lobe."
+    },
+    {
+      "id": "E4-04-05",
+      "name": "Parking pawl",
+      "description": "BOTTOM ROW CELL 1 ONLY. One atomic fragment. one pawl nose sits between teeth of one short sector. Clear contact with steep locking flank. One transparent flat guard over contact, with pawl engagement visible through it."
+    },
+    {
+      "id": "E4-04-06",
+      "name": "Finger tendon sector",
+      "description": "BOTTOM ROW CELL 2 ONLY. One atomic fragment. short arcuate pulley sector and one tensioned cable lying in the groove with a captive end ferrule. No finger assembly."
+    },
+    {
+      "id": "E4-04-07",
+      "name": "Parallel flexure guide",
+      "description": "BOTTOM ROW CELL 3 ONLY. One atomic fragment. one rectangular frame with exactly two parallel thin leaves both deflected equally, keeping moving platform parallel to the base."
+    },
+    {
+      "id": "E4-04-08",
+      "name": "Mechanical zero drum",
+      "description": "BOTTOM ROW CELL 4 ONLY. One atomic fragment. short drum with precisely one asymmetric deep notch occupied by a follower roller. No repeating teeth."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, logos, pseudo-writing",
+    "extra items, whole robot, whole machine, scene",
+    "glow, rays, baked shadows or holograms",
+    "photorealism or smooth CAD render"
+  ],
+  "era_contract": {
+    "character": "Targeted edit of first input. Change only R1C4. Preserve the other seven cells in form, scale, pose, position and physical state.",
+    "required_signals": [
+      "clearly visible air gap and mechanical contact states",
+      "glass guard integrated into parking pawl only",
+      "distinct engineering silhouettes and coherent HD pixel art"
+    ],
+    "replaced_previous_language": [
+      "separate E3 motor and gearbox give way to direct drive and integrated feedback",
+      "manual service checks evolve into physical homing and parked-state evidence"
+    ],
+    "forbidden_regressions": [
+      "E3 drive modules copied as-is",
+      "full mechanisms or levitation"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

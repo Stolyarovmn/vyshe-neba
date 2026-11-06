@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/materials-construction-03-service-architecture.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "c3201a97c84dcee8d31858118c43060aa212a35016818d799ad3bacd19c89306",
+    "bytes": 1784219,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1MauKn6uwWLHtszrLHTBzafbPVmqgK63S",
+    "drive_url": "https://drive.google.com/file/d/1MauKn6uwWLHtszrLHTBzafbPVmqgK63S/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-03-01",
+      "name": "Thermally broken mullion",
+      "verdict": "pass",
+      "notes": "Утопленный узкий рассеиватель, видны перемычки."
+    },
+    {
+      "id": "E4-03-02",
+      "name": "Point supported glass",
+      "verdict": "pass",
+      "notes": "Видны шайба, прокладка и сферическая опора."
+    },
+    {
+      "id": "E4-03-03",
+      "name": "Sill shoe",
+      "verdict": "pass",
+      "notes": "Стекло опирается на нижнюю колодку."
+    },
+    {
+      "id": "E4-03-04",
+      "name": "Secondary catch",
+      "verdict": "pass",
+      "notes": "Перехват над стеклом с зазором."
+    },
+    {
+      "id": "E4-03-05",
+      "name": "Weep outlet",
+      "verdict": "pass",
+      "notes": "Наклонное дно и щель."
+    },
+    {
+      "id": "E4-03-06",
+      "name": "Perimeter firestop",
+      "verdict": "pass",
+      "notes": "Волокнистый клин перекрывает зазор."
+    },
+    {
+      "id": "E4-03-07",
+      "name": "Floating louver bracket",
+      "verdict": "pass",
+      "notes": "Палец посередине прорези."
+    },
+    {
+      "id": "E4-03-08",
+      "name": "Overlap joint",
+      "verdict": "pass",
+      "notes": "Прямые торцы, отдельные металлические полки перекрываются с просветом."
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Визуальная сверка восьми ячеек и шести защищённых образцов с версией 02",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

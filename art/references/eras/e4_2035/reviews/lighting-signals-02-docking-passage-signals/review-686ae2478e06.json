@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/lighting-signals-02-docking-passage-signals.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "686ae2478e06759731c720b984866610193856af76da3780cba1e04dead84825",
+    "bytes": 1561074,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1luBei5SW621c9K4sBvceRnRD4AgPuMZC",
+    "drive_url": "https://drive.google.com/file/d/1luBei5SW621c9K4sBvceRnRD4AgPuMZC/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-10-01",
+      "name": "Split closure witness",
+      "verdict": "pass",
+      "notes": "Сомкнутые торцы"
+    },
+    {
+      "id": "E4-10-02",
+      "name": "Angular sector indicator",
+      "verdict": "pass",
+      "notes": "Треугольная апертура"
+    },
+    {
+      "id": "E4-10-03",
+      "name": "Passive retroreflective marker",
+      "verdict": "pass",
+      "notes": "Девять отдельных отражателей"
+    },
+    {
+      "id": "E4-10-04",
+      "name": "Bidirectional signal splitter",
+      "verdict": "pass",
+      "notes": "Разделённые выходы"
+    },
+    {
+      "id": "E4-10-05",
+      "name": "Latch travel optical window",
+      "verdict": "pass",
+      "notes": "Выемка совмещена с окном"
+    },
+    {
+      "id": "E4-10-06",
+      "name": "Fan warning optic",
+      "verdict": "pass",
+      "notes": "Веерные рёбра"
+    },
+    {
+      "id": "E4-10-07",
+      "name": "Guard status light guide",
+      "verdict": "pass",
+      "notes": "Два выхода на разных плоскостях"
+    },
+    {
+      "id": "E4-10-08",
+      "name": "Passive clearance flag",
+      "verdict": "pass",
+      "notes": "Дуга внутри кармана"
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Визуальная сверка восьми ячеек и защищённых образцов",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/mechanics-infrastructure-01-robot-actuation.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "f8cdc743307dae286b09a565a05650778d6648d1bd14b988346bba0fc7baa467",
+    "bytes": 1942035,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1vQt_Hb8-ytrLH2jgdy-DjgfJvDuethug",
+    "drive_url": "https://drive.google.com/file/d/1vQt_Hb8-ytrLH2jgdy-DjgfJvDuethug/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-04-01",
+      "name": "Hollow direct-drive motor",
+      "verdict": "pass",
+      "notes": "Сквозное отверстие и зазор ротора видны."
+    },
+    {
+      "id": "E4-04-02",
+      "name": "Torque-sensing spoke",
+      "verdict": "pass",
+      "notes": "Изгиб спицы и смещённые риски видны."
+    },
+    {
+      "id": "E4-04-03",
+      "name": "Linear motor carriage",
+      "verdict": "pass",
+      "notes": "С одного конца открыт ряд магнитов."
+    },
+    {
+      "id": "E4-04-04",
+      "name": "Cam compression follower",
+      "verdict": "pass",
+      "notes": "Вершина кулачка под осью ролика, виден поясок хода."
+    },
+    {
+      "id": "E4-04-05",
+      "name": "Parking pawl",
+      "verdict": "pass",
+      "notes": "Собачка вошла во впадину, контакт виден через щиток."
+    },
+    {
+      "id": "E4-04-06",
+      "name": "Finger tendon sector",
+      "verdict": "pass",
+      "notes": "Трос лежит в канавке и закреплён."
+    },
+    {
+      "id": "E4-04-07",
+      "name": "Parallel flexure guide",
+      "verdict": "pass",
+      "notes": "Две изогнутые перемычки, площадка параллельна основанию."
+    },
+    {
+      "id": "E4-04-08",
+      "name": "Mechanical zero drum",
+      "verdict": "pass",
+      "notes": "Ролик в единственной прорези."
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Сверка восьми ячеек и сохранения семи защищённых образцов с исходной версией",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
