@@ -8,6 +8,7 @@ visual review for the parts that still need vision/human judgement.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import struct
@@ -23,6 +24,12 @@ MAX_SPECIMENS = 8
 ERA_REFERENCE_SOURCE_TOLERANCE_PX = 1
 PASS, FAIL, PENDING = "pass", "fail", "pending"
 VERDICTS = {PASS, FAIL, PENDING}
+
+# One project-owner decision, intentionally not a generic waiver facility.
+E3_WAIVER_SOURCE = '51966994c0d6c5c1cc20dfc03307c65fc477870b6b29263ca046b871a2cceb1b'
+E3_WAIVER_SPEC = 'ed71584fee6ecacf3ea5c53e587ed08864eccaf9ac1b7a89ddd4ed1ff3efa59a'
+E3_WAIVER_DRIVE = '1tuff5Rk5t3KI8h9typGLjTfIh49jg1DN'
+E3_WAIVER_ID = 'e3-mi11-tooth-engagement-51966994c0d6'
 
 
 class GuardError(ValueError):
@@ -234,6 +241,33 @@ def validate_review(spec: dict[str, Any], review: dict[str, Any], image_path: Pa
     return e
 
 
+def validate_review_with_e3_waiver(spec: dict[str, Any], review: dict[str, Any], image_path: Path | None,
+                                   waiver: dict[str, Any], spec_bytes: bytes) -> list[str]:
+    """Validate one SHA-bound owner exception without changing the recorded review."""
+    expected = {'id': E3_WAIVER_ID, 'source_sha256': E3_WAIVER_SOURCE,
+                'drive_file_id': E3_WAIVER_DRIVE, 'spec_sha256': E3_WAIVER_SPEC,
+                'specimen_id': '03', 'decision': 'owner_accepts_unconfirmed_engagement'}
+    errors = []
+    if waiver != expected: errors.append('waiver record does not match the sole authorized exception')
+    if hashlib.sha256(spec_bytes).hexdigest() != E3_WAIVER_SPEC: errors.append('waiver spec SHA mismatch')
+    if (spec.get('era'), spec.get('role'), spec.get('sheet')) != ('E3','mechanics-infrastructure','02-joints-guides-handling'):
+        errors.append('waiver does not apply to this era/role/sheet')
+    source = review.get('source', {})
+    if source.get('sha256') != E3_WAIVER_SOURCE or source.get('drive_file_id') != E3_WAIVER_DRIVE:
+        errors.append('waiver source or Drive ID mismatch')
+    if image_path is None: errors.append('waiver requires --image exact source verification')
+    items = [x for x in review.get('specimens', []) if isinstance(x, dict) and x.get('id') == '03']
+    if len(items) != 1 or items[0].get('verdict') != PENDING:
+        errors.append('waiver applies only to the single pending specimen 03')
+    if review.get('final_verdict') != PENDING: errors.append('waiver requires an unchanged pending review')
+    if errors: return errors
+    # Only the temporary validation copy is adjusted. The source review remains pending.
+    accepted = copy.deepcopy(review)
+    next(x for x in accepted['specimens'] if x['id'] == '03')['verdict'] = PASS
+    accepted['final_verdict'] = PASS
+    return validate_review(spec, accepted, image_path)
+
+
 def validate_tree(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     spec_paths = sorted((root / "art/reference_specs").rglob("*.json")) if (root / "art/reference_specs").is_dir() else []
@@ -264,7 +298,7 @@ def main() -> int:
     for name in ("validate-spec", "render-prompt", "build-request"): p=sub.add_parser(name); p.add_argument("spec"); p.add_argument("--output") if name != "validate-spec" else None
     p=sub.add_parser("verify-source"); p.add_argument("spec"); p.add_argument("image"); p.add_argument("--output")
     p=sub.add_parser("init-review"); p.add_argument("spec"); p.add_argument("image"); p.add_argument("--generation-id", required=True); p.add_argument("--drive-file-id", required=True); p.add_argument("--drive-url", required=True); p.add_argument("--output", required=True)
-    p=sub.add_parser("validate-review"); p.add_argument("spec"); p.add_argument("review"); p.add_argument("--image")
+    p=sub.add_parser("validate-review"); p.add_argument("spec"); p.add_argument("review"); p.add_argument("--image"); p.add_argument("--waiver")
     sub.add_parser("validate-tree")
     args=parser.parse_args()
     try:
@@ -281,11 +315,14 @@ def main() -> int:
         if args.command == "init-review":
             spec=read_json(args.spec); report=verify_source(spec, repo_path(args.image)); review=review_template(spec, report, args.spec, args.generation_id, args.drive_file_id, args.drive_url); write_output(args.output, json.dumps(review, ensure_ascii=False, indent=2)+"\n"); return 0 if report["technical_verdict"] == PASS else 1
         if args.command == "validate-review":
-            errors=validate_review(read_json(args.spec), read_json(args.review), repo_path(args.image) if args.image else None)
+            if args.waiver:
+                errors=validate_review_with_e3_waiver(read_json(args.spec), read_json(args.review), repo_path(args.image) if args.image else None, read_json(args.waiver), repo_path(args.spec).read_bytes())
+            else:
+                errors=validate_review(read_json(args.spec), read_json(args.review), repo_path(args.image) if args.image else None)
             if errors:
                 for x in errors: print("ERROR:", x, file=sys.stderr)
                 return 1
-            print("PASS: exact source and structured visual review are approved"); return 0
+            print("PASS: owner-accepted exact source with unconfirmed specimen 03 exception" if args.waiver else "PASS: exact source and structured visual review are approved"); return 0
         errors=validate_tree()
         if errors:
             for x in errors: print("ERROR:", x, file=sys.stderr)

@@ -184,3 +184,8 @@ A production asset is derived from:
 `gameplay role + parts/lineage from PRODUCTION_MANIFEST + asset brief + applicable atomic era references + style bible`.
 
 Era references never determine the identity, overall layout or gameplay function of the new object. They provide only reusable construction/material/mechanical/interface/lighting vocabulary.
+
+
+### Owner-accepted E3 harmonic detail exception
+
+For the single E3 `mechanics-infrastructure/02-joints-guides-handling` source with SHA-256 `51966994c0d6c5c1cc20dfc03307c65fc477870b6b29263ca046b871a2cceb1b`, the project owner accepts that specimen 03 does not visibly establish tooth engagement. This is a visual limitation, not a claim that engagement has been verified. The exception is bound to that source, Drive ID, exact specification bytes, specimen 03 and the recorded waiver. The untouched review remains pending for this detail; all other source, visual and provenance gates remain mandatory. `validate-review --image ... --waiver ...` may validate this one accepted exception when this contract change is merged. It does not apply to other images, specimens, specifications or eras.
