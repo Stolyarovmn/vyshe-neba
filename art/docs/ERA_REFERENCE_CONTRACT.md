@@ -143,6 +143,17 @@ If the reviewer cannot explain a physical manufacturing/mechanical/interface/lig
 - Each sheet-part prompt must enumerate the allowed specimens explicitly and say that **nothing not listed may be generated**.
 - The applicable sheet-part prompt is combined with `art/style_bible.txt` **verbatim exactly once**.
 
+### Per-cell prompt rules for every era
+
+Apply these rules to every future era-reference sheet generation and revision, for any era E0–E5. Record the per-cell instructions in the machine-readable spec so they reach the deterministic prompt.
+
+- **Cell and scope.** For each specimen, state its exact cell, physical class, and the parts that may be visible. If the class is easily confused with another specimen or role, name the likely substitution and exclude it in that cell. For a display fragment, for example, specify the glass, bezel and allowed mounting depth, and exclude the stand and complete monitor.
+- **Visual distinction.** Give each specimen a visible identifying feature such as its silhouette, mounting, connector or joint. When two entries look similar, describe how to tell them apart at sheet scale without labels or color. Keep each silhouette readable against the background and clear of neighboring specimens.
+- **Physical state.** When a movable or mating part is shown, specify the intended state and what the reviewer must see to recognize it. For example, show one end of a two-position rocker depressed and the other visibly raised. When contact or engagement defines the specimen, choose a view that exposes the contact surfaces.
+- **Targeted revision.** Identify the cells to change and the specific change in each. Preserve the other specimens' silhouette, pose, scale, placement, materials and lighting, along with the grid and background. Compare the revised image with the supplied input before approval and check the unchanged cells for drift.
+
+During visual review, check each cell against its specified class, physical scope and identifying features, including the visible state where applicable. These rules apply to new attempts and leave historical prompts, request digests and approvals as recorded.
+
 ### ImageGen request evidence for E3 and later
 
 1. Run `production_guard.py validate-spec` and `build-request` for the sheet-part. Preserve the full UTF-8 request and record its SHA-256 together with the production commit and spec path.
