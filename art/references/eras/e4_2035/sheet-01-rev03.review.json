@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/materials-construction-01-surfaces-stock.json",
+  "generation_id": null,
+  "returned_filename": "exec-f724bb32-8ebe-47c2-ba2f-33cf12503876.png",
+  "request_sha256": "01ff24dfd2061020283cf11069775e3aae0f4557248fef0f9eca60f0a8d493f1",
+  "source": {
+    "sha256": "086d26a0d86279acdcd836c658b34dadebe598fb34feec26bcf90cc4a31a47b4",
+    "bytes": 1839028,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1xF2VRor2BrrjFKi7bvE7afESdNBJths4",
+    "drive_url": "https://drive.google.com/file/d/1xF2VRor2BrrjFKi7bvE7afESdNBJths4/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "name": "Graded lattice sandwich",
+      "id": "E4-01-01",
+      "verdict": "pass",
+      "notes": "Сгущение решётки видно вдоль кромки."
+    },
+    {
+      "name": "Forked continuous-fibre transition",
+      "id": "E4-01-02",
+      "verdict": "pass",
+      "notes": "Волокна непрерывно расходятся по ветвям."
+    },
+    {
+      "name": "Tailored-thickness stamping",
+      "id": "E4-01-03",
+      "verdict": "pass",
+      "notes": "Видно утолщение среза к правому плечу."
+    },
+    {
+      "name": "Three-lobed closed torsion spar",
+      "id": "E4-01-04",
+      "verdict": "pass",
+      "notes": "Три полости, разделённые сплошными перемычками."
+    },
+    {
+      "name": "Laminated safety glass retaining tongue",
+      "id": "E4-01-05",
+      "verdict": "pass",
+      "notes": "Широкая плоскость и свободный язычок сохранены визуально."
+    },
+    {
+      "name": "Omega expansion membrane",
+      "id": "E4-01-06",
+      "verdict": "pass",
+      "notes": "Видны одиночная складка и открытый просвет."
+    },
+    {
+      "name": "Undercut ceramic thermal wedge",
+      "id": "E4-01-07",
+      "verdict": "pass",
+      "notes": "Оба обратных заплечика видны на одной выступающей ножке."
+    },
+    {
+      "name": "Robot grip window at panel edge",
+      "id": "E4-01-08",
+      "verdict": "pass",
+      "notes": "Две встречные площадки, фаски и открытый просвет читаются."
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Визуальная проверка исходного PNG по восьми ячейкам",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "preservation_review": {
+    "baseline": "E4_sheet01_rev02.png",
+    "criterion_file": "art/references/eras/e4_2035/E4_PLAN_REVISION_02.md",
+    "protected_cells": [
+      "R1C1",
+      "R1C2",
+      "R1C3",
+      "R2C1",
+      "R2C2"
+    ],
+    "verdict": "pass",
+    "notes": "Сравнение с версией 02 подтвердило сохранение формы, размера, положения, ориентации и состояния пяти образцов. Увеличенная стеклянная плоскость и удерживающий язычок сохранены. Небольшие изменения оттенков допустимы по уточнённому критерию."
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E4",
+  "year": 2035,
+  "role": "materials-construction",
+  "sheet": "01-surfaces-stock",
+  "title": "Orbital era structural materials and profiles",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e4_2035/materials-construction-01-surfaces-stock.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "specimens": [
+    {
+      "id": "E4-01-01",
+      "name": "Graded lattice sandwich",
+      "description": "TOP ROW CELL 1 ONLY. One short oblique cut through two face skins and a branching 3D lattice, inclined struts visibly packed more densely near one edge. No uniform honeycomb, foam or whole panel. PRESERVE THIS INPUT CELL EXACTLY."
+    },
+    {
+      "id": "E4-01-02",
+      "name": "Forked continuous-fibre transition",
+      "description": "TOP ROW CELL 2 ONLY. One unperforated Y-shaped load-branching composite coupon; visible continuous fibre bundles curve from one strip into two narrow branches. No clevis, pin or rectangular coupon. PRESERVE THIS INPUT CELL EXACTLY."
+    },
+    {
+      "id": "E4-01-03",
+      "name": "Tailored-thickness stamping",
+      "description": "TOP ROW CELL 3 ONLY. One shallow saddle-shaped alloy shell fragment with a readable exposed cut edge smoothly thickening toward one shoulder. No seam, doubler, L-bracket or whole cover. PRESERVE THIS INPUT CELL EXACTLY."
+    },
+    {
+      "id": "E4-01-04",
+      "name": "Three-lobed closed torsion spar",
+      "description": "TOP ROW CELL 4 ONLY. Completely replace the current end face. Rounded triangular extrusion. Three equally large rounded bores arranged like a clover: ONE centered above, TWO side by side below. Solid central web and solid wall between every pair. All other material of the face is solid, including between the upper bore and the outer edge. Exactly THREE dark apertures total. Render the end almost straight-on with a short visible extrusion depth."
+    },
+    {
+      "id": "E4-01-05",
+      "name": "Laminated safety glass retaining tongue",
+      "description": "BOTTOM ROW CELL 1 ONLY. One broad transparent unmounted architectural laminated glass corner, still fully inside its cell. Widen the visible glass plane substantially. Show exactly two clear glass plies and a single thin flexible interlayer tongue curving freely beyond the cut edge. Background visible through the broad face. No frame, electrodes or full window. PRESERVE THIS ENLARGED INPUT CELL EXACTLY."
+    },
+    {
+      "id": "E4-01-06",
+      "name": "Omega expansion membrane",
+      "description": "BOTTOM ROW CELL 2 ONLY. One thin metal cross-section with exactly one symmetric unloaded open omega fold joining two flat wings, visible open space below fold. No tubular bellows or rubber seal. PRESERVE THIS INPUT CELL EXACTLY."
+    },
+    {
+      "id": "E4-01-07",
+      "name": "Undercut ceramic thermal wedge",
+      "description": "BOTTOM ROW CELL 3 ONLY. Redraw one pale matte solid ceramic insulation wedge, upside down to expose its foot. The foot is ONE raised male dovetail ridge, a narrow solid neck topped with a wider trapezoidal head. On the near cross-section its two opposite overhanging shoulders are silhouetted against the background, one on the left and one on the right. No slot, no recess in the foot, no hollow channel, no separate rail."
+    },
+    {
+      "id": "E4-01-08",
+      "name": "Robot grip window at panel edge",
+      "description": "BOTTOM ROW CELL 4 ONLY. Redraw one cutaway composite edge with integral recessed metal robot pickup. One clear rectangular through aperture. At the midpoint of its LEFT and RIGHT inner walls each has ONE broad rectangular machined jaw land standing proud into the aperture, two opposing flat faces, mirrored lead-in chamfers and flat stop steps. Darken the internal wall behind the lands to make these two solid steps readable by geometry. Leave open background between the lands. No gripper, no separate handle."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, letters, numbers, logos or pseudo-writing",
+    "any ninth specimen, extra fragment, repeated object class, substituted, merged or omitted specimen",
+    "whole building, room, facade, vehicle, spacecraft, radar, machinery, control panel, catalog application board or staged scene",
+    "baked cast/contact shadows, studio-product shadows, glow, bloom, rays, live display graphics or temporary FX",
+    "photorealistic PBR material-catalog rendering, rendered CAD/studio 3D look, photographic materials or filtered 3D render",
+    "generic smooth image devoid of intentional HD pixel-art clusters, missing dark chromatic selective outlines or continuous-airbrush gradients",
+    "motors, buttons, standalone connectors, lights, dashboards or any other role's standalone hardware",
+    "E3 uniform honeycomb, exposed T-slot stock, plain flat composite coupons, E5 holograms, levitation and ornamental light lines"
+  ],
+  "era_contract": {
+    "character": "TARGETED EDIT of the supplied E4 revision 02. REDRAW only R1C4, R2C3 and R2C4 from their new geometry instructions. Keep the enlarged glass in R2C1 and keep R1C1 R1C2 R1C3 R2C2. Copy those five cells unchanged, including their background, pose, size and position.",
+    "required_signals": [
+      "visible graded lattice, continuous curved fibre paths and local thickness change",
+      "architectural glazing limited to one functional retaining edge",
+      "robot handling via a bare integral grip window",
+      "quiet off-white graphite industrial family and deliberate HD pixel clusters"
+    ],
+    "replaced_previous_language": [
+      "uniform honeycomb replaced by branching graded lattice",
+      "flat laminate coupon replaced by directional fibre bifurcation",
+      "uniform folded sheet replaced by tailored saddle",
+      "T-slot profile replaced by closed torsional spar",
+      "ordinary bonded glass edge evolves into retained safety laminate"
+    ],
+    "forbidden_regressions": [
+      "identical E3 specimens recolored",
+      "whole architecture or machine",
+      "spatial holography or levitation"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}
