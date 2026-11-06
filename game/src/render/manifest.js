@@ -176,6 +176,7 @@ function buildAssetFiles() {
       files[`station_${id}_${year}`] = placeableFile(place, i);
     });
   }
+  files.bld_radar_1978 = `${eraFolder(0)}base/radar.png`;
   files.backdrop_interior = BACKDROP_INTERIOR_FILE;
   files.backdrop_env = BACKDROP_ENV_FILE;
   files.backdrop_base = BACKDROP_BASE_FILE;
