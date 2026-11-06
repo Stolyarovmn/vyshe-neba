@@ -1,0 +1,266 @@
+{
+  "schema_version": 2,
+  "era": "E3",
+  "year": 2015,
+  "name": "Модульный космопорт",
+  "status": "approved_visual_reference_set",
+  "approval_context": "Ten exact-SHA originals passed set QA. Sheet 05 uses only the owner-approved MI11 waiver for the stated engagement visibility check. Merge the waiver in PR #111 before promoting this registry.",
+  "authority": {
+    "rules": "art/docs/ERA_DESIGN_MATRIX.md",
+    "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
+    "style": "art/style_bible.txt",
+    "previous_era_reference": "art/references/eras/e2_1998/reference-set.json",
+    "anchor_era_reference": "art/references/eras/e0_1978/reference-set.json"
+  },
+  "transition_from_e2": [
+    {
+      "role": "materials-construction",
+      "physical_replacement": "Layered composite sections, bonded joints, flush panel latches and sealed service interfaces follow E2 fastened sheet stock, bolted angle joints and exposed service grilles."
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "physical_replacement": "Enclosed precision drives, protected cable carriers, dry-break couplings and blind-mate interfaces follow E2 finned servos, exposed actuator assemblies and separate wired connectors."
+    },
+    {
+      "role": "controls-displays",
+      "physical_replacement": "Shallow gasketed operator modules and flat digital instrument packages follow E2 deeper rack hardware, CRT housings and taller separately mounted controls."
+    },
+    {
+      "role": "lighting-signals",
+      "physical_replacement": "Planar LED cartridges, replaceable emitter modules and molded passive light guides follow E2 deeper fixtures, individual pilot lamps and discrete multi-lamp housings."
+    }
+  ],
+  "raw_archive": {
+    "provider": "google_drive",
+    "folder_id": "1rgb5bx72J8oDu3Tyo93-FeewJ87dm_fJ",
+    "folder_name": "E3_2015"
+  },
+  "required_roles": [
+    "materials-construction",
+    "mechanics-infrastructure",
+    "controls-displays",
+    "lighting-signals"
+  ],
+  "sheets": [
+    {
+      "role": "materials-construction",
+      "sheet": "01-surfaces-stock",
+      "sha256": "01e8ad19ff6e856bcb4b518f6915dfc6bf71649b61536889240b03c21d170a17",
+      "bytes": 1708814,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1QnrJgcK4ScTysthAF9Na3hdWIpW7Bvgo",
+      "drive_url": "https://drive.google.com/file/d/1QnrJgcK4ScTysthAF9Na3hdWIpW7Bvgo/view",
+      "spec_file": "art/reference_specs/e3_2015/materials-construction-01-surfaces-stock.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/materials-construction-01-surfaces-stock.md",
+      "request_sha256": "b32c3ad33763b23e86876cdd82c547e111241afa157f639eb41c6df36b192899",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/materials-construction-01-surfaces-stock/invocation-01e8ad19ff6e.json",
+      "review_file": "art/references/eras/e3_2015/reviews/materials-construction-01-surfaces-stock/review-01e8ad19ff6e.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-approval-01e8ad19ff6e.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "02-joints-repairs",
+      "sha256": "ced4fbd87a77028c7117a22b01351c13c88a35d6ee132ad825d5b1b56bcb2cda",
+      "bytes": 1691609,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1R4S2Fxxk-sU8OLyASZs3CXFnhkIno2bD",
+      "drive_url": "https://drive.google.com/file/d/1R4S2Fxxk-sU8OLyASZs3CXFnhkIno2bD/view",
+      "spec_file": "art/reference_specs/e3_2015/materials-construction-02-joints-repairs.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/materials-construction-02-joints-repairs.md",
+      "request_sha256": "292dbf3a666c4c9f781ea5539c913d4b62b7125e8fc464e168f568a0d1a793c7",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/materials-construction-02-joints-repairs/invocation-ced4fbd87a77.json",
+      "review_file": "art/references/eras/e3_2015/reviews/materials-construction-02-joints-repairs/review-ced4fbd87a77.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-approval-ced4fbd87a77.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true
+    },
+    {
+      "role": "materials-construction",
+      "sheet": "03-service-architecture",
+      "sha256": "bca7cfa2c96dafb48ed57b93f1c6626fd72bd7587301509df3d19a9a16881400",
+      "bytes": 1617218,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1qn5FF5d8xB45TlEFx9j2mUOq-wLjtpqz",
+      "drive_url": "https://drive.google.com/file/d/1qn5FF5d8xB45TlEFx9j2mUOq-wLjtpqz/view",
+      "spec_file": "art/reference_specs/e3_2015/materials-construction-03-service-architecture.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/materials-construction-03-service-architecture.md",
+      "request_sha256": "db3ffda283eb0803035819b85ba5ed9c59d382976caa365534150d0b3ba98114",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/materials-construction-03-service-architecture/invocation-bca7cfa2c96d.json",
+      "review_file": "art/references/eras/e3_2015/reviews/materials-construction-03-service-architecture/review-bca7cfa2c96d.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-approval-bca7cfa2c96d.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "01-enclosed-precision-drives",
+      "sha256": "4affa59aaf6cf69ea617fdd133d67b58c84972cf72f97f6e0662b956abffc1b6",
+      "bytes": 1863927,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1SgBuzSky2hIrGA2oJejDMfjpLTOP0DQA",
+      "drive_url": "https://drive.google.com/file/d/1SgBuzSky2hIrGA2oJejDMfjpLTOP0DQA/view",
+      "spec_file": "art/reference_specs/e3_2015/mechanics-infrastructure-01-enclosed-precision-drives.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/mechanics-infrastructure-01-enclosed-precision-drives.md",
+      "request_sha256": "095a82faeaa793654d3325557e348839df88056dc74488593891438b1616b960",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/mechanics-infrastructure-01-enclosed-precision-drives/invocation-4affa59aaf6c.json",
+      "review_file": "art/references/eras/e3_2015/reviews/mechanics-infrastructure-01-enclosed-precision-drives/review-4affa59aaf6c.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-approval-4affa59aaf6c.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "02-joints-guides-handling",
+      "sha256": "51966994c0d6c5c1cc20dfc03307c65fc477870b6b29263ca046b871a2cceb1b",
+      "bytes": 1730319,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1tuff5Rk5t3KI8h9typGLjTfIh49jg1DN",
+      "drive_url": "https://drive.google.com/file/d/1tuff5Rk5t3KI8h9typGLjTfIh49jg1DN/view",
+      "spec_file": "art/reference_specs/e3_2015/mechanics-infrastructure-02-joints-guides-handling.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/mechanics-infrastructure-02-joints-guides-handling.md",
+      "request_sha256": "84c9e13e47147a4d376a355e4a5cc4f9e12efbf1818379cbcb408376dd95a0a8",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/mechanics-infrastructure-02-joints-guides-handling/invocation-51966994c0d6.json",
+      "review_file": "art/references/eras/e3_2015/reviews/mechanics-infrastructure-02-joints-guides-handling/review-51966994c0d6.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-acceptance-51966994c0d6.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true,
+      "waiver_file": "art/references/eras/e3_2015/reviews/waiver-mi11-51966994c0d6.json"
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "sheet": "03-utilities-service-routing",
+      "sha256": "e2c17fcedbccd084c1ff1b282b136a27f3948452cfe348627ba672a0ffeec6ed",
+      "bytes": 1901643,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1sqDKF89w4hiCpr1JBenYnIZRtdwqbL8L",
+      "drive_url": "https://drive.google.com/file/d/1sqDKF89w4hiCpr1JBenYnIZRtdwqbL8L/view",
+      "spec_file": "art/reference_specs/e3_2015/mechanics-infrastructure-03-utilities-service-routing.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/mechanics-infrastructure-03-utilities-service-routing.md",
+      "request_sha256": "73ddfec26bf927e0d36b3eafc59d9765ce3ea301dfd2c21d93ac9139b0aa9ce0",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/mechanics-infrastructure-03-utilities-service-routing/invocation-e2c17fcedbcc.json",
+      "review_file": "art/references/eras/e3_2015/reviews/mechanics-infrastructure-03-utilities-service-routing/review-e2c17fcedbcc.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-approval-e2c17fcedbcc.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "01-operator-controls",
+      "sha256": "40c0560b21d11f97b2fcb56975d26c51d873fd6dbdc2b88a9c9e3e52d0fe4fd9",
+      "bytes": 1632803,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1LSPx9IKszvNctO2IQ0zSu23RPVKAEpeZ",
+      "drive_url": "https://drive.google.com/file/d/1LSPx9IKszvNctO2IQ0zSu23RPVKAEpeZ/view",
+      "spec_file": "art/reference_specs/e3_2015/controls-displays-01-operator-controls.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/controls-displays-01-operator-controls.md",
+      "request_sha256": "77c4ebdc61a5979b4025f4822c61d25ef1dc11ead57ab7c742a10d8e9f479105",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/controls-displays-01-operator-controls/invocation-40c0560b21d1.json",
+      "review_file": "art/references/eras/e3_2015/reviews/controls-displays-01-operator-controls/review-40c0560b21d1.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-approval-40c0560b21d1.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true
+    },
+    {
+      "role": "controls-displays",
+      "sheet": "02-digital-instruments",
+      "sha256": "14555ffde5cf77a75b60b84ced20a13cec9df12dba3670d3de129bd1a57c4fd8",
+      "bytes": 1456560,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1I_1-4gxKdP6KjITnvbTnpMIih4aY-5fe",
+      "drive_url": "https://drive.google.com/file/d/1I_1-4gxKdP6KjITnvbTnpMIih4aY-5fe/view",
+      "spec_file": "art/reference_specs/e3_2015/controls-displays-02-digital-instruments.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/controls-displays-02-digital-instruments.md",
+      "request_sha256": "48ebc0deea15b5d332dd66e31d69527f5138a62a1a67cda32b8eba457e0ea4bb",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/controls-displays-02-digital-instruments/invocation-14555ffde5cf.json",
+      "review_file": "art/references/eras/e3_2015/reviews/controls-displays-02-digital-instruments/review-14555ffde5cf.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-approval-14555ffde5cf.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "01-led-fixtures",
+      "sha256": "396582cf383505796b2bb2434383fba2d164a0d38b2d9c5ed75593ab08fd1837",
+      "bytes": 1570588,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1KzC-LA9M33klfgPHdlBxUA08vUN8w_f0",
+      "drive_url": "https://drive.google.com/file/d/1KzC-LA9M33klfgPHdlBxUA08vUN8w_f0/view",
+      "spec_file": "art/reference_specs/e3_2015/lighting-signals-01-led-fixtures.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/lighting-signals-01-led-fixtures.md",
+      "request_sha256": "e629e77f3870875db22580b69814c14a8388c84db6595dff436a8085423bf640",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/lighting-signals-01-led-fixtures/invocation-396582cf3835.json",
+      "review_file": "art/references/eras/e3_2015/reviews/lighting-signals-01-led-fixtures/review-396582cf3835.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-approval-396582cf3835.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true
+    },
+    {
+      "role": "lighting-signals",
+      "sheet": "02-status-signaling",
+      "sha256": "39ddb9c5574eef01b338a5c3cde479b04cf94b78349d421bb08111444916f6fb",
+      "bytes": 1537052,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1f0RXdfgTLyszTpQIun-aRzHQnSyO4DJK",
+      "drive_url": "https://drive.google.com/file/d/1f0RXdfgTLyszTpQIun-aRzHQnSyO4DJK/view",
+      "spec_file": "art/reference_specs/e3_2015/lighting-signals-02-status-signaling.json",
+      "prompt_file": "art/prompts/era_references/e3_2015/lighting-signals-02-status-signaling.md",
+      "request_sha256": "e50112e0769f7cd0878909c541dc8bfd134b27176fe122d41c4e1f2eb8d137e1",
+      "generation_id": "UNKNOWN_UNAVAILABLE",
+      "invocation_file": "art/references/eras/e3_2015/reviews/lighting-signals-02-status-signaling/invocation-39ddb9c5574e.json",
+      "review_file": "art/references/eras/e3_2015/reviews/lighting-signals-02-status-signaling/review-39ddb9c5574e.json",
+      "owner_approval_file": "art/references/eras/e3_2015/reviews/owner-approval-39ddb9c5574e.json",
+      "status": "exact_sha_visual_review_pass",
+      "canonical_set_approved": true
+    }
+  ],
+  "cross_era_review_file": "art/references/eras/e3_2015/cross-era-e2-e3-review.json",
+  "approval_gate": {
+    "sha256_readback": "pass",
+    "technical_review": "pass",
+    "exact_sha_visual_review": "pass_with_scoped_mi11_waiver",
+    "role_completeness": "pass",
+    "cross_era_review": "pass",
+    "promotion_dependency_pr": 111
+  }
+}

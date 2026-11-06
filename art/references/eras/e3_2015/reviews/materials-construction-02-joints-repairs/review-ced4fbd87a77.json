@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/materials-construction-02-joints-repairs.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "ced4fbd87a77028c7117a22b01351c13c88a35d6ee132ad825d5b1b56bcb2cda",
+    "bytes": 1691609,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1R4S2Fxxk-sU8OLyASZs3CXFnhkIno2bD",
+    "drive_url": "https://drive.google.com/file/d/1R4S2Fxxk-sU8OLyASZs3CXFnhkIno2bD/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Captive quarter-turn fastener",
+      "verdict": "pass",
+      "notes": "The panel cutaway shows the shaft and retaining ring below the panel; the ring is wider than the shaft opening."
+    },
+    {
+      "id": "02",
+      "name": "Composite scarf joint",
+      "verdict": "pass",
+      "notes": "Stepped laminate joint and bond are visible."
+    },
+    {
+      "id": "03",
+      "name": "Bolted structural flange splice",
+      "verdict": "pass",
+      "notes": "Aligned structural flanges and two bolts are visible."
+    },
+    {
+      "id": "04",
+      "name": "Sandwich-panel threaded insert",
+      "verdict": "pass",
+      "notes": "Threaded insert with local potting and panel skins is visible."
+    },
+    {
+      "id": "05",
+      "name": "Dowel-aligned panel-frame joint",
+      "verdict": "pass",
+      "notes": "Panel/frame alignment and one locating dowel are visible."
+    },
+    {
+      "id": "06",
+      "name": "Access-hatch hinge cassette",
+      "verdict": "pass",
+      "notes": "Compact hinge cassette and captive pin are visible."
+    },
+    {
+      "id": "07",
+      "name": "Gasketed flush corner joint",
+      "verdict": "pass",
+      "notes": "Flush corner joint and dark gasket are visible."
+    },
+    {
+      "id": "08",
+      "name": "Replaceable abrasion strip fixing",
+      "verdict": "pass",
+      "notes": "Abrasion strip and two recessed fasteners are visible."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Visual inspection against machine spec, prior candidate and E2 material references; exact source verified separately. Project owner approval pending.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

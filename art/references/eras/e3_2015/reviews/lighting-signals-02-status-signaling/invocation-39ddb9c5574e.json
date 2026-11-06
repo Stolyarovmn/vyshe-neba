@@ -1,0 +1,13 @@
+{
+  "production_commit": "517db773c9c36a2f1c8c5f0716151edbd94693b0",
+  "spec_commit": "9955a7e3d62aae319483e3c386faf45341b4aa44",
+  "request_sha256": "e50112e0769f7cd0878909c541dc8bfd134b27176fe122d41c4e1f2eb8d137e1",
+  "tool": "image_gen__imagegen",
+  "delivery": "full deterministic explicit prompt",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source_sha256": "39ddb9c5574eef01b338a5c3cde479b04cf94b78349d421bb08111444916f6fb",
+  "drive_file_id": "1f0RXdfgTLyszTpQIun-aRzHQnSyO4DJK",
+  "drive_readback": "byte_identical",
+  "assistant_visual_review": "pass",
+  "owner_approval": "pending"
+}

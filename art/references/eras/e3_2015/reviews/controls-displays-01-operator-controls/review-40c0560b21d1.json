@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/controls-displays-01-operator-controls.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "40c0560b21d11f97b2fcb56975d26c51d873fd6dbdc2b88a9c9e3e52d0fe4fd9",
+    "bytes": 1632803,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1LSPx9IKszvNctO2IQ0zSu23RPVKAEpeZ",
+    "drive_url": "https://drive.google.com/file/d/1LSPx9IKszvNctO2IQ0zSu23RPVKAEpeZ/view",
+    "image": "/workspace/scratch/9252f4912fe0/generated_images/exec-8bce31d9-a59e-4c0a-a3c3-8169a20ee5af.png",
+    "planned_dimensions": [
+      1536,
+      1024
+    ]
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Sealed momentary button",
+      "verdict": "pass",
+      "notes": "Unlit circular button with layered seal"
+    },
+    {
+      "id": "02",
+      "name": "Guarded emergency stop",
+      "verdict": "pass",
+      "notes": "Red mushroom between two guards"
+    },
+    {
+      "id": "03",
+      "name": "Detented rotary encoder",
+      "verdict": "pass",
+      "notes": "Knurled knob and distinct detent ring"
+    },
+    {
+      "id": "04",
+      "name": "Membrane key insert",
+      "verdict": "pass",
+      "notes": "Eight raised domes in two rows"
+    },
+    {
+      "id": "05",
+      "name": "Sealed rocker selector",
+      "verdict": "pass",
+      "notes": "A single sloped rocker face with its left edge depressed and right edge raised; dark sidewall visible under raised edge."
+    },
+    {
+      "id": "06",
+      "name": "Keyed enable switch",
+      "verdict": "pass",
+      "notes": "Recessed lock cylinder and empty keyway"
+    },
+    {
+      "id": "07",
+      "name": "Touch-surface bezel",
+      "verdict": "pass",
+      "notes": "Blank shallow glass and bezel"
+    },
+    {
+      "id": "08",
+      "name": "Control-pod bare shell",
+      "verdict": "pass",
+      "notes": "Empty shell with three cutouts and mounting bosses"
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Reviewed edited exact PNG against the revised spec and previous candidate. All seven other specimens retain their visual identities and positions. Owner approval pending.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

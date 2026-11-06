@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/lighting-signals-02-status-signaling.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "39ddb9c5574eef01b338a5c3cde479b04cf94b78349d421bb08111444916f6fb",
+    "bytes": 1537052,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1f0RXdfgTLyszTpQIun-aRzHQnSyO4DJK",
+    "drive_url": "https://drive.google.com/file/d/1f0RXdfgTLyszTpQIun-aRzHQnSyO4DJK/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Flush multicolor LED status puck",
+      "verdict": "pass",
+      "notes": "Flush circular puck with three colored sectors and threaded barrel"
+    },
+    {
+      "id": "02",
+      "name": "Modular stack-light segment",
+      "verdict": "pass",
+      "notes": "Single ribbed amber stack-light segment with tabs"
+    },
+    {
+      "id": "03",
+      "name": "Directional warning chevron optic",
+      "verdict": "pass",
+      "notes": "Molded chevron lens without housing or lettering"
+    },
+    {
+      "id": "04",
+      "name": "Equipment-ready ring-light collar",
+      "verdict": "pass",
+      "notes": "Thin green collar with clear open center"
+    },
+    {
+      "id": "05",
+      "name": "Dual-chamber fault indicator",
+      "verdict": "pass",
+      "notes": "Separate red and amber chambers with opaque divider"
+    },
+    {
+      "id": "06",
+      "name": "Illuminated-button LED insert",
+      "verdict": "pass",
+      "notes": "Single square emitter insert with terminals and no switch cap"
+    },
+    {
+      "id": "07",
+      "name": "Compact strobe emitter",
+      "verdict": "pass",
+      "notes": "Deep faceted reflector and attached rear driver"
+    },
+    {
+      "id": "08",
+      "name": "Light-pipe terminal fixture",
+      "verdict": "pass",
+      "notes": "Clear bent light pipe with clip and round terminal"
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Visual inspection of exact source against E3 spec and comparison with LED fixtures sheet. Owner approval pending.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

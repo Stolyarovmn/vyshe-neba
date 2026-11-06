@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "source_sha256": "39ddb9c5574eef01b338a5c3cde479b04cf94b78349d421bb08111444916f6fb",
+  "drive_file_id": "1f0RXdfgTLyszTpQIun-aRzHQnSyO4DJK",
+  "decision": "accepted",
+  "evidence": "Project owner instructed the assistant to proceed with final checks and close the set through PRs if the assistant accepted this sheet. Assistant accepted this exact source after visual review and Drive readback."
+}

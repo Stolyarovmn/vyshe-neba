@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/lighting-signals-01-led-fixtures.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "396582cf383505796b2bb2434383fba2d164a0d38b2d9c5ed75593ab08fd1837",
+    "bytes": 1570588,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1KzC-LA9M33klfgPHdlBxUA08vUN8w_f0",
+    "drive_url": "https://drive.google.com/file/d/1KzC-LA9M33klfgPHdlBxUA08vUN8w_f0/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Sealed linear LED work-light bar",
+      "verdict": "pass",
+      "notes": "Rigid diffuser bar with feet and endcaps"
+    },
+    {
+      "id": "02",
+      "name": "Recessed LED downlight can",
+      "verdict": "pass",
+      "notes": "Recessed circular flange and diffuser"
+    },
+    {
+      "id": "03",
+      "name": "Adjustable task-light spot",
+      "verdict": "pass",
+      "notes": "Directional head with pivot and fins"
+    },
+    {
+      "id": "04",
+      "name": "Waterproof surface light strip",
+      "verdict": "pass",
+      "notes": "Thin sealed surface strip with visible passive emitters"
+    },
+    {
+      "id": "05",
+      "name": "Asymmetric anti-glare service optic",
+      "verdict": "pass",
+      "notes": "Slanted reflector and cutoff baffle"
+    },
+    {
+      "id": "06",
+      "name": "Replaceable LED light-engine cartridge",
+      "verdict": "pass",
+      "notes": "Emitter cartridge with copper thermal slug"
+    },
+    {
+      "id": "07",
+      "name": "Protected floor-edge marker fixture",
+      "verdict": "pass",
+      "notes": "Low wedge marker with amber lens"
+    },
+    {
+      "id": "08",
+      "name": "Backup emergency luminaire",
+      "verdict": "pass",
+      "notes": "Broad diffuser and separate access latch"
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Exact source inspection against E3 spec. Owner approval pending.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

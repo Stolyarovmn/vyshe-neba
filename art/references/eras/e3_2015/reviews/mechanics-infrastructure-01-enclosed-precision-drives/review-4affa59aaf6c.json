@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/mechanics-infrastructure-01-enclosed-precision-drives.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "4affa59aaf6cf69ea617fdd133d67b58c84972cf72f97f6e0662b956abffc1b6",
+    "bytes": 1863927,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1SgBuzSky2hIrGA2oJejDMfjpLTOP0DQA",
+    "drive_url": "https://drive.google.com/file/d/1SgBuzSky2hIrGA2oJejDMfjpLTOP0DQA/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Sealed precision servo cartridge",
+      "verdict": "pass",
+      "notes": "Sealed servo cartridge with flange, shaft and connector is visible."
+    },
+    {
+      "id": "02",
+      "name": "Inline planetary reducer module",
+      "verdict": "pass",
+      "notes": "Separate planetary reducer with output and rear coupling is visible."
+    },
+    {
+      "id": "03",
+      "name": "Electromechanical linear actuator",
+      "verdict": "pass",
+      "notes": "Rectangular actuator with guarded extending rod is visible."
+    },
+    {
+      "id": "04",
+      "name": "Enclosed belt-drive cassette",
+      "verdict": "pass",
+      "notes": "Belt cassette cutaway contains one belt and two pulleys."
+    },
+    {
+      "id": "05",
+      "name": "Brake-clutch shaft cartridge",
+      "verdict": "pass",
+      "notes": "Shaft cartridge and stacked friction plates in inspection opening are visible."
+    },
+    {
+      "id": "06",
+      "name": "Servo encoder rear endcap",
+      "verdict": "pass",
+      "notes": "Shallow encoder endcap, connector and three mounting holes are visible."
+    },
+    {
+      "id": "07",
+      "name": "Rotary actuator output yoke",
+      "verdict": "pass",
+      "notes": "Rotating collar lug meets left fixed stop, second stop remains separate on the right."
+    },
+    {
+      "id": "08",
+      "name": "Servo thermal jacket",
+      "verdict": "pass",
+      "notes": "Hollow cooling jacket, two ports and visible annular passage are present."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Visual inspection against the spec, prior attempt and E2 mechanical references; exact-source verification separately. Owner approval pending.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

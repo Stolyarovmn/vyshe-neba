@@ -1,0 +1,18 @@
+{
+  "production_commit": "4b644ad6e19046f67d04e35313b6089397b80b1d",
+  "spec_commit": "426fd12531a6d94b58dab94359df66677054838c",
+  "spec_git_blob": "4093e008093486be216b076d329ab19aa8a3c6c9",
+  "spec_path": "art/reference_specs/e3_2015/mechanics-infrastructure-03-utilities-service-routing.json",
+  "request_sha256": "73ddfec26bf927e0d36b3eafc59d9765ce3ea301dfd2c21d93ac9139b0aa9ce0",
+  "tool": "image_gen__imagegen",
+  "delivery": "full build-request in explicit prompt",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "input_sha256": "9b892f76904a3f2fae7cbd623f227930874142e144735c5b983ee54773d3562b",
+  "input_drive_id": "16s-sIy-oZq8Vv46k5FZobrN0NLsvgpfq",
+  "source_sha256": "e2c17fcedbccd084c1ff1b282b136a27f3948452cfe348627ba672a0ffeec6ed",
+  "drive_readback": "byte_identical",
+  "drive_file_id": "1sqDKF89w4hiCpr1JBenYnIZRtdwqbL8L",
+  "technical_verdict": "pass",
+  "assistant_visual_review": "pass",
+  "owner_approval": "pending"
+}

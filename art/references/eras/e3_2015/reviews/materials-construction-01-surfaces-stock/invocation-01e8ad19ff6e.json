@@ -1,0 +1,25 @@
+{
+  "production_commit": "4b644ad6e19046f67d04e35313b6089397b80b1d",
+  "spec_commit": "f4d2a723a820f4d0ebfc02a91341e4d6091ff7cf",
+  "spec_git_blob": "716912296c748569c6baedaf7be4ad73aa65133d",
+  "spec_path": "art/reference_specs/e3_2015/materials-construction-01-surfaces-stock.json",
+  "request_sha256": "b32c3ad33763b23e86876cdd82c547e111241afa157f639eb41c6df36b192899",
+  "tool": "image_gen__imagegen",
+  "delivery": "complete build-request text supplied through explicit prompt argument",
+  "input_image_sha256": "439f2bd8c1b67b16786adf7bbfc6e2f54149bdeed5715837fcdbc8b2419a116f",
+  "input_drive_file_id": "1gX0_LIRI9SDXjba_pS-H23aEsxQXiHc2",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source_sha256": "01e8ad19ff6e856bcb4b518f6915dfc6bf71649b61536889240b03c21d170a17",
+  "source_bytes": 1708814,
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "drive_file_id": "1QnrJgcK4ScTysthAF9Na3hdWIpW7Bvgo",
+  "drive_url": "https://drive.google.com/file/d/1QnrJgcK4ScTysthAF9Na3hdWIpW7Bvgo/view",
+  "drive_readback_sha256": "01e8ad19ff6e856bcb4b518f6915dfc6bf71649b61536889240b03c21d170a17",
+  "automated_technical_verdict": "pass",
+  "assistant_visual_review_verdict": "pass",
+  "owner_approval": "pending",
+  "cross_era_set_review": "pending"
+}

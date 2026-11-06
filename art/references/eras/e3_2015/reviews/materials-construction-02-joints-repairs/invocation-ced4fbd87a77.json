@@ -1,0 +1,24 @@
+{
+  "production_commit": "4b644ad6e19046f67d04e35313b6089397b80b1d",
+  "spec_commit": "464700ff06d8f5b029bfea40fcc851b4eb5926c0",
+  "spec_git_blob": "075019b612ad8d399cefa600ec8849739321d934",
+  "spec_path": "art/reference_specs/e3_2015/materials-construction-02-joints-repairs.json",
+  "request_sha256": "292dbf3a666c4c9f781ea5539c913d4b62b7125e8fc464e168f568a0d1a793c7",
+  "tool": "image_gen__imagegen",
+  "delivery": "complete build-request text supplied through explicit prompt argument",
+  "input_source_sha256": "b8e13fba6e841ba9ae5d8d0031d9e76ba896b7e3f6c6724dfc1881ac0bb9cdcb",
+  "input_drive_file_id": "1esUnmt8Z8c3rvL3VT67cTLBk5YmoCC4W",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source_sha256": "ced4fbd87a77028c7117a22b01351c13c88a35d6ee132ad825d5b1b56bcb2cda",
+  "source_bytes": 1691609,
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "drive_file_id": "1R4S2Fxxk-sU8OLyASZs3CXFnhkIno2bD",
+  "drive_url": "https://drive.google.com/file/d/1R4S2Fxxk-sU8OLyASZs3CXFnhkIno2bD/view",
+  "drive_readback_sha256": "ced4fbd87a77028c7117a22b01351c13c88a35d6ee132ad825d5b1b56bcb2cda",
+  "technical_verdict": "pass",
+  "assistant_visual_review": "pass",
+  "owner_approval": "pending"
+}

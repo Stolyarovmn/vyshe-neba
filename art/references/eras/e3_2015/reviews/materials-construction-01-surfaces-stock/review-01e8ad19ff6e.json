@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/materials-construction-01-surfaces-stock.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "01e8ad19ff6e856bcb4b518f6915dfc6bf71649b61536889240b03c21d170a17",
+    "bytes": 1708814,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1QnrJgcK4ScTysthAF9Na3hdWIpW7Bvgo",
+    "drive_url": "https://drive.google.com/file/d/1QnrJgcK4ScTysthAF9Na3hdWIpW7Bvgo/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Aluminium sandwich-panel perimeter edge",
+      "verdict": "pass",
+      "notes": "Solid-core panel edge and extrusion are visible."
+    },
+    {
+      "id": "02",
+      "name": "Carbon-fibre laminate cutaway coupon",
+      "verdict": "pass",
+      "notes": "Carbon weave and laminate layers are visible."
+    },
+    {
+      "id": "03",
+      "name": "Moulded glass-fibre service-cover corner",
+      "verdict": "pass",
+      "notes": "Cover corner has two clearly visible open fastening seats; faint mark remains near upper edge."
+    },
+    {
+      "id": "04",
+      "name": "Powder-coated folded graphite sheet corner",
+      "verdict": "pass",
+      "notes": "Single folded graphite metal corner is visible."
+    },
+    {
+      "id": "05",
+      "name": "Off-white snap-fit engineering-polymer extrusion",
+      "verdict": "pass",
+      "notes": "Two hooked retaining lips and open groove are visible."
+    },
+    {
+      "id": "06",
+      "name": "Honeycomb-core bonded sandwich panel coupon",
+      "verdict": "pass",
+      "notes": "Open honeycomb core between face sheets is visible."
+    },
+    {
+      "id": "07",
+      "name": "Anodized aluminium T-slot structural profile",
+      "verdict": "pass",
+      "notes": "Aluminium structural extrusion with T-slot interfaces is visible."
+    },
+    {
+      "id": "08",
+      "name": "Elastomeric environmental compression edge seal",
+      "verdict": "pass",
+      "notes": "Two flexible lips, hollow chambers and retention foot are visible."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Visual comparison with spec, input sheet and approved E2 materials; exact source checked separately. Visual judgment pending project owner approval.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
