@@ -3,7 +3,7 @@
 // The requirements of every module follow the table in DESIGN.md section 4.3.
 
 import { STAGE_DEFAULTS } from '../sim/config.js';
-import { MAX_PART_LEVEL, PART_LEVELS_PER_ERA, PRICE_SCALE } from './economy.js';
+import { MAX_PART_LEVEL, PART_LEVELS_PER_ERA, PART_PRICE_SCALE } from './economy.js';
 
 const core = STAGE_DEFAULTS.core;
 const capsule = STAGE_DEFAULTS.capsule;
@@ -27,7 +27,7 @@ const DATA_CURVE = [0, 0, 0, 0, 0, 0, 2, 3, 5, 8, 12, 18, 26, 38, 55, 80, 115, 1
 function costs(base, growth) {
   const out = [];
   for (const level of LEVELS) {
-    const value = nice(PRICE_SCALE * base * growth ** (level - 1));
+    const value = nice(PART_PRICE_SCALE * base * growth ** (level - 1));
     out.push(out.length && value <= out[out.length - 1] ? out[out.length - 1] + 5 : value);
   }
   return out;
@@ -79,7 +79,7 @@ export const PARTS = {
     name: 'Двигатель',
     desc: 'Тяга, предел скорости и расход топлива. Сильный двигатель быстрее набирает высоту и тратит меньше.',
     need: 'Нужен двигатель',
-    cost: { base: 150, growth: 1.32 },
+    cost: { base: 150, growth: 1.34 },
     dataWeight: 1,
     stats: (level) => ({
       thrust: round(core.thrust * (1 + level / 12), 1),
@@ -97,7 +97,7 @@ export const PARTS = {
     name: 'Топливный бак',
     desc: 'Ёмкость маршевой ступени. Больше топлива — выше потолок и запас на посадку.',
     need: 'Нужен топливный бак',
-    cost: { base: 70, growth: 1.3 },
+    cost: { base: 70, growth: 1.33 },
     dataWeight: 0.8,
     stats: (level) => ({ fuel: round(core.fuel * (1 + 0.16 * level)) }),
     statInfo: [stat('fuel', 'Топливо', 'ед.', 1, 0)],
@@ -108,7 +108,7 @@ export const PARTS = {
     name: 'Обшивка',
     desc: 'Прочность корпуса и защита от обломков.',
     need: 'Нужна обшивка',
-    cost: { base: 100, growth: 1.3 },
+    cost: { base: 100, growth: 1.33 },
     dataWeight: 0.8,
     stats: (level) => ({ hp: 100 + 35 * level, debrisResist: Math.min(0.6, round(0.033 * level, 3)) }),
     statInfo: [stat('hp', 'Прочность', 'ед.', 1, 0), stat('debrisResist', 'Защита от обломков', '%', 1, 3)],
@@ -119,8 +119,7 @@ export const PARTS = {
     name: 'Разгонный блок',
     desc: 'Отдельная стартовая ступень с собственным топливом. Мощность растёт с уровнем башни обслуживания.',
     need: 'Нужен разгонный блок',
-    minEra: 1,
-    cost: { base: 190, growth: 1.33 },
+    cost: { base: 190, growth: 1.34 },
     dataWeight: 1.1,
     stats: (level) => ({
       fuel: level === 0 ? 0 : booster.fuel + 18 * level,
@@ -134,7 +133,7 @@ export const PARTS = {
     name: 'Капсула',
     desc: 'Последняя ступень: запасной бак, возврат и посадка.',
     need: 'Нужна капсула',
-    cost: { base: 110, growth: 1.31 },
+    cost: { base: 110, growth: 1.34 },
     dataWeight: 1,
     stats: (level) => ({
       fuel: capsule.fuel + 7 * level,
@@ -148,7 +147,7 @@ export const PARTS = {
     name: 'Посадочные опоры',
     desc: 'Допуск посадки: вертикальная и горизонтальная скорость, наклон корпуса.',
     need: 'Нужны посадочные опоры',
-    cost: { base: 60, growth: 1.29 },
+    cost: { base: 60, growth: 1.32 },
     dataWeight: 0.6,
     stats: (level) => ({
       vTol: round(13 + 2.2 * level, 1),
@@ -164,7 +163,7 @@ export const PARTS = {
     desc: 'Маневровые двигатели и стабилизаторы: шире угол наклона и быстрее поворот.',
     need: 'Нужны стабилизаторы',
     // Cheap early levels: without them the rocket barely steers, so players buy the first ones at once.
-    cost: { base: 35, growth: 1.29 },
+    cost: { base: 35, growth: 1.32 },
     dataWeight: 0.6,
     stats: (level) => ({ maxTilt: finsTilt(level), turn: finsTurn(level), dragCut: round(1 - 1 / (1 + 0.06 * level), 3) }),
     statInfo: [stat('maxTilt', 'Угол наклона', '°', 1, 0, 180 / Math.PI), stat('turn', 'Поворот', '×', 1, 2), stat('dragCut', 'Меньше сноса', '%', 1, 3)],
@@ -178,8 +177,8 @@ export const PARTS = {
     cost: { base: 140, growth: 1.34 },
     dataWeight: 1.2,
     stats: (level) => ({
-      predict: level >= 10 ? 2 : level >= 4 ? 1 : 0,
-      assist: level >= 7 ? 1 : 0,
+      predict: level >= 6 ? 2 : level >= 1 ? 1 : 0,
+      assist: level >= 3 ? 1 : 0,
       transferSave: round(0.012 * level, 3),
     }),
     statInfo: [stat('predict', 'Линия прогноза', 'ур.', 1, 0), stat('assist', 'Автостабилизация', '', 1, 0), stat('transferSave', 'Экономия на перелёте', '%', 1, 3)],

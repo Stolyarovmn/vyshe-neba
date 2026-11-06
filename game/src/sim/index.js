@@ -2,7 +2,7 @@
 
 export { createFlight, step, summarize } from './flight.js';
 export {
-  BODIES, DT, METERS_PER_UNIT, SPACE_ALT, ZONES, densityAt, gravityAt, zoneAt,
+  BODIES, DT, METERS_PER_UNIT, SHADOW_RANGE, SPACE_ALT, ZONES, densityAt, gravityAt, zoneAt,
 } from './bodies.js';
 export { STAGE_DEFAULTS, normalizeConfig } from './config.js';
 export { mulberry32 } from './rng.js';

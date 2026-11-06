@@ -2,7 +2,7 @@
 // Coordinates: x right, y DOWN, altitude = -y. Angle 0 points the nose up, positive turns clockwise.
 // Velocities: vy > 0 means falling.
 
-import { BODIES, DT, SPACE_ALT, densityAt, gravityAt, zoneAt } from './bodies.js';
+import { BODIES, DT, SHADOW_RANGE, SPACE_ALT, densityAt, gravityAt, zoneAt } from './bodies.js';
 import { normalizeConfig } from './config.js';
 import {
   CHUTE, applyChute, canParachute, deployChute, evaluateTouchdown, hasChute, liveLanding, predictTrajectory,
@@ -58,6 +58,8 @@ export function createFlight(config) {
     av: 0,
     throttle: 0,
     alt: 0,
+    heightAboveGround: 0,
+    shadowRange: SHADOW_RANGE,
     speed: 0,
     climb: 0,
     stageIndex: Math.min(firstStage, cfg.stages.length - 1),
@@ -434,6 +436,8 @@ function refresh(s) {
   const alt = Math.max(0, -s.y);
   const stage = activeStage(s);
   s.alt = alt;
+  s.heightAboveGround = alt;
+  s.shadowRange = SHADOW_RANGE;
   s.speed = Math.hypot(s.vx, s.vy);
   s.climb = -s.vy;
   s.g = gravityAt(body, alt);

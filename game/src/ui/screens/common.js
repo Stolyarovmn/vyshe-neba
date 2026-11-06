@@ -4,6 +4,7 @@
 import { t } from '../../i18n/index.js';
 import { clamp, fmtCompact, fmtInt } from '../format.js';
 import { chromeLayout } from '../layout.js';
+import { reasonFull } from '../next-steps.js';
 
 const MIN_ROW = 44; // нижняя граница высоты нажимаемых строк и кнопок щитка
 
@@ -129,7 +130,8 @@ export function drawChrome(app, kit, o = {}) {
   if (o.back && G.back && kit.iconButton('back', G.back, { icon: 'back', label: t('common.back'), variant: 'btn' })) app.back();
   if (o.era && G.era) {
     const cc = kit.cell();
-    if (kit.button('plate-era', G.era, { variant: o.eraOpen ? 'cardOn' : 'raised', icon: 'era', label: String(ERA_YEARS[p.era] ?? ''), size: Math.round(G.era.h * 0.3), iconSize: Math.round(G.era.h * 0.46), lamp: false })) out.era = true;
+    // o.eraBadge — переход в новую эпоху доступен: на табличке пульсирует «!»
+    if (kit.button('plate-era', G.era, { variant: o.eraOpen ? 'cardOn' : 'raised', icon: 'era', label: String(ERA_YEARS[p.era] ?? ''), size: Math.round(G.era.h * 0.3), iconSize: Math.round(G.era.h * 0.46), lamp: false, badge: o.eraBadge && !o.eraOpen ? '!' : undefined, badgePulse: true })) out.era = true;
     void cc;
   }
   if (o.gear && G.gear && kit.iconButton('hub-gear', G.gear, { icon: 'gear', label: t('more.settings'), variant: 'btn' })) out.gear = true;
@@ -224,6 +226,94 @@ export function lockRows(app, kit, x, y, w, reasons, o = {}) {
   return cy - y;
 }
 
+/**
+ * Причины блокировки щитка целиком, перенос по словам: «Нужна эпоха 1986», «Нужна башня обслуживания ур. 1»,
+ * «Не хватает 120 монет». Возвращает [{ r, lines, h, tappable }] — по нему считается высота и рисуются строки.
+ */
+export function lockPlan(app, kit, reasons, w, o = {}) {
+  const L = kit.L;
+  const size = kit.fs(12);
+  const step = kit.text.lineStep(size, 1.25);
+  const isz = Math.round(size * 1.7);
+  return reasons.map((r) => {
+    const tappable = !!(o.goto && r.kind === 'building' && r.building);
+    const lines = kit.text.wrap(reasonFull(app, r), w - isz - Math.round(size * 0.9), size).slice(0, 3);
+    const h = Math.max(tappable ? L.touch(44) : Math.round(22 * (o.u ?? L.ui)), Math.round(lines.length * step + size * 0.5));
+    return { r, lines, h, tappable };
+  });
+}
+
+/** Рисует план причин (lockPlan) с значками: замок/эпоха/монеты/данные, постройка или модуль. Возвращает высоту. */
+export function drawLockPlan(app, kit, x, y, w, plan, o = {}) {
+  const L = kit.L;
+  const c = kit.c;
+  const size = kit.fs(12);
+  const step = kit.text.lineStep(size, 1.25);
+  const isz = Math.round(size * 1.7);
+  let cy = y;
+  for (const { r, lines, h, tappable } of plan) {
+    const row = { x, y: cy, w, h };
+    if (tappable && kit.button(`goto-${r.building}`, row, { variant: 'inset' })) o.goto(r.building);
+    const mid = cy + h / 2;
+    const funds = isFundsReason(r);
+    const ic = r.kind === 'building' ? buildingIcon(r.building, 1) : r.kind === 'part' ? partIcon(r.part) : r.kind === 'era' ? 'era' : r.kind === 'coins' ? 'coin' : r.kind === 'data' ? 'data' : 'lock';
+    kit.icon(ic, x + isz / 2 + 2, mid, isz, funds ? c.amber : c.text);
+    lines.forEach((ln, i) => kit.drawText(ln, x + isz + Math.round(size * 0.9), mid + (i - (lines.length - 1) / 2) * step, { size, color: funds ? c.amber : c.red }));
+    cy += h + Math.round(L.gap * 0.3);
+  }
+  return cy - y;
+}
+
+/** Высота свёрнутой строки причин (lockChips): тап-цель 44 px, если среди причин есть постройка с переходом. */
+export function lockChipsH(kit, reasons, o = {}) {
+  const L = kit.L;
+  const tappable = !!(o.goto && reasons.some((r) => r.kind === 'building' && r.building));
+  return tappable ? L.touch(44) : Math.max(26, Math.round(28 * (o.u ?? L.ui)));
+}
+
+/**
+ * Свёрнутые причины блокировки для тесных щитков: одна строка плашек «значок + короткая метка» (год эпохи, ур.N,
+ * недостающие монеты). Полный текст — в обычном виде (lockPlan). Возвращает занятую высоту.
+ */
+export function drawLockChips(app, kit, x, y, w, reasons, o = {}) {
+  const L = kit.L;
+  const c = kit.c;
+  const size = kit.fs(12);
+  const h = lockChipsH(kit, reasons, o);
+  const gap = Math.round(L.gap * 0.5);
+  const n = reasons.length;
+  const cw = (w - gap * (n - 1)) / n;
+  reasons.forEach((r, i) => {
+    const rect = { x: x + i * (cw + gap), y, w: cw, h };
+    if (o.goto && r.kind === 'building' && r.building && kit.button(`goto-${r.building}`, rect, { variant: 'inset' })) o.goto(r.building);
+    const funds = isFundsReason(r);
+    let ic = 'lock';
+    let lab = '';
+    if (r.kind === 'building') {
+      ic = buildingIcon(r.building, 1);
+      lab = t('lvl.short', { n: r.level });
+    } else if (r.kind === 'part') {
+      ic = partIcon(r.part);
+      lab = t('lvl.short', { n: r.level });
+    } else if (r.kind === 'era') {
+      ic = 'era';
+      lab = String(ERA_YEARS[r.era] ?? '');
+    } else if (r.kind === 'coins' || r.kind === 'data') {
+      ic = r.kind === 'coins' ? 'coin' : 'data';
+      lab = fmtCompact(Math.max(0, r.need - r.have));
+    }
+    const isz = Math.round(size * 1.7);
+    const gapI = Math.round(size * 0.4);
+    const lw = kit.text.measure(lab, size);
+    const withIcon = isz + gapI + lw <= cw;
+    const sx = rect.x + (cw - (withIcon ? isz + gapI : 0) - lw) / 2;
+    const mid = y + h / 2;
+    if (withIcon) kit.icon(ic, sx + isz / 2, mid, isz, funds ? c.amber : c.text);
+    kit.drawText(lab, sx + (withIcon ? isz + gapI : 0), mid, { size, color: funds ? c.amber : c.red, maxWidth: cw });
+  });
+  return h + Math.round(L.gap * 0.3);
+}
+
 // ---------- щиток модуля и постройки ----------
 
 // поля щитка уменьшаются вместе с масштабом: в тесном окне каждая строка на счету
@@ -231,7 +321,9 @@ const padOfL = (L, uu) => (uu < L.ui * 0.95 ? Math.round(L.pad * 0.6) : L.pad);
 
 /**
  * Масштаб размеров щитка: если щиток не помещается в bounds, его строки ужимаются (но не меньше 0,62).
- * Если не помещается и так, щиток получает всю безопасную область окна: он важнее фона. Возвращает { u, bounds }.
+ * Не помещается и так — берётся вся область под угловыми табличками; верхняя полоса («назад», эпоха, шестерёнка,
+ * монеты, данные) щитку не принадлежит никогда. Возвращает { u, bounds, ok }: ok = false, когда не помещается и там
+ * (вызывающий сворачивает содержимое и пробует снова).
  */
 function fitScale(L, bounds, calcH) {
   const tryFit = (b) => {
@@ -244,16 +336,16 @@ function fitScale(L, bounds, calcH) {
     }
     return calcH(u) <= avail ? u : null;
   };
-  const u = tryFit(bounds);
-  if (u !== null) return { u, bounds };
-  // сначала вся область под угловыми табличками, и только если и там тесно — всё окно
+  // область под верхней полосой: границы вызывающего тоже не могут заходить выше неё
   const row = chromeLayout(L, { back: true, era: true, gear: true }).row;
   const top = row.y + row.h + L.gap;
   const below = { x: L.area.x, y: top, w: L.area.w, h: L.area.y + L.area.h - top };
+  const own = bounds && bounds.y < top ? { x: bounds.x, y: top, w: bounds.w, h: Math.max(0, bounds.y + bounds.h - top) } : bounds;
+  const u = tryFit(own);
+  if (u !== null) return { u, bounds: own, ok: true };
   const ub = tryFit(below);
-  if (ub !== null) return { u: ub, bounds: below };
-  const full = { x: L.area.x, y: L.area.y, w: L.area.w, h: L.area.h };
-  return { u: tryFit(full) ?? L.ui * 0.62, bounds: full };
+  if (ub !== null) return { u: ub, bounds: below, ok: true };
+  return { u: L.ui * 0.62, bounds: below, ok: false };
 }
 
 /**
@@ -267,9 +359,20 @@ export function infoCallout(app, kit, spec) {
   const c = kit.c;
   const p = app.profile;
   const padOf = (uu) => padOfL(L, uu);
-  const rows = (spec.rows || []).slice(0, 3);
-  const locks = (spec.locks || []).filter((r) => !isFundsReason(r)).slice(0, 2);
-  const w = Math.min(Math.round(310 * L.ui), 480, L.area.w - L.gap * 2);
+  const rowsAll = (spec.rows || []).slice(0, 3);
+  // причины блокировки показываются целиком, включая нехватку денег; больше трёх строк в щиток не помещается
+  const locks = (spec.locks || []).slice(0, 3);
+  // лестница свёртки: щиток не вылезает ни на верхнюю полосу, ни за область, поэтому при нехватке места
+  // сначала причины сворачиваются в одну строку плашек, затем убираются лишние строки «было → станет» и подпись
+  const LADDER = [
+    { rows: 3, chips: false, line: true },
+    { rows: 3, chips: true, line: true },
+    { rows: 2, chips: true, line: true },
+    { rows: 1, chips: true, line: false },
+    { rows: 0, chips: true, line: false },
+  ];
+  // в ландшафте щиток шире: цена и кнопка встают в одну строку, высота щитка меньше
+  const w = Math.min(Math.max(Math.round(310 * L.ui), L.portrait ? 0 : Math.round(L.area.w * 0.5)), 480, L.area.w - L.gap * 2);
   // подвал: цена и кнопка в одну строку; не помещаются без мелкого шрифта — цена отдельной строкой над кнопкой на всю ширину
   const hasBuy = !spec.noBuy && spec.next !== false;
   const buySize = kit.fs(15);
@@ -278,7 +381,7 @@ export function infoCallout(app, kit, spec) {
   const powW = spec.power ? Math.round(powSize * 1.4) + kit.text.measure(spec.power.text, powSize) + L.gap : 0;
   const buyNeed = hasBuy ? kit.buttonNeed(spec.buyLabel || '', buySize, { lamp: !!spec.canBuy }) : 0;
   const stackFoot = (uu) => hasBuy && (costW > 0 || powW > 0) && costW + powW + L.gap * 2 + kit.cell() * 4 + buyNeed > w - padOf(uu) * 2;
-  const dims = (uu) => {
+  const dims = (uu, D) => {
     const touch = (n) => Math.max(MIN_ROW, Math.round(n * uu));
     // абсолютные минимумы: при сжатии щитка строки не должны слипаться (подпись, зазор, полоска помещаются всегда)
     const atLeast = (n, min) => Math.max(min, Math.round(n * uu));
@@ -286,22 +389,30 @@ export function infoCallout(app, kit, spec) {
       titleH: atLeast(34, 28),
       segH: atLeast(18, 16),
       rowH: atLeast(36, 30),
-      lockH: (spec.goto ? touch(44) : atLeast(28, 26)) + Math.round(L.gap * 0.3),
-      lineH: spec.line ? atLeast(24, 20) : 0,
+      locksH: !locks.length ? 0 : D.chips ? lockChipsH(kit, locks, { goto: spec.goto, u: uu }) + Math.round(L.gap * 0.3) : lockPlan(app, kit, locks, w - padOf(uu) * 2, { goto: spec.goto, u: uu }).reduce((a, q) => a + q.h + Math.round(L.gap * 0.3), 0),
+      lineH: spec.line && D.line ? atLeast(24, 20) : 0,
       btnH: touch(52),
       priceH: atLeast(30, 26),
       stack: stackFoot(uu),
       footH: spec.next === false || spec.noBuy ? atLeast(32, 28) : touch(52) + (stackFoot(uu) ? atLeast(30, 26) + Math.round(L.gap * 0.4) : 0),
     };
   };
-  const calcH = (uu) => {
-    const d = dims(uu);
+  const calcH = (uu, D) => {
+    const d = dims(uu, D);
     const extra = typeof spec.extraH === 'function' ? spec.extraH(uu) : spec.extraH || 0;
-    return padOf(uu) * 2 + d.titleH + (spec.max ? d.segH : 0) + d.lineH + rows.length * (d.rowH + Math.round(L.gap * 0.3)) + locks.length * d.lockH + extra + d.footH + L.gap;
+    return padOf(uu) * 2 + d.titleH + (spec.max ? d.segH : 0) + d.lineH + Math.min(rowsAll.length, D.rows) * (d.rowH + Math.round(L.gap * 0.3)) + d.locksH + extra + d.footH + L.gap;
   };
-  const { u, bounds } = fitScale(L, spec.bounds, calcH);
-  const { titleH, segH, rowH, lockH, lineH, footH, btnH, priceH, stack } = dims(u);
-  const h = calcH(u);
+  let step = 0;
+  let fit = fitScale(L, spec.bounds, (uu) => calcH(uu, LADDER[0]));
+  while (!fit.ok && step < LADDER.length - 1) {
+    step++;
+    fit = fitScale(L, spec.bounds, (uu) => calcH(uu, LADDER[step]));
+  }
+  const D = LADDER[step];
+  const rows = rowsAll.slice(0, D.rows);
+  const { u, bounds } = fit;
+  const { titleH, segH, rowH, lineH, footH, btnH, priceH, stack } = dims(u, D);
+  const h = calcH(u, D);
   // только размеры щитка (мастерская освобождает под него место на схеме)
   if (spec.measureOnly) return { h, w };
   const co = kit.callout(spec.id, spec.anchor || { x: L.w / 2, y: L.h / 2 }, { w, h }, { target: spec.target, bounds, side: spec.side, variant: 'panel', pad: padOf(u) });
@@ -330,7 +441,7 @@ export function infoCallout(app, kit, spec) {
         levelSegs(kit, { x: r.x, y: y + Math.round(2 * u), w: r.w, h: Math.round(10 * u) }, spec.level, spec.max, spec.cap);
         y += segH;
       }
-      if (spec.line) {
+      if (spec.line && D.line) {
         kit.drawText(spec.line, r.x, y + lineH / 2 - Math.round(2 * u), { size: kit.fs(11), color: c.textDim, maxWidth: r.w });
         y += lineH;
       }
@@ -338,7 +449,7 @@ export function infoCallout(app, kit, spec) {
         kit.statDelta({ x: r.x, y, w: r.w, h: rowH }, row);
         y += rowH + Math.round(L.gap * 0.3);
       }
-      if (locks.length) y += lockRows(app, kit, r.x, y, r.w, locks, { goto: spec.goto });
+      if (locks.length) y += D.chips ? drawLockChips(app, kit, r.x, y, r.w, locks, { goto: spec.goto, u }) : drawLockPlan(app, kit, r.x, y, r.w, lockPlan(app, kit, locks, r.w, { goto: spec.goto, u }), { goto: spec.goto });
       if (spec.extra) y += spec.extra({ x: r.x, y, w: r.w }, u) || 0;
       // состояние без кнопки: «макс» / награда / «есть» — на самом экране внизу
       if (!hasButton) {

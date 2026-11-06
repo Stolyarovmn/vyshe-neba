@@ -206,7 +206,7 @@ export function createInput(canvas, getLayout, opts = {}) {
       const d = dt ?? Math.min(0.1, t - lastPoll);
       lastPoll = t;
       if (mode !== 'flight') return mergeInputs([]);
-      return mergeInputs([keyboard.poll(d, settings.controlMode), touchModel.poll(t, settings.controlMode), gamepad.pollFlight(settings.controlMode)]);
+      return mergeInputs([keyboard.poll(d, settings.controlMode), touchModel.poll(t, settings.controlMode, d), gamepad.pollFlight(settings.controlMode)]);
     },
     /** Разовое действие из интерфейса (кнопки HUD при управлении мышью). */
     pulse(name) {
