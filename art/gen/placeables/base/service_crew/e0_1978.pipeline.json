@@ -13,7 +13,13 @@
       1254
     ],
     "original_sha256": "f4eb509097b0f16602b3f968d678d58bce4f8aeb499535fc83502b2b49f851b5",
-    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/BI-SERVICE_service_crew/",
+    "original_storage": {
+      "provider": "google_drive",
+      "drive_file_id": "14SWHf2Ilo1KKfawrN6K1wA5PadZgxcr-",
+      "drive_url": "https://drive.google.com/file/d/14SWHf2Ilo1KKfawrN6K1wA5PadZgxcr-/view",
+      "folder": "vyshe-neba/art-originals/base/E0_hd_candidates_2026-11/",
+      "original_filename": "BI-SERVICE_E0_1978_service_crew_hd_candidate_original.png"
+    },
     "generated_on": "2026-10-29"
   },
   "processing": {

@@ -12,7 +12,13 @@
       1254
     ],
     "original_sha256": "95a52f3b091a35ffb50d929d5b3383a80aa69913ff2b507ac5a37807dcd27614",
-    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/OB01_observatory/",
+    "original_storage": {
+      "provider": "google_drive",
+      "drive_file_id": "1wn8_14xqbWNBDzib6_xuEDs0iZGSVio4",
+      "drive_url": "https://drive.google.com/file/d/1wn8_14xqbWNBDzib6_xuEDs0iZGSVio4/view",
+      "folder": "vyshe-neba/art-originals/base/E0_hd_candidates_2026-11/",
+      "original_filename": "OB01_E0_1978_observatory_hd_candidate_original.png"
+    },
     "generated_on": "2026-10-29"
   },
   "prompt": "art/prompts/missing/observatory_e0_1978.txt (compact version used; chroma-key #FF00FF background instead of alpha because the generator does not output transparency)",

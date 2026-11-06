@@ -12,7 +12,13 @@
       1254
     ],
     "original_sha256": "c903717816a7f19722bc612ff3d4c45855773a6ee97e972682f9c798f9bd1c5f",
-    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/EN01_power_node/",
+    "original_storage": {
+      "provider": "google_drive",
+      "drive_file_id": "1hljDAGGCesuTY3jCoQEufWZDxQn3fzpP",
+      "drive_url": "https://drive.google.com/file/d/1hljDAGGCesuTY3jCoQEufWZDxQn3fzpP/view",
+      "folder": "vyshe-neba/art-originals/base/E0_hd_candidates_2026-11/",
+      "original_filename": "EN01_E0_1978_power_node_hd_candidate_original.png"
+    },
     "generated_on": "2026-10-29"
   },
   "prompt": "art/prompts/missing/power_node_e0_1978.txt (compact version used; chroma-key #FF00FF background instead of alpha because the generator does not output transparency)",

@@ -12,7 +12,13 @@
       1254
     ],
     "original_sha256": "34ae7bc4ef9105e9e9643a56de977ceb86c6c043ff068f56ee3222658224ba65",
-    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/B07_cargo_terminal/",
+    "original_storage": {
+      "provider": "google_drive",
+      "drive_file_id": "1o0UUBjyI2IN13UBuPd1UMtlvu6vG6GNZ",
+      "drive_url": "https://drive.google.com/file/d/1o0UUBjyI2IN13UBuPd1UMtlvu6vG6GNZ/view",
+      "folder": "vyshe-neba/art-originals/base/E0_hd_candidates_2026-11/",
+      "original_filename": "B07_E0_1978_cargo_terminal_hd_candidate_original.png"
+    },
     "generated_on": "2026-10-29"
   },
   "prompt": "art/prompts/missing/cargo_terminal_e0_1978.txt (compact version used; chroma-key #FF00FF background instead of alpha because the generator does not output transparency)",

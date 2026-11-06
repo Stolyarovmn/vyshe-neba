@@ -13,7 +13,13 @@
       1254
     ],
     "original_sha256": "abf90c81157c6aec5db3cf3a2b386ee537c8bc8624fa9b2f7e10bd30944d7914",
-    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/BI-RESCUE_rescue_station/",
+    "original_storage": {
+      "provider": "google_drive",
+      "drive_file_id": "12sAf_oeezNGtYAtaqK_BxjH1FZcrufSh",
+      "drive_url": "https://drive.google.com/file/d/12sAf_oeezNGtYAtaqK_BxjH1FZcrufSh/view",
+      "folder": "vyshe-neba/art-originals/base/E0_hd_candidates_2026-11/",
+      "original_filename": "BI-RESCUE_E0_1978_rescue_station_hd_candidate_original.png"
+    },
     "generated_on": "2026-10-29"
   },
   "processing": {
