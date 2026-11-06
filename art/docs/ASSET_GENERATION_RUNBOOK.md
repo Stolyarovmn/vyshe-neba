@@ -89,6 +89,10 @@ Immediately after every production generation attempt, including a rejected one:
 
 For native-alpha sources, run `python tools/art_pipeline/inspect_sprite_alpha.py <original.png> --preview <alpha-check.png>` and inspect both backgrounds at gameplay scale. The script samples the interior separately from edges. Intermediate alpha alone does not establish visible show-through. Reject visible contamination or unwanted translucency using the preview and interior evidence together. Enforce exact binary alpha on the processed sprite via `qa_sprite.py`. Apply the separate transport rules to opaque chroma-key sources.
 
+For every mechanical placeable, check the physical construction before processing. A single-piece bracket or support must read as continuous. Each separate member must have a visible connection appropriate to the era, such as a clamp, weld, fastener or through-mount. Check that the moving part is supported at its pivot and that the ground plate has consistent perspective with the island. Record which silhouette or mechanism distinguishes the era from adjacent eras. Reject ambiguous load-bearing joints, floating members and cross-era substitutions.
+
+After snapping and indexed export, recheck the exact candidate at intended and reduced gameplay size: main silhouette, support contact and important joints must remain readable. Use the asset's recorded palette and select any unmeasured family grid from the accepted source and gameplay-size comparison. Record the chosen grid, canvas and registration with the candidate SHA. An export or build check alone does not verify visual display in a running game.
+
 Reject at **source gate** if subject, era, camera/projection family, parts, silhouette, era-language or exclusions are wrong. A source geometry/projection/era defect is not repaired by Pixel Snapper or normalization.
 
 ## 4. Placeable machine pipeline
