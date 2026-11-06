@@ -116,8 +116,8 @@ export const PROCEDURAL_BUILDINGS = ['logistics', 'radar', 'energy', 'observatio
  * Размеры [w, h] PNG. Для остальных эпох остаются прежние файлы infrastructure/ и программные силуэты.
  */
 export const E0_BUILDING_SIZES = {
-  beacons: [236, 462], gantry: [340, 516], deluge: [421, 516], service: [516, 354], rescue: [516, 312], fuel: [516, 264],
-  logistics: [516, 458], radar: [376, 516], energy: [516, 463], observation: [473, 516], recovery: [516, 349],
+  beacons: [319, 644], gantry: [340, 516], deluge: [421, 516], service: [516, 354], rescue: [516, 312], fuel: [516, 264],
+  logistics: [516, 458], radar: [644, 379], energy: [516, 463], observation: [473, 516], recovery: [516, 349],
 };
 export const BUILDING_KEYS = [
   'beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel', 'logistics', 'factory',
@@ -350,7 +350,7 @@ ISLAND.topUnits = -ISLAND.launchOrigin[1] * ISLAND.unitsPerPx;
 
 // anchors: [[x, y], ...] px острова; size: видимый спрайт [w, h] px; footprint: след на земле [w, глубина] px.
 export const BUILDING_ANCHORS = {
-  beacons: { zone: 'launch_core', anchors: [[284, 396], [492, 396]], size: [72, 140], footprint: [62, 22] },
+  beacons: { zone: 'launch_core', anchors: [[284, 396], [492, 396]], size: [44, 89], footprint: [40, 16] },
   gantry: { zone: 'launch_core', anchors: [[484, 267]], size: [125, 190], footprint: [108, 32] },
   deluge: { zone: 'launch_core', anchors: [[526, 528]], size: [122, 150], footprint: [105, 30] },
   service: { zone: 'service_central', anchors: [[660, 451]], size: [140, 96], footprint: [120, 28] },
@@ -360,7 +360,7 @@ export const BUILDING_ANCHORS = {
   factory: { zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34] },
   weather: { zone: 'command_north', anchors: [[1000, 350]], size: [142, 180], footprint: [100, 28] },
   control: { zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34] },
-  radar: { zone: 'command_north', anchors: [[798, 174]], size: [124, 170], footprint: [107, 30] },
+  radar: { zone: 'command_north', anchors: [[798, 174]], size: [150, 88], footprint: [92, 24] },
   energy: { zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30] },
   observation: { zone: 'perimeter_east', anchors: [[1378, 378]], size: [138, 150], footprint: [119, 30] },
   recovery: { zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28] },
