@@ -48,3 +48,7 @@ Failure remains a source failure. Do not send a failed keyed raw into Pixel Snap
 ## B03 E0 recovery decision
 
 `B03 / landing_guidance / E0 1978` may use `opaque_chroma_key` with exact key `#FF00FF` because repeated native-alpha attempts produced globally non-opaque sprites and broad baked alpha/light fields. This change addresses only alpha transport. The existing `island_top_3_4` projection gate, exact approved island reference, E0 atomic reference evidence, compact manual sight/yoke geometry and all downstream QA remain mandatory.
+
+## Проверка файла перед обработкой
+
+Для наземных ассетов с preflight обработчик проверяет исходный PNG до Pixel Snapper. Для native_transparent требуется прозрачный фон и силуэт внутри границ холста. Для opaque_chroma_key проверяется полная непрозрачность и точное совпадение цвета по периметру. Однородность внутри фоновой области, ореолы и видимое просвечивание остаются частью визуальной проверки. Контрастные подложки используются для просмотра исходника с альфой. Две попытки B03 E0 на хромакее дали разные оттенки фона, после чего режим B03 E0 вернули на native_transparent.
