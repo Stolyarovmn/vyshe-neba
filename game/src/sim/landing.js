@@ -4,8 +4,10 @@ import { BODIES, densityAt, gravityAt } from './bodies.js';
 import { clamp, wrapAngle } from './math.js';
 
 // The canopy is a shop item: one fixed canopy that needs dense air and a moment to inflate.
-// Terminal speed 8 units/s (80 m/s) is inside the legs' tolerance; the braking is strong at first and fades smoothly.
-export const CHUTE = { minDensity: 0.35, terminal: 8, openTime: 0.6, softness: 1.8, maxDecel: 140 };
+// Terminal speed 10 units/s (100 m/s) is inside the legs' tolerance (13 + 2.2 per level) but above the free zone, so a
+// touchdown under the canopy on base legs costs a few percent of hull and is never "perfect"; the braking is strong at
+// first and fades smoothly.
+export const CHUTE = { minDensity: 0.35, terminal: 10, openTime: 0.6, softness: 1.8, maxDecel: 140 };
 const OFF_PAD_FACTOR = 0.7; // rough ground: every tolerance shrinks
 const BEACON_TOLERANCE_GAIN = 0.25; // full beacon coverage widens tolerances by this much on the pad
 const PERFECT = { v: 0.46, h: 0.34, ang: 0.44 }; // share of the tolerance a perfect landing must stay under
