@@ -86,11 +86,11 @@ test('DESIGN 4.3: eight modules, 18 levels, requirements per level', () => {
   }
 });
 
-test('DESIGN 4.3: the booster waits for the first era after the garage; capsule destinations need the recovery system', () => {
+test('DESIGN 4.3: the booster needs only the tower; capsule destinations need the recovery system', () => {
   const rows = tableAfter('### 4.3 Модули ракеты');
   const booster = rows.find((row) => row[0] === 'Разгонный блок');
-  assert.match(booster[2], /E1\+/);
-  assert.ok(PARTS.booster.levels.every((l) => l.requires.some((r) => r.era >= 1)), 'booster needs era >= 1 on every level');
+  assert.doesNotMatch(booster[2], /E1\+/, 'the booster is available from the first era');
+  assert.ok(PARTS.booster.levels.slice(0, 3).every((l) => l.requires.every((r) => r.era == null || r.era === 0)), 'no era wall for the first booster levels');
   const capsule = rows.find((row) => row[0] === 'Капсула');
   assert.match(capsule[2], /Система возврата для Луны\/Марса/);
   for (const body of ['moon', 'mars']) {
@@ -112,26 +112,18 @@ test('DESIGN 4.4: fourteen purchases with the keys of the data package', () => {
   }
 });
 
-test('DESIGN 4.4: first eras of the delayed buildings', () => {
-  const sentence = /Некоторые постройки доступны только с эпохи \(([^)]+)\)/.exec(design)[1];
-  const names = {
-    'энергоузел': 'energy',
-    'радар': 'radar',
-    'центр управления': 'control',
-    'наблюдательный комплекс': 'observation',
-    'система возврата': 'recovery',
-    'логистика': 'logistics',
-    'завод': 'factory',
-    'метеостанция': 'weather',
-  };
-  const listed = new Set();
-  for (const part of sentence.split(',')) {
-    const [, name, era] = /^\s*(.+?)\s+E(\d)\s*$/.exec(part);
-    assert.ok(names[name], `known building "${name}"`);
-    assert.equal(BUILDINGS[names[name]].minEra, Number(era), `${names[name]} first era`);
-    listed.add(names[name]);
+test('DESIGN 4.4: every building is available from the first era at level 1', () => {
+  assert.match(design, /Все 14 построек доступны уже в эпохе 1978/);
+  for (const key of BUILDING_KEYS) assert.equal(BUILDINGS[key].minEra, 0, `${key} is available from the start`);
+  for (const key of BUILDING_KEYS) {
+    const first = BUILDINGS[key].levels[0].requires;
+    assert.ok(first.every((r) => r.era == null || r.era === 0), `${key} level 1 has no era wall`);
+    assert.ok(first.every((r) => !r.building), `${key} level 1 depends on no other building`);
   }
-  for (const key of BUILDING_KEYS) if (!listed.has(key)) assert.equal(BUILDINGS[key].minEra, 0, `${key} is available from the start`);
+  const cheap = ['service', 'factory', 'logistics'].map((k) => BUILDINGS[k].levels[0].cost);
+  const dear = ['radar', 'energy', 'observation', 'recovery'].map((k) => BUILDINGS[k].levels[0].cost);
+  const middle = ['control', 'weather'].map((k) => BUILDINGS[k].levels[0].cost);
+  assert.ok(Math.max(...cheap) < Math.min(...middle) && Math.max(...middle) < Math.min(...dear), 'level 1 prices: cheap, middle, expensive groups');
 });
 
 test('DESIGN 4.4: levels follow the era cap (era + 1)', () => {

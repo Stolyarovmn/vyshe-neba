@@ -1,0 +1,38 @@
+{
+  "asset_id": "EN01",
+  "asset": "power_node",
+  "building_key": "energy",
+  "era": "E0",
+  "year": 1978,
+  "source": {
+    "generator": "ChatGPT image generation via browser (GPT, high quality)",
+    "original_file": "energy_e0_1978_original.png",
+    "original_size": [
+      1254,
+      1254
+    ],
+    "original_sha256": "c903717816a7f19722bc612ff3d4c45855773a6ee97e972682f9c798f9bd1c5f",
+    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/EN01_power_node/",
+    "generated_on": "2026-10-29"
+  },
+  "prompt": "art/prompts/missing/power_node_e0_1978.txt (compact version used; chroma-key #FF00FF background instead of alpha because the generator does not output transparency)",
+  "processing": {
+    "steps": [
+      "chroma-key magenta #FF00FF to alpha with edge defringe",
+      "crop to alpha bbox + 2 px padding",
+      "LANCZOS downscale to max side 512"
+    ],
+    "tool": "keysprite.py (documented in art/docs/MISSING_ASSETS_PROMPTS.md)"
+  },
+  "runtime": {
+    "file": "art/gen/runtime/bld_energy_1978.png",
+    "size": [
+      516,
+      463
+    ],
+    "sha256": "3b25d31ec10430347aa49a81a6ce4116009c56d7e1b0450818adc542348ecb82",
+    "mode": "RGBA"
+  },
+  "status": "candidate_not_user_approved",
+  "note": "E1-E5 for this family are still procedural placeholders in game; generate by chain from this approved E0."
+}

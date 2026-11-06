@@ -137,7 +137,7 @@ async function checkAssets(page, vp) {
   });
   assert(res.loadErrors.length === 0, `${vp.name}: ассеты не загрузились: ${res.loadErrors.slice(0, 5).join(', ')}`);
   assert(res.empty.length === 0, `${vp.name}: пустые иконки: ${res.empty.join(', ')}`);
-  for (const must of ['coin', 'fuel', 'repair', 'chute', 'capsule', 'booster', 'earth', 'moon', 'bld:gantry:1', 'bld:beacons:1']) {
+  for (const must of ['coin', 'fuel', 'repair', 'chute', 'capsule', 'booster', 'earth', 'moon', 'magnet', 'bld:gantry:1', 'bld:beacons:1']) {
     assert(res.sprites.includes(must), `${vp.name}: у иконки «${must}» нет спрайта (рисуется запасной вектор)`);
   }
   return res;
@@ -184,9 +184,18 @@ async function auditState(page, vp, label, wait = 280) {
   await page.evaluate((l) => globalThis.__VN_APP__.kit.audit.enable(true, l), label);
   await page.waitForTimeout(wait);
   const issues = await page.evaluate(() => {
-    const a = globalThis.__VN_APP__.kit.audit;
+    const app = globalThis.__VN_APP__;
+    const a = app.kit.audit;
     const r = a.take();
     a.enable(false);
+    // открытая выноска не должна перекрывать верхнюю полосу: кнопки «назад», «эпоха», шестерёнку и таблички монет и данных
+    const hits = app.kit.hitsSnapshot;
+    const strip = hits.filter((h) => ['back', 'hub-gear', 'plate-era'].includes(h.id)).map((h) => ({ id: h.id, x: h.x, y: h.y, w: h.w, h: h.h }));
+    for (const [k, v] of Object.entries(app.plateRects || {})) if (v) strip.push({ id: `plate-${k}`, x: v.x, y: v.y, w: v.w, h: v.h });
+    const hit = (p, q) => Math.min(p.x + p.w, q.x + q.w) - Math.max(p.x, q.x) > 1 && Math.min(p.y + p.h, q.y + q.h) - Math.max(p.y, q.y) > 1;
+    for (const co of hits.filter((h) => h.id.startsWith('callout-'))) {
+      for (const s of strip) if (hit(co, s)) r.push({ kind: 'covered', str: s.id, other: co.id, at: `выноска ${Math.round(co.x)},${Math.round(co.y)} ${Math.round(co.w)}×${Math.round(co.h)} закрывает ${Math.round(s.x)},${Math.round(s.y)} ${Math.round(s.w)}×${Math.round(s.h)}` });
+    }
     return r;
   });
   return issues.map((i) => ({ ...i, label: `${vp.name}/${label}` }));
@@ -288,6 +297,18 @@ async function tourScreens(page, vp, era = null) {
     await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
     await page.waitForTimeout(500);
     await audit(`полёт/${mode}`, 400);
+    if (mode === 'on') {
+      // жест наклона: палец тянет по экрану в свободном месте — след жеста, указатель крена без стрелок
+      await page.evaluate(() => {
+        const cv = document.querySelector('canvas');
+        const fire = (type, id, x, y) => cv.dispatchEvent(new PointerEvent(type, { pointerId: id, pointerType: 'touch', clientX: x, clientY: y, bubbles: true, isPrimary: true }));
+        globalThis.__steer = fire;
+        fire('pointerdown', 41, innerWidth * 0.4, innerHeight * 0.45);
+        fire('pointermove', 41, innerWidth * 0.4 + innerWidth * 0.1, innerHeight * 0.45);
+      });
+      await audit('полёт/жест наклона', 300);
+      await page.evaluate(() => globalThis.__steer('pointerup', 41, innerWidth * 0.5, innerHeight * 0.45));
+    }
     await page.evaluate(() => globalThis.__VN_APP__.pause());
     await audit(`пауза/${mode}`, 250);
     await page.evaluate(() => { globalThis.__VN_APP__.resume(); globalThis.__VN_APP__.queueCard('help', true); });
@@ -324,6 +345,76 @@ async function tourScreens(page, vp, era = null) {
     await audit(`итоги/${mission}`, 300);
     await page.evaluate(() => { globalThis.__VN_APP__.results = null; globalThis.__VN_APP__.go('hub'); });
   }
+
+  // магнит в полёте: значок в HUD (над ракетой магнит не рисуется)
+  await go(page, 'launch');
+  await page.evaluate(() => { globalThis.__VN_APP__.prefs.touchControls = 'on'; globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: { magnet: true } }); });
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+  await page.waitForTimeout(600);
+  await audit('полёт/магнит', 400);
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.abandon(); });
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
+  await page.waitForTimeout(300);
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); a.prefs.touchControls = 'auto'; });
+
+  // потолок эпохи: всё куплено, не хватает до модернизации — подсказка на хабе, причины блокировок, «Что дальше» в итогах
+  await page.evaluate(() => {
+    const a = globalThis.__VN_APP__;
+    const t = globalThis.__VN_TEST__;
+    let p = t.profile();
+    p.era = 0;
+    p.coins = 5e6;
+    p.data = 5e5;
+    for (let i = 0; i < 400; i++) {
+      let bought = false;
+      for (const id of Object.keys(a.data.BUILDINGS)) { const r = a.rules.buyBuilding(p, id); if (r.ok) { p = r.profile; bought = true; } }
+      for (const id of Object.keys(a.data.PARTS)) { const r = a.rules.buyPart(p, id); if (r.ok) { p = r.profile; bought = true; } }
+      if (!bought) break;
+    }
+    p.coins = 40;
+    p.data = 3;
+    t.setProfile(p);
+    a.history.length = 0;
+  });
+  await go(page, 'hub');
+  await page.waitForTimeout(500);
+  await audit('хаб/потолок эпохи', 400);
+  for (const key of ['beacons', 'gantry', 'service']) {
+    await setUi(page, (k) => { globalThis.__VN_APP__.ui.hub.sel = k; }, key);
+    await audit(`хаб/причины/${key}`, 300);
+  }
+  await setUi(page, () => { globalThis.__VN_APP__.ui.hub.sel = null; });
+  await go(page, 'rocket');
+  await page.waitForTimeout(300);
+  for (const id of ['engine', 'capsule']) {
+    await setUi(page, (k) => { globalThis.__VN_APP__.ui.rocket.selected = k; }, id);
+    await audit(`мастерская/причины/${id}`, 250);
+  }
+  await go(page, 'base');
+  await page.waitForTimeout(300);
+  await setUi(page, () => { globalThis.__VN_APP__.ui.base.sel = 'deluge'; });
+  await audit('стройка/причины', 250);
+  await page.evaluate(() => globalThis.__VN_APP__.startLaunch({ destination: 'earth', consumables: {} }));
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'flight', null, { timeout: 15000 });
+  await page.waitForTimeout(400);
+  await page.evaluate(() => globalThis.__VN_APP__.abandon());
+  await page.waitForFunction(() => globalThis.__VN_TEST__.screen() === 'results', null, { timeout: 15000 });
+  await page.waitForTimeout(3300);
+  await audit('итоги/что дальше', 300);
+  await page.evaluate(() => { const a = globalThis.__VN_APP__; a.results = null; a.go('hub'); });
+  // переход в эпоху доступен: отметка на памятнике и пульсирующая «!» на табличке эпохи
+  await page.evaluate(() => {
+    const t = globalThis.__VN_TEST__;
+    const p = t.profile();
+    p.coins = 9e4;
+    p.data = 900;
+    p.milestones.softLandings = 9;
+    p.milestones.maxAlt = 1e7;
+    t.setProfile(p);
+  });
+  await go(page, 'hub');
+  await page.waitForTimeout(500);
+  await audit('хаб/переход доступен', 400);
 
   // настройки: прокрутка сверху донизу
   await go(page, 'settings');
@@ -590,12 +681,23 @@ async function runViewport(browser, vp) {
     await page.waitForFunction(() => globalThis.__VN_TEST__.flight().throttle > 0.5, null, { timeout: 8000 }).catch(() => {});
     const thr = await hook(page, () => globalThis.__VN_TEST__.flight().throttle);
     assert(thr > 0.5, `${vp.name}: касание рычага не дало тягу (${thr})`);
-    // диск наклона вторым пальцем (мультитач)
-    const disc = await target(page, 'flight-tilt');
-    await touch(cdp, 'touchStart', [{ x: lever.x + lever.w / 2, y: lever.y + lever.h * 0.2, id: 1 }, { x: disc.x + disc.w * 0.9, y: disc.y + disc.h / 2, id: 2 }]);
+    // наклон вторым пальцем (мультитач): перетаскивание в свободном месте экрана, без диска и стрелок
+    const leverPt = { x: lever.x + lever.w / 2, y: lever.y + lever.h * 0.2, id: 1 };
+    const sx = Math.round(vp.width * 0.4);
+    const sy = Math.round(vp.height * 0.45);
+    const dragTo = Math.round(vp.width * 0.18);
+    await touch(cdp, 'touchStart', [leverPt, { x: sx, y: sy, id: 2 }]);
+    for (let i = 1; i <= 6; i++) {
+      await touch(cdp, 'touchMove', [leverPt, { x: sx + Math.round((dragTo * i) / 6), y: sy, id: 2 }]);
+      await page.waitForTimeout(40);
+    }
     await page.waitForTimeout(500);
+    const tilt = await hook(page, () => globalThis.__VN_APP__.session.lastInput.tilt);
     const tilted = await hook(page, () => Math.abs(globalThis.__VN_TEST__.flight().angle));
-    assert(tilted > 0.01, `${vp.name}: диск наклона не наклонил ракету`);
+    assert(tilt > 0.9, `${vp.name}: перетаскивание пальца по экрану не задало наклон (${tilt})`);
+    assert(tilted > 0.01, `${vp.name}: жест наклона не наклонил ракету`);
+    const thrStill = await hook(page, () => globalThis.__VN_APP__.session.lastInput.throttle);
+    assert(thrStill > 0.5, `${vp.name}: тяга на рычаге пропала при жесте наклона (${thrStill})`);
     await shot(page, vp, '13-flight-touch');
     await touch(cdp, 'touchEnd', []);
     await page.waitForTimeout(200);

@@ -40,7 +40,9 @@ test('events carry the simulation time and arrive in time order', () => {
 });
 
 test('the heavy rocket trip tells its story in the right order', () => {
-  const { events, result } = runFlight(heavyRocket({ seed: 5, destination: 'moon' }), { skill: 1, mission: 'space', maxTime: 900 });
+  // A tough hull keeps a chance collision with traffic from cutting the story short.
+  const config = heavyRocket({ seed: 5, destination: 'moon', hull: { hp: 100000, debrisResist: 8 } });
+  const { events, result } = runFlight(config, { skill: 1, mission: 'space', maxTime: 900 });
   assert.equal(result.outcome, 'landed');
   const at = (type) => indexOfType(events, type);
   assert.ok(at('liftoff') === 0 || events.slice(0, at('liftoff')).every((e) => e.type === 'warn' || e.type === 'pickup'));
