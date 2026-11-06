@@ -196,3 +196,11 @@ Dated evidence below is a checkpoint, not a permanent branch pointer. Re-pin ref
 ## 11. Non-negotiable publication rule
 
 Production approval and runtime publication are different facts. `promote` never means “already in game”; `publish_runtime` never becomes success merely because a PR was opened. Exact bytes, exact target, verified semantics, merge/resulting SHA and applicable runtime checks are required.
+
+### Единая проверка проекции наземных ассетов
+
+Этот этап обязателен для всех наземных B/W во всех эпохах. Единственные источники проекции — утверждённый остров и связанная с ним калибровка art/gen/environment/start_island_hd.projection.json. Параметры конкретного ассета не переопределяют общую проекцию.
+
+1. До генерации сверить SHA-256 острова с калибровкой и подтвердить, что генератор получил изображение как визуальный вход. Числовые значения взять из калибровки как ориентиры.
+2. До обработки сравнить исходник с островом на временной композиции TEST_ONLY в обычном и уменьшенном масштабе. Сверить раскрытие верхних плоскостей, видимость боковых граней и опору на землю. Записать результат и SHA-256 исходника и острова.
+3. При несовпадении остановить обработку. Перед приёмкой проверить проекцию на точном итоговом PNG. Временная композиция служит для проверки спрайта. Расстановка на игровой карте проходит отдельно.
