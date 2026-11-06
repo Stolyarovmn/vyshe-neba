@@ -91,8 +91,22 @@ def main() -> int:
     from_top = float(generation.get("generation_tilt_from_top_down_proxy_deg"))
     compression = float(generation.get("ground_plane_compression_target"))
 
+    if gate.get("alpha_strategy") == "opaque_chroma_key":
+        key = gate["source_transport"]["key_color_hex"]
+        source_mode = (
+            f"RAW OUTPUT: fully opaque PNG on a uniform solid {key} background. "
+            f"Fill all empty space and holes with {key}. No white background or transparent pixels. "
+            "Use transparent_background=false in the image tool.\n"
+        )
+    else:
+        source_mode = (
+            "RAW OUTPUT: transparent PNG with opaque solid surfaces and transparent empty space. "
+            "Use transparent_background=true in the image tool.\n"
+        )
+
     scope = (
         "PRODUCTION GENERATION REQUEST\n"
+        f"{source_mode}"
         f"Asset: {asset_id} / {slug}\n"
         f"Era: {era} / {year}\n"
         "Scope: exactly ONE complete isolated asset in this call; no era board, alternatives, detached spare parts, or extra objects.\n"
