@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/mechanics-infrastructure-03-utilities-service-routing.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "e2c17fcedbccd084c1ff1b282b136a27f3948452cfe348627ba672a0ffeec6ed",
+    "bytes": 1901643,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1sqDKF89w4hiCpr1JBenYnIZRtdwqbL8L",
+    "drive_url": "https://drive.google.com/file/d/1sqDKF89w4hiCpr1JBenYnIZRtdwqbL8L/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Blind-mate connector pair",
+      "verdict": "pass",
+      "notes": "Two distinct housings with visible gap, nine male pins and nine recessed sockets in matching 3-by-3 arrays, and two corresponding guide pins and guide holes."
+    },
+    {
+      "id": "02",
+      "name": "Panel cable feedthrough",
+      "verdict": "pass",
+      "notes": "Verified visually against the specimen description."
+    },
+    {
+      "id": "03",
+      "name": "Enclosed moving cable chain",
+      "verdict": "pass",
+      "notes": "Verified visually against the specimen description."
+    },
+    {
+      "id": "04",
+      "name": "Replaceable service manifold",
+      "verdict": "pass",
+      "notes": "Verified visually against the specimen description."
+    },
+    {
+      "id": "05",
+      "name": "Dry-break hose coupler",
+      "verdict": "pass",
+      "notes": "Verified visually against the specimen description."
+    },
+    {
+      "id": "06",
+      "name": "Liquid-cooling cold plate",
+      "verdict": "pass",
+      "notes": "Verified visually against the specimen description."
+    },
+    {
+      "id": "07",
+      "name": "Filter-cassette receiver",
+      "verdict": "pass",
+      "notes": "Verified visually against the specimen description."
+    },
+    {
+      "id": "08",
+      "name": "Digital service port access cover",
+      "verdict": "pass",
+      "notes": "Verified visually against the specimen description."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Visual comparison to revised spec and earlier source. Owner approval pending.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

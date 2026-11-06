@@ -1,0 +1,20 @@
+{
+  "production_commit": "4b644ad6e19046f67d04e35313b6089397b80b1d",
+  "spec_commit": "97f3506978a09bb52e2ee2b32a2a1e58321a3fcc",
+  "spec_git_blob": "37e6f97fbde2b6015dc7921d343b37f9cfa949ee",
+  "spec_path": "art/reference_specs/e3_2015/mechanics-infrastructure-02-joints-guides-handling.json",
+  "request_sha256": "84c9e13e47147a4d376a355e4a5cc4f9e12efbf1818379cbcb408376dd95a0a8",
+  "tool": "image_gen__imagegen",
+  "delivery": "full build-request in explicit prompt",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source_sha256": "51966994c0d6c5c1cc20dfc03307c65fc477870b6b29263ca046b871a2cceb1b",
+  "bytes": 1730319,
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "drive_id": "1tuff5Rk5t3KI8h9typGLjTfIh49jg1DN",
+  "drive_url": "https://drive.google.com/file/d/1tuff5Rk5t3KI8h9typGLjTfIh49jg1DN/view",
+  "drive_readback_sha256": "51966994c0d6c5c1cc20dfc03307c65fc477870b6b29263ca046b871a2cceb1b",
+  "review": "pending specimen 03: engagement of teeth at both ends is not visually established"
+}

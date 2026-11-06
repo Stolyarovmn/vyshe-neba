@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "era": "E3",
+  "sheet": "materials-construction/03-service-architecture",
+  "source_sha256": "bca7cfa2c96dafb48ed57b93f1c6626fd72bd7587301509df3d19a9a16881400",
+  "drive_file_id": "1qn5FF5d8xB45TlEFx9j2mUOq-wLjtpqz",
+  "decision": "approved_by_project_owner_conditionally",
+  "date": "2026-11-05",
+  "basis": "Owner instructed to proceed if assistant accepts; assistant review was pass. This authorizes proceeding with exact source.",
+  "review_url": "https://drive.google.com/file/d/1LTVMkWNvE64UQtT9jQwRqPof7PkWMG0X/view",
+  "cross_era_review": "pending"
+}

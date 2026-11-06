@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E3",
+  "year": 2015,
+  "role": "materials-construction",
+  "sheet": "02-joints-repairs",
+  "title": "modular structural joints, fastening and repair details",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e3_2015/materials-construction-02-joints-repairs.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1rgb5bx72J8oDu3Tyo93-FeewJ87dm_fJ",
+    "folder_name": "E3_2015"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Captive quarter-turn fastener",
+      "description": "TOP ROW CELL 1 ONLY. ONE quarter-turn captive fastener installed in ONE small thin off-white panel fragment, shown as a clear physical partial CUTAWAY in slight three-quarter view: retain the slotted turn head and its flush washer on the upper face, expose the same fastener shaft through the panel, and show ONE small metal retaining circlip fitted around the shaft in a groove immediately BELOW the underside of the panel. The circlip must be visibly wider than the panel hole so the shaft cannot withdraw upward; it stays attached, not a loose extra object. Show the panel upper and underside clearly in the same single specimen. No exploded view, no separate spare fastener, no whole hatch."
+    },
+    {
+      "id": "02",
+      "name": "Composite scarf joint",
+      "description": "TOP ROW CELL 2 ONLY. ONE short bonded joint between composite laminate ends in section: a broad stepped taper overlaps the matching tapered end, exposing multiple ply steps and a thin adhesive bond line. No fasteners or complete panel."
+    },
+    {
+      "id": "03",
+      "name": "Bolted structural flange splice",
+      "description": "TOP ROW CELL 3 ONLY. ONE short structural splice: two aligned short metal frame ends meet at matching abutting flanges, clamped by two clearly visible bolts. The bolts belong to this one joint. No long beam, frame or additional joint."
+    },
+    {
+      "id": "04",
+      "name": "Sandwich-panel threaded insert",
+      "description": "TOP ROW CELL 4 ONLY. ONE small sandwich panel cutaway showing ONE metal threaded insert embedded in a local load-spreading potted core, bounded by two thin face skins; the tapped bore and surrounding potting must be legible. No extra loose hardware."
+    },
+    {
+      "id": "05",
+      "name": "Dowel-aligned panel-frame joint",
+      "description": "BOTTOM ROW CELL 1 ONLY. ONE short cross-section where a removable thin panel edge aligns with an aluminium frame by ONE cylindrical locating dowel in matching socket. Show the two mating pieces and their shared dowel as ONE joint; no separate spare pins."
+    },
+    {
+      "id": "06",
+      "name": "Access-hatch hinge cassette",
+      "description": "BOTTOM ROW CELL 2 ONLY. ONE compact replaceable hinge cassette connecting two short flush panel-edge fragments, with a single captive hinge pin visible at the end; no entire hatch, no loose fasteners or other hinge types."
+    },
+    {
+      "id": "07",
+      "name": "Gasketed flush corner joint",
+      "description": "BOTTOM ROW CELL 3 ONLY. ONE small right-angle joint where two flat off-white modular panel edges meet flush, with a continuous dark compression gasket visible in the seam. No full wall, building, extra fasteners or mechanical hinge."
+    },
+    {
+      "id": "08",
+      "name": "Replaceable abrasion strip fixing",
+      "description": "BOTTOM ROW CELL 4 ONLY. ONE short protective abrasion strip mounted flush along a short panel edge, held by two recessed flush fasteners visible on its surface. No loose fasteners, no sealing profile or separate gasket."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, letters, numbers, logos or pseudo-writing",
+    "any ninth specimen, extra fragment, repeated object class, substituted, merged or omitted specimen",
+    "whole building, room, facade, vehicle, spacecraft, radar, machinery, control panel, catalog application board or staged scene",
+    "baked cast/contact shadows, studio-product shadows, glow, bloom, rays, live display graphics or temporary FX",
+    "photorealistic PBR material-catalog rendering, rendered CAD/studio 3D look, photographic materials or filtered 3D render",
+    "generic smooth image devoid of intentional HD pixel-art clusters, missing dark chromatic selective outlines or continuous-airbrush gradients",
+    "motors, buttons, standalone connectors, lights, dashboards or any other role's standalone hardware",
+    "E2 beige rack and dense external wiring, E4 curtain-wall structures, E5 transparent holograms and levitation",
+    "surface material stock coupons from E3 sheet 01 as independent specimens; duplicate joint classes; whole doors or structures"
+  ],
+  "era_contract": {
+    "character": "E3 2015 modular aerospace service architecture: precision serviceable joints in aluminium and composites, captive replaceable fasteners and sealed flush construction. Cohesive stylized HD pixel art, not photographic metal specimens.",
+    "required_signals": [
+      "eight different passive joint and repair constructions, clear load paths and serviceable interfaces",
+      "composite bonded stepped scarf and potted sandwich insert visibly distinct from bolted metal splice",
+      "clean modular edges and local mounting fragments only, no complete assemblies",
+      "cohesive HD pixel art following the complete verbatim style bible",
+      "Edit the supplied source sheet: retain the appearance, positions, style and background of the other seven cells, and change only cell 1 to expose the captive retaining circlip beneath the panel."
+    ],
+    "replaced_previous_language": [
+      "E2 visible simple folded sheet-metal and threaded inserts supplemented by bonded composite scarf and potted sandwich inserts",
+      "E2 screwed joints replaced where appropriate by captive quarter-turn and replaceable modular hinge hardware",
+      "E2 rack-style joints replaced by gasketed flush panel-to-frame and panel-edge connections"
+    ],
+    "forbidden_regressions": [
+      "E2 plain bracket grid, beige laboratory rack or unstructured screw collection",
+      "eight near-identical metal angle brackets or identical bolts",
+      "recolor-only evolution without physical construction changes",
+      "photorealistic industrial product catalog"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

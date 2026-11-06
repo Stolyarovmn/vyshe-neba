@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "era": "E3",
+  "sheet": "materials-construction/02-joints-repairs",
+  "source_sha256": "ced4fbd87a77028c7117a22b01351c13c88a35d6ee132ad825d5b1b56bcb2cda",
+  "drive_file_id": "1R4S2Fxxk-sU8OLyASZs3CXFnhkIno2bD",
+  "decision": "approved_by_project_owner",
+  "date": "2026-11-05",
+  "basis": "User requested the next sheet immediately after being asked to approve this exact source.",
+  "review_url": "https://drive.google.com/file/d/1ZPVLOMqsp7VtZL29RNMLDVSXiRBr00_4/view",
+  "cross_era_review": "pending"
+}

@@ -37,7 +37,8 @@ Era reference approval is separate from approval of any production asset and doe
 - `e0_1978/` — **approved visual reference set**; 10/10 exact-SHA atomic sheet-parts and all four complete roles passed the required E0↔E1 blind-order review. Canonical/required for E0 generation.
 - `e1_1986/` — **approved visual reference set**; 10/10 exact-SHA atomic sheet-parts and all four complete roles passed the required E0↔E1 blind-order review. Canonical/required for E1 generation and the approved lineage base for rebuilding E2.
 - `e2_1998/` — **approved visual reference set**; all 10 exact-SHA sheet-parts and all four E1↔E2 role comparisons passed. The owner accepted the historical request-delivery gap for these originals only. Canonical for E2 and approved lineage for E3.
-- E3–E5 — pending; must be created directly in the atomic-only format after E0–E2 are approved.
+- [`e3_2015/`](e3_2015/reference-set.json) — approved visual reference set. Ten exact-SHA sheet-parts passed review, with the scoped MI11 waiver on sheet 05. All four E2↔E3 role comparisons passed.
+- E4–E5 — pending. Create their reference sets directly in the atomic-only format.
 
 Cross-era blind-order review compares matching complete role sets (`materials` to `materials`, `mechanics` to `mechanics`, etc.), using all approved/candidate sheet-parts of the role being reviewed and never complete architecture/application scenes. Canonical approval is granted only after the required adjacent-era role review passes.
 

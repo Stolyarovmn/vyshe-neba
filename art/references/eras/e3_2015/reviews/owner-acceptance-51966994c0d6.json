@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "era": "E3",
+  "sheet": "mechanics-infrastructure/02-joints-guides-handling",
+  "source_sha256": "51966994c0d6c5c1cc20dfc03307c65fc477870b6b29263ca046b871a2cceb1b",
+  "drive_file_id": "1tuff5Rk5t3KI8h9typGLjTfIh49jg1DN",
+  "decision": "owner_accepts_visual_limitation",
+  "date": "2026-11-05",
+  "scope": "Only this exact source SHA, specimen 03 harmonic-drive joint.",
+  "limitation": "Full tooth engagement at both sides is not confirmed; owner considers the missing detail acceptable at island scale.",
+  "claim": "This decision does not assert tooth engagement or a production_guard PASS.",
+  "guard_status": "pending_specimen_03",
+  "review_url": "https://drive.google.com/file/d/1q2pEwnsch00J3Z6bPelp_R7WTgZsd-Ff/view",
+  "production_promotion": "blocked_pending_guard_or_separately_authorized_contract_change"
+}

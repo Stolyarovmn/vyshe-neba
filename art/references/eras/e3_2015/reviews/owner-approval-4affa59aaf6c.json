@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "era": "E3",
+  "sheet": "mechanics-infrastructure/01-enclosed-precision-drives",
+  "source_sha256": "4affa59aaf6cf69ea617fdd133d67b58c84972cf72f97f6e0662b956abffc1b6",
+  "drive_file_id": "1SgBuzSky2hIrGA2oJejDMfjpLTOP0DQA",
+  "decision": "approved_by_project_owner_conditionally",
+  "date": "2026-11-05",
+  "basis": "Owner instructed to proceed if assistant accepts; assistant exact-source review passed.",
+  "review_url": "https://drive.google.com/file/d/1PxOhmmtpoPFg53ocfXj9izUJZRJ0fcn0/view",
+  "cross_era_review": "pending"
+}

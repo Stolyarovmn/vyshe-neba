@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E3",
+  "year": 2015,
+  "role": "lighting-signals",
+  "sheet": "02-status-signaling",
+  "title": "modular LED signaling hardware",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e3_2015/lighting-signals-02-status-signaling.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1rgb5bx72J8oDu3Tyo93-FeewJ87dm_fJ",
+    "folder_name": "E3_2015"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Flush multicolor LED status puck",
+      "description": "TOP ROW CELL 1 ONLY. One isolated unpowered specimen. One low round metal puck with three small red, amber and green translucent sectors in its face, short threaded panel barrel. No projecting beacon dome."
+    },
+    {
+      "id": "02",
+      "name": "Modular stack-light segment",
+      "description": "TOP ROW CELL 2 ONLY. One isolated unpowered specimen. One short cylindrical ribbed amber lens segment with black bayonet base and visible twist-lock tabs. One segment only, no tower or stacked lenses."
+    },
+    {
+      "id": "03",
+      "name": "Directional warning chevron optic",
+      "description": "TOP ROW CELL 3 ONLY. One isolated unpowered specimen. One detached solid amber V-shaped chevron lens with molded optical facets, short retention tabs, no housing or printed arrow."
+    },
+    {
+      "id": "04",
+      "name": "Equipment-ready ring-light collar",
+      "description": "TOP ROW CELL 4 ONLY. One isolated unpowered specimen. One thin annular green-tinted light collar with a large open central hole and dark mounting lip, viewed obliquely. The hole must be clear."
+    },
+    {
+      "id": "05",
+      "name": "Dual-chamber fault indicator",
+      "description": "BOTTOM ROW CELL 1 ONLY. One isolated unpowered specimen. One compact oblong sealed case with exactly two discrete recessed lens chambers side by side, dark red left and amber right, opaque separator between them."
+    },
+    {
+      "id": "06",
+      "name": "Illuminated-button LED insert",
+      "description": "BOTTOM ROW CELL 2 ONLY. One isolated unpowered specimen. One small naked square graphite light-engine module with a single central pale emitter die and two short electrical terminals. No pushbutton cap, frame or switch."
+    },
+    {
+      "id": "07",
+      "name": "Compact strobe emitter",
+      "description": "BOTTOM ROW CELL 3 ONLY. One isolated unpowered specimen. One compact square open metal strobe module with a deep faceted silver reflector cup, small emitter at the center, and one short attached driver block at rear. No flash effect."
+    },
+    {
+      "id": "08",
+      "name": "Light-pipe terminal fixture",
+      "description": "BOTTOM ROW CELL 4 ONLY. One isolated unpowered specimen. One small L-shaped clear molded optical waveguide end with visible right-angle bend, polished round output end and integral retaining clip. No emitter board."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, logos, footer, titles or printed style instructions anywhere",
+    "light emission, beams, flash, glow or halos",
+    "whole fixtures from the previous LED lighting sheet, duplicate objects, whole assembled signaling towers or scenes",
+    "photorealistic CAD or PBR rendering",
+    "E2 tall incandescent beacons or exposed cabling",
+    "E4 or E5 futuristic or holographic effects"
+  ],
+  "era_contract": {
+    "character": "E3 2015 modular spaceport signaling components with shallow housings, graphite seals, precision molded colored optics, replaceable emitters and passive light guides. HD pixel art.",
+    "required_signals": [
+      "Exactly eight unpowered objects in order, each centered with generous gaps in its own cell",
+      "Lens color is passive material tint, never visible light emission",
+      "Round puck, annular collar, cylindrical bayonet segment and angular chevron must have different silhouettes",
+      "Keep naked button insert distinct from the strobe reflector and clear light pipe",
+      "Canvas contains only the eight specimens and neutral blank background, no text"
+    ],
+    "replaced_previous_language": [
+      "Preserve physical lens color and service access",
+      "Replace bulky incandescent signal housings with compact modular LED optics and keyed mounts",
+      "Add passive waveguides and replaceable light-engine inserts for dense equipment panels"
+    ],
+    "forbidden_regressions": [
+      "Recolor-only era change or repeated LED fixtures",
+      "Glow, beam, flash, symbols printed on the devices"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

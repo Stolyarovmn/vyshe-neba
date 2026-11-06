@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/materials-construction-03-service-architecture.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "bca7cfa2c96dafb48ed57b93f1c6626fd72bd7587301509df3d19a9a16881400",
+    "bytes": 1617218,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1qn5FF5d8xB45TlEFx9j2mUOq-wLjtpqz",
+    "drive_url": "https://drive.google.com/file/d/1qn5FF5d8xB45TlEFx9j2mUOq-wLjtpqz/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Facade rainscreen cassette section",
+      "verdict": "pass",
+      "notes": "Facade cassette edge, rear rail, clip and ventilated gap are visible."
+    },
+    {
+      "id": "02",
+      "name": "Passive ventilation louver cover",
+      "verdict": "pass",
+      "notes": "Passive shallow louver with fixed vanes is visible."
+    },
+    {
+      "id": "03",
+      "name": "Structural glass-to-frame corner",
+      "verdict": "pass",
+      "notes": "Glass thickness, two partial frame edges and dark bonded edge are visible."
+    },
+    {
+      "id": "04",
+      "name": "Recessed service-door jamb",
+      "verdict": "pass",
+      "notes": "Recessed metal jamb, weather seal and mating panel edge are visible."
+    },
+    {
+      "id": "05",
+      "name": "Flush floor raceway cover",
+      "verdict": "pass",
+      "notes": "Floor-level removable cover and passive receiving channel are visible."
+    },
+    {
+      "id": "06",
+      "name": "Modular roof-wall seam",
+      "verdict": "pass",
+      "notes": "Roof-wall section with overlapping flashing and drainage lip is visible."
+    },
+    {
+      "id": "07",
+      "name": "Raised-floor support pedestal",
+      "verdict": "pass",
+      "notes": "Adjustable pedestal, base and partial raised-floor tile are visible."
+    },
+    {
+      "id": "08",
+      "name": "Composite-metal threshold section",
+      "verdict": "pass",
+      "notes": "Threshold profile, composite edge and intervening dark isolation pad are visible."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Visual inspection against the eight-item spec and E2 material/service references. Exact-source bytes verified separately; owner approval pending.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

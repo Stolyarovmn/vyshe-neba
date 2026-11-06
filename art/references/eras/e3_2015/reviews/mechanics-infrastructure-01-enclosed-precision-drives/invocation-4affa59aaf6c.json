@@ -1,0 +1,25 @@
+{
+  "production_commit": "4b644ad6e19046f67d04e35313b6089397b80b1d",
+  "spec_commit": "9a9a72e5be07dbfbffe8489677bb05a6bd7db5a7",
+  "spec_git_blob": "4c19d152282902ef24f2ee45787246d1e2ac1fb3",
+  "spec_path": "art/reference_specs/e3_2015/mechanics-infrastructure-01-enclosed-precision-drives.json",
+  "request_sha256": "095a82faeaa793654d3325557e348839df88056dc74488593891438b1616b960",
+  "tool": "image_gen__imagegen",
+  "delivery": "full build-request in explicit prompt",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "input_sha256": "bb1c706d8401748f01cc6eb323c359b4bd2a5b053026ad201fa96ddad2067be8",
+  "input_drive_id": "1TIBu9VvP9985DiSWrIvz81PeSs4gA4qM",
+  "source_sha256": "4affa59aaf6cf69ea617fdd133d67b58c84972cf72f97f6e0662b956abffc1b6",
+  "bytes": 1863927,
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "drive_id": "1SgBuzSky2hIrGA2oJejDMfjpLTOP0DQA",
+  "drive_url": "https://drive.google.com/file/d/1SgBuzSky2hIrGA2oJejDMfjpLTOP0DQA/view",
+  "drive_readback_sha256": "4affa59aaf6cf69ea617fdd133d67b58c84972cf72f97f6e0662b956abffc1b6",
+  "technical_verdict": "pass",
+  "assistant_visual_review": "pass",
+  "owner_approval": "pending",
+  "cross_era_role_review": "pending"
+}

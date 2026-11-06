@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E3",
+  "year": 2015,
+  "role": "lighting-signals",
+  "sheet": "01-led-fixtures",
+  "title": "serviceable solid-state lighting fixtures",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e3_2015/lighting-signals-01-led-fixtures.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1rgb5bx72J8oDu3Tyo93-FeewJ87dm_fJ",
+    "folder_name": "E3_2015"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Sealed linear LED work-light bar",
+      "description": "TOP ROW CELL 1 ONLY. One isolated unpowered physical specimen. Long thick rectangular work light, full frosted diffuser, rugged endcaps and mounting feet."
+    },
+    {
+      "id": "02",
+      "name": "Recessed LED downlight can",
+      "description": "TOP ROW CELL 2 ONLY. One isolated unpowered physical specimen. Round shallow recessed fixture with circular flange, inset diffuser and compact rear housing."
+    },
+    {
+      "id": "03",
+      "name": "Adjustable task-light spot",
+      "description": "TOP ROW CELL 3 ONLY. One isolated unpowered physical specimen. Short cylindrical directional head with stepped heat fins and one compact attached pivot bracket."
+    },
+    {
+      "id": "04",
+      "name": "Waterproof surface light strip",
+      "description": "TOP ROW CELL 4 ONLY. One isolated unpowered physical specimen. Very narrow short flexible strip segment in translucent sealed encapsulation, flush mounting profile. No reel."
+    },
+    {
+      "id": "05",
+      "name": "Asymmetric anti-glare service optic",
+      "description": "BOTTOM ROW CELL 1 ONLY. One isolated unpowered physical specimen. Compact rectangular service light optic with distinctly slanted asymmetric reflector and a dark physical cutoff baffle."
+    },
+    {
+      "id": "06",
+      "name": "Replaceable LED light-engine cartridge",
+      "description": "BOTTOM ROW CELL 2 ONLY. One isolated unpowered physical specimen. Small square metal-backed emitter cartridge with exposed unlit emitter chips and a visible copper thermal slug."
+    },
+    {
+      "id": "07",
+      "name": "Protected floor-edge marker fixture",
+      "description": "BOTTOM ROW CELL 3 ONLY. One isolated unpowered physical specimen. Low wedge-shaped protected fixture with one narrow sealed amber lens along its front edge."
+    },
+    {
+      "id": "08",
+      "name": "Backup emergency luminaire",
+      "description": "BOTTOM ROW CELL 4 ONLY. One isolated unpowered physical specimen. Compact bulkhead luminaire with broad frosted lens above a separate visible battery-access seam and captive latch."
+    }
+  ],
+  "global_forbidden": [
+    "text, captions, logos, labels, title, footer or printed style instructions anywhere",
+    "emitted light, glow, beams or active indicators",
+    "duplicate or extra objects, detached accessories, scenes or installations",
+    "photorealistic CAD or PBR rendering",
+    "E2 bulky incandescent housings and exposed cabling",
+    "E4 or E5 futuristic glowing or holographic hardware"
+  ],
+  "era_contract": {
+    "character": "E3 2015 modular spaceport service lighting: warm off-white housings, graphite seals, passive heat sinking and replaceable solid-state modules, HD pixel art.",
+    "required_signals": [
+      "Exactly eight unpowered specimens in order in the 4 by 2 grid",
+      "Distinguish the rigid work bar with endcaps from the narrow encapsulated strip",
+      "Each fixture identifiable through its optics, mount, or service interface",
+      "Canvas contains only specimens and plain background, style text is instruction only"
+    ],
+    "replaced_previous_language": [
+      "Preserve protected lenses and service access",
+      "Replace bulky E2 lamps with shallow LED optics, heat paths and sealed low-profile construction",
+      "Add cartridge replacement and separate battery service for compact field maintenance"
+    ],
+    "forbidden_regressions": [
+      "Exposed wires, deep lamp housings, recolor-only change",
+      "Visible emitted light or scene effects"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/controls-displays-02-digital-instruments.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "14555ffde5cf77a75b60b84ced20a13cec9df12dba3670d3de129bd1a57c4fd8",
+    "bytes": 1456560,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1I_1-4gxKdP6KjITnvbTnpMIih4aY-5fe",
+    "drive_url": "https://drive.google.com/file/d/1I_1-4gxKdP6KjITnvbTnpMIih4aY-5fe/view",
+    "image": "/workspace/scratch/9252f4912fe0/generated_images/exec-8ed8a2f7-dfa7-4404-8b26-6b58eb8621ee.png",
+    "planned_dimensions": [
+      1536,
+      1024
+    ]
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Thin ruggedized LCD",
+      "verdict": "pass",
+      "notes": "Shallow blank LCD with gasket and corner mounts"
+    },
+    {
+      "id": "02",
+      "name": "Narrow OLED strip module",
+      "verdict": "pass",
+      "notes": "Narrow blank OLED strip with amber flexible tail"
+    },
+    {
+      "id": "03",
+      "name": "Sunlight-readable flat instrument insert",
+      "verdict": "pass",
+      "notes": "Matte square insert with two mounting tabs"
+    },
+    {
+      "id": "04",
+      "name": "Touch digitizer and glass layer stack",
+      "verdict": "pass",
+      "notes": "Three distinct stepped laminate layers"
+    },
+    {
+      "id": "05",
+      "name": "Fanless controller front I/O",
+      "verdict": "pass",
+      "notes": "Shallow I/O fragment with recessed ports and passive fins"
+    },
+    {
+      "id": "06",
+      "name": "Round digital pressure gauge head",
+      "verdict": "pass",
+      "notes": "Round sealed instrument body, blank dark readout, hex base and threaded inlet. Clearly distinct from square insert in cell 3."
+    },
+    {
+      "id": "07",
+      "name": "Tablet dock contact socket",
+      "verdict": "pass",
+      "notes": "Recessed dock contact row and guide shoulders"
+    },
+    {
+      "id": "08",
+      "name": "Flat display backlight guide",
+      "verdict": "pass",
+      "notes": "Unpowered translucent optical plate corner with visible edge"
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Reviewed exact PNG against revised spec and previous candidate. All eight cells visually checked. Owner approval pending.",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e3_2015/mechanics-infrastructure-02-joints-guides-handling.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "51966994c0d6c5c1cc20dfc03307c65fc477870b6b29263ca046b871a2cceb1b",
+    "bytes": 1730319,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1tuff5Rk5t3KI8h9typGLjTfIh49jg1DN",
+    "drive_url": "https://drive.google.com/file/d/1tuff5Rk5t3KI8h9typGLjTfIh49jg1DN/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "01",
+      "name": "Cross-roller bearing block",
+      "verdict": "pass",
+      "notes": "Alternating crossed roller orientation is visible."
+    },
+    {
+      "id": "02",
+      "name": "Linear rail carriage",
+      "verdict": "pass",
+      "notes": "Compact rail and roller carriage are visible."
+    },
+    {
+      "id": "03",
+      "name": "Harmonic-drive joint module",
+      "verdict": "pending",
+      "notes": "Both toothed rings are visible; enlarged inspection does not establish interlocking at both ends."
+    },
+    {
+      "id": "04",
+      "name": "Telescopic guide sample",
+      "verdict": "pass",
+      "notes": "Nested sections, guide shoes and end stops are visible."
+    },
+    {
+      "id": "05",
+      "name": "Quick-fit tool coupler",
+      "verdict": "pass",
+      "notes": "Coupler assembly and locking lugs are visible."
+    },
+    {
+      "id": "06",
+      "name": "Vibration-isolated foot",
+      "verdict": "pass",
+      "notes": "Metal plates and elastomer isolation layer are visible."
+    },
+    {
+      "id": "07",
+      "name": "Sensor-ready clevis pivot",
+      "verdict": "pass",
+      "notes": "Clevis pivot, sensor port and stop are visible."
+    },
+    {
+      "id": "08",
+      "name": "Enclosed leadscrew carriage",
+      "verdict": "pass",
+      "notes": "Short leadscrew, nut block and end bearing are visible."
+    }
+  ],
+  "reviewer": "ChatGPT visual reviewer",
+  "review_method": "Visual inspection including enlarged cell 3, exact-source verification and comparison with E2 mechanical references.",
+  "final_verdict": "pending",
+  "rejection_reasons": []
+}

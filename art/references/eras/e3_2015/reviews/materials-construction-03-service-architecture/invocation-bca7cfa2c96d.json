@@ -1,0 +1,23 @@
+{
+  "production_commit": "4b644ad6e19046f67d04e35313b6089397b80b1d",
+  "spec_commit": "6d094e5dbb1be22e5b9c6fe7af9e2e2c2a1af24a",
+  "spec_git_blob": "9b832f760424ef6d2dc892c51a3d2729e4728eaa",
+  "spec_path": "art/reference_specs/e3_2015/materials-construction-03-service-architecture.json",
+  "request_sha256": "db3ffda283eb0803035819b85ba5ed9c59d382976caa365534150d0b3ba98114",
+  "tool": "image_gen__imagegen",
+  "delivery": "complete build-request text supplied through explicit prompt argument",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source_sha256": "bca7cfa2c96dafb48ed57b93f1c6626fd72bd7587301509df3d19a9a16881400",
+  "source_bytes": 1617218,
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "drive_file_id": "1qn5FF5d8xB45TlEFx9j2mUOq-wLjtpqz",
+  "drive_url": "https://drive.google.com/file/d/1qn5FF5d8xB45TlEFx9j2mUOq-wLjtpqz/view",
+  "drive_readback_sha256": "bca7cfa2c96dafb48ed57b93f1c6626fd72bd7587301509df3d19a9a16881400",
+  "technical_verdict": "pass",
+  "assistant_visual_review": "pass",
+  "owner_approval": "pending",
+  "cross_era_role_review": "pending"
+}
