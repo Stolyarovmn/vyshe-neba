@@ -380,15 +380,6 @@ export const ISLAND_ROADS = [
   { id: 'east', points: [[525, 392], [745, 392], [745, 338]] },
 ];
 
-// Слои движения самолётов по высоте (ед. мира) — как art/aircraft/traffic.json и live/aircraft.js.
-export const AIRCRAFT_LAYERS = [
-  { min: 30, max: 300, weights: { low_primary: 0.7, low_multiwing: 0.3 } },
-  { min: 300, max: 600, weights: { medium_cargo: 0.5, medium_passenger: 0.35, low_primary: 0.1, low_multiwing: 0.05 } },
-  { min: 600, max: 1200, weights: { medium_passenger: 0.6, medium_cargo: 0.35, high_fighter: 0.05 } },
-  { min: 1200, max: 1800, weights: { high_fighter: 0.7, high_experimental: 0.3 } },
-  { min: 1800, max: 2400, weights: { high_experimental: 1 } },
-];
-export const AIRCRAFT_PREVIOUS_ERA_MIX = 0.18;
 /** Ширина отрисовки самолёта (ед. мира) по линейке — DISPLAY_WIDTH из live/aircraft.js. */
 export const AIRCRAFT_DISPLAY_WIDTH = {
   low_primary: 98, low_multiwing: 98, medium_passenger: 118, medium_cargo: 120, high_fighter: 105, high_experimental: 110,

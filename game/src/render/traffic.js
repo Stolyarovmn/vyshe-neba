@@ -1,50 +1,7 @@
-// Самолёты и дроны: стабильный выбор спрайта по точке рождения и лёгкая анимация (винты, двигатели, огни).
+// Самолёты и дроны: отрисовка спрайта и лёгкая анимация (винты, двигатели, огни). Где и какие самолёты летят — решает sim/hazards.js.
 // Арт — физический объект; движение и свет принадлежат коду (уроки art/PROGRESS.md).
 
-import {
-  AIRCRAFT_DISPLAY_WIDTH, AIRCRAFT_LAYERS, AIRCRAFT_PREVIOUS_ERA_MIX, BASE_DRONES, eraYear,
-} from './manifest.js';
-import { hash2 } from './util.js';
-
-function weighted(weights, r) {
-  let acc = 0;
-  let last = null;
-  for (const [id, w] of Object.entries(weights)) {
-    acc += w;
-    last = id;
-    if (r < acc) return id;
-  }
-  return last;
-}
-
-/** Слой самолётов для высоты (ед. мира) или null, если здесь самолётов нет. */
-export function aircraftLayer(alt) {
-  return AIRCRAFT_LAYERS.find((layer) => alt >= layer.min && alt < layer.max) || null;
-}
-
-/**
- * Стабильный выбор самолёта по точке рождения (origin) и эпохе: линейка (low_primary...) и год.
- * Перемещение самолёта не меняет выбор; доля предыдущей эпохи — 18 %.
- * Возвращает { lineage, era, name } или null.
- */
-export function aircraftChoice(originX, originY, era) {
-  const layer = aircraftLayer(originY);
-  if (!layer) return null;
-  const lineage = weighted(layer.weights, hash2(Math.floor(originX * 8), Math.floor(originY * 8), 13));
-  const useEra = era > 0 && hash2(Math.floor(originX * 8), Math.floor(originY * 8), 77) < AIRCRAFT_PREVIOUS_ERA_MIX ? era - 1 : era;
-  return { lineage, era: useEra, name: `${lineage}_${eraYear(useEra)}` };
-}
-
-/** Линейка самолёта по принудительному типу ('low'|'medium'|'high'|имя) и высоте. */
-export function lineageFor(kindHint, originX, originY) {
-  if (kindHint && AIRCRAFT_DISPLAY_WIDTH[kindHint]) return kindHint;
-  const layer = aircraftLayer(originY) || AIRCRAFT_LAYERS[0];
-  let weights = layer.weights;
-  if (kindHint === 'low') weights = { low_primary: 0.7, low_multiwing: 0.3 };
-  else if (kindHint === 'medium') weights = { medium_passenger: 0.55, medium_cargo: 0.45 };
-  else if (kindHint === 'high') weights = { high_fighter: 0.65, high_experimental: 0.35 };
-  return weighted(weights, hash2(Math.floor(originX * 8), Math.floor(originY * 8), 13));
-}
+import { AIRCRAFT_DISPLAY_WIDTH, BASE_DRONES } from './manifest.js';
 
 function point(dx, dy, dw, dh, p) {
   return [dx + p[0] * dw, dy + p[1] * dh];
