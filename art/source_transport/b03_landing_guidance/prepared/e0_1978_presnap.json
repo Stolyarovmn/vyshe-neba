@@ -1,0 +1,21 @@
+{
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1GAmZSLZ6bJRLaM85EYeR7qSuEPKC5kT_"
+  },
+  "source_gen_id": "0d9a5799-c12e-4725-b862-d10d3ebc2a78",
+  "source_sha256": "cdc4c606dcff0aeccf1666d37e5c5bdfd309a5f6749656bded97894ee4c953fd",
+  "original_png_file": "art/source_transport/b03_landing_guidance/prepared/e0_1978_original.png",
+  "preparation": {
+    "resampling": "Lanczos",
+    "alpha_threshold": 128,
+    "final_grid": [
+      429,
+      858
+    ],
+    "first_grid": [
+      456,
+      912
+    ]
+  }
+}

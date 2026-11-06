@@ -65,12 +65,18 @@ def main():
     p.add_argument("--config", default="art/placeables/PIPELINE_CONFIG.json")
     p.add_argument("--asset", required=True)
     p.add_argument("--candidate", required=True)
+    p.add_argument("--era", help="Promote only this configured era stem")
     p.add_argument("--state-dir")
     a = p.parse_args()
 
     repo = Path(a.repo_root).resolve()
     root = json.loads((repo / a.config).read_text(encoding="utf-8"))
     cfg = root["assets"][a.asset]
+    if a.era is not None:
+        eras = [era for era in cfg["eras"] if era["stem"] == a.era]
+        if not eras:
+            raise SystemExit(f"Unknown era {a.era!r} for {a.asset}")
+        cfg = {**cfg, "eras": eras}
     candidate = Path(a.candidate).resolve()
     state_dir = Path(a.state_dir).resolve() if a.state_dir else candidate / ".tracker"
     review = repo / cfg["visual_review"]
@@ -85,6 +91,8 @@ def main():
     if manifest.get("asset_id") != a.asset or manifest.get("production_dir") != cfg["production_dir"]:
         raise SystemExit("PROMOTION_BLOCKED: candidate identity/production_dir differs from machine config")
     hashes = [(x["stem"], x["sha256"]) for x in manifest["files"]]
+    if sorted(stem for stem, _ in hashes) != sorted(era["stem"] for era in cfg["eras"]):
+        raise SystemExit("PROMOTION_BLOCKED: candidate eras do not match the requested scope")
     assert_pre_promotion_gates(cfg, state_dir, a.asset)
 
     review_fp = fingerprint(
@@ -154,7 +162,8 @@ def main():
     promotion["runtime_published"] = False
     promotion["runtime_branch"] = "main"
     promotion["runtime_publication"] = "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
-    promotion_path = production / "promotion-manifest.json"
+    promotion_name = f"{a.era}.promotion-manifest.json" if a.era else "promotion-manifest.json"
+    promotion_path = production / promotion_name
     promotion_path.write_text(json.dumps(promotion, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     promote_fp = fingerprint(

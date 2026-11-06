@@ -56,19 +56,23 @@ jobs:
             printf '%s\n' "${changed[@]}" >&2
             exit 1
           fi
-          python3 - "$asset" <<'PY'
+          era="$(jq -er 'if has("era") then .era | strings | select(test("^[a-zA-Z0-9_]+$")) else "" end' "$command")"
+          python3 - "$asset" "$era" <<'PY'
           import json, sys
           from pathlib import Path
           asset=sys.argv[1]
           cfg=json.loads(Path('art/placeables/PIPELINE_CONFIG.json').read_text(encoding='utf-8'))
           if asset not in cfg.get('assets', {}):
               raise SystemExit(f'unknown asset id: {asset}')
+          if sys.argv[2] and sys.argv[2] not in {era['stem'] for era in cfg['assets'][asset]['eras']}:
+              raise SystemExit(f'unknown era for {asset}: {sys.argv[2]}')
           PY
           checkpoint="asset-checkpoint-${asset}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "asset=$asset" >> "$GITHUB_OUTPUT"
           echo "checkpoint=$checkpoint" >> "$GITHUB_OUTPUT"
           echo "production_base_sha=$base" >> "$GITHUB_OUTPUT"
           echo "ASSET=$asset" >> "$GITHUB_ENV"
+          echo "ASSET_ERA=$era" >> "$GITHUB_ENV"
           echo "CHECKPOINT_NAME=$checkpoint" >> "$GITHUB_ENV"
           echo "PRODUCTION_BASE_SHA=$base" >> "$GITHUB_ENV"
           # Remove the command-only commit from the working tree before staging production art.
@@ -100,7 +104,9 @@ jobs:
 
       - name: Resume and verify exact deterministic candidate
         run: |
-          python3 tools/art_pipeline/process_asset.py \
+          era_args=()
+          if [ -n "$ASSET_ERA" ]; then era_args=(--era "$ASSET_ERA"); fi
+          python3 tools/art_pipeline/process_asset.py "${era_args[@]}" \
             --repo-root . \
             --asset "$ASSET" \
             --output "$RUNNER_TEMP/candidate" \
@@ -111,7 +117,9 @@ jobs:
 
       - name: Enforce hash-bound visual approval and stage production only
         run: |
-          python3 tools/art_pipeline/promote_asset.py \
+          era_args=()
+          if [ -n "$ASSET_ERA" ]; then era_args=(--era "$ASSET_ERA"); fi
+          python3 tools/art_pipeline/promote_asset.py "${era_args[@]}" \
             --repo-root . \
             --asset "$ASSET" \
             --candidate "$RUNNER_TEMP/candidate" \

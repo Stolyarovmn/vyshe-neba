@@ -1,0 +1,22 @@
+{
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "actual_camera_angle": "UNKNOWN",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "reviewer": "Codex",
+  "ground_compression_proxy": 0.958515,
+  "review_evidence": "Reviewed source composition at 100% and 50%; three ground contacts, visible upper surfaces and period hardware.",
+  "source_sha256": "cdc4c606dcff0aeccf1666d37e5c5bdfd309a5f6749656bded97894ee4c953fd",
+  "tilt_proxy_deg": 16.56,
+  "scene_preview_sha256": "dd1357a8fee96302b832a0c05db9aae401bf72684e1eb7e3831609e5c0ce09be",
+  "elevation_proxy_deg": 73.44,
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "source_gate": "PASS"
+}
