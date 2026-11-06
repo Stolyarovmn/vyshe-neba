@@ -13,7 +13,13 @@
       1254
     ],
     "original_sha256": "c64e693a2799c17b5c79515c1151fb3be330b15c72c8c21f9a06749509bf60d3",
-    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/BI-DELUGE_deluge_cooling/",
+    "original_storage": {
+      "provider": "google_drive",
+      "drive_file_id": "1WCBOE3umnAvyu5Pgs9hkHHKmYwyxk98n",
+      "drive_url": "https://drive.google.com/file/d/1WCBOE3umnAvyu5Pgs9hkHHKmYwyxk98n/view",
+      "folder": "vyshe-neba/art-originals/base/E0_hd_candidates_2026-11/",
+      "original_filename": "BI-DELUGE_E0_1978_deluge_cooling_hd_candidate_original.png"
+    },
     "generated_on": "2026-10-29"
   },
   "processing": {

@@ -13,7 +13,13 @@
       1254
     ],
     "original_sha256": "4d0983f5acd260a99abfd4c13496cf79b1d7b19e152ac9d7c17fe21eb98cb806",
-    "original_storage": "pending_upload_to_google_drive: vyshe-neba/art-originals/base/BI-GANTRY_service_gantry/",
+    "original_storage": {
+      "provider": "google_drive",
+      "drive_file_id": "1DdyPzi8a-SvpfiWCcPpTI6WX3GMlim7n",
+      "drive_url": "https://drive.google.com/file/d/1DdyPzi8a-SvpfiWCcPpTI6WX3GMlim7n/view",
+      "folder": "vyshe-neba/art-originals/base/E0_hd_candidates_2026-11/",
+      "original_filename": "BI-GANTRY_E0_1978_service_gantry_hd_candidate_original.png"
+    },
     "generated_on": "2026-10-29"
   },
   "processing": {
