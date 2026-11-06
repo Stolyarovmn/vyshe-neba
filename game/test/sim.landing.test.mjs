@@ -119,7 +119,7 @@ const withChute = (extra = {}, config = {}) => createFlight(startRocket({
   weather: 'clear', consumables: { chute: 1 }, ...config, start: { body: 'earth', alt: 600, ...extra },
 }));
 
-test('the canopy opens after a short delay, then brakes the fall to a fixed 4.5 units/s and lands softly', () => {
+test('the canopy opens after a short delay, sheds the speed quickly but smoothly down to a fixed 8 units/s and lands softly', () => {
   const state = withChute({}, { fins: { turn: 1, maxTilt: Math.PI } });
   state.objects = [];
   advance(state, { throttle: 0 }, 2);
@@ -136,19 +136,39 @@ test('the canopy opens after a short delay, then brakes the fall to a fixed 4.5 
   assert.ok(state.vy >= fall - 1, 'the canopy has not braked yet: it needs about 0.6 s to inflate');
   assert.ok(state.chute.t > 0.5 && state.chute.t < 1);
 
-  advance(state, { parachute: true }, 0.4);
+  const speeds = [];
+  advance(state, { parachute: true }, 0.4, (s) => { if (s.chute.open) speeds.push(s.vy); });
+  advance(state, { parachute: true }, 3, (s) => speeds.push(s.vy));
   assert.equal(state.chute.open, true);
-  advance(state, { parachute: true }, 1);
-  assert.ok(state.vy < fall / 2, 'braking has begun');
-  advance(state, { parachute: true }, 1.5);
-  assert.ok(Math.abs(state.vy - 4.5) < 1e-9, `sinks at ${state.vy}`);
+  let sharpest = 0;
+  for (let i = 1; i < speeds.length; i++) {
+    assert.ok(speeds[i] <= speeds[i - 1] + 1e-9, 'the speed only falls');
+    assert.ok(speeds[i] >= 8 - 1e-9, 'and never goes below the terminal speed');
+    sharpest = Math.max(sharpest, (speeds[i - 1] - speeds[i]) * 120);
+  }
+  assert.ok(sharpest <= 141, `the braking is capped (${sharpest} units/s²), not instant`);
+  assert.ok(speeds[Math.round(0.1 * 120)] > fall * 0.6, 'a tenth of a second after opening the speed is still high');
+  assert.ok(speeds[Math.round(1 * 120)] < fall * 0.35, 'one second after opening most of it is gone');
+  advance(state, { parachute: true }, 2);
+  assert.ok(Math.abs(state.vy - 8) < 0.2, `sinks at ${state.vy}`);
+  assert.ok(Math.abs(state.vy - 8) > -1);
 
   advance(state, { parachute: true }, 120);
   assert.equal(state.phase, 'landed');
   const result = summarize(state);
   assert.equal(result.usedChute, true);
-  assert.ok(result.landing.v < 5);
+  assert.ok(result.landing.v <= 8.5 && result.landing.v < result.landing.vTol, 'a safe touchdown');
   assert.equal(result.outcome, 'landed');
+});
+
+test('a kilometre under the canopy takes about 10-20 seconds, not a crawl of 22 s and more', () => {
+  const state = withChute({ alt: 100 }, { fins: { turn: 1, maxTilt: Math.PI } });
+  state.objects = [];
+  advance(state, { throttle: 0 }, 0.05);
+  advance(state, { parachute: true }, 120);
+  assert.equal(state.phase, 'landed');
+  assert.ok(state.time > 8 && state.time < 20, `${state.time} s from 1 km`);
+  assert.ok(summarize(state).landing.v < 9, 'and the touchdown is safe');
 });
 
 test('the canopy exists only if it was taken along; the parachute module level no longer matters', () => {

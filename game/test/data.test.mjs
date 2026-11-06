@@ -23,7 +23,7 @@ test('eras: six eras with caps and the transitions of DESIGN 4.2', () => {
     assert.ok(era.name && era.desc);
   });
   assert.deepEqual(ERAS.map((e) => e.year), [1978, 1986, 1998, 2015, 2035, 2060]);
-  assert.deepEqual(ERAS.slice(0, 5).map((e) => e.advance.buildings.count), [2, 4, 6, 8, 10]);
+  assert.deepEqual(ERAS.slice(0, 5).map((e) => e.advance.buildings.count), [8, 8, 10, 12, 14]);
   assert.deepEqual(ERAS.slice(0, 5).map((e) => e.advance.buildings.level), [1, 2, 3, 4, 5]);
   assert.equal(ERAS[5].advance, null);
   for (const key of ['fuel', 'income', 'discount']) {
@@ -105,6 +105,29 @@ test('fins: the first levels are cheap and need only the first service team', ()
   }
   assert.ok(BUILDINGS.service.levels[0].cost <= 2 * cheapest, 'the service team is among the cheapest buildings');
   assert.equal(BUILDINGS.service.minEra, 0);
+});
+
+test('the first era is rich: 14 buildings and 8 modules, 39 purchases, nothing waits for a later era', () => {
+  assert.ok(BUILDING_KEYS.every((key) => BUILDINGS[key].minEra === 0), 'every building can be built at level 1 in 1978');
+  let profile = makeProfile({ coins: 1e9, data: 1e9 });
+  let purchases = 0;
+  for (let guard = 0; guard < 200; guard++) {
+    let bought = false;
+    for (const key of BUILDING_KEYS) { const r = buyBuilding(profile, key); if (r.ok) { profile = { ...r.profile, coins: 1e9, data: 1e9 }; bought = true; purchases += 1; } }
+    for (const id of PART_IDS) { const r = buyPart(profile, id); if (r.ok) { profile = { ...r.profile, coins: 1e9, data: 1e9 }; bought = true; purchases += 1; } }
+    if (!bought) break;
+  }
+  assert.equal(purchases, 39, '14 buildings + the second level of the energy node (it leads the era) + 8 modules x 3 levels');
+  assert.ok(purchases >= 35 && purchases <= 45, 'about 35-45 purchases');
+  assert.ok(BUILDING_KEYS.every((key) => profile.buildings[key] === Math.min(6, 1 + BUILDINGS[key].lead)));
+  assert.ok(PART_IDS.every((id) => profile.parts[id] === 3));
+  // The first levels of the modules that used to wait for a later era now ask only for level-1 buildings.
+  for (const id of ['engine', 'hull', 'booster', 'avionics']) {
+    for (const level of PARTS[id].levels.slice(0, 3)) {
+      assert.ok(level.requires.every((r) => r.era == null || r.era === 0), `${id}: no era requirement in 1978`);
+      assert.ok(level.requires.every((r) => r.building == null || r.level === 1), `${id}: only level-1 buildings`);
+    }
+  }
 });
 
 test('buildings: fourteen keys that match the island layout, six levels each', () => {
@@ -193,16 +216,9 @@ test('every level is reachable: a player with unlimited funds buys the whole tre
       if (!bought) break;
     }
     const cap = ERAS[era].cap;
-    for (const id of PART_IDS) {
-      const expected = id === 'avionics' && era < 2 ? 0 : id === 'booster' && era < 1 ? 0 : null;
-      if (expected !== null) assert.equal(profile.parts[id], expected, `${id} in era ${era}`);
-    }
-    // The era caps are met by everything that is not delayed by a building's first era.
-    for (const key of BUILDING_KEYS) {
-      const spec = BUILDINGS[key];
-      if (spec.minEra <= era) assert.equal(profile.buildings[key], Math.min(6, cap.building + spec.lead), `${key} in era ${era}`);
-      else assert.equal(profile.buildings[key], 0, `${key} locked in era ${era}`);
-    }
+    // Every module and every building reaches the cap of its era, starting with the very first era.
+    for (const id of PART_IDS) assert.equal(profile.parts[id], cap.part, `${id} in era ${era}`);
+    for (const key of BUILDING_KEYS) assert.equal(profile.buildings[key], Math.min(6, cap.building + BUILDINGS[key].lead), `${key} in era ${era}`);
   }
   assert.ok(PART_IDS.every((id) => profile.parts[id] === 18), 'all modules reach level 18');
   assert.ok(BUILDING_KEYS.every((key) => profile.buildings[key] === 6), 'all buildings reach level 6');

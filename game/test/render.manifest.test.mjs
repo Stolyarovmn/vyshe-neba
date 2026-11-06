@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  ART_BUILDINGS, ASSET_FILES, BROKEN_PLACEABLE_ERAS, BUILDING_ANCHORS, BUILDING_KEYS, ENTRY_KEYS, ERA_SPRITE_SIZES, ERA_YEARS,
+  ART_BUILDINGS, ASSET_FILES, BROKEN_PLACEABLE_ERAS, BUILDING_ANCHORS, BUILDING_KEYS, E0_BUILDING_SIZES, ENTRY_KEYS, ERA_SPRITE_SIZES, ERA_YEARS,
   FLAT_SPRITE_SIZES, ISLAND, ISLAND_ROADS, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, WORLD_ENTRIES, buildingSpriteName, eraYear,
   placeableFile, spriteAnchor, spriteName, spriteSize,
 } from '../src/render/manifest.js';
@@ -152,4 +152,29 @@ test('объекты-входы: раскладка в манифесте сов
 test('манифест чистый: читается Node без DOM (как в tools/build.mjs)', () => {
   assert.equal(typeof globalThis.window, 'undefined');
   assert.ok(ASSET_FILES.aircraft_fx.kind === 'json');
+});
+
+test('HD-постройки E0: в каталоге из art/gen/runtime, размеры совпадают с PNG, для остальных эпох прежние файлы', () => {
+  const keys = Object.keys(E0_BUILDING_SIZES);
+  assert.equal(keys.length, 11);
+  for (const key of keys) {
+    const name = `bld_${key}_1978`;
+    assert.equal(fileOf(ASSET_FILES[name]), `art/gen/runtime/${name}.png`, name);
+    assert.deepEqual(pngSize(path.join(repoRoot, fileOf(ASSET_FILES[name]))), E0_BUILDING_SIZES[key], `${name}: размер`);
+    assert.deepEqual(spriteSize(name), E0_BUILDING_SIZES[key]);
+    assert.deepEqual(spriteAnchor(name), [0.5, 1], `${name}: низ по центру`);
+    assert.equal(pngProblem(path.join(repoRoot, fileOf(ASSET_FILES[name]))), null, `${name}: повреждён`);
+    assert.ok(BUILDING_ANCHORS[key], key);
+  }
+  // арт других эпох: готовые infrastructure/ у шести построек, у пяти программных — только силуэт кодом
+  for (const key of ART_BUILDINGS) {
+    for (const year of ERA_YEARS.slice(1)) assert.equal(fileOf(ASSET_FILES[`bld_${key}_${year}`]), `outputs/rocket/dist/assets/infrastructure/${key}/${year}.png`);
+  }
+  for (const key of PROCEDURAL_BUILDINGS) {
+    assert.ok(ASSET_FILES[`bld_${key}_1978`], `${key}: арт E0`);
+    for (const year of ERA_YEARS.slice(1)) assert.equal(ASSET_FILES[`bld_${key}_${year}`], undefined, `${key} ${year}: силуэт кодом`);
+  }
+  // старые маленькие файлы E0 больше не подключаются
+  const used = new Set(Object.values(ASSET_FILES).map(fileOf));
+  for (const key of ART_BUILDINGS) assert.ok(!used.has(`outputs/rocket/dist/assets/infrastructure/${key}/1978.png`), `${key}: старый E0`);
 });

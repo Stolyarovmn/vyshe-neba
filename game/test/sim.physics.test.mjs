@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  BODIES, DT, SPACE_ALT, advance, createFlight, densityAt, gravityAt, startRocket, step,
+  BODIES, DT, SHADOW_RANGE, SPACE_ALT, advance, createFlight, densityAt, gravityAt, startRocket, step,
 } from '../src/sim/index.js';
 
 // Free rotation (a fully upgraded RCS module): the default rocket may only lean a little.
@@ -267,4 +267,26 @@ test('paused input does not advance time', () => {
   const events = step(state, { throttle: 1, pause: true }, 1);
   assert.deepEqual(events, []);
   assert.equal(JSON.stringify(state), before);
+});
+
+test('the state tells the renderer the height above the ground and the range of the contact mark and shadow', () => {
+  assert.equal(SHADOW_RANGE, 40);
+  const pad = createFlight(startRocket({ weather: 'clear' }));
+  assert.equal(pad.heightAboveGround, 0);
+  assert.equal(pad.shadowRange, 40);
+  const state = airborne(123);
+  assert.equal(state.heightAboveGround, 123);
+  assert.equal(state.shadowRange, SHADOW_RANGE);
+  advance(state, { throttle: 0 }, 0.5);
+  assert.equal(state.heightAboveGround, state.alt, 'measured from the feet, the same number as alt');
+  assert.ok(state.heightAboveGround < 123);
+  for (const body of ['moon', 'mars']) {
+    const other = createFlight(startRocket({ start: { body, alt: 55 } }));
+    assert.equal(other.heightAboveGround, 55);
+    assert.equal(other.shadowRange, 40);
+  }
+  const rising = createFlight(startRocket({ weather: 'clear' }));
+  advance(rising, { throttle: 1 }, 2);
+  assert.equal(rising.heightAboveGround, rising.alt);
+  assert.ok(rising.heightAboveGround > 0 && rising.heightAboveGround !== rising.shadowRange);
 });

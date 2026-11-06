@@ -10,32 +10,53 @@ import { createView } from '../src/render/camera.js';
 import { ISLAND } from '../src/render/manifest.js';
 import { fakeAssets, makeStubCanvas, stubContext } from './render-helpers.mjs';
 
-test('земля в полёте: на земле масштаб 1 без смещения, выше мельче и ниже, плавно', () => {
+test('земля в полёте: масштаб 1/(1+(h/250)^2), смещение 1:1 с высотой, плавно, без скачков', () => {
   assert.equal(groundScale(0), 1);
   assert.equal(groundDrop(0), 0);
+  assert.equal(GROUND_DISTANCE, 250);
   assert.ok(Math.abs(groundScale(GROUND_DISTANCE) - 0.5) < 1e-9);
-  let previousScale = 1;
-  let previousDrop = 0;
-  for (let a = 5; a <= 6000; a += 5) {
-    const s = groundScale(a);
-    const d = groundDrop(a);
-    assert.ok(s < previousScale && d > previousDrop, `монотонность на ${a}`);
-    assert.ok(previousScale - s < 0.01 && d - previousDrop < 3.1, `нет скачка на ${a}`);
-    previousScale = s;
-    previousDrop = d;
+  // 1 ед. мира = 10 м: на 1 км остров ~0,86 начального масштаба, на 2,5 км ~0,5, на 4 км ~0,28, на 8 км ~0,09
+  for (const [meters, expected] of [[1000, 0.86], [2500, 0.5], [4000, 0.28], [8000, 0.09]]) {
+    assert.ok(Math.abs(groundScale(meters / 10) - expected) < 0.01, `${meters} м: ${groundScale(meters / 10).toFixed(3)}`);
+    assert.ok(Math.abs(groundScale(meters / 10) - 1 / (1 + (meters / 10 / 250) ** 2)) < 1e-12);
   }
+  let previousScale = 1;
+  for (let a = 1; a <= 6000; a += 1) {
+    const s = groundScale(a);
+    assert.ok(s < previousScale, `масштаб убывает на ${a}`);
+    assert.ok(previousScale - s < 0.004, `нет скачка на ${a}`);
+    assert.equal(groundDrop(a), a, 'расстояние до земли равно высоте 1:1');
+    previousScale = s;
+  }
+  assert.ok(groundScale(10) > 0.998 && groundScale(40) > 0.97, 'вначале остров почти не мельчает');
+  assert.ok(groundScale(800) < 0.1, 'на 8 км остров мелкий');
   const tr = groundTransform({}, 0, 3, 500, 400, 25);
   assert.equal(tr.s, 3);
   assert.equal(tr.oy, 500);
   assert.equal(tr.ox, 400 - 25 * 3);
 });
 
-test('параллакс: карта уходит вниз медленнее ракеты, у земли высота читается по расстоянию до тени', () => {
-  const near = groundTransform({}, 100, 3, 500, 400, 0);
-  const high = groundTransform({}, 1000, 3, 500, 400, 0);
-  assert.ok(near.oy > 500 && high.oy > near.oy);
-  assert.ok(high.oy - 500 < 3 * 1000, 'медленнее, чем при прямом сносе вниз');
-  assert.ok(near.oy - 500 >= 3 * 100 * 0.55, 'у земли смещение заметно');
+test('высота читается по острову: карта ниже ног ракеты ровно на высоту (экранные пиксели = высота * S), остров мельче', () => {
+  const S = 3;
+  const feetY = 500;
+  let previousScale = S;
+  for (const alt of [10, 25, 40, 100, 200, 400, 800]) {
+    const tr = groundTransform({}, alt, S, feetY, 400, 0);
+    assert.equal(tr.oy - feetY, alt * S, `${alt * 10} м: расстояние до земли на экране равно высоте`);
+    assert.ok(tr.s < previousScale && Math.abs(tr.s - S * groundScale(alt)) < 1e-12);
+    previousScale = tr.s;
+    // северный берег острова ещё ниже точки старта на экране на высоту острова в масштабе карты
+    const mv = createMapView().set(tr.ox, tr.oy, tr.s, 1200, 2000);
+    assert.ok(mv.sy(ISLAND.topUnits) < tr.oy, 'остров лежит вокруг точки старта');
+  }
+  // на 4 км остров мелкий и далеко внизу: берег дальше, чем кадр высотой 700 ед., когда ракета в нижней трети
+  const far = groundTransform({}, 400, 3.4, 1670, 585, 0);
+  const mv = createMapView().set(far.ox, far.oy, far.s, 1170, 2532);
+  assert.ok(far.s < 3.4 * 0.3 && mv.sy(ISLAND.topUnits) > 2532, 'на 4 км остров за нижним краем портретного кадра');
+  // а к посадке плавно возвращается: на 1 км площадка в кадре на 100 ед. * S под ногами ракеты, остров крупный
+  const near = groundTransform({}, 100, 3.4, 1670, 585, 0);
+  assert.ok(near.oy === 1670 + 340 && near.oy < 2532, 'на 1 км площадка видна в кадре');
+  assert.ok(near.s > 3.4 * 0.85);
 });
 
 test('MapView: преобразования обратимы, границы соответствуют экрану', () => {
