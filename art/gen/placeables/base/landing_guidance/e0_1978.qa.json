@@ -3,21 +3,27 @@
     46,
     82
   ],
-  "opaque_colors": 29,
+  "opaque_colors": 31,
   "binary_alpha": true,
-  "opaque_pixel_count": 549,
-  "coverage": 0.145546,
+  "opaque_pixel_count": 1152,
+  "coverage": 0.305408,
   "visible_bbox": [
-    5,
-    36,
-    41,
+    4,
+    2,
+    42,
     78
   ],
   "visible_bbox_size": [
-    36,
-    42
+    38,
+    76
   ],
   "min_coverage": 0.04,
   "min_bbox_fraction": 0.35,
-  "sha256": "309dc8dcb61b4304b60a710189b0b75829f03507cf441171157fd62cc5689a24"
+  "visible_bbox_constraints": {
+    "min_width": 38,
+    "max_width": 42,
+    "min_height": 70,
+    "max_height": 76
+  },
+  "sha256": "6d0d055ec643301050ac29009b646bb40d43c3ce5a98715ff59c50ded132a23f"
 }

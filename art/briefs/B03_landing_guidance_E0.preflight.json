@@ -79,21 +79,13 @@
     "previous_e0_visible_bbox": [36, 42],
     "qa_result": "fail",
     "failure_class": "repeated_native_alpha_transport_failure_plus_projection_source_gate",
-    "action": "switch the E0 raw generation transport to an exact opaque #FF00FF chroma key while keeping projection/era/FX gates fail-closed; archive untouched raw before deterministic key removal"
+    "action": "use native transparent alpha after opaque chroma-key trials returned nonuniform backgrounds; inspect the untouched source over contrasting backgrounds and require binary alpha on the processed sprite"
   },
   "generation_gate": {
     "one_asset_per_call": true,
     "one_era_per_call": true,
-    "alpha_strategy": "opaque_chroma_key",
-    "transparent_background": false,
-    "alpha_transport_contract_file": "art/docs/SOURCE_ALPHA_TRANSPORT.md",
-    "source_transport": {
-      "key_color_hex": "#FF00FF",
-      "raw_must_be_fully_opaque": true,
-      "background_must_be_uniform": true,
-      "source_prepare": "ref2game_key",
-      "keying_may_fix_projection_or_baked_fx": false
-    },
+    "alpha_strategy": "native_transparent",
+    "transparent_background": true,
     "style_bible_verbatim": true,
     "can_generate_isolated_candidate": true,
     "can_scene_approve": true,

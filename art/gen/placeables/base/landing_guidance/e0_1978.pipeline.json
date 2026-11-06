@@ -1,19 +1,47 @@
 {
-  "asset": "B03 landing_guidance",
+  "asset_id": "B03",
+  "asset": "landing_guidance",
+  "zone": "base",
   "era": "E0",
   "year": 1978,
-  "source_gen_id": "7b0172e8-a316-4f42-bf91-7355d46037d3",
-  "source_original_sha256": "1c9ecd76cdd455f97fe9f1d25c7acd6d94523b64a6120438fd360e3112599b11",
-  "text_transport_format": "indexed-zlib-b85-v1",
-  "transport_pixel_sha256": "de25aa533ed0b029b1647219c087d127890edf4d0e68f0b21c58da947960645d",
-  "transport_canvas": [138, 246],
-  "transport_to_presnap": "nearest-neighbor x4",
-  "spritefusion_pixel_snapper_rev": "ae20461f60fb39e75d15f184bab1ebec1219511c",
-  "pixel_size": 14,
-  "colors": 32,
-  "aseprite": "1.3.18.6",
+  "adapter": "prepared_grid_png",
+  "source_gen_id": "0d9a5799-c12e-4725-b862-d10d3ebc2a78",
+  "source_sha256": "cdc4c606dcff0aeccf1666d37e5c5bdfd309a5f6749656bded97894ee4c953fd",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1GAmZSLZ6bJRLaM85EYeR7qSuEPKC5kT_"
+  },
+  "transport_sha256": "2911f5ec51d2c9a7790b1ea7724d98a77e2e69f692bab47771b75034defdb30b",
+  "transport_pixel_sha256": null,
+  "spritefusion_pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "aseprite_version": "1.3.18.6",
   "aseprite_dithering": "none",
-  "target_canvas": [46, 82],
-  "registration_target": [23, 78],
-  "mechanism_pivots": "pending_measured_rig_pass"
+  "pixel_size": 12,
+  "colors": 32,
+  "target_canvas": [
+    46,
+    82
+  ],
+  "registration_target": [
+    23,
+    78
+  ],
+  "mechanism_pivots": "pending_measured_rig_pass",
+  "output_sha256": "6d0d055ec643301050ac29009b646bb40d43c3ce5a98715ff59c50ded132a23f",
+  "reproducibility": {
+    "git_commit": "96883e11eed309a7227c5e5c3263c844c09cc442",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "2eaf11c004649c2ebd1585e9734f82f2841281d951efead31127640c7a2fe0d0",
+    "processor_sha256": "fb7ae0c6600c76fdb551d76eac8fa8e429a5432608034010d529b87b663c9ac5",
+    "prompt_sha256": "7d9c0c5b4c836096832eedebedbd771e7f393230dbc0c4c50be1aed179716158"
+  },
+  "publication": {
+    "state": "production",
+    "runtime_published": false,
+    "visual_review": "art/gen/placeables/base/landing_guidance/visual_qa.json",
+    "visual_review_sha256": "27911a8782c4f02dc6cff299a5736d61323f8bc88a9753104ad4aaeb4ff9e07b",
+    "hash_bound": true,
+    "runtime_boundary": "separate_main_pr"
+  }
 }

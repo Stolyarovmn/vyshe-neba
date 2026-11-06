@@ -3,20 +3,98 @@
   "asset": "landing_guidance",
   "stage": "gameplay_size_visual_geometry",
   "result": "fail_regenerate",
-  "canvas": [46, 82],
-  "registration_target": [23, 78],
+  "canvas": [
+    46,
+    82
+  ],
+  "registration_target": [
+    23,
+    78
+  ],
   "prompt_contract": {
-    "target_visible_width_lp": [38, 42],
-    "target_visible_height_lp": [70, 76],
+    "target_visible_width_lp": [
+      38,
+      42
+    ],
+    "target_visible_height_lp": [
+      70,
+      76
+    ],
     "shape": "tall narrow landing beacon; base -> mast/yoke -> aiming head -> lamp"
   },
   "processed_candidate": {
-    "e0_1978": {"visible_bbox": [5, 36, 41, 78], "visible_bbox_size": [36, 42]},
-    "e1_1986": {"visible_bbox": [4, 40, 43, 78], "visible_bbox_size": [39, 38]},
-    "e2_1998": {"visible_bbox": [2, 40, 43, 78], "visible_bbox_size": [41, 38]},
-    "e3_2015": {"visible_bbox": [3, 41, 43, 78], "visible_bbox_size": [40, 37]},
-    "e4_2035": {"visible_bbox": [4, 39, 43, 78], "visible_bbox_size": [39, 39]},
-    "e5_2060": {"visible_bbox": [8, 43, 39, 78], "visible_bbox_size": [31, 35]}
+    "e0_1978": {
+      "visible_bbox": [
+        5,
+        36,
+        41,
+        78
+      ],
+      "visible_bbox_size": [
+        36,
+        42
+      ]
+    },
+    "e1_1986": {
+      "visible_bbox": [
+        4,
+        40,
+        43,
+        78
+      ],
+      "visible_bbox_size": [
+        39,
+        38
+      ]
+    },
+    "e2_1998": {
+      "visible_bbox": [
+        2,
+        40,
+        43,
+        78
+      ],
+      "visible_bbox_size": [
+        41,
+        38
+      ]
+    },
+    "e3_2015": {
+      "visible_bbox": [
+        3,
+        41,
+        43,
+        78
+      ],
+      "visible_bbox_size": [
+        40,
+        37
+      ]
+    },
+    "e4_2035": {
+      "visible_bbox": [
+        4,
+        39,
+        43,
+        78
+      ],
+      "visible_bbox_size": [
+        39,
+        39
+      ]
+    },
+    "e5_2060": {
+      "visible_bbox": [
+        8,
+        43,
+        39,
+        78
+      ],
+      "visible_bbox_size": [
+        31,
+        35
+      ]
+    }
   },
   "automatic_qa": "pass",
   "visual_findings": [
@@ -26,5 +104,34 @@
     "E5 collapses further to 31x35 LP and loses the intended tall mast/yoke silhouette."
   ],
   "decision": "Reject this processed lineage for runtime. Keep art/gen files only as QA evidence. Regenerate E0 with the current prompt silhouette contract, archive the approved original, then evolve E1-E5 sequentially from the approved predecessor before re-running Pixel Snapper/Aseprite.",
-  "runtime_published": false
+  "runtime_published": false,
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "scene_projection": {
+        "candidate_sha256": "6d0d055ec643301050ac29009b646bb40d43c3ce5a98715ff59c50ded132a23f",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "source_sha256": "cdc4c606dcff0aeccf1666d37e5c5bdfd309a5f6749656bded97894ee4c953fd",
+        "approval_evidence": "User explicitly approved B03 E0 from the final TEST_ONLY composition",
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "scene_png_sha256": "b582ac6be884a2d07562e4f30adf77ecff8c4162597d6f44d46e7aa21d55e2f5",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        },
+        "reviewer": "project_user"
+      },
+      "sha256": "6d0d055ec643301050ac29009b646bb40d43c3ce5a98715ff59c50ded132a23f"
+    }
+  }
 }

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -39,7 +40,7 @@ def qa_args(cfg):
 
 def read_source(repo,cfg,stem):
     root=repo/cfg['source_dir']; adapter=cfg['adapter']
-    if adapter=='presnap_png':
+    if adapter in ('presnap_png', 'prepared_grid_png'):
         source=root/f'{stem}_presnap.png'; meta_path=root/f'{stem}_presnap.json'
         if not source.is_file() or not meta_path.is_file(): raise SystemExit(f'missing source pair for {stem}')
         meta=json.loads(meta_path.read_text(encoding='utf-8')); meta['_meta_path']=str(meta_path); return source,meta
@@ -51,6 +52,10 @@ def read_source(repo,cfg,stem):
 
 def prepare_source(repo,cfg,stem,work,source):
     w,h=map(int,cfg['canvas']); px=int(cfg['pixel_size'])
+    if cfg['adapter']=='prepared_grid_png':
+        out = work / f"{stem}_presnap.png"
+        shutil.copyfile(source, out)
+        return out
     if cfg['adapter']=='presnap_png':
         out=work/f'{stem}_presnap_grid.png'; im=Image.open(source).convert('RGBA'); target=(w*px,h*px)
         if im.size!=target: im=im.resize(target,Image.Resampling.NEAREST)
@@ -104,7 +109,9 @@ def main():
     eras=[x for x in cfg['eras'] if not a.era or x['stem']==a.era]
     if not eras: raise SystemExit(f'unknown era {a.era!r} for {a.asset}')
 
+    asset_cfg = cfg
     for era in eras:
+        cfg = {**asset_cfg, **era.get('source_override', {})}
         stem=era['stem']; tracker=Tracker(state_dir,a.asset,stem); work=work_root/stem; work.mkdir(parents=True,exist_ok=True)
         with tracker.lock():
             source,meta=read_source(repo,cfg,stem); meta_path=Path(meta['_meta_path']) if meta.get('_meta_path') else None
@@ -150,16 +157,17 @@ def main():
             provenance={'asset_id':a.asset,'asset':cfg['asset'],'zone':cfg['zone'],'era':era['era'],'year':int(era['year']),'adapter':cfg['adapter'],'source_gen_id':meta.get('source_gen_id'),'source_sha256':meta.get('source_sha256') or meta.get('source_original_sha256'),'source_storage':meta.get('source_storage'),'transport_sha256':source_stat['source_sha256'],'transport_pixel_sha256':meta.get('pixel_sha256'),'spritefusion_pixel_snapper_revision':toolchain['pixel_snapper_revision'],'aseprite_version':toolchain['aseprite_version'],'aseprite_dithering':'none','pixel_size':pixel_size,'colors':colors,'target_canvas':[w,h],'registration_target':[rx,ry],'mechanism_pivots':'pending_measured_rig_pass','output_sha256':sha(final),'reproducibility':common,'publication':{'state':'candidate','runtime_published':False,'visual_review_required':True}}
             (out/f'{stem}.pipeline.json').write_text(json.dumps(provenance,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
 
+    cfg = asset_cfg
     family=[]
-    for era in cfg['eras']:
+    for era in eras:
         stem=era['stem']; png=out/f'{stem}.png'; report=out/f'{stem}.qa.json'; pipe=out/f'{stem}.pipeline.json'
         if not (png.is_file() and report.is_file() and pipe.is_file()):
             print(json.dumps({'asset_id':a.asset,'state':'partial_checkpoint','processed':[x['stem'] for x in eras],'state_dir':str(state_dir)},indent=2)); return
         family.append({'stem':stem,'era':era['era'],'year':int(era['year']),'png':png.name,'sha256':sha(png),'qa':report.name,'pipeline':pipe.name})
 
-    candidate={'version':2,'asset_id':a.asset,'asset':cfg['asset'],'production_dir':cfg['production_dir'],'runtime_target':cfg['runtime_target'],'state':'awaiting_visual_approval','visual_review':cfg['visual_review'],'files':family,'reproducibility':common,'checkpoint':{'state_dir':'.tracker','resume':True,'eras':[x['stem'] for x in cfg['eras']]}}
+    candidate={'version':2,'asset_id':a.asset,'asset':cfg['asset'],'production_dir':cfg['production_dir'],'runtime_target':cfg['runtime_target'],'state':'awaiting_visual_approval','visual_review':cfg['visual_review'],'files':family,'reproducibility':common,'checkpoint':{'state_dir':'.tracker','resume':True,'eras':[x['stem'] for x in eras]}}
     candidate_path=out/'candidate-manifest.json'; candidate_path.write_text(json.dumps(candidate,indent=2,ensure_ascii=False)+'\n',encoding='utf-8'); family_fp=fingerprint({'step':'candidate_manifest','files':[(x['stem'],x['sha256']) for x in family],'config_sha256':sha(config_path)})
-    for era in cfg['eras']:
+    for era in eras:
         t=Tracker(state_dir,a.asset,era['stem'])
         if not t.reusable('candidate_manifest',family_fp):
             if t.state['steps']['candidate_manifest']['status']=='success': t.invalidate_from('candidate_manifest','family candidate changed')
@@ -169,7 +177,7 @@ def main():
     if review.is_file():
         approved=subprocess.run([sys.executable,repo/'tools/art_pipeline/verify_visual_gate.py','--candidate',out,'--review',review],capture_output=True,text=True).returncode==0
     review_fp=fingerprint({'step':'visual_review','candidate':[(x['stem'],x['sha256']) for x in family],'review_sha256':maybe_sha(review)})
-    for era in cfg['eras']:
+    for era in eras:
         t=Tracker(state_dir,a.asset,era['stem'])
         if approved: t.success('visual_review',review_fp,[review],'hash-bound visual review approved')
         elif t.state['steps']['visual_review']['status']!='success': t.block('visual_review','awaiting hash-bound visual approval for this exact candidate')
