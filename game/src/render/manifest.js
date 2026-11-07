@@ -436,8 +436,8 @@ export const ENTRY_KEYS = ['workshop', 'board', 'shop', 'monument'];
 export const WORLD_ENTRIES = {
   workshop: { zone: 'launch_core', anchors: [[330, 262]], size: [130, 157], footprint: [114, 28] },
   monument: { zone: 'launch_core', anchors: [[232, 276]], size: [50, 120], footprint: [44, 22] },
-  board: { zone: 'launch_core', anchors: [[210, 352]], size: [78, 72], footprint: [60, 20] },
-  shop: { zone: 'launch_core', anchors: [[578, 352]], size: [120, 98], footprint: [110, 30] },
+  board: { zone: 'launch_core', anchors: [[210, 352]], size: [78, 72], footprint: [60, 20], e0Scale: 0.2 },
+  shop: { zone: 'launch_core', anchors: [[578, 352]], size: [120, 98], footprint: [110, 30], e0Scale: 0.3, e0Anchor: [542, 369] },
 };
 
 // Дороги острова (пиксели острова): по ним ездят машины и летают дроны.

@@ -9,7 +9,7 @@ import {
 } from './manifest.js';
 import { buildingLayout, buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
 import { powerBalance } from '../rules/base.js';
-import { drawEntry, drawEntryHint, entrySize, entryWorld } from './entries.js';
+import { drawEntry, drawEntryHint, entryScale, entrySize, entryWorld } from './entries.js';
 import { BUILD_DURATION, createHubFx, drawScaffold } from './hubfx.js';
 import {
   dayOverlay, daylightAt, drawBirds, drawFoam, drawGlow, drawGlowScreen, drawHeadlights, drawVehicles, lightsAt, shorePoints,
@@ -210,9 +210,9 @@ export function createHub(painter, shared) {
         x = wx;
         y = wy - heightUnits * 0.4;
       } else if (typeof target === 'string' && WORLD_ENTRIES[target]) {
-        const [wx, wy] = entryWorld(target);
+        const [wx, wy] = entryWorld(target, state.era);
         x = wx;
-        y = wy - WORLD_ENTRIES[target].size[1] * ISLAND.unitsPerPx * 0.4;
+        y = wy - entrySize(target, painter, state.era)[1] * 0.4;
       } else if (target && typeof target === 'object') {
         x = target.x;
         y = target.y;
@@ -380,6 +380,7 @@ export function createHub(painter, shared) {
       const night = lightsAt(daylight);
 
       const era = profile ? clamp(profile.era | 0, 0, 5) : 0;
+      state.era = era;
       const parts = profile && profile.parts ? profile.parts : {};
       const owned = profile && profile.buildings ? profile.buildings : {};
       const ownedCount = Object.keys(owned).filter((key) => (owned[key] | 0) > 0).length;
@@ -418,7 +419,7 @@ export function createHub(painter, shared) {
       };
       const contracts = profile && profile.contracts && profile.contracts.active ? profile.contracts.active.length : 0;
       const entryItems = ENTRY_KEYS.map((key) => {
-        const [wx, wy] = entryWorld(key);
+        const [wx, wy] = entryWorld(key, era);
         return {
           y: wy,
           draw() {
@@ -539,8 +540,9 @@ function drawNightLights(ctx, painter, mv, profile, time, strength, era, beaconR
   }
   const [wx, wy] = entryWorld('workshop');
   drawGlow(ctx, mv, wx, wy - 50, 34, GLOW_WARM, strength * 0.75);
-  const [sx, sy] = entryWorld('shop');
-  drawGlow(ctx, mv, sx, sy - 32, 46, GLOW_WARM, strength * 0.9);
+  const [sx, sy] = entryWorld('shop', era);
+  const shopScale = entryScale('shop', era);
+  drawGlow(ctx, mv, sx, sy - 32 * shopScale, 46 * shopScale, GLOW_WARM, strength * 0.9);
   const [mx, my] = entryWorld('monument');
   const k = ISLAND.unitsPerPx;
   for (let i = 0; i <= era; i++) drawGlow(ctx, mv, mx + (-11.5 + i * 4.6) * k, my - 62 * k, 8, GLOW_WARM, strength * 0.9);

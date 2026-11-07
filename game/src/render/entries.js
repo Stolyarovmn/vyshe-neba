@@ -15,21 +15,27 @@ const AMBER = '#efc263';
 const AMBER_DARK = '#7a5a22';
 const LAMP_OFF = '#2a2418';
 
+export function entryScale(key, era) {
+  return era === 0 ? (WORLD_ENTRIES[key]?.e0Scale ?? 1) : 1;
+}
+
 /** Размер объекта-входа в единицах мира [ширина, высота] по sprite_px. */
 export function entrySize(key, painter, era) {
   const spec = WORLD_ENTRIES[key];
   if (!spec) return [40, 40];
-  const height = spec.size[1] * ISLAND.unitsPerPx;
+  const scale = entryScale(key, era) * ISLAND.unitsPerPx;
+  const height = spec.size[1] * scale;
   if (key === 'workshop' && painter) {
     const asset = painter.assets.get(`station_service_lift_${eraYear(era)}`);
     if (asset) return [(height * asset.w) / asset.h, height];
   }
-  return [spec.size[0] * ISLAND.unitsPerPx, height];
+  return [spec.size[0] * scale, height];
 }
 
 /** Мировая точка якоря (ед. мира, ось Y вниз) объекта-входа. */
-export function entryWorld(key) {
-  const [px, py] = WORLD_ENTRIES[key].anchors[0];
+export function entryWorld(key, era) {
+  const spec = WORLD_ENTRIES[key];
+  const [px, py] = era === 0 && spec.e0Anchor ? spec.e0Anchor : spec.anchors[0];
   return [(px - ISLAND.launchOrigin[0]) * ISLAND.unitsPerPx, (py - ISLAND.launchOrigin[1]) * ISLAND.unitsPerPx];
 }
 
@@ -100,8 +106,8 @@ function drawSheet(ctx, dv, sheet, time, sway) {
   ctx.restore();
 }
 
-function drawBoard(ctx, view, wx, wy, time, sheets, sway) {
-  const k = ISLAND.unitsPerPx;
+function drawBoard(ctx, view, wx, wy, time, sheets, sway, era) {
+  const k = ISLAND.unitsPerPx * entryScale('board', era);
   const dv = designView(view, wx, wy, k);
   groundShadow(ctx, view, wx, wy, 78 * k, 14 * k);
   const R = (x, y, w, h, color) => designRect(ctx, dv, x, y, w, h, color);
@@ -133,7 +139,7 @@ function drawBoard(ctx, view, wx, wy, time, sheets, sway) {
 // --- Лавка ---------------------------------------------------------------------------------------------
 
 function drawShop(ctx, painter, view, wx, wy, time, era) {
-  const k = ISLAND.unitsPerPx;
+  const k = ISLAND.unitsPerPx * entryScale('shop', era);
   const dv = designView(view, wx, wy, k);
   const year = eraYear(era);
   groundShadow(ctx, view, wx, wy, 118 * k, 18 * k);
@@ -290,7 +296,7 @@ export function drawEntry(ctx, painter, view, key, wx, wy, time, info) {
       drawWorkshop(ctx, painter, view, wx, wy, time, era);
       break;
     case 'board':
-      drawBoard(ctx, view, wx, wy, time, clamp((info.contracts | 0) + 2, 3, SHEETS.length), info.sway !== false);
+      drawBoard(ctx, view, wx, wy, time, clamp((info.contracts | 0) + 2, 3, SHEETS.length), info.sway !== false, era);
       break;
     case 'shop':
       drawShop(ctx, painter, view, wx, wy, time, era);
