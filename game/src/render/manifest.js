@@ -388,7 +388,7 @@ export const BUILDING_ANCHORS = {
   },
   rescue: {
     zone: 'service_central', anchors: [[740, 340]], size: [139, 84], footprint: [120, 26],
-    e0: { anchors: [[741, 311]], size: [47, 60], footprint: [45, 53] },
+    e0: { anchors: [[830, 501]], size: [47, 60], footprint: [45, 53] },
   },
   fuel: {
     zone: 'fuel_east', anchors: [[870, 470]], size: [160, 82], footprint: [138, 26],
