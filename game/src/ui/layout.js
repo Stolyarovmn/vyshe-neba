@@ -122,6 +122,12 @@ export function chromeLayout(L, o = {}) {
   out.data = rect(right0 - want.data, y, want.data, h);
   out.coins = rect(out.data.x - g - want.coins, y, want.coins, h);
   out.left = x - g; // правая граница левой группы
+  // свободное место между левой группой и счётчиками — монитор подсказки «Дальше» (только в широком окне, в один ряд)
+  out.next = null;
+  if (!row2.length) {
+    const nw = out.coins.x - g - x;
+    if (nw >= R(230 * L.ui)) out.next = rect(x, y, nw, h);
+  }
   return out;
 }
 

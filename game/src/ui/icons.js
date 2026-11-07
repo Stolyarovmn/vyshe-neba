@@ -49,6 +49,8 @@ const STAR = [16, 3, 19.7, 12, 29, 12.6, 21.8, 18.7, 24.2, 28, 16, 22.8, 7.8, 28
 const ROCKET = [P('bd', [11, 17, 5, 26, 11, 24]), P('bd', [21, 17, 27, 26, 21, 24]), P('b', [16, 2, 21, 9, 21, 24, 11, 24, 11, 9]), P('red', [16, 2, 21, 9, 11, 9]), C('cyan', 16, 14, 3.2), P('amber', [12.5, 25, 16, 31, 19.5, 25])];
 const BOLT = [P('b', [19, 2, 7, 18, 14, 18, 12, 30, 25, 13, 17.5, 13])];
 const CHUTE = [P('b', [3, 15, 5, 9, 10, 4.5, 16, 3, 22, 4.5, 27, 9, 29, 15, 22, 13, 16, 15, 10, 13]), L('bd', 1.4, [3, 15, 16, 27]), L('bd', 1.4, [29, 15, 16, 27]), L('bd', 1.4, [16, 15, 16, 27]), R('bd', 13.5, 26, 5, 4)];
+// красная грибовидная кнопка на гайке (E0: «ПУСК»)
+const MUSHROOM = [R('bd', 4, 24, 24, 5), R('b', 6, 20, 20, 5), P('red', [5, 21, 7, 13, 12, 8, 20, 8, 25, 13, 27, 21]), P('w', [10, 12, 13, 10, 16, 10, 12.5, 14], true)];
 const FLAME = [P('b', [16, 2, 25, 15, 22, 27, 10, 27, 7, 15, 12, 18]), P('w', [16, 12, 20.5, 20, 18.5, 25.5, 13.5, 25.5, 11.5, 20], true)];
 
 /** Описания иконок. Тона: b (цвет вызова), bl/bd (светлее/темнее), w, k, и фиксированные (gold, cyan, red, amber, green, glass). */
@@ -63,6 +65,7 @@ const ICONS = {
   shield: [P('b', [16, 3, 27, 7, 27, 16, 16, 29, 5, 16, 5, 7]), P('bd', [16, 7, 23, 10, 23, 16, 16, 24, 9, 16, 9, 10]), P('bl', [16, 7, 23, 10, 16, 16])],
   rocket: ROCKET,
   launch: ROCKET,
+  mushroom: MUSHROOM,
   base: [P('b', [16, 4, 29, 15, 25, 15, 25, 28, 7, 28, 7, 15, 3, 15]), R('bd', 13, 19, 6, 9), R('cyan', 20, 17, 3.5, 3.5)],
   journal: [R('b', 6, 4, 20, 24), R('bd', 6, 4, 4, 24), L('bd', 1.6, [13, 10, 22, 10]), L('bd', 1.6, [13, 14.5, 22, 14.5]), L('bd', 1.6, [13, 19, 19, 19])],
   more: [C('b', 6.5, 16, 3), C('b', 16, 16, 3), C('b', 25.5, 16, 3)],
@@ -136,7 +139,7 @@ const BUILDING_FALLBACK = {
 };
 
 export const ICON_NAMES = Object.keys(ICONS);
-export const hasIcon = (name) => name in ICONS || name.startsWith('bld:');
+export const hasIcon = (name) => name in ICONS || name.startsWith('bld:') || name.startsWith('ui_');
 
 const FIXED = { gold: '#ffd23f', cyan: '#52d8ff', red: '#f0584a', amber: '#e6a020', green: '#3aa860', w: '#f6f1e4', k: '#0b0f1a' };
 
@@ -260,7 +263,8 @@ export function createIcons() {
   function spriteFor(name) {
     if (!painter) return null;
     let sprite = null;
-    if (name.startsWith('bld:')) {
+    if (name.startsWith('ui_')) sprite = name;
+    else if (name.startsWith('bld:')) {
       const [, key, lv] = name.split(':');
       sprite = buildingSpriteName(key, Math.max(1, Number(lv) || era + 1));
     } else if (SPRITE_FLAT[name]) sprite = SPRITE_FLAT[name];

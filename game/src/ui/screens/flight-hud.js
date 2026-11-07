@@ -390,7 +390,11 @@ function hudButton(app, kit, L, name, r, o) {
   } else if (kit.button(id, r, { icon: o.icon, label: o.wide ? o.label : undefined, variant: dim ? 'disabled' : o.variant === 'hud' ? 'btn' : o.variant || 'btn', disabled: dim, tip: o.label, iconSize: Math.round(Math.min(r.w, r.h) * 0.5), size: kit.fs(13) })) {
     app.input.pulse(name);
   }
-  if (o.count !== undefined) kit.drawText(String(o.count), r.x + r.w - cc * 3, r.y + cc * 6, { size: kit.fs(12), color: c.amberLight, align: 'right', shadow: true });
+  if (o.count !== undefined) {
+    // счётчик расходника читается на любой подложке кнопки эпохи (у E0 кнопки светлая крашеная сталь)
+    const bodyVariant = dim ? 'disabled' : touch ? o.variant || 'hud' : o.variant === 'hud' ? 'btn' : o.variant || 'btn';
+    kit.drawText(String(o.count), r.x + r.w - cc * 3, r.y + cc * 6, { size: kit.fs(12), color: kit.readable(c.amberLight, kit.frameMid(bodyVariant)), align: 'right', shadow: true });
+  }
   if (o.heat > 0.02) kit.ledBar({ x: r.x + cc * 4, y: r.y + r.h - cc * 9, w: r.w - cc * 8, h: cc * 4 }, { value: o.heat, color: o.heat > 0.8 ? c.red : c.amber, segments: 6 });
 }
 

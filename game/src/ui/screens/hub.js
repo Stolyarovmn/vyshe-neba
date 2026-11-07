@@ -171,7 +171,7 @@ export default {
       if (sel && sel !== 'monument') hub.focus?.(sel);
     }
 
-    const ch = drawChrome(app, kit, { era: true, gear: true, back: false, eraOpen: st.era, eraBadge: !!info.era?.ok });
+    const ch = drawChrome(app, kit, { era: true, gear: true, back: false, eraOpen: st.era, eraBadge: !!info.era?.ok, next: true });
     if (ch.gear) app.go('settings', {}, { push: true });
     if (ch.era) {
       st.era = !st.era;
@@ -189,7 +189,7 @@ export default {
     kit.hit('dock-bar', D.bar, {});
     const first = app.profile.stats.flights === 0 && !st.sel && !st.era;
     const pulse = first && !app.settings.reduceMotion && Math.floor(app.time * 2.5) % 2 === 0;
-    if (kit.button('dock-launch', D.button, { label: t('launch.start'), icon: 'launch', variant: pulse ? 'dangerHover' : 'danger', size: kit.fs(24), iconSize: Math.round(D.button.h * 0.46), lamp: pulse ? c.white : c.amberLight, tip: t('dock.launch.tip'), solo: true })) app.go('launch', {}, { push: true });
+    if (kit.button('dock-launch', D.button, { label: t('launch.start'), icon: kit.th.era === 'e0' ? 'ui_redbtn' : 'launch', variant: pulse ? 'launchHover' : 'launch', size: kit.fs(24), iconSize: Math.round(kit.th.era === 'e0' ? Math.min(D.button.h * 0.84, D.button.w * 0.3) : D.button.h * 0.46), lamp: pulse ? c.white : c.amberLight, tip: t('dock.launch.tip'), solo: true })) app.go('launch', {}, { push: true });
     for (const n of NAV) {
       const r = D.items[n.id];
       // «!» пульсирует, когда в этом разделе есть покупка, доступная прямо сейчас

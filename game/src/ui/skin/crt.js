@@ -30,7 +30,7 @@ export function createCrt() {
   function entryFor(id, w, h, dpr, tokens, cc) {
     const key = `${id}`;
     let e = entries.get(key);
-    const sig = `${Math.round(w)}x${Math.round(h)}@${dpr}|${tokens.kind}|${tokens.tint}|${tokens.curve}|${tokens.vignette}|${tokens.scan}|${cc}`;
+    const sig = `${Math.round(w)}x${Math.round(h)}@${dpr}|${tokens.kind}|${tokens.tint}|${tokens.curve}|${tokens.vignette}|${tokens.scan}|${tokens.grain || 0}|${cc}`;
     if (e && e.sig === sig) {
       entries.delete(key);
       entries.set(key, e);
@@ -80,6 +80,18 @@ export function createCrt() {
     if (tokens.scan > 0) {
       og.fillStyle = `rgba(0,0,0,${tokens.scan})`;
       for (let y = 0; y < h; y += cc * 2) og.fillRect(0, y + cc, w, cc);
+    }
+    if (tokens.grain > 0) {
+      // зерно стекла: неподвижные светлые и тёмные точки (пыль, выгоревший люминофор); считается один раз на размер экрана
+      let seed = (pw * 31 + ph * 17) >>> 0 || 1;
+      const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const n = Math.floor((w * h) / (cc * cc * 4) * tokens.grain);
+      for (let i = 0; i < n; i++) {
+        const gx = Math.floor((rnd() * w) / cc) * cc;
+        const gy = Math.floor((rnd() * h) / cc) * cc;
+        og.fillStyle = rnd() < 0.45 ? `rgba(190,255,205,${0.05 + rnd() * 0.07})` : `rgba(0,0,0,${0.16 + rnd() * 0.16})`;
+        og.fillRect(gx, gy, cc, cc);
+      }
     }
     if (tokens.vignette > 0) {
       // затемняются только края и углы трубки: заголовки и строки в верхней части экрана остаются яркими

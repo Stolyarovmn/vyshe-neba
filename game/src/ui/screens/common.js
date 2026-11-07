@@ -4,7 +4,7 @@
 import { t } from '../../i18n/index.js';
 import { clamp, fmtCompact, fmtInt } from '../format.js';
 import { chromeLayout } from '../layout.js';
-import { reasonFull } from '../next-steps.js';
+import { nextSummary, reasonFull } from '../next-steps.js';
 
 const MIN_ROW = 44; // нижняя граница высоты нажимаемых строк и кнопок щитка
 
@@ -116,6 +116,64 @@ export function drawFallbackBackground(ctx, L, kit) {
 
 // ---------- угловые таблички ----------
 
+/** Год эпохи на барабанах (E0): кремовые барабаны с тёмными цифрами на оливковой табличке и сигнальная лампа справа. */
+function drawEraDrums(kit, r, year, lampOn) {
+  const c = kit.c;
+  const cc = kit.cell();
+  const lip = cc * 2;
+  const pad = cc * 3;
+  const lampW = Math.round((r.h - lip) * 0.42);
+  const n = year.length;
+  const dh = r.h - lip - pad * 2;
+  const dw = Math.min(Math.floor((r.w - pad * 2 - lampW - cc * 2) / n), Math.round(dh * 0.78));
+  const x0 = Math.round(r.x + pad + (r.w - pad * 2 - lampW - cc * 2 - dw * n) / 2);
+  const y0 = r.y + pad;
+  const size = kit.text.fit('8', dw - cc * 2, Math.round(dh * 0.62)).size;
+  for (let i = 0; i < n; i++) {
+    const wx = x0 + i * dw;
+    kit.rect(wx, y0, dw, dh, c.ink);
+    kit.rect(wx + cc, y0 + cc, dw - cc * 2, dh - cc * 2, c.paper1);
+    kit.rect(wx + cc, y0 + cc, dw - cc * 2, cc, c.paper0);
+    kit.rect(wx + cc, y0 + dh - cc * 2, dw - cc * 2, cc, c.paper0);
+    kit.drawText(year[i], wx + dw / 2, y0 + dh / 2, { size, color: c.ink, align: 'center', noAudit: true });
+  }
+  kit.lamp(r.x + r.w - pad - lampW / 2, y0 + dh / 2, Math.round(lampW * 1.2), c.amber, true, lampOn);
+}
+
+/**
+ * Монитор подсказки «Дальше» (хаб, широкое окно): первые шаги прогресса одной строкой; влезают целиком, без многоточия.
+ */
+function drawNextTicker(app, kit, r) {
+  const c = kit.c;
+  const cc = kit.cell();
+  const steps = nextSummary(app, 3).steps.map((st) => String(st.text || '')).filter(Boolean);
+  if (!steps.length) return;
+  const scr = { x: r.x + cc * 3, y: r.y + cc * 3, w: r.w - cc * 6, h: r.h - cc * 6 };
+  const head = t('hub.next');
+  // самая длинная связка шагов, помещающаяся целиком (сначала обычным размером, затем мельче, но не мельче ×2); затем короткая форма
+  // первого шага (после двоеточия). Не помещается ничего — монитор не рисуется: многоточия в подсказке быть не должно
+  const tail = (st) => (st.includes(':') ? st.split(':').slice(1).join(':').trim() : st);
+  const options = [steps.slice(0, 3).join('  ·  '), steps.slice(0, 2).join('  ·  '), steps[0], tail(steps[0])];
+  let pick = null;
+  for (const size of [kit.fs(12), kit.fs(10)]) {
+    if (kit.text.scaleFor(size) < 2) continue;
+    const headW = kit.text.measure(head, size) + cc * 3;
+    const room = scr.w - cc * 6 - headW;
+    const line = options.find((o2) => o2 && kit.text.measure(o2, size) <= room);
+    if (line) {
+      pick = { size, headW, line };
+      break;
+    }
+  }
+  if (!pick) return;
+  kit.nine('plateTag', r.x, r.y, r.w, r.h);
+  kit.screen('hub-next', scr, () => {
+    const midY = scr.y + scr.h / 2;
+    kit.drawText(head, scr.x + cc * 3, midY, { size: pick.size, color: c.textMute, box: scr });
+    kit.drawText(pick.line, scr.x + cc * 3 + pick.headW, midY, { size: pick.size, color: c.text, box: scr });
+  });
+}
+
 /**
  * Угловые элементы сцены: «назад» / табличка эпохи / шестерёнка слева, таблички данных и монет справа.
  * o: back, era, gear, coins, data (значения для анимации; по умолчанию из профиля).
@@ -130,11 +188,20 @@ export function drawChrome(app, kit, o = {}) {
   if (o.back && G.back && kit.iconButton('back', G.back, { icon: 'back', label: t('common.back'), variant: 'btn' })) app.back();
   if (o.era && G.era) {
     const cc = kit.cell();
-    // o.eraBadge — переход в новую эпоху доступен: на табличке пульсирует «!»
-    if (kit.button('plate-era', G.era, { variant: o.eraOpen ? 'cardOn' : 'raised', icon: 'era', label: String(ERA_YEARS[p.era] ?? ''), size: Math.round(G.era.h * 0.3), iconSize: Math.round(G.era.h * 0.46), lamp: false, badge: o.eraBadge && !o.eraOpen ? '!' : undefined, badgePulse: true })) out.era = true;
+    if (kit.th.era === 'e0') {
+      // E0: год эпохи — механические барабаны, у края сигнальная лампа; нажатие открывает щиток эпохи
+      if (kit.button('plate-era', G.era, { variant: o.eraOpen ? 'cardOn' : 'plateTag', lamp: false })) out.era = true;
+      drawEraDrums(kit, G.era, String(ERA_YEARS[p.era] ?? ''), !!o.eraBadge && !o.eraOpen);
+    } else {
+      // o.eraBadge — переход в новую эпоху доступен: на табличке пульсирует «!»
+      if (kit.button('plate-era', G.era, { variant: o.eraOpen ? 'cardOn' : 'plateTag', icon: 'era', label: String(ERA_YEARS[p.era] ?? ''), size: Math.round(G.era.h * 0.3), iconSize: Math.round(G.era.h * 0.46), lamp: false, badge: o.eraBadge && !o.eraOpen ? '!' : undefined, badgePulse: true })) out.era = true;
+    }
     void cc;
   }
-  if (o.gear && G.gear && kit.iconButton('hub-gear', G.gear, { icon: 'gear', label: t('more.settings'), variant: 'btn' })) out.gear = true;
+  // E0: шестерёнка настроек — чёрная рукоять-диск из референса controls-displays
+  const gearIcon = kit.th.era === 'e0' ? 'ui_dial' : 'gear';
+  if (o.gear && G.gear && kit.iconButton('hub-gear', G.gear, { icon: gearIcon, label: t('more.settings'), variant: 'btn', iconSize: kit.th.era === 'e0' ? Math.round(Math.min(G.gear.w, G.gear.h) * 0.78) : undefined })) out.gear = true;
+  if (o.next && G.next) drawNextTicker(app, kit, G.next);
   kit.plate(G.coins.x, G.coins.y, G.coins.w, G.coins.h, 'coin', o.coins ?? p.coins, c.gold);
   kit.plate(G.data.x, G.data.y, G.data.w, G.data.h, 'data', o.data ?? p.data, c.cyan);
   app.plateRects = { coins: G.coins, data: G.data };

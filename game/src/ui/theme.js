@@ -49,6 +49,12 @@ const P = PALETTE;
 const FRAMES = {
   panel: { hi: 'steel1', mid: 'navy2', lo: 'ink', edge: 'ink', rivets: true },
   raised: { hi: 'steel2', mid: 'steel1', lo: 'steel0', edge: 'ink', rivets: true },
+  // табличка с подписью (эпоха, счётчики): у эпох без своего plateTag совпадает с raised
+  plateTag: { hi: 'steel2', mid: 'steel1', lo: 'steel0', edge: 'ink', rivets: true },
+  // главная кнопка «ПУСК»: у эпох без своего вида совпадает с danger
+  launch: { hi: 'red2', mid: 'red3', lo: 'red0', edge: 'ink', rivets: true },
+  launchHover: { hi: 'white', mid: 'red1', lo: 'red0', edge: 'ink', rivets: true },
+  launchPress: { hi: 'red0', mid: 'red3', lo: 'red2', edge: 'ink' },
   inset: { hi: 'ink', mid: 'navy1', lo: 'steel0', edge: 'ink' },
   screen: { hi: 'ink', mid: 'navy0', lo: 'navy2', edge: 'ink' },
   btn: { hi: 'steel2', mid: 'steel1', lo: 'navy2', edge: 'ink', rivets: true },
@@ -76,8 +82,12 @@ const FRAMES = {
   panelGlass: { hi: 'steel1', mid: 'navy1', lo: 'ink', edge: 'ink' },
 };
 
+// виды, которые без собственного описания в скине берут описание другого вида (рамка и цвет подписи)
+const ALIAS = { plateTag: 'raised', launch: 'danger', launchHover: 'dangerHover', launchPress: 'dangerPress' };
+
 const LABEL = {
   btn: 'white', btnHover: 'white', btnPress: 'steel3',
+  launch: 'white', launchHover: 'ink', launchPress: 'white',
   primary: 'ink', primaryHover: 'ink', primaryPress: 'ink',
   danger: 'white', dangerHover: 'ink', dangerPress: 'white',
   good: 'ink', goodHover: 'ink', goodPress: 'ink',
@@ -151,14 +161,17 @@ export function getTheme(settings = {}, era = 0) {
     mat1: pal.mat1,
     mat2: pal.mat2,
     shade: pal.ink,
+    // тона ржавчины для текстуры 'rust' (у эпох без своих — тона пробки)
+    rust: skin.rust || [pal.cork0, pal.cork1, pal.cork2],
     phosphor: skin.crt.tint,
   };
   const frames = {};
   for (const [name, base] of Object.entries(FRAMES)) {
-    const f = { ...base, ...(skin.frames[name] || {}) };
+    const f = { ...base, ...(ALIAS[name] ? skin.frames[ALIAS[name]] || {} : {}), ...(skin.frames[name] || {}) };
     frames[name] = { hi: pal[f.hi], mid: pal[f.mid], lo: pal[f.lo], edge: pal[f.edge], rivets: f.rivets === undefined ? false : f.rivets === true ? 'screw' : f.rivets === 'none' ? false : f.rivets, tex: f.tex || null, dither: !!f.dither };
   }
   const labels = { ...LABEL, ...skin.labels };
+  for (const [k, v] of Object.entries(ALIAS)) if (skin.labels && !(k in skin.labels) && v in skin.labels) labels[k] = skin.labels[v];
   theme = {
     key,
     era: skin.id,
@@ -169,6 +182,8 @@ export function getTheme(settings = {}, era = 0) {
     variants: frames,
     /** Цвет подписи на кнопке данного варианта. */
     labelColor: (variant) => pal[labels[variant] || 'white'],
+    /** Светлая «гравировочная» тень под подписью варианта (E0: тёмная краска на стали) или null. */
+    labelShadow: (variant) => (skin.engrave && skin.engrave[variant] ? pal[skin.engrave[variant]] : null),
     good: c.green,
     bad: c.red,
     coin: c.gold,

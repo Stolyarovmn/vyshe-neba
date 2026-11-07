@@ -161,8 +161,12 @@ export function placeableFile(place, eraIndex) {
   return `${eraFolder(index)}${place}.png`;
 }
 
+/** UI-спрайты эпохи E0 (образцы референса controls-displays): грибовидная кнопка и чёрный диск. */
+export const UI_SPRITES = ['redbtn', 'dial'];
+
 function buildAssetFiles() {
   const files = {};
+  for (const n of UI_SPRITES) files[`ui_${n}`] = `game/assets/ui/e0/${n}.png`;
   for (const base of ERA_SPRITES) {
     const [from, to] = ERA_RANGE[base] || [0, ERA_YEARS.length - 1];
     for (let e = from; e <= to; e++) files[`${base}_${ERA_YEARS[e]}`] = worldSpriteFile(`${base}_${ERA_YEARS[e]}`);
@@ -250,6 +254,7 @@ export const FLAT_SPRITE_SIZES = {
   terrain_moon: [729, 174], terrain_mars: [728, 185],
   base_drone_0: [606, 354], base_drone_1: [738, 365],
   pad_moon_early: [675, 220], pad_moon_future: [691, 257], pad_mars_early: [667, 218], pad_mars_future: [704, 264],
+  ui_redbtn: [330, 353], ui_dial: [268, 266],
 };
 
 /** Размер подготовленного PNG [w, h] по логическому имени ('core_1998', 'cloud_2') или undefined. */

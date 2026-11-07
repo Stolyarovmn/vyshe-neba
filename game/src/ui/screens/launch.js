@@ -140,7 +140,7 @@ export default {
     kit.hazard(G.start);
     for (const [x, y, w, h] of [[G.start.x, G.start.y, G.start.w, cc], [G.start.x, G.start.y + G.start.h - cc, G.start.w, cc], [G.start.x, G.start.y, cc, G.start.h], [G.start.x + G.start.w - cc, G.start.y, cc, G.start.h]]) kit.rect(x, y, w, h, c.ink);
     const btn = { x: G.start.x + cc * 3, y: G.start.y + cc * 3, w: G.start.w - cc * 6, h: G.start.h - cc * 6 };
-    if (kit.button('launch-start', btn, { label: t('launch.start'), icon: 'launch', variant: 'danger', size: kit.fs(24), iconSize: Math.round(btn.h * 0.46), disabled: !sel?.ok, lamp: sel?.ok ? c.amberLight : false, solo: true })) {
+    if (kit.button('launch-start', btn, { label: t('launch.start'), icon: kit.th.era === 'e0' ? 'ui_redbtn' : 'launch', variant: 'launch', size: kit.fs(24), iconSize: Math.round(kit.th.era === 'e0' ? Math.min(btn.h * 0.84, btn.w * 0.3) : btn.h * 0.46), disabled: !sel?.ok, lamp: sel?.ok ? c.amberLight : false, solo: true })) {
       const consumables = {};
       for (const id of CONS) consumables[id] = !!(st.cons[id] && (p.inventory[id] || 0) > 0);
       app.startLaunch({ destination: st.dest, consumables });

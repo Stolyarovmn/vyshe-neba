@@ -251,6 +251,7 @@ export default {
   'results.n.era': 'Пора в новую эпоху',
   'results.n.dest': 'Открыто: {name}',
   'next.title': 'ЧТО ДАЛЬШЕ',
+  'hub.next': 'Дальше:',
   'hub.eraHint.title': 'Модернизация до {year}',
   'hub.eraHint.ready': 'Можно перейти в эпоху {year}',
   'hub.eraHint.tap': 'Тапни по памятнику эпох',
