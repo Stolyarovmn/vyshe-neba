@@ -12,7 +12,7 @@ import { powerBalance } from '../rules/base.js';
 import { drawEntry, drawEntryHint, entrySize, entryWorld } from './entries.js';
 import { BUILD_DURATION, createHubFx, drawScaffold } from './hubfx.js';
 import {
-  dayOverlay, daylightAt, drawBirds, drawFoam, drawGlow, drawHeadlights, drawVehicles, lightsAt, shorePoints,
+  dayOverlay, daylightAt, drawBirds, drawFoam, drawGlow, drawGlowScreen, drawHeadlights, drawVehicles, lightsAt, shorePoints,
 } from './life.js';
 import { MOUNT_RADIUS, drawLaunchMount } from './launchpad.js';
 import { createRocketPose, drawRocket, stackHeight } from './rocket.js';
@@ -520,10 +520,20 @@ function drawNightLights(ctx, painter, mv, profile, time, strength, era, beaconR
     layout.anchors.forEach(([px, py], i) => {
       const [x, y] = islandToWorld(px, py);
       const lamp = layout.lamp;
-      const lightX = lamp ? x + (lamp[0] - 0.5) * w * (i > 0 ? -1 : 1) : x;
-      const lightY = lamp ? y - (1 - lamp[1]) * h : y - h * (key === 'beacons' ? 0.78 : 0.42);
       const intensity = strength * (on ? 0.9 : 0.3) * (key === 'beacons' ? beaconPower : 1);
-      drawGlow(ctx, mv, lightX, lightY, Math.max(w, h) * (key === 'beacons' ? 0.4 : 0.55), blinking ? GLOW_RED : GLOW_WARM, intensity);
+      const radius = Math.max(w, h) * (key === 'beacons' ? 0.4 : 0.55);
+      const color = blinking ? GLOW_RED : GLOW_WARM;
+      if (lamp) {
+        // Совпадает с округлением размера и якоря в painter.blitSource.
+        const width = Math.max(1, Math.round(w * mv.S));
+        const height = Math.max(1, Math.round(h * mv.S));
+        const offsetX = lamp[0] * width - Math.round(width / 2);
+        const lightX = mv.sx(x) + (i > 0 ? -offsetX : offsetX);
+        const lightY = mv.sy(y) - height + lamp[1] * height;
+        drawGlowScreen(ctx, lightX, lightY, radius * mv.s, color, intensity);
+      } else {
+        drawGlow(ctx, mv, x, y - h * (key === 'beacons' ? 0.78 : 0.42), radius, color, intensity);
+      }
       if (i === 0 && !blinking) drawGlow(ctx, mv, x + w * 0.25, y - h * 0.2, w * 0.35, GLOW_WARM, strength * 0.6);
     });
   }
