@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/materials-construction-02-joints-repairs.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "1f3c8351672a366f6e464b2f98f0431f24e21f182c9e42d2cb10ec83b9c53db3",
+    "bytes": 1752497,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1rxkbxEI9xk0e83fUKe0l3D0iIY0UM50l",
+    "drive_url": "https://drive.google.com/file/d/1rxkbxEI9xk0e83fUKe0l3D0iIY0UM50l/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-02-01",
+      "name": "Captive wedge lock with inspection glass",
+      "verdict": "pass",
+      "notes": "Зуб виден через стекло за перемычкой."
+    },
+    {
+      "id": "E4-02-02",
+      "name": "Induction-welded thermoplastic lap",
+      "verdict": "pass",
+      "notes": "Встроенная прослойка видна."
+    },
+    {
+      "id": "E4-02-03",
+      "name": "Open ball-to-V datum",
+      "verdict": "pass",
+      "notes": "Шар касается двух граней."
+    },
+    {
+      "id": "E4-02-04",
+      "name": "Upset blind threaded insert",
+      "verdict": "pass",
+      "notes": "Буртик прилегает снизу."
+    },
+    {
+      "id": "E4-02-05",
+      "name": "Pull-release bond seam",
+      "verdict": "pass",
+      "notes": "Непрозрачная накладка и короткая петля."
+    },
+    {
+      "id": "E4-02-06",
+      "name": "Flat living hinge",
+      "verdict": "pass",
+      "notes": "Тонкая перемычка между наклонной и плоской кромками."
+    },
+    {
+      "id": "E4-02-07",
+      "name": "Expanding spline seam",
+      "verdict": "pass",
+      "notes": "Шпонка обжимает губки."
+    },
+    {
+      "id": "E4-02-08",
+      "name": "Spent crush link",
+      "verdict": "pass",
+      "notes": "Видны две складки."
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Визуальная сверка восьми ячеек и защищённых деталей с первой версией",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/controls-displays-02-context-diagnostics.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "92023f5119426c6f531e249aac01924da12ba8a7d358cbc346a6cf6d62e89d67",
+    "bytes": 1644502,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1RWEr4z1siqnfoRRwIrxpnkCddPb7Bxo5",
+    "drive_url": "https://drive.google.com/file/d/1RWEr4z1siqnfoRRwIrxpnkCddPb7Bxo5/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-08-01",
+      "name": "Transparent segment display",
+      "verdict": "pass",
+      "notes": "Стекло, три электрода, шлейф и утопленная линия."
+    },
+    {
+      "id": "E4-08-02",
+      "name": "Bistable state display",
+      "verdict": "pass",
+      "notes": "Один тёмный сегмент и контакты."
+    },
+    {
+      "id": "E4-08-03",
+      "name": "Curved touch strip",
+      "verdict": "pass",
+      "notes": "Изогнутое стекло и три краевых контакта."
+    },
+    {
+      "id": "E4-08-04",
+      "name": "Camera depth standard",
+      "verdict": "pass",
+      "notes": "Три ступени глубины."
+    },
+    {
+      "id": "E4-08-05",
+      "name": "Focus mask",
+      "verdict": "pass",
+      "notes": "Три группы сквозных щелей."
+    },
+    {
+      "id": "E4-08-06",
+      "name": "Pressure zero reference",
+      "verdict": "pass",
+      "notes": "Встречные порты соединены через прорезь."
+    },
+    {
+      "id": "E4-08-07",
+      "name": "Thermal reference target",
+      "verdict": "pass",
+      "notes": "Две площадки разделены щелью."
+    },
+    {
+      "id": "E4-08-08",
+      "name": "Camera alignment slider",
+      "verdict": "pass",
+      "notes": "Реперы на рамке, насечка по центру ползуна."
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Проверка восьми ячеек и сохранения шести защищённых образцов",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

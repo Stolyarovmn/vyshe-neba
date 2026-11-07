@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/mechanics-infrastructure-03-automated-utilities.json",
+  "generation_id": null,
+  "returned_filename": "exec-145e7569-f3b3-4a82-b2b0-b391c20900ea.png",
+  "request_sha256": "1f829654bca2b1aefea700866c5c3ebb281982c7a3ee72cc7c62cfea0d8b2e39",
+  "source": {
+    "sha256": "de089cabbc20f2aacc87904f214937965b65240978326e3b18917a62103c14ba",
+    "bytes": 1659913,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1iSpJLWfFcS2ixYrhwSbdI5LH7To8Rbr5",
+    "drive_url": "https://drive.google.com/file/d/1iSpJLWfFcS2ixYrhwSbdI5LH7To8Rbr5/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "name": "Recessed power comb",
+      "notes": "Контакты разделены, направляющая вошла раньше контактов, контроль сопряжения читается.",
+      "id": "E4-06-01",
+      "verdict": "pass"
+    },
+    {
+      "name": "Dual coolant face coupling",
+      "notes": "Герметичная камера, поршень полного сечения, сухая камера, пружина, плоская мишень и зазор датчика.",
+      "id": "E4-06-02",
+      "verdict": "pass"
+    },
+    {
+      "name": "Vacuum service bell",
+      "notes": "Раструб уплотнён у широкой плиты, осевое отверстие открыто.",
+      "id": "E4-06-03",
+      "verdict": "pass"
+    },
+    {
+      "name": "Optical data feedthrough",
+      "notes": "D-образный интерфейс, два окна, уплотнение и направляющая.",
+      "id": "E4-06-04",
+      "verdict": "pass"
+    },
+    {
+      "name": "Leak witness annulus",
+      "notes": "Двойная стенка, сборная полость и один отвод.",
+      "id": "E4-06-05",
+      "verdict": "pass"
+    },
+    {
+      "name": "Spiral rotary ribbon",
+      "notes": "Одна открытая спираль, два концевых крепления.",
+      "id": "E4-06-06",
+      "verdict": "pass"
+    },
+    {
+      "name": "Closed branch spool",
+      "notes": "Оба порта закрыты. Полюс слева от якоря, зазор вокруг штока читается. Электромагнит открывает клапан против пружины.",
+      "id": "E4-06-07",
+      "verdict": "pass"
+    },
+    {
+      "name": "Slit lubrication septum",
+      "notes": "Закрытый септум, отведённая канюля, мишень каретки и независимый датчик с зазором.",
+      "id": "E4-06-08",
+      "verdict": "pass"
+    }
+  ],
+  "reviewer": "Codex и sheet06_pressure_review",
+  "review_method": "Независимая инженерная проверка и сравнение защищённых ячеек. Слепая проверка роли, раунд 15.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "preservation_review": {
+    "verdict": "pass",
+    "notes": "Независимый критик подтвердил сохранность семи защищённых ячеек.",
+    "baseline": "E4_sheet06_rev18.png"
+  }
+}

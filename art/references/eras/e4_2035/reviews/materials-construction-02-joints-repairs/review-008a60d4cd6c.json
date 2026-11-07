@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/materials-construction-02-joints-repairs.json",
+  "generation_id": null,
+  "source": {
+    "sha256": "008a60d4cd6c761df2856a5eed8098683e8c5368f7ff30ac83856b8e52eea935",
+    "bytes": 1708558,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1RZmTGk4jowY3DvIvWzYldcVCbviTyp72",
+    "drive_url": "https://drive.google.com/file/d/1RZmTGk4jowY3DvIvWzYldcVCbviTyp72/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-02-01",
+      "name": "Captive wedge lock with inspection glass",
+      "verdict": "pass",
+      "notes": "Зуб перекрывает мостик и читается через стекло. В кромку слева утоплен один узкий рассеиватель подтверждения запирания."
+    },
+    {
+      "id": "E4-02-02",
+      "name": "Induction-welded thermoplastic lap",
+      "verdict": "pass",
+      "notes": "Встроенная прослойка видна."
+    },
+    {
+      "id": "E4-02-03",
+      "name": "Open ball-to-V datum",
+      "verdict": "pass",
+      "notes": "Шар касается двух граней."
+    },
+    {
+      "id": "E4-02-04",
+      "name": "Upset blind threaded insert",
+      "verdict": "pass",
+      "notes": "Буртик прилегает снизу."
+    },
+    {
+      "id": "E4-02-05",
+      "name": "Pull-release bond seam",
+      "verdict": "pass",
+      "notes": "Непрозрачная накладка и короткая петля."
+    },
+    {
+      "id": "E4-02-06",
+      "name": "Flat living hinge",
+      "verdict": "pass",
+      "notes": "Тонкая перемычка между наклонной и плоской кромками."
+    },
+    {
+      "id": "E4-02-07",
+      "name": "Expanding spline seam",
+      "verdict": "pass",
+      "notes": "Шпонка обжимает губки."
+    },
+    {
+      "id": "E4-02-08",
+      "name": "Spent crush link",
+      "verdict": "pass",
+      "notes": "Видны две складки."
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Сравнение восьми ячеек с версией 02. Семь сохранённых деталей сохраняют форму, размер, положение и состояние. В R1C1 сохранено зацепление, добавлена лента без ореола.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "returned_filename": "exec-42a9c42c-d116-46e6-9b46-bc991f3b791b.png",
+  "request_sha256": "30b1eec0a5034625a3ec3f72ab9194b9f71f800d7a5aecb457db51fe7d97a691"
+}

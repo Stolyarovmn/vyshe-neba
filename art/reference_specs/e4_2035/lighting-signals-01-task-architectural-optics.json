@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E4",
+  "year": 2035,
+  "role": "lighting-signals",
+  "sheet": "01-task-architectural-optics",
+  "title": "Task and architectural optics",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e4_2035/lighting-signals-01-task-architectural-optics.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "specimens": [
+    {
+      "id": "E4-09-01",
+      "name": "Glass edge light injector",
+      "description": "TOP ROW CELL 1 ONLY. Broad thin clear glass sheet corner, its straight polished edge pressed flush against a small dark optical shoe through a visible thin clear pad. Side cutaway shows the pad sandwiched between two flat contact faces and the dark wraparound baffle. No projecting rod."
+    },
+    {
+      "id": "E4-09-02",
+      "name": "Deep overhead cutoff grid",
+      "description": "TOP ROW CELL 2 ONLY. One isolated unpowered physical specimen. One wedge-shaped block of deep straight light channels and one cropped mounting rib. No slanted vent blades."
+    },
+    {
+      "id": "E4-09-03",
+      "name": "Rail side-light prism",
+      "description": "TOP ROW CELL 3 ONLY. One isolated unpowered physical specimen. One removed narrow hard prism, asymmetrical angled exit face and exposed mounting tenon."
+    },
+    {
+      "id": "E4-09-04",
+      "name": "Inspection slit aperture",
+      "description": "TOP ROW CELL 4 ONLY. One long opaque blank metal face with one extremely thin dark horizontal slit cut THROUGH it. Show tiny dark rib ends inside the slit, no bars across it, no wide recessed opening or grille."
+    },
+    {
+      "id": "E4-09-05",
+      "name": "Near-field edge diffuser",
+      "description": "BOTTOM ROW CELL 1 ONLY. One isolated unpowered physical specimen. One short concave matte diffuser segment with opaque central ledge, no closed ring or mirrored cup."
+    },
+    {
+      "id": "E4-09-06",
+      "name": "Step side-light outlet",
+      "description": "BOTTOM ROW CELL 2 ONLY. One short stair nosing profile viewed from BELOW. Vertical front fascia is solid and blank. Single recessed narrow diffuser lies entirely on the horizontal underside behind front lip, facing directly down. Show underside clearly. Unpowered."
+    },
+    {
+      "id": "E4-09-07",
+      "name": "Wall bounce reflector",
+      "description": "BOTTOM ROW CELL 3 ONLY. One isolated unpowered physical specimen. One open parabolic leaf with integral back stop, no emitter or closed cup."
+    },
+    {
+      "id": "E4-09-08",
+      "name": "Task light shutter",
+      "description": "BOTTOM ROW CELL 4 ONLY. One closed opaque shutter flap mounted to an exposed cylindrical pivot along top edge. Show the rectangular aperture frame behind the flap in three-quarter cutaway. Flap overlaps frame on both sides and along lower edge, fully blocking opening. No glass, airflow hardware or light."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, logos, pseudo-writing",
+    "extra items, whole robot, whole machine, scene",
+    "glow, rays, baked shadows or holograms",
+    "photorealism or smooth CAD render"
+  ],
+  "era_contract": {
+    "character": "Edit first image only. Redraw R1C1 R1C4 R2C2 R2C4. Preserve the other four cells in form, size, pose, position and state.",
+    "required_signals": [
+      "distinct physical output geometries and optical cutoff",
+      "unpowered optics, no light effects",
+      "coherent HD pixel art"
+    ],
+    "replaced_previous_language": [
+      "E3 standalone bars and spots evolve into directional edge optics and local occlusion"
+    ],
+    "forbidden_regressions": [
+      "generic light fixture catalog",
+      "ornamental glowing lines or holograms"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

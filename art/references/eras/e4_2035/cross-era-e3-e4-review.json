@@ -1,0 +1,98 @@
+{
+  "previous_era": "E3",
+  "next_era": "E4",
+  "roles": [
+    {
+      "role": "materials-construction",
+      "verdict": "pass",
+      "reviewer_selection": "B",
+      "confidence": 90,
+      "inputs": {
+        "A": {
+          "era": "E3",
+          "sha256": [
+            "01e8ad19ff6e856bcb4b518f6915dfc6bf71649b61536889240b03c21d170a17",
+            "ced4fbd87a77028c7117a22b01351c13c88a35d6ee132ad825d5b1b56bcb2cda",
+            "bca7cfa2c96dafb48ed57b93f1c6626fd72bd7587301509df3d19a9a16881400"
+          ]
+        },
+        "B": {
+          "era": "E4",
+          "sha256": [
+            "fb14dc22db2e42afcccc92c91bd175e590bfdca03153c366059f59dc5e88061c",
+            "008a60d4cd6c761df2856a5eed8098683e8c5368f7ff30ac83856b8e52eea935",
+            "c3201a97c84dcee8d31858118c43060aa212a35016818d799ad3bacd19c89306"
+          ]
+        }
+      }
+    },
+    {
+      "role": "mechanics-infrastructure",
+      "verdict": "pass",
+      "reviewer_selection": "B",
+      "confidence": 82,
+      "inputs": {
+        "A": {
+          "era": "E3",
+          "sha256": [
+            "4affa59aaf6cf69ea617fdd133d67b58c84972cf72f97f6e0662b956abffc1b6",
+            "51966994c0d6c5c1cc20dfc03307c65fc477870b6b29263ca046b871a2cceb1b",
+            "e2c17fcedbccd084c1ff1b282b136a27f3948452cfe348627ba672a0ffeec6ed"
+          ]
+        },
+        "B": {
+          "era": "E4",
+          "sha256": [
+            "d2f536c97968f494eac89a888b4f087105af0e333dec292eff6c85d8ded5d574",
+            "2a27baf4107296f880922860a2ebb91d16060af20fa1d09e3f5841cb5c2c130f",
+            "de089cabbc20f2aacc87904f214937965b65240978326e3b18917a62103c14ba"
+          ]
+        }
+      }
+    },
+    {
+      "role": "controls-displays",
+      "verdict": "pass",
+      "reviewer_selection": "B",
+      "confidence": null,
+      "inputs": {
+        "A": {
+          "era": "E3",
+          "sha256": [
+            "40c0560b21d11f97b2fcb56975d26c51d873fd6dbdc2b88a9c9e3e52d0fe4fd9",
+            "14555ffde5cf77a75b60b84ced20a13cec9df12dba3670d3de129bd1a57c4fd8"
+          ]
+        },
+        "B": {
+          "era": "E4",
+          "sha256": [
+            "f8ba9ab82a5a21af39f48a4e6d4208bc45f3ff90fcc0bbd3dc35a9bc08f566e9",
+            "92023f5119426c6f531e249aac01924da12ba8a7d358cbc346a6cf6d62e89d67"
+          ]
+        }
+      }
+    },
+    {
+      "role": "lighting-signals",
+      "verdict": "pass",
+      "reviewer_selection": "A",
+      "confidence": null,
+      "inputs": {
+        "A": {
+          "era": "E4",
+          "sha256": [
+            "20882231848a28b5533c1802349d5db7672ef8f324bb4ac21a8eff44e291bbb1",
+            "686ae2478e06759731c720b984866610193856af76da3780cba1e04dead84825"
+          ]
+        },
+        "B": {
+          "era": "E3",
+          "sha256": [
+            "396582cf383505796b2bb2434383fba2d164a0d38b2d9c5ed75593ab08fd1837",
+            "39ddb9c5574eef01b338a5c3cde479b04cf94b78349d421bb08111444916f6fb"
+          ]
+        }
+      }
+    }
+  ]
+}

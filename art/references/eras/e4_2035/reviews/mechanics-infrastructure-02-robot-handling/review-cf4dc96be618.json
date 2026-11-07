@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/mechanics-infrastructure-02-robot-handling.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "cf4dc96be61855ba03b914c0e56dd2410ec099da5fbf7d97bcb22fbee230509c",
+    "bytes": 1804493,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1KGNerWSEkQaN5_PEYWd5EDVGQgUDt8Sl",
+    "drive_url": "https://drive.google.com/file/d/1KGNerWSEkQaN5_PEYWd5EDVGQgUDt8Sl/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-05-01",
+      "name": "Adaptive jaw shoe",
+      "verdict": "pass",
+      "notes": "Два башмачка касаются ступеней с одной стороны общей планки."
+    },
+    {
+      "id": "E4-05-02",
+      "name": "Floating docking nose",
+      "verdict": "pass",
+      "notes": "Носок смещён вниз до касания, шаг витков различается, рассеиватель виден."
+    },
+    {
+      "id": "E4-05-03",
+      "name": "Calibration sphere",
+      "verdict": "pass",
+      "notes": "Три точки опоры сферы видны."
+    },
+    {
+      "id": "E4-05-04",
+      "name": "Contact probe",
+      "verdict": "pass",
+      "notes": "Щуп наклонён, зазор у воротника открыт."
+    },
+    {
+      "id": "E4-05-05",
+      "name": "Fail safe cassette hook",
+      "verdict": "pass",
+      "notes": "Крюк и предохранитель видны."
+    },
+    {
+      "id": "E4-05-06",
+      "name": "Wheel quadrature pickup",
+      "verdict": "pass",
+      "notes": "Два окна показывают разные фазы."
+    },
+    {
+      "id": "E4-05-07",
+      "name": "Spring loaded rail guide roller",
+      "verdict": "pass",
+      "notes": "Ролик касается рельса."
+    },
+    {
+      "id": "E4-05-08",
+      "name": "Collision breakaway wrist",
+      "verdict": "pass",
+      "notes": "Один лепесток поднят, две стороны посажены."
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Визуальная сверка восьми ячеек и шести защищённых образцов с первой версией",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}
