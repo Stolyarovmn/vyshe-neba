@@ -429,6 +429,11 @@ export function buildingDrawOrder(profile) {
 // Привязки утверждённого экспорта 83×228 в координатах пикселей острова.
 const E0_FEEDER_POLES = [[1514, 378], [1434, 378]];
 const E0_FEEDER_WIRE_Y = [58.18, 30.99, 4.94];
+// Въезд открыт. Две стойки стоят на разных обочинах маршрута техники.
+const E0_PAD_GATE = [
+  { sprite: 'pad_gate_pedestal_1978', py: 376, width: 5, height: 20, anchorY: 244 / 272 },
+  { sprite: 'pad_gate_receiver_1978', py: 407, width: 4, height: 5, anchorY: 38 / 61 },
+];
 
 function drawE0Feeder(ctx, painter, view, poles) {
   const unit = ISLAND.unitsPerPx;
@@ -490,6 +495,15 @@ export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, e
   }
   const delugeBuild = profile?.buildings?.deluge === 1 ? hooks?.build?.('deluge') : null;
   if (profile?.buildings?.deluge === 1 && (!delugeBuild || delugeBuild.reveal >= 1)) {
+    if (E0_PAD_GATE.every(part => painter.has(part.sprite))) {
+      for (const { sprite, py, width, height, anchorY } of E0_PAD_GATE) {
+        const [x, y] = islandToWorld(580, py);
+        additions.push({ y, draw: () => painter.sprite(ctx, view, sprite, x, y, {
+          w: width * ISLAND.unitsPerPx, h: height * ISLAND.unitsPerPx,
+          ax: 0.5, ay: anchorY, smooth: false,
+        }) });
+      }
+    }
     const [x, y] = islandToWorld(455, 470);
     additions.push({ y, draw: () => painter.sprite(ctx, view, 'deluge_manifold_1978', x, y, {
       w: 15 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, smooth: true,

@@ -206,6 +206,8 @@ function buildAssetFiles() {
 export const ASSET_FILES = {
   ...buildAssetFiles(),
   deluge_nozzle_1978: `${eraFolder(0)}base/deluge-nozzle.png`,
+  pad_gate_pedestal_1978: `${eraFolder(0)}base/pad-gate-pedestal.png`,
+  pad_gate_receiver_1978: `${eraFolder(0)}base/pad-gate-receiver.png`,
   deluge_manifold_1978: `${eraFolder(0)}base/deluge-manifold.png`,
   deluge_outlet_1978: `${eraFolder(0)}base/deluge-outlet.png`,
   gantry_inlet_1978: `${eraFolder(0)}base/gantry-inlet.png`,
