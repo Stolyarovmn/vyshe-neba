@@ -13,6 +13,9 @@
     252
   ],
   "runtime_target": "game/assets/eras/e0-1978/base/factory.png",
-  "state": "local_preview_only",
-  "runtime_published": false
+  "state": "published_to_main",
+  "runtime_published": true,
+  "runtime_main_sha": "2981d16e3e8fac20fb8df536f10c525e273cd931",
+  "runtime_pr": "https://github.com/Stolyarovmn/vyshe-neba/pull/140",
+  "runtime_bytes_verified": "main:game/assets/eras/e0-1978/base/factory.png совпадает побайтно с runtime.png"
 }
