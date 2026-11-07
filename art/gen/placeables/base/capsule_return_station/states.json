@@ -1,0 +1,85 @@
+{
+  "asset": "BI-RETURN capsule_return_station",
+  "era": "E0",
+  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слой и pivot части ON сделаны (animation.json); остальные части pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the winch",
+      "parts": [
+        "crank"
+      ],
+      "motion": "рукоять лебёдки проворачивается на четверть оборота и возвращается",
+      "frames": 2,
+      "fps": 12,
+      "loop": false,
+      "code_fx": [
+        "ratchet_click_sound"
+      ],
+      "why": "ручной привод виден прямо на лебёдке: игрок понимает, чем здесь поднимают"
+    },
+    "ON": {
+      "trigger": "safe_landing (капсула вернулась)",
+      "parts": [
+        "jib",
+        "rope",
+        "hook_block",
+        "winch_drum"
+      ],
+      "motion": "стрела поворачивается над люлькой, барабан мотает трос, крюковая обойма опускается к капсуле и поднимает её на люльку",
+      "frames": 9,
+      "fps": 10,
+      "loop": false,
+      "reduce_motion": "один конечный кадр: капсула стоит на люльке",
+      "code_fx": [
+        "rope_creak_sound"
+      ],
+      "why": "возврат капсулы — главная награда здания; игрок должен увидеть, что её подняли и бережно поставили на резину",
+      "animation": {
+        "file": "animation.json",
+        "clip": "ON",
+        "part": "hook_block",
+        "pivot": [
+          126,
+          30
+        ],
+        "range_px": [
+          0,
+          8
+        ],
+        "motion": "translate_y"
+      }
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": [
+        "era",
+        "building:recovery"
+      ],
+      "visible": "стрела зафиксирована штырём в стойке, трос слабый, крюковая обойма упёрта в барабан",
+      "art_variant": "idle_locked",
+      "why": "причина видна на механизме: стрела застопорена, поднимать нечем"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "parts": [
+        "jib_pin"
+      ],
+      "motion": "штырь стопора дребезжит на 1 px и возвращается",
+      "frames": 2,
+      "fps": 12,
+      "loop": false,
+      "code_fx": [
+        "bubble_shake",
+        "red_lamp_blink_once"
+      ],
+      "why": "стопор — единственный элемент, который отказывает; сама конструкция остаётся целой"
+    }
+  },
+  "not_applicable": [],
+  "accessibility": "при «меньше движения» остаётся один конечный кадр каждого состояния",
+  "sprite": {
+    "path": "art/gen/placeables/base/capsule_return_station/e0_1978.png",
+    "sha256": "7819f1d3ebab21d008754a62a344f62fba90927cbb3de8ca0e463d7df7983ac4"
+  },
+  "mechanism_pivots": "measured_for_ON_part_only (animation.json); remaining parts pending_measured_rig_pass"
+}

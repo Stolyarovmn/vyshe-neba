@@ -1,0 +1,41 @@
+{
+  "asset": "BI-FACTORY assembly_workshop",
+  "era": "E0",
+  "status": "draft until the exact approved sprite exists; parts below are the closed PARTS list of the brief",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the workshop",
+      "parts": ["personnel_door"],
+      "motion": "дверь персонала приоткрывается на 1 логический пиксель и закрывается",
+      "frames": 2, "fps": 12, "loop": false,
+      "code_fx": ["latch_click_sound"],
+      "why": "игрок видит, что в цех можно войти, и получает отклик на касание"
+    },
+    "ON": {
+      "trigger": "stage_assembled / launch_prepare",
+      "parts": ["gate_leaf", "hoist_hook"],
+      "motion": "створка ворот уезжает по рельсу на 2,4 м, крюк тали опускается к секции на седлах и поднимается",
+      "frames": 12, "fps": 10, "loop": false,
+      "reduce_motion": "один конечный кадр: ворота открыты",
+      "code_fx": ["gate_rumble_sound", "chimney_smoke_event"],
+      "why": "показывает, что ступень собрана и готова выйти по рельсу; дым трубы — событие кода, а не часть спрайта"
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": ["era", "prerequisite_building (по game/src/data/buildings.js при внедрении)", "power"],
+      "visible": "створка ворот закрыта, на ручке сидит стопорный засов, лампа у двери погашена",
+      "art_variant": "idle_locked",
+      "why": "цех заперт физически: причина читается без серого фильтра"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "parts": ["gate_leaf"],
+      "motion": "створка ворот дёргается на 1 px и возвращается",
+      "frames": 2, "fps": 12, "loop": false,
+      "code_fx": ["bubble_shake", "red_lamp_blink_once"],
+      "why": "створка упирается в засов: цех целый, но не разрешён"
+    }
+  },
+  "not_applicable": [],
+  "accessibility": "при «меньше движения» остаётся один конечный кадр каждого состояния"
+}

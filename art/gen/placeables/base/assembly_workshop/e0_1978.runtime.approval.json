@@ -1,18 +1,21 @@
 {
   "asset": "assembly_workshop",
-  "production_sha256": "9a411a46bf8356997578255721b23e1d7d30d718237c815023e846cf6538603c",
-  "runtime_sha256": "12c2513986fd1556e735528d4cacd9744aff11c4abf935eed77eb41869dd56c3",
+  "production_sha256": "0e0e97ad6d865294cd4ab87d0b8956bc11897cad182e3a2323ab631e7ee53935",
+  "runtime_sha256": "3628aa8292caa242fab3746ecd37c82b9de69f4da7bf682181017fe8aff6786a",
   "approved": true,
-  "sha256": "12c2513986fd1556e735528d4cacd9744aff11c4abf935eed77eb41869dd56c3",
-  "promotion_manifest_sha256": "da45ffb5570b7f9f993a8d044552b4e87e0af38583c10e17d388496088371398",
-  "approval_scope": "\u0422\u043e\u0447\u043d\u0430\u044f \u043e\u0431\u0440\u0435\u0437\u043a\u0430 \u043f\u0440\u043e\u0437\u0440\u0430\u0447\u043d\u044b\u0445 \u043f\u043e\u043b\u0435\u0439 \u043f\u0440\u0438\u043d\u044f\u0442\u043e\u0433\u043e PNG \u0431\u0435\u0437 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f \u043f\u0438\u043a\u0441\u0435\u043b\u0435\u0439 \u043e\u0431\u044a\u0435\u043a\u0442\u0430.",
+  "sha256": "3628aa8292caa242fab3746ecd37c82b9de69f4da7bf682181017fe8aff6786a",
+  "promotion_manifest_sha256": "d1d46b8fff65874823ca6bed74d4fefec9bacdbbe58cbcdc9b182c235a378b6b",
+  "approval_scope": "Точная обрезка прозрачных полей принятого PNG без изменения пикселей объекта.",
   "crop_bbox": [
-    39,
-    82,
-    281,
+    18,
+    45,
+    301,
     252
   ],
   "runtime_target": "game/assets/eras/e0-1978/base/factory.png",
-  "state": "local_preview_only",
-  "runtime_published": false
+  "state": "published_to_main",
+  "runtime_published": true,
+  "runtime_main_sha": "2981d16e3e8fac20fb8df536f10c525e273cd931",
+  "runtime_pr": "https://github.com/Stolyarovmn/vyshe-neba/pull/140",
+  "runtime_bytes_verified": "main:game/assets/eras/e0-1978/base/factory.png совпадает побайтно с runtime.png"
 }

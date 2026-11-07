@@ -1,0 +1,85 @@
+{
+  "asset": "B07 cargo_terminal",
+  "era": "E0",
+  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слой и pivot части ON сделаны (animation.json); остальные части pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the hoist or the building",
+      "parts": [
+        "hand_chain"
+      ],
+      "motion": "ручная цепь тали смещается на одно звено и возвращается",
+      "frames": 2,
+      "fps": 12,
+      "loop": false,
+      "code_fx": [
+        "chain_click_sound"
+      ],
+      "why": "ручной привод E0: игрок видит, что таль тянут руками, и получает отклик на касание"
+    },
+    "ON": {
+      "trigger": "contract_complete (груз принят)",
+      "parts": [
+        "trolley",
+        "hoist",
+        "hook",
+        "crate"
+      ],
+      "motion": "тележка идёт по балке от платформы к приёмной площадке, крюк опускается и поднимается, ящик переходит с платформы на площадку",
+      "frames": 13,
+      "fps": 10,
+      "loop": false,
+      "reduce_motion": "один конечный кадр: ящик стоит на приёмной площадке",
+      "code_fx": [
+        "chain_rattle_sound"
+      ],
+      "why": "показывает, что груз по контракту действительно перемещён, а не просто засчитан в счётчике",
+      "animation": {
+        "file": "animation.json",
+        "clip": "ON",
+        "part": "trolley_hoist_hook",
+        "pivot": [
+          150,
+          12
+        ],
+        "range_px": [
+          0,
+          24
+        ],
+        "motion": "translate_x"
+      }
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": [
+        "era",
+        "building:logistics"
+      ],
+      "visible": "тележка стоит у упора балки, цепь закреплена на стойке стопорным звеном, крюк поднят",
+      "art_variant": "idle_locked",
+      "why": "причина видна физически: механизм застопорен, а не закрашен серым"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "parts": [
+        "trolley"
+      ],
+      "motion": "тележка дёргается на 1 px в сторону упора и возвращается",
+      "frames": 2,
+      "fps": 12,
+      "loop": false,
+      "code_fx": [
+        "bubble_shake",
+        "red_lamp_blink_once"
+      ],
+      "why": "упор не пускает тележку: так игрок понимает, что механизм жив, но не разрешён"
+    }
+  },
+  "not_applicable": [],
+  "accessibility": "при «меньше движения» остаётся один конечный кадр каждого состояния",
+  "sprite": {
+    "path": "art/gen/placeables/base/cargo_terminal/e0_1978.png",
+    "sha256": "ae7c00f7d5fc4bf0f8171a4d78158ada84e643c4f8282e35b6e8310d8abd920f"
+  },
+  "mechanism_pivots": "measured_for_ON_part_only (animation.json); remaining parts pending_measured_rig_pass"
+}

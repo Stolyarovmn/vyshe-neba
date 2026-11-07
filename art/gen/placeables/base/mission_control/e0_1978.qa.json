@@ -5,17 +5,17 @@
   ],
   "opaque_colors": 32,
   "binary_alpha": true,
-  "opaque_pixel_count": 42178,
-  "coverage": 0.514868,
+  "opaque_pixel_count": 52936,
+  "coverage": 0.646191,
   "visible_bbox": [
-    28,
-    79,
-    293,
+    24,
+    25,
+    296,
     252
   ],
   "visible_bbox_size": [
-    265,
-    173
+    272,
+    227
   ],
   "min_coverage": 0.01,
   "min_bbox_fraction": 0.35,
@@ -25,5 +25,5 @@
     "min_height": null,
     "max_height": null
   },
-  "sha256": "ce0460798824242eec13debf9f82a98b01a8ab9e619e24516f114a3342830cf6"
+  "sha256": "f519f4184cb7490c30b27bf86730e82533ecbc1dcf868f8efb5ba4dbd60a519e"
 }

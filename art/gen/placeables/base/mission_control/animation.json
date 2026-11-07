@@ -1,0 +1,69 @@
+{
+  "asset": "mission_control",
+  "era": "E0",
+  "source_sprite": {
+    "path": "art/gen/placeables/base/mission_control/e0_1978.runtime.png",
+    "sha256": "a314799d8187c93a175bf0a1b08062832ba9333b1884d70ed114209b3d28a4a4",
+    "size": [
+      272,
+      227
+    ]
+  },
+  "clips": {
+    "ON": {
+      "trigger": "см. states.json (ON)",
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "frame_size": [
+        272,
+        227
+      ],
+      "sheet": "animation/on_sheet.png",
+      "sheet_sha256": "d4a1836e38508cb8add6f57fd2f9231f2e777050a5cdec54b6bb3d93e5643faf",
+      "preview_gif": "animation/on.gif",
+      "rest_frame": 0,
+      "reduce_motion_frame": 2,
+      "parts": [
+        {
+          "part": "dish_head",
+          "box": [
+            53,
+            0,
+            102,
+            39
+          ],
+          "pivot": [
+            78,
+            36
+          ],
+          "motion": "translate_xy_steps",
+          "range_px": [
+            [
+              0,
+              0
+            ],
+            [
+              3,
+              -1
+            ]
+          ],
+          "why": "тарелка на мачте наводится на ракету тремя шагами и остаётся в конечном положении (приём телеметрии)"
+        }
+      ],
+      "method": "часть вырезана из утверждённого спрайта, фон под ней восстановлен копией соседнего фона того же спрайта, смещение целыми пикселями на той же сетке",
+      "palette_colors": {
+        "base": 32,
+        "all_frames": 32
+      }
+    }
+  },
+  "pivot_policy": "измерены по утверждённому спрайту, указаны в parts[].pivot (пиксели runtime-кадра)",
+  "code_owned": [
+    "свет",
+    "звук",
+    "дым",
+    "тени событий"
+  ],
+  "runtime_integration": "подключено в хаб (PR №140, main 2981d16): кадры game/assets/eras/e0-1978/base/anim/control_on<i>.png; запуск: нажатие на постройку и конец стройки, один показ, без цикла"
+}

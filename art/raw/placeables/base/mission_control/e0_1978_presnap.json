@@ -1,8 +1,20 @@
 {
-  "source_sha256": "1af4b321cff156d92c2ba11f87df81aa84384e8d459c1ee4d6dda026bebf961c",
+  "source_sha256": "c62861b5f4a24903a11b4b43806563515996dabeebcf8458d96dfe02d4585a1d",
   "original_png_file": "art/raw/placeables/base/mission_control/e0_1978_presnap.png",
+  "source_original_sha256": "d4c1345e054918ad4c4d2456fddd78a023d90acd2894024ad96b618d2828c9fa",
+  "source_keyed_transport_sha256": "57646d0276a82ff3bd53a08f8a57fd972670de662ac9f3ab5d546ab9cbde5624",
   "source_storage": {
     "provider": "google_drive",
-    "drive_file_id": "1ODwfMfZEepQVjnyJdhdgisBf_JyS1Drs"
+    "drive_file_id": "1IbDo3UXGBITJ2x-AVt0vb0BkahXZNTEg"
+  },
+  "rework": {
+    "date": "2026-11-07",
+    "attempt": 3,
+    "generator": "chatgpt_imagegen_games_project",
+    "preparer": "tools/art_pipeline/e0_rework_prepare.py",
+    "key_tolerance": "±8 по каналам, принято владельцем",
+    "logical_width": 240,
+    "pixel_size": 5,
+    "slab_edge_ratio_measured": 0.965
   }
 }
