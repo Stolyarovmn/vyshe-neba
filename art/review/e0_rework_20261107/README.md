@@ -11,6 +11,22 @@
 | `logistics_e0_attempt04_original.png` | `dc19d9873c1796ed0aba294a62202df76811a58dcf109b300100ad17d956cd72` | 0,924 | 0,415 (0,52) | кромка ниже порога на 1,6 п.п.; плита мельче схемы; вертикаль по строгой камере, портал над обеими точками груза. Альтернатива: попытка 3 (`0fdfd21e…14fb0`, кромка 0,951, но стойки ≈2 раза выше нормы) |
 | `recovery_e0_attempt03_original.png` | `bf6e302526a259de37d134bca2cb9fa992ff9f777961bbb8eb22eabe812e207f` | 0,946 | 0,35 (0,45) | плита мельче схемы; без капсулы по паспорту BI-RETURN. Альтернатива: попытка 4 (`6ae5e74b…58cf`, глубина 0,48, но кромка 0,925 и стойка выше) |
 
+## Архив неизменённых оригиналов в Drive (выполнено 2026-11-07)
+
+Папка `E0_hd_candidates_2026-11` (`1idbr23HOmdgq0uocCZ2o63DLHwXVDrPW`, та же, что указана в preflight BI-CONTROL, BI-FACTORY, B07). Размеры в байтах на Drive совпали с локальными файлами; SHA-256 локальных файлов указаны в имени (первые 8 знаков) и в таблице выше.
+
+| Drive file ID | Имя на Drive | Байт | Роль |
+| --- | --- | --- | --- |
+| `1IbDo3UXGBITJ2x-AVt0vb0BkahXZNTEg` | `BI-CONTROL_E0_1978_rework_a03_d4c1345e.png` | 1965208 | выбран |
+| `1Ky4bMncsvW_soRxmMaoQON03YA6rMK_k` | `BI-FACTORY_E0_1978_rework_a04_5709f4d8.png` | 2017061 | выбран |
+| `1NMvuczKesq4k5SHO5ASqsC3xCQ6b52hy` | `BI-FACTORY_E0_1978_rework_a02_28de512b.png` | 2414614 | альтернатива |
+| `1PUlSXm5RxWoKjj9rBQ6BfO0BjcBBJuWo` | `B07_E0_1978_rework_a04_dc19d987.png` | 2015184 | выбран |
+| `1qrDYL86Q7YfMWG3h2DJMHDJjeMupgkBj` | `B07_E0_1978_rework_a03_0fdfd21e.png` | 2147333 | альтернатива |
+| `15VdtgJkQhuKCWoXuPpUE9G9BAuTCc5ow` | `BI-RETURN_E0_1978_rework_a03_bf6e3025.png` | 1963535 | выбран |
+| `1-_sgop6_ZqEBW3St8Sa2_OjLVQCwW4qj` | `BI-RETURN_E0_1978_rework_a04_6ae5e74b.png` | 2122666 | альтернатива |
+
+Остальные отклонённые попытки остаются локально (SHA в `E0_REWORK_TRACKER_20261107.md`); в `_rejected` не переносились.
+
 ## Решение владельца (2026-11-07)
 
 Владелец принял перечисленные отклонения (кромка плиты 0,92–0,95, глубина плиты, размер двери) и дважды ответил «Принять отклонения»; второй ответ относится к вопросу о хромакее и понят как принятие **ключа с допуском ±8 по каналам** вместо перегенерации. Это исключение надо записать в preflight-квитанцию (`generation_gate.alpha_strategy = opaque_chroma_key`, допуск) при встраивании. Визуальное утверждение (exact-SHA) это решение не заменяет.
