@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "ce27bdd6669b05fa8af284c242005d8ee5ecf572b485ff09021b6b17b543d6e9",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "65858e32b96d36ab9e39e0f81a84e5d361e001963df9f1ba08abcff23a6095b0",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Две направленные антенны симметричны. Размах 3,64 м, дальняя кромка плиты 0,9595 ближней. Рукоять связана с корпусом редуктора и вынесена к южному подходу. В масштабе острова читаются решётки и основание на открытом грунте. Фактический угол камеры неизвестен."
+}
