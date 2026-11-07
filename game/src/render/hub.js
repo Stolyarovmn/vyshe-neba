@@ -538,17 +538,20 @@ function drawNightLights(ctx, painter, mv, profile, time, strength, era, beaconR
       if (i === 0 && !blinking) drawGlow(ctx, mv, x + w * 0.25, y - h * 0.2, w * 0.35, GLOW_WARM, strength * 0.6);
     });
   }
-  const [wx, wy] = entryWorld('workshop');
-  drawGlow(ctx, mv, wx, wy - 50, 34, GLOW_WARM, strength * 0.75);
+  if (era !== 0) {
+    const [wx, wy] = entryWorld('workshop', era);
+    drawGlow(ctx, mv, wx, wy - 50, 34, GLOW_WARM, strength * 0.75);
+  }
   const [sx, sy] = entryWorld('shop', era);
   const shopScale = entryScale('shop', era);
   if (era !== 0 || !painter.has(WORLD_ENTRIES.shop.e0Sprite)) {
     drawGlow(ctx, mv, sx, sy - 32 * shopScale, 46 * shopScale, GLOW_WARM, strength * 0.9);
   }
-  const [mx, my] = entryWorld('monument');
-  const k = ISLAND.unitsPerPx;
-  for (let i = 0; i <= era; i++) drawGlow(ctx, mv, mx + (-11.5 + i * 4.6) * k, my - 62 * k, 8, GLOW_WARM, strength * 0.9);
-  drawGlow(ctx, mv, mx, my - 122 * k, 12, GLOW_WARM, strength);
+  const [mx, my] = entryWorld('monument', era);
+  const monumentScale = entryScale('monument', era);
+  const k = ISLAND.unitsPerPx * monumentScale;
+  for (let i = 0; i <= era; i++) drawGlow(ctx, mv, mx + (-11.5 + i * 4.6) * k, my - 62 * k, 8 * monumentScale, GLOW_WARM, strength * 0.9);
+  drawGlow(ctx, mv, mx, my - 122 * k, 12 * monumentScale, GLOW_WARM, strength);
 }
 
 function drawCapsuleOnCart(ctx, painter, mv, era) {

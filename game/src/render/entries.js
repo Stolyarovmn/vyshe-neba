@@ -53,13 +53,15 @@ function groundShadow(ctx, view, wx, wy, widthUnits, depthUnits) {
 
 function drawWorkshop(ctx, painter, view, wx, wy, time, era) {
   const [width, height] = entrySize('workshop', painter, era);
-  groundShadow(ctx, view, wx, wy, width * 0.95, 12);
+  const scale = entryScale('workshop', era);
+  groundShadow(ctx, view, wx, wy, width * 0.95, 12 * scale);
   const drawn = painter.sprite(ctx, view, `station_service_lift_${eraYear(era)}`, wx, wy, { h: height, ax: 0.5, ay: 1, smooth: true });
   if (!drawn) {
-    const dv = designView(view, wx, wy, ISLAND.unitsPerPx);
+    const dv = designView(view, wx, wy, ISLAND.unitsPerPx * scale);
     designRect(ctx, dv, -34, -150, 68, 150, '#5a626b');
     designRect(ctx, dv, -34, -150, 68, 6, '#8a929b');
   }
+  if (era === 0) return width;
   // сигнальная лампа на верху подъёмника: мастерская «работает»
   const lit = Math.floor(time * 1.6) % 2 === 0;
   const s = view.S;
@@ -245,7 +247,7 @@ function lamp(ctx, R, dv, x, y, lit, glow) {
 }
 
 function drawMonument(ctx, view, wx, wy, time, era, pulse) {
-  const k = ISLAND.unitsPerPx;
+  const k = ISLAND.unitsPerPx * entryScale('monument', era);
   const dv = designView(view, wx, wy, k);
   groundShadow(ctx, view, wx, wy, 52 * k, 12 * k);
   const R = (x, y, w, h, color) => designRect(ctx, dv, x, y, w, h, color);
