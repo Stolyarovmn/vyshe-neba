@@ -23,6 +23,9 @@ export function entryScale(key, era) {
 export function entrySize(key, painter, era) {
   const spec = WORLD_ENTRIES[key];
   if (!spec) return [40, 40];
+  if (era === 0 && spec.e0Size && painter?.has(spec.e0Sprite)) {
+    return spec.e0Size.map(size => size * ISLAND.unitsPerPx);
+  }
   const scale = entryScale(key, era) * ISLAND.unitsPerPx;
   const height = spec.size[1] * scale;
   if (key === 'workshop' && painter) {
@@ -291,6 +294,12 @@ function drawMonument(ctx, view, wx, wy, time, era, pulse) {
  */
 export function drawEntry(ctx, painter, view, key, wx, wy, time, info) {
   const era = clamp(info.era | 0, 0, 5);
+  const sprite = era === 0 && WORLD_ENTRIES[key]?.e0Sprite;
+  if (sprite && painter.has(sprite)) {
+    const [w, h] = entrySize(key, painter, era);
+    painter.sprite(ctx, view, sprite, wx, wy, { w, h, ax: 0.5, ay: 1, smooth: false });
+    return;
+  }
   switch (key) {
     case 'workshop':
       drawWorkshop(ctx, painter, view, wx, wy, time, era);

@@ -213,6 +213,8 @@ export const ASSET_FILES = {
   gantry_inlet_1978: `${eraFolder(0)}base/gantry-inlet.png`,
   beacons_junction_1978: `${eraFolder(0)}base/beacons-junction.png`,
   feeder_pole_1978: `${eraFolder(0)}base/feeder-pole.png`,
+  entry_shop_1978: `${eraFolder(0)}base/entry-shop.png`,
+  entry_board_1978: `${eraFolder(0)}base/entry-contract-board.png`,
 };
 
 // Размеры [ширина, высота] по эпохам (индекс = эпоха 0..5).
@@ -436,8 +438,10 @@ export const ENTRY_KEYS = ['workshop', 'board', 'shop', 'monument'];
 export const WORLD_ENTRIES = {
   workshop: { zone: 'launch_core', anchors: [[330, 262]], size: [130, 157], footprint: [114, 28] },
   monument: { zone: 'launch_core', anchors: [[232, 276]], size: [50, 120], footprint: [44, 22] },
-  board: { zone: 'launch_core', anchors: [[210, 352]], size: [78, 72], footprint: [60, 20], e0Scale: 0.2 },
-  shop: { zone: 'launch_core', anchors: [[578, 352]], size: [120, 98], footprint: [110, 30], e0Scale: 0.3, e0Anchor: [542, 369] },
+  board: { zone: 'launch_core', anchors: [[210, 352]], size: [78, 72], footprint: [60, 20],
+    e0Scale: 0.2, e0Anchor: [225, 360], e0Sprite: 'entry_board_1978', e0Size: [13, 7] },
+  shop: { zone: 'launch_core', anchors: [[578, 352]], size: [120, 98], footprint: [110, 30],
+    e0Scale: 0.3, e0Anchor: [542, 369], e0Sprite: 'entry_shop_1978', e0Size: [30, 18] },
 };
 
 // Дороги острова (пиксели острова): по ним ездят машины и летают дроны.

@@ -542,7 +542,9 @@ function drawNightLights(ctx, painter, mv, profile, time, strength, era, beaconR
   drawGlow(ctx, mv, wx, wy - 50, 34, GLOW_WARM, strength * 0.75);
   const [sx, sy] = entryWorld('shop', era);
   const shopScale = entryScale('shop', era);
-  drawGlow(ctx, mv, sx, sy - 32 * shopScale, 46 * shopScale, GLOW_WARM, strength * 0.9);
+  if (era !== 0 || !painter.has(WORLD_ENTRIES.shop.e0Sprite)) {
+    drawGlow(ctx, mv, sx, sy - 32 * shopScale, 46 * shopScale, GLOW_WARM, strength * 0.9);
+  }
   const [mx, my] = entryWorld('monument');
   const k = ISLAND.unitsPerPx;
   for (let i = 0; i <= era; i++) drawGlow(ctx, mv, mx + (-11.5 + i * 4.6) * k, my - 62 * k, 8, GLOW_WARM, strength * 0.9);
