@@ -1,16 +1,20 @@
 {
-  "source_sha256": "e04e2d29b2cc7bc46d517dcca89146626c7c8b9bc546f53622347612cdf31a26",
+  "source_sha256": "6515062a5e79c0606cfffdd39d00a99bcaae1f04af007ec509a5c294c7496f78",
   "original_png_file": "art/raw/placeables/base/cargo_terminal/e0_1978_presnap.png",
+  "source_original_sha256": "dc19d9873c1796ed0aba294a62202df76811a58dcf109b300100ad17d956cd72",
+  "source_keyed_transport_sha256": "2a23900b9bc3dd63ee834963d7a2cbd540e4ec898888502036e8966a78f538df",
   "source_storage": {
     "provider": "google_drive",
-    "drive_file_id": "1pBe5Ll-cpR47Yx3ePdkE1jM0N8jMgkcV"
+    "drive_file_id": "1PUlSXm5RxWoKjj9rBQ6BfO0BjcBBJuWo"
   },
-  "authoring": "parametric_vector_source",
-  "svg_archive_id": "1z7y8CUw_ZHqWjWsSbRC5VnV4qjfCcU28",
-  "authoring_sha256": {
-    "B07_vector_grid_source.svg": "af7d7c2e15d5c68cc5b064b6ef6f142b53c74901b5b90a0602a1dbc74382ed66",
-    "B07_vector_grid_source.geometry.json": "4dd1d5d336ffb8432a9d59384955e083d314ef53794996365681e894cf221568",
-    "B07_vector.py": "7ba817112b95801dbdb6d7003a2682e5b5e10e3cd7f8073c03e727773733bea7",
-    "E0_rigid_scene.py": "e942ce7713e3204628a0aaf1560bcee66892b26ba5bc47492f819bd15e5358de"
+  "rework": {
+    "date": "2026-11-07",
+    "attempt": 4,
+    "generator": "chatgpt_imagegen_games_project",
+    "preparer": "tools/art_pipeline/e0_rework_prepare.py",
+    "key_tolerance": "±8 по каналам, принято владельцем",
+    "logical_width": 246,
+    "pixel_size": 4,
+    "slab_edge_ratio_measured": 0.924
   }
 }

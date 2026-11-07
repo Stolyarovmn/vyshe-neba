@@ -1,15 +1,15 @@
 {
   "asset": "cargo_terminal",
-  "production_sha256": "74f19e4d8022eeda571c687949b915a8ff30a432b3bf1993c5bbc7229f2a3899",
-  "runtime_sha256": "84606407eebc1a7b56c8c2b02127b69a707b5c6281a90f640938c44549293357",
+  "production_sha256": "ae7c00f7d5fc4bf0f8171a4d78158ada84e643c4f8282e35b6e8310d8abd920f",
+  "runtime_sha256": "c9a2b53afb5e6f50724e73d0729e3af10b90110e17d6d785e2f8e502646c28ff",
   "approved": true,
-  "sha256": "84606407eebc1a7b56c8c2b02127b69a707b5c6281a90f640938c44549293357",
-  "promotion_manifest_sha256": "e48ae5c8bcfdc696c61d04fac071fe86d7ef45b67f2790bc3a5b127d7464dfc9",
-  "approval_scope": "\u0422\u043e\u0447\u043d\u0430\u044f \u043e\u0431\u0440\u0435\u0437\u043a\u0430 \u043f\u0440\u043e\u0437\u0440\u0430\u0447\u043d\u044b\u0445 \u043f\u043e\u043b\u0435\u0439 \u043f\u0440\u0438\u043d\u044f\u0442\u043e\u0433\u043e PNG \u0431\u0435\u0437 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f \u043f\u0438\u043a\u0441\u0435\u043b\u0435\u0439 \u043e\u0431\u044a\u0435\u043a\u0442\u0430.",
+  "sha256": "c9a2b53afb5e6f50724e73d0729e3af10b90110e17d6d785e2f8e502646c28ff",
+  "promotion_manifest_sha256": "7fb8ad8417c9c4e7a2863bbd3a46a85ed32f981cd2c9fb690bedde15f31d62e9",
+  "approval_scope": "Точная обрезка прозрачных полей принятого PNG без изменения пикселей объекта.",
   "crop_bbox": [
-    37,
-    97,
-    283,
+    17,
+    136,
+    303,
     252
   ],
   "runtime_target": "game/assets/eras/e0-1978/base/logistics.png",

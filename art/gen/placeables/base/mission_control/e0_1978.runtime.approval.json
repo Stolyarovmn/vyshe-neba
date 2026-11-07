@@ -1,15 +1,15 @@
 {
   "asset": "mission_control",
-  "production_sha256": "ce0460798824242eec13debf9f82a98b01a8ab9e619e24516f114a3342830cf6",
-  "runtime_sha256": "2cd21417648911ace4256b4c50630d2cf591bc102ef50900e52de897ad43ece4",
+  "production_sha256": "f519f4184cb7490c30b27bf86730e82533ecbc1dcf868f8efb5ba4dbd60a519e",
+  "runtime_sha256": "a314799d8187c93a175bf0a1b08062832ba9333b1884d70ed114209b3d28a4a4",
   "approved": true,
-  "sha256": "2cd21417648911ace4256b4c50630d2cf591bc102ef50900e52de897ad43ece4",
-  "promotion_manifest_sha256": "8336922359824283475e67538298020c6670544e479176460330eb51edf51803",
-  "approval_scope": "\u0422\u043e\u0447\u043d\u0430\u044f \u043e\u0431\u0440\u0435\u0437\u043a\u0430 \u043f\u0440\u043e\u0437\u0440\u0430\u0447\u043d\u044b\u0445 \u043f\u043e\u043b\u0435\u0439 \u043f\u0440\u0438\u043d\u044f\u0442\u043e\u0433\u043e PNG \u0431\u0435\u0437 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f \u043f\u0438\u043a\u0441\u0435\u043b\u0435\u0439 \u043e\u0431\u044a\u0435\u043a\u0442\u0430.",
+  "sha256": "a314799d8187c93a175bf0a1b08062832ba9333b1884d70ed114209b3d28a4a4",
+  "promotion_manifest_sha256": "5c43131d74e938672f2066d20480c1768222f3be1b9318e12b92a1508501d550",
+  "approval_scope": "Точная обрезка прозрачных полей принятого PNG без изменения пикселей объекта.",
   "crop_bbox": [
-    28,
-    79,
-    293,
+    24,
+    25,
+    296,
     252
   ],
   "runtime_target": "game/assets/eras/e0-1978/base/control.png",

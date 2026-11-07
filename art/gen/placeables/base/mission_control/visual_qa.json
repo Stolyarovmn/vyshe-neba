@@ -4,12 +4,12 @@
   "eras": {
     "e0_1978": {
       "status": "approved",
-      "sha256": "ce0460798824242eec13debf9f82a98b01a8ab9e619e24516f114a3342830cf6",
+      "sha256": "f519f4184cb7490c30b27bf86730e82533ecbc1dcf868f8efb5ba4dbd60a519e",
       "scene_projection": {
-        "candidate_sha256": "ce0460798824242eec13debf9f82a98b01a8ab9e619e24516f114a3342830cf6",
+        "candidate_sha256": "f519f4184cb7490c30b27bf86730e82533ecbc1dcf868f8efb5ba4dbd60a519e",
         "scene_png": "e0_1978.candidate_scene.png",
-        "scene_png_sha256": "288b5b7144871daa1df45f372c4aa2926058f664756c8d1c75017e7eb49b4d82",
-        "source_sha256": "1af4b321cff156d92c2ba11f87df81aa84384e8d459c1ee4d6dda026bebf961c",
+        "scene_png_sha256": "611d5f5b7c9121f0b58e563148a4c3cdecbc63828b14f8527b5e7a6a44212d7f",
+        "source_sha256": "c62861b5f4a24903a11b4b43806563515996dabeebcf8458d96dfe02d4585a1d",
         "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
         "tilt_proxy_deg": 16.56,
         "elevation_proxy_deg": 73.44,
@@ -17,8 +17,8 @@
         "actual_camera_angle": "UNKNOWN",
         "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
         "status": "pass",
-        "reviewer": "Codex",
-        "approval_evidence": "Обработанный PNG проверен при ширине 44 px в точке (1320,250). Порог и коробка ввода находятся на открытой южной стороне, крыша и низкий фасад сохраняют верхний ракурс. Приёмка относится к зданию центра управления. Масштаб соседнего наблюдательного комплекса и совместное размещение проверяются отдельно.",
+        "reviewer": "Claude (по делегированию владельца 2026-11-07; владелец правит точечно после пробной сборки)",
+        "approval_evidence": "Обработанный PNG (32 цвета, бинарная альфа) просмотрен на острове при ширине 44 px в (1320,250) и увеличенно. Читаются узкая рубка, мачта с антенной, люк и вытяжка на тёмной крыше, траншея с плитами и два вводных шкафа; фасад низкий, камера сверху сохранена. Крыша около 30 % плиты. Отклонения (кромка плиты 0,965 в норме; дверь около 0,85 м) приняты владельцем, точечные правки после пробной сборки.",
         "checks": {
           "projection_match": "pass",
           "era_style_match": "pass",

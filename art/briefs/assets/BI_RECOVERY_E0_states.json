@@ -1,0 +1,41 @@
+{
+  "asset": "BI-RETURN capsule_return_station",
+  "era": "E0",
+  "status": "draft until the exact approved sprite exists; parts below are the closed PARTS list of the brief",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the winch",
+      "parts": ["crank"],
+      "motion": "рукоять лебёдки проворачивается на четверть оборота и возвращается",
+      "frames": 2, "fps": 12, "loop": false,
+      "code_fx": ["ratchet_click_sound"],
+      "why": "ручной привод виден прямо на лебёдке: игрок понимает, чем здесь поднимают"
+    },
+    "ON": {
+      "trigger": "safe_landing (капсула вернулась)",
+      "parts": ["jib", "rope", "hook_block", "winch_drum"],
+      "motion": "стрела поворачивается над люлькой, барабан мотает трос, крюковая обойма опускается к капсуле и поднимает её на люльку",
+      "frames": 20, "fps": 10, "loop": false,
+      "reduce_motion": "один конечный кадр: капсула стоит на люльке",
+      "code_fx": ["rope_creak_sound"],
+      "why": "возврат капсулы — главная награда здания; игрок должен увидеть, что её подняли и бережно поставили на резину"
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": ["era", "building:recovery"],
+      "visible": "стрела зафиксирована штырём в стойке, трос слабый, крюковая обойма упёрта в барабан",
+      "art_variant": "idle_locked",
+      "why": "причина видна на механизме: стрела застопорена, поднимать нечем"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "parts": ["jib_pin"],
+      "motion": "штырь стопора дребезжит на 1 px и возвращается",
+      "frames": 2, "fps": 12, "loop": false,
+      "code_fx": ["bubble_shake", "red_lamp_blink_once"],
+      "why": "стопор — единственный элемент, который отказывает; сама конструкция остаётся целой"
+    }
+  },
+  "not_applicable": [],
+  "accessibility": "при «меньше движения» остаётся один конечный кадр каждого состояния"
+}
