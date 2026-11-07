@@ -1,14 +1,20 @@
 {
-  "source_sha256": "4909e0d6c427906d835e7e4ceb784fda187907a2bd95bb6a195928ad3ed8254f",
+  "source_sha256": "bc4d02ab69fc8aae2ee9d30a60e03c2ff37fa6a2463afde97c3337832066ddac",
   "original_png_file": "art/raw/placeables/base/assembly_workshop/e0_1978_presnap.png",
+  "source_original_sha256": "5709f4d869e6c0b6e88b9f0502fc4cad2281342f658ddc488093ce26c6041d8b",
+  "source_keyed_transport_sha256": "ef9f3c09be4d46ea909e34672ef04765836839469aae96219ef4e3e772243e0c",
   "source_storage": {
     "provider": "google_drive",
-    "drive_file_id": "1n027FuvkE0faAxa6kp4ugxMCK9tr44Ew"
+    "drive_file_id": "1Ky4bMncsvW_soRxmMaoQON03YA6rMK_k"
   },
-  "authoring": "parametric_vector_source",
-  "svg_archive_id": "1n64awTNcOMn91ARiikLcUIfEAuqyQbPn",
-  "svg_sha256": "af7948f558da8778ed7daed1e7996313a97c7b37c5e85c385432af5cee0c5099",
-  "geometry_sha256": "87c55081ac36609ac33c032e46a252d96b01f3210815fbd6b8cce40aedaabb63",
-  "generator_script_sha256": "4bc57a828a761ae15db70d47024b8b802d62f628f27a6867b9e980b159aa3945",
-  "projection_library_sha256": "e942ce7713e3204628a0aaf1560bcee66892b26ba5bc47492f819bd15e5358de"
+  "rework": {
+    "date": "2026-11-07",
+    "attempt": 4,
+    "generator": "chatgpt_imagegen_games_project",
+    "preparer": "tools/art_pipeline/e0_rework_prepare.py",
+    "key_tolerance": "±8 по каналам, принято владельцем",
+    "logical_width": 242,
+    "pixel_size": 4,
+    "slab_edge_ratio_measured": 0.925
+  }
 }

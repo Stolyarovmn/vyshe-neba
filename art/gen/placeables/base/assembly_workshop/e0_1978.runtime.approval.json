@@ -1,15 +1,15 @@
 {
   "asset": "assembly_workshop",
-  "production_sha256": "9a411a46bf8356997578255721b23e1d7d30d718237c815023e846cf6538603c",
-  "runtime_sha256": "12c2513986fd1556e735528d4cacd9744aff11c4abf935eed77eb41869dd56c3",
+  "production_sha256": "fda2b1e9967ef448044b075debf0c7abd1a74a25a35f2dfd6cb2f345db0bee6a",
+  "runtime_sha256": "4189570ec249d3e7635cadd9987e33715a29c408c12284ed1bad19074c9f777a",
   "approved": true,
-  "sha256": "12c2513986fd1556e735528d4cacd9744aff11c4abf935eed77eb41869dd56c3",
-  "promotion_manifest_sha256": "da45ffb5570b7f9f993a8d044552b4e87e0af38583c10e17d388496088371398",
-  "approval_scope": "\u0422\u043e\u0447\u043d\u0430\u044f \u043e\u0431\u0440\u0435\u0437\u043a\u0430 \u043f\u0440\u043e\u0437\u0440\u0430\u0447\u043d\u044b\u0445 \u043f\u043e\u043b\u0435\u0439 \u043f\u0440\u0438\u043d\u044f\u0442\u043e\u0433\u043e PNG \u0431\u0435\u0437 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f \u043f\u0438\u043a\u0441\u0435\u043b\u0435\u0439 \u043e\u0431\u044a\u0435\u043a\u0442\u0430.",
+  "sha256": "4189570ec249d3e7635cadd9987e33715a29c408c12284ed1bad19074c9f777a",
+  "promotion_manifest_sha256": "7d06f2460533b3f2c46a7244ae56d1b08aa4a845e5bbc6198ddfdf5d48b73e3f",
+  "approval_scope": "Точная обрезка прозрачных полей принятого PNG без изменения пикселей объекта.",
   "crop_bbox": [
-    39,
-    82,
-    281,
+    18,
+    49,
+    302,
     252
   ],
   "runtime_target": "game/assets/eras/e0-1978/base/factory.png",
