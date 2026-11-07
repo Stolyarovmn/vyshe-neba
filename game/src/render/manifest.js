@@ -386,10 +386,19 @@ export const BUILDING_ANCHORS = {
   logistics: { zone: 'logistics_east', anchors: [[1200, 470]], size: [141, 125], footprint: [121, 30] },
   factory: { zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34] },
   weather: { zone: 'command_north', anchors: [[1000, 350]], size: [140, 171], footprint: [100, 28] },
-  control: { zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34] },
+  control: {
+    zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34],
+    e0: { anchors: [[1320, 250]], size: [44, 30], footprint: [43, 24] },
+  },
   radar: { zone: 'command_north', anchors: [[798, 174]], size: [150, 88], footprint: [92, 24] },
-  energy: { zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30] },
-  observation: { zone: 'perimeter_east', anchors: [[1378, 378]], size: [138, 150], footprint: [119, 30] },
+  energy: {
+    zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30],
+    e0: { anchors: [[1535, 403]], size: [34, 22], footprint: [32, 18] },
+  },
+  observation: {
+    zone: 'perimeter_east', anchors: [[1378, 378]], size: [138, 150], footprint: [119, 30],
+    e0: { anchors: [[1420, 273]], size: [24, 25], footprint: [24, 23] },
+  },
   recovery: { zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28] },
 };
 
