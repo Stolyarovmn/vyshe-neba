@@ -1,15 +1,15 @@
 {
   "asset": "assembly_workshop",
-  "production_sha256": "fda2b1e9967ef448044b075debf0c7abd1a74a25a35f2dfd6cb2f345db0bee6a",
-  "runtime_sha256": "4189570ec249d3e7635cadd9987e33715a29c408c12284ed1bad19074c9f777a",
+  "production_sha256": "0e0e97ad6d865294cd4ab87d0b8956bc11897cad182e3a2323ab631e7ee53935",
+  "runtime_sha256": "3628aa8292caa242fab3746ecd37c82b9de69f4da7bf682181017fe8aff6786a",
   "approved": true,
-  "sha256": "4189570ec249d3e7635cadd9987e33715a29c408c12284ed1bad19074c9f777a",
-  "promotion_manifest_sha256": "7d06f2460533b3f2c46a7244ae56d1b08aa4a845e5bbc6198ddfdf5d48b73e3f",
+  "sha256": "3628aa8292caa242fab3746ecd37c82b9de69f4da7bf682181017fe8aff6786a",
+  "promotion_manifest_sha256": "d1d46b8fff65874823ca6bed74d4fefec9bacdbbe58cbcdc9b182c235a378b6b",
   "approval_scope": "Точная обрезка прозрачных полей принятого PNG без изменения пикселей объекта.",
   "crop_bbox": [
     18,
-    49,
-    302,
+    45,
+    301,
     252
   ],
   "runtime_target": "game/assets/eras/e0-1978/base/factory.png",

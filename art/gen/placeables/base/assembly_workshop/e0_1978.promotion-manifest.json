@@ -12,13 +12,13 @@
       "era": "E0",
       "year": 1978,
       "png": "e0_1978.png",
-      "sha256": "fda2b1e9967ef448044b075debf0c7abd1a74a25a35f2dfd6cb2f345db0bee6a",
+      "sha256": "0e0e97ad6d865294cd4ab87d0b8956bc11897cad182e3a2323ab631e7ee53935",
       "qa": "e0_1978.qa.json",
       "pipeline": "e0_1978.pipeline.json"
     }
   ],
   "reproducibility": {
-    "git_commit": "780512eadf8f4c00ba98097630a112df435b9447",
+    "git_commit": "e6c1aff49cd118e9e50dbf8a39af5ba665ff3244",
     "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
     "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
     "pipeline_config_sha256": "f37e7f7d98fee52ce8dd1cd5b7d6bc4fd3c5ad45c47e4bd224aa628b3390b60d",
@@ -32,7 +32,7 @@
       "e0_1978"
     ]
   },
-  "visual_review_sha256": "5ffcf886e73e1ff5ef594a6630350755a31128a2cbe1825449f85057e0f05eb9",
+  "visual_review_sha256": "2c518d96803c9a29a07eefeb15dd4a588e36f881c78c57edc7b44d8ce3ddda0c",
   "runtime_published": false,
   "runtime_branch": "main",
   "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
