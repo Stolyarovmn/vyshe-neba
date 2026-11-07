@@ -5,7 +5,7 @@
 import { createMapView, drawIslandHd, drawSea } from './islandmap.js';
 import { ensureWorld } from './layout.js';
 import {
-  BUILDING_ANCHORS, E0_DELUGE_NOZZLES, ENTRY_KEYS, ISLAND, WORLD_ENTRIES, eraYear, spriteName,
+  BUILDING_ANCHORS, E0_BUILDING_CLIPS, E0_DELUGE_NOZZLES, ENTRY_KEYS, ISLAND, WORLD_ENTRIES, buildingClipFrameName, eraYear, spriteName,
 } from './manifest.js';
 import { buildingLayout, buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
 import { powerBalance } from '../rules/base.js';
@@ -78,6 +78,24 @@ export function createHub(painter, shared) {
     shore: null,
   };
   const fx = createHubFx();
+  // ON-клипы построек E0: один показ по событию (нажатие на постройку, конец стройки), без цикла, при «меньше движения» не играют.
+  const clips = new Map();
+  const lastReveal = new Map();
+  function startClip(key, at) {
+    if (E0_BUILDING_CLIPS[key] && Number.isFinite(at)) clips.set(key, { t0: at });
+  }
+  function clipFrame(key, level, time, reduce) {
+    const spec = E0_BUILDING_CLIPS[key];
+    const clip = clips.get(key);
+    if (!spec || !clip || reduce || level !== 1) return null;
+    const i = Math.floor((time - clip.t0) * spec.fps);
+    if (i >= spec.sequence.length) {
+      clips.delete(key);
+      return null;
+    }
+    const f = spec.sequence[Math.max(0, i)];
+    return f > 0 ? buildingClipFrameName(key, f) : null;
+  }
   const overlay = { r: 0, g: 0, b: 0, a: 0 };
   const vents = [
     { x: -26, y: 20, rate: 5, drift: -1 },
@@ -275,6 +293,7 @@ export function createHub(painter, shared) {
     },
 
     setSelected(key) {
+      if (key && key !== state.selected) startClip(key, state.lastTime);
       state.selected = key || null;
     },
 
@@ -333,7 +352,10 @@ export function createHub(painter, shared) {
       state.buildingLevels = profile?.buildings ?? {};
       const weather = params.weather || null;
       if (shared) shared.profile = profile;
-      if (params.selected !== undefined) state.selected = params.selected;
+      if (params.selected !== undefined) {
+        if (params.selected && params.selected !== state.selected) startClip(params.selected, time);
+        state.selected = params.selected;
+      }
       const canvas = ctx.canvas;
       const devW = canvas.width;
       const devH = canvas.height;
@@ -387,6 +409,11 @@ export function createHub(painter, shared) {
 
       // эффекты: стройка, праздник, пар
       fx.update(dt, reduce, (key) => buildBoxes(painter, key, owned[key] | 0), mv);
+      for (const key of Object.keys(E0_BUILDING_CLIPS)) {
+        const reveal = (owned[key] | 0) > 0 ? (fx.buildState(key, reduce)?.reveal ?? 1) : 0;
+        if ((lastReveal.get(key) ?? 1) < 1 && reveal >= 1) startClip(key, time);
+        lastReveal.set(key, reveal);
+      }
       fx.steam(dt, vents, reduce ? 0.4 : 1);
       if (owned.deluge > 0 && (fx.buildState('deluge', reduce)?.reveal ?? 1) >= 1) {
         fx.steam(dt, owned.deluge === 1 ? mistVentsE0 : mistVent, reduce ? 0.3 : 0.8);
@@ -431,6 +458,7 @@ export function createHub(painter, shared) {
       });
       drawPlacedBuildings(ctx, painter, mv, profile, time, addRect, [rocketItem, ...entryItems], {
         build: (key) => fx.buildState(key, reduce),
+        clip: (key, level) => clipFrame(key, level, time, reduce),
         scaffold: (c, box, build) => drawScaffold(c, mv, box, build.reveal, build.scaffold, time),
       });
       fx.draw(ctx, mv, 0);

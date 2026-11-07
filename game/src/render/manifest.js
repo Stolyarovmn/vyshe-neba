@@ -119,6 +119,23 @@ export const E0_BUILDING_SIZES = {
   beacons: [319, 644], gantry: [340, 516], deluge: [421, 516], service: [516, 354], rescue: [516, 312], fuel: [516, 264],
   logistics: [516, 458], radar: [644, 379], energy: [516, 463], observation: [473, 516], recovery: [516, 349],
 };
+/**
+ * ON-клипы построек E0 (art/gen/placeables/base/<asset>/animation.json): кадр 0 — обычный спрайт, кадры 1..N-1 — файлы
+ * base/anim/<ключ>_on<i>.png того же размера и с той же привязкой. sequence — порядок кадров за один показ, fps — частота.
+ * Клип играет один раз по событию хаба (завершение стройки, нажатие на постройку) и не зацикливается; при «меньше движения» не играет.
+ */
+export const E0_BUILDING_CLIPS = {
+  control: { frames: 4, fps: 8, sequence: [0, 1, 2, 3, 3, 3, 2, 1, 0] },
+  logistics: { frames: 7, fps: 10, sequence: [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0] },
+  recovery: { frames: 5, fps: 10, sequence: [0, 1, 2, 3, 4, 3, 2, 1, 0] },
+  factory: { frames: 7, fps: 10, sequence: [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0] },
+};
+
+/** Имя спрайта кадра клипа постройки E0: 'bld_control_1978_on2' (кадр 0 — сам bld_control_1978). */
+export function buildingClipFrameName(key, index) {
+  return `bld_${key}_${ERA_YEARS[0]}${index > 0 ? `_on${index}` : ''}`;
+}
+
 export const BUILDING_KEYS = [
   'beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel', 'logistics', 'factory',
   'weather', 'control', 'radar', 'energy', 'observation', 'recovery',
@@ -203,6 +220,14 @@ function buildAssetFiles() {
   return files;
 }
 
+function buildClipFrameFiles() {
+  const files = {};
+  for (const [key, clip] of Object.entries(E0_BUILDING_CLIPS)) {
+    for (let i = 1; i < clip.frames; i++) files[buildingClipFrameName(key, i)] = `${eraFolder(0)}base/anim/${key}_on${i}.png`;
+  }
+  return files;
+}
+
 export const ASSET_FILES = {
   ...buildAssetFiles(),
   deluge_nozzle_1978: `${eraFolder(0)}base/deluge-nozzle.png`,
@@ -215,6 +240,7 @@ export const ASSET_FILES = {
   feeder_pole_1978: `${eraFolder(0)}base/feeder-pole.png`,
   entry_shop_1978: `${eraFolder(0)}base/entry-shop.png`,
   entry_board_1978: `${eraFolder(0)}base/entry-contract-board.png`,
+  ...buildClipFrameFiles(),
 };
 
 // Размеры [ширина, высота] по эпохам (индекс = эпоха 0..5).
@@ -396,11 +422,11 @@ export const BUILDING_ANCHORS = {
   },
   logistics: {
     zone: 'logistics_east', anchors: [[1200, 470]], size: [141, 125], footprint: [121, 30],
-    e0: { anchors: [[1200, 470]], size: [44, 28], footprint: [44, 28] },
+    e0: { anchors: [[1200, 470]], size: [44, 18], footprint: [44, 18] },
   },
   factory: {
     zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34],
-    e0: { anchors: [[920, 255]], size: [70, 49], footprint: [67, 42] },
+    e0: { anchors: [[920, 255]], size: [70, 51], footprint: [68, 43] },
   },
   weather: {
     zone: 'command_north', anchors: [[1000, 350]], size: [140, 171], footprint: [100, 28],
@@ -408,7 +434,7 @@ export const BUILDING_ANCHORS = {
   },
   control: {
     zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34],
-    e0: { anchors: [[1320, 250]], size: [44, 30], footprint: [43, 24] },
+    e0: { anchors: [[1320, 250]], size: [44, 37], footprint: [43, 30] },
   },
   radar: {
     zone: 'command_north', anchors: [[798, 174]], size: [150, 88], footprint: [92, 24],
@@ -424,7 +450,7 @@ export const BUILDING_ANCHORS = {
   },
   recovery: {
     zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28],
-    e0: { anchors: [[1505, 440]], size: [41, 32], footprint: [41, 32] },
+    e0: { anchors: [[1505, 440]], size: [41, 17], footprint: [41, 17] },
   },
 };
 
