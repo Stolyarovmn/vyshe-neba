@@ -400,7 +400,7 @@ export const BUILDING_ANCHORS = {
   },
   factory: {
     zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34],
-    e0: { anchors: [[920, 255]], size: [70, 50], footprint: [68, 42] },
+    e0: { anchors: [[920, 255]], size: [70, 51], footprint: [68, 43] },
   },
   weather: {
     zone: 'command_north', anchors: [[1000, 350]], size: [140, 171], footprint: [100, 28],
