@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "ec61a9d08e74fd5805d38748286dfe5b44c19035e33c9679e98c238468a96002",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "02b7c78b63193c676ac07d20f0eae40894d68ec4cb07a04790c23759e7855ef1",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Просмотрены исходник и сцена шириной 41 px в (1505,440). Пустая люлька и ручная консольная лебёдка имеют раздельные функции и не выдают покупку за земную спасательную машину. Стойка закреплена на основании, оттяжка связывает её с концом стрелы, канат идёт через оба блока к одному поднятому крюку. Крюк выше земли. Вылет до центра люльки 2,290 м при доступных 2,3 м. Подход к рукояти и южный вход свободны; соседний генератор не пересекается. Дальняя/ближняя кромки 0,947420, сжатие 0,958317. Материалы E0 и ручной привод, корпус без выдуманных органов управления. Это статичная проба; путь доставки, части rig, тени, map-editor и публикация отдельно."
+}

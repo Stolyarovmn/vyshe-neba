@@ -1,0 +1,16 @@
+{
+  "source_sha256": "a564e4e1e6ae95eb253d2660355511a139749aa5ed011e04385af155de4fff08",
+  "original_png_file": "art/raw/placeables/base/weather_complex_e0_vector/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "16D_idiRIg725CHANEVJ8JrnCReQ-IhNP"
+  },
+  "authoring": "parametric_vector_source",
+  "svg_archive_id": "1peY-Tl336Jv3ErOOyBlGeKp7fxBb-Zjq",
+  "authoring_sha256": {
+    "E0_weather_vector.svg": "d26ad50e0d17fac09c73e19b609fb5a847ec870bb9ed53c93e7e79f18594f5f8",
+    "E0_weather_vector.geometry.json": "cb2bdf03ac4023559bc24ec856998842e08e280f90b5e85ef1d6941a398ff68e",
+    "E0_weather_vector.py": "603af4035ea18071bf7e370ae63ee04d8f3816a0bdc83a6317f9bd58d149fa7d",
+    "E0_rigid_scene.py": "e8923e6f972450397d316b6d55f244b5d494872090e0d371e03e980ab1461604"
+  }
+}

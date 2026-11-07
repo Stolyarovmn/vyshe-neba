@@ -1,0 +1,47 @@
+{
+  "asset_id": "OB01",
+  "asset": "observation_post",
+  "zone": "base",
+  "era": "E0",
+  "year": 1978,
+  "adapter": "prepared_grid_png",
+  "source_gen_id": null,
+  "source_sha256": "34b645e6c1b57312b8739b74be75fdb58a57a2ce38444c0a08aa0bccf999ed26",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1osBC4Y02eLYXPw8iaQTdmPgnj9Wzt6DK"
+  },
+  "transport_sha256": "34b645e6c1b57312b8739b74be75fdb58a57a2ce38444c0a08aa0bccf999ed26",
+  "transport_pixel_sha256": null,
+  "spritefusion_pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "aseprite_version": "1.3.18.6",
+  "aseprite_dithering": "none",
+  "pixel_size": 5,
+  "colors": 32,
+  "target_canvas": [
+    280,
+    280
+  ],
+  "registration_target": [
+    140,
+    276
+  ],
+  "mechanism_pivots": "pending_measured_rig_pass",
+  "output_sha256": "b2e760e342b456d803f2ae09d97b84c0e90f3128e9af5e7076efc5c1be78efc2",
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "2f5e5863ec2b3d437bc7a848a358098b5a90952c7332026ec62c0446fca97e49",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": "c38ea359cba1d189af463a55cf742cce7304f43bf8a0a2ef8ef3ab76746a3fe8"
+  },
+  "publication": {
+    "state": "production",
+    "runtime_published": false,
+    "visual_review": "art/gen/placeables/base/observation_post/visual_qa.json",
+    "visual_review_sha256": "806860fccf71f8527517206dc1da2c26e40b7106863285e26c9212a553b21a80",
+    "hash_bound": true,
+    "runtime_boundary": "separate_main_pr"
+  }
+}

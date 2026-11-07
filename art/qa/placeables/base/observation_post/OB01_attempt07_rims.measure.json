@@ -1,0 +1,18 @@
+{
+  "source_sha256": "34b645e6c1b57312b8739b74be75fdb58a57a2ce38444c0a08aa0bccf999ed26",
+  "method": "Подгонка осевого эллипса по вручную отмеченному видимому ободу; скрытые точки не восстановлены.",
+  "measurements": {
+    "mounting_plate_top": {
+      "center": [
+        621.3390999602308,
+        547.7651657849789
+      ],
+      "width": 405.65525394855626,
+      "depth": 392.18160817637107,
+      "depth_width": 0.9667854769757429,
+      "radial_residual_rms_pixels": 3.5117400153074225,
+      "point_count": 24,
+      "manual_point_uncertainty_pixels": 3
+    }
+  }
+}

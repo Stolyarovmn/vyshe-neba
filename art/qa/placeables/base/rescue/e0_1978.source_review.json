@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "93641a90624899e92a23c3c7ed23599fe1df9518fff10d8ee67529e732fee874",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "ee19f83885a6ec62a010cd3d79f2f3ff6a20f27788e36fbd4318b4bd53f911ec",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Крыша занимает основную глубину бокса, фасад показан узкой полосой. Дальняя кромка крыши визуально уже ближней, конёк проходит по центру. Двухстворчатые ворота имеют симметричные петли и центральную задвижку, порог читается ниже створок. Сценическая проба подтверждает верхний ракурс и контакт основания с грунтом. Маршрут выезда и итоговый размер проверяются на штатном якоре отдельно."
+}

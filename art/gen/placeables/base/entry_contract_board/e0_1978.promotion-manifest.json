@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "ENTRY_CONTRACT_BOARD",
+  "asset": "entry_contract_board",
+  "production_dir": "art/gen/placeables/base/entry_contract_board",
+  "runtime_target": "eras/e0-1978/base/entry-contract-board.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/entry_contract_board/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "9fd3bcf26a676d911ca96adf494ccd0cdce815a8a7d2ed2855d5e17749d41e78",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "946b672e7f389cd84bac82d03c1b6fb3bc69bc1a2309fdb4940197705ccb7436",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": "c926a707d7530fd764161c22b02ec22cb91bacf8f52c05ef77a15823ba5681ab"
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "b936980798623795b08a7fb02c21e40912aa149a0aaaba6fde618317e87db8e5",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

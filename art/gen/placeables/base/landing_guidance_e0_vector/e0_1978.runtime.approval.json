@@ -1,0 +1,42 @@
+{
+  "island_size": [
+    4,
+    7
+  ],
+  "lamp": [
+    0.5,
+    0.1002879667029207
+  ],
+  "lamp_pixel": [
+    2,
+    0
+  ],
+  "rgba": [
+    156,
+    85,
+    76,
+    255
+  ],
+  "ground_edge_ratio": 0.9786307874950536,
+  "alpha_crop_bbox": [
+    6,
+    8,
+    90,
+    144
+  ],
+  "approved": true,
+  "status": "runtime_geometry_verified",
+  "source_sha256": "10d3cf0ce8f4a7d4325309f76affc90acfca0c76db36e6e59e62734c0d8c64d4",
+  "sha256": "8004db22cd26910eec804e105805b3a9638d3efb61480d8ce56c42602563fa6b",
+  "review_sha256": "fc00304ff0e252522833a65290f25c473f229447232b6e1a4bd41dc2c14399b9",
+  "resampling": "box_alpha_threshold_32",
+  "runtime_size": [
+    4,
+    7
+  ],
+  "runtime_published": false,
+  "glow_anchor": [
+    0.625,
+    0.07142857142857142
+  ]
+}

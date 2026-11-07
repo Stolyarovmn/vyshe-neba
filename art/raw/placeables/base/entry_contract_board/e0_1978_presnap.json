@@ -1,0 +1,16 @@
+{
+  "source_sha256": "16486bc6adc599c4d5a017028e88727acc1008ff35537771b0b80d36fec448ae",
+  "original_png_file": "art/raw/placeables/base/entry_contract_board/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1nw518WR1dfMFc0v2XfW-GsInwgHuF3oM"
+  },
+  "authoring": "parametric_vector_source",
+  "svg_archive_id": "1vwShknS4bfjV-_jZTeABQw0z8tPv39pU",
+  "authoring_sha256": {
+    "E0_contract_board_vector.svg": "cd7d2e3cc07670aefe49964e7d5758c5a7fab20d56c6490a175535baf3b68d34",
+    "E0_contract_board_vector.geometry.json": "c0549103688f3d24c87cd2a0200682e0d897f47c58eb8dcf30545fd7548d6f2e",
+    "E0_entry_vector.py": "abb9b892f74b1bb52e0ad1b03b1de82cb06b6e2bbaf617961126e18bf1f42ccb",
+    "E0_rigid_scene.py": "e8923e6f972450397d316b6d55f244b5d494872090e0d371e03e980ab1461604"
+  }
+}

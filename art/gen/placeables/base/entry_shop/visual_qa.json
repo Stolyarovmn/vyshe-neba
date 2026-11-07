@@ -1,0 +1,32 @@
+{
+  "asset_id": "ENTRY_SHOP",
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "77071dda53ba338dd7a3bcfdb892769a20a700ac821f8214c220ceb3ee683713",
+      "scene_projection": {
+        "candidate_sha256": "77071dda53ba338dd7a3bcfdb892769a20a700ac821f8214c220ceb3ee683713",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "scene_png_sha256": "2fff652bb47dbbc4693017e97c2c74bd5df08557305de9e3f8ab16f71174625d",
+        "source_sha256": "7558d5dc3c894f467157f98e378bd85334a298ce5af30414d12edb3f9500480e",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "reviewer": "Codex",
+        "approval_evidence": "Полноразмерная маска совпала с исходником. На статичном кадре в масштабе острова видны навес с прилавком и отдельный стенд с листами. Плиты стоят на грунте, подходы свободны. Проверка размещения в редакторе карты остаётся отдельной.",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        }
+      }
+    }
+  }
+}

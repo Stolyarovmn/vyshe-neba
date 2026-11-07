@@ -1,0 +1,18 @@
+{
+  "asset": "cargo_terminal",
+  "production_sha256": "74f19e4d8022eeda571c687949b915a8ff30a432b3bf1993c5bbc7229f2a3899",
+  "runtime_sha256": "84606407eebc1a7b56c8c2b02127b69a707b5c6281a90f640938c44549293357",
+  "approved": true,
+  "sha256": "84606407eebc1a7b56c8c2b02127b69a707b5c6281a90f640938c44549293357",
+  "promotion_manifest_sha256": "e48ae5c8bcfdc696c61d04fac071fe86d7ef45b67f2790bc3a5b127d7464dfc9",
+  "approval_scope": "\u0422\u043e\u0447\u043d\u0430\u044f \u043e\u0431\u0440\u0435\u0437\u043a\u0430 \u043f\u0440\u043e\u0437\u0440\u0430\u0447\u043d\u044b\u0445 \u043f\u043e\u043b\u0435\u0439 \u043f\u0440\u0438\u043d\u044f\u0442\u043e\u0433\u043e PNG \u0431\u0435\u0437 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f \u043f\u0438\u043a\u0441\u0435\u043b\u0435\u0439 \u043e\u0431\u044a\u0435\u043a\u0442\u0430.",
+  "crop_bbox": [
+    37,
+    97,
+    283,
+    252
+  ],
+  "runtime_target": "game/assets/eras/e0-1978/base/logistics.png",
+  "state": "local_preview_only",
+  "runtime_published": false
+}

@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "B01-E0-VECTOR",
+  "asset": "weather_complex_e0_vector",
+  "production_dir": "art/gen/placeables/base/weather_complex_e0_vector",
+  "runtime_target": "eras/e0-1978/base/weather-complex.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/weather_complex_e0_vector/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "11451a2dcb896d537c7179f1a1d36098f2cb6df5d33929d84e604f5ed51cf24d",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "13155a386f9a949ac2d33897fcbd5d8f76d180ea01f8dcd00a575ba264d26b31",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": "acbd0ca6a6ba3c0ad66c80ed6dfa4af9b258b9b2b51d66f705167008c48aa4a5"
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "cf191e5e27df6852e71961da3d6bffc74c0d913ef17fe49d6d6d666c020fcb2b",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

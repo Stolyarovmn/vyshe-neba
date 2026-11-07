@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "BI-FACTORY",
+  "asset": "assembly_workshop",
+  "production_dir": "art/gen/placeables/base/assembly_workshop",
+  "runtime_target": "eras/e0-1978/base/factory.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/assembly_workshop/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "9a411a46bf8356997578255721b23e1d7d30d718237c815023e846cf6538603c",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "0f77df2cd8812f2e2341606f08f151c713bf0a1b821fc7131d1d239efa6c8b05",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": "cee0d0624a05925debdffcf86d3914ca36bee2b5a57ae1ad3d518401fe6a18cf"
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "42580829db288f005178984862c56ab6002ee99551d9e8345e2fe69a0efe25fa",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}
