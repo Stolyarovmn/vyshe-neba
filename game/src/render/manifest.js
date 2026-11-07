@@ -410,7 +410,7 @@ export const BUILDING_ANCHORS = {
   },
   radar: {
     zone: 'command_north', anchors: [[798, 174]], size: [150, 88], footprint: [92, 24],
-    e0: { anchors: [[830, 265]], size: [28, 17], footprint: [11, 9] },
+    e0: { anchors: [[830, 265]], size: [27, 16], footprint: [11, 9], smooth: false },
   },
   energy: {
     zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30],
