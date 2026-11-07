@@ -7,7 +7,8 @@ import { ensureWorld } from './layout.js';
 import {
   BUILDING_ANCHORS, ENTRY_KEYS, ISLAND, WORLD_ENTRIES, eraYear, spriteName,
 } from './manifest.js';
-import { buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
+import { buildingLayout, buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
+import { powerBalance } from '../rules/base.js';
 import { drawEntry, drawEntryHint, entrySize, entryWorld } from './entries.js';
 import { BUILD_DURATION, createHubFx, drawScaffold } from './hubfx.js';
 import {
@@ -65,6 +66,7 @@ export function createHub(painter, shared) {
     ready: false,
     orientation: '',
     selected: null,
+    buildingLevels: {},
     pending: null,
     lastTime: null,
     devW: 1,
@@ -197,9 +199,11 @@ export function createHub(painter, shared) {
       let y;
       let zoom = clamp(state.devW / 380 / state.sFit, 1, maxZoom());
       if (typeof target === 'string' && BUILDING_ANCHORS[target]) {
-        const anchor = BUILDING_ANCHORS[target].anchors[0];
+        const level = state.buildingLevels[target] || 1;
+        const layout = buildingLayout(target, level);
+        const anchor = layout.anchors[0];
         const [wx, wy] = islandToWorld(anchor[0], anchor[1]);
-        const heightUnits = BUILDING_ANCHORS[target].size[1] * ISLAND.unitsPerPx;
+        const heightUnits = layout.size[1] * ISLAND.unitsPerPx;
         x = wx;
         y = wy - heightUnits * 0.4;
       } else if (typeof target === 'string' && WORLD_ENTRIES[target]) {
@@ -323,6 +327,7 @@ export function createHub(painter, shared) {
      */
     draw(ctx, params) {
       const { profile, time, layout } = params;
+      state.buildingLevels = profile?.buildings ?? {};
       const weather = params.weather || null;
       if (shared) shared.profile = profile;
       if (params.selected !== undefined) state.selected = params.selected;
@@ -444,7 +449,8 @@ export function createHub(painter, shared) {
       if (lightStrength > 0.03) {
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
-        drawNightLights(ctx, painter, mv, profile, time, lightStrength, era);
+        drawNightLights(ctx, painter, mv, profile, time, lightStrength, era,
+          fx.buildState('beacons', reduce)?.reveal ?? 1);
         ctx.restore();
         drawHeadlights(ctx, mv, time, vehicleCount(ownedCount), night);
       }
@@ -474,7 +480,7 @@ export function vehicleCount(ownedCount) {
 
 /** Рамки здания key (ед. мира, y — низ) по его якорям: для стройки и эффектов. */
 function buildBoxes(painter, key, level) {
-  const spec = BUILDING_ANCHORS[key];
+  const spec = buildingLayout(key, level);
   if (!spec || level <= 0) return null;
   const [w, h] = buildingSize(painter, key, level);
   return spec.anchors.map(([px, py]) => {
@@ -487,8 +493,9 @@ const GLOW_WARM = '255,206,120';
 const GLOW_RED = '255,90,70';
 
 /** Ночные огни построек, стола, объектов-входов: ровные и мигающие; strength 0..1. */
-function drawNightLights(ctx, painter, mv, profile, time, strength, era) {
+function drawNightLights(ctx, painter, mv, profile, time, strength, era, beaconReveal) {
   const owned = profile && profile.buildings ? profile.buildings : {};
+  const beaconPower = owned.beacons > 0 ? powerBalance(profile).ratio : 1;
   for (let i = 0; i < 4; i++) {
     const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
     const on = (Math.floor(time * 1.5) + i) % 2 === 0;
@@ -497,12 +504,18 @@ function drawNightLights(ctx, painter, mv, profile, time, strength, era) {
   for (const key of Object.keys(BUILDING_ANCHORS)) {
     const level = owned[key] | 0;
     if (level <= 0) continue;
+    if (key === 'beacons' && beaconReveal < 1) continue;
     const [w, h] = buildingSize(painter, key, level);
     const blinking = key === 'beacons' || key === 'radar' || key === 'recovery';
     const on = !blinking || Math.floor(time * 1.4 + hash2(key.length, level, 3)) % 2 === 0;
-    BUILDING_ANCHORS[key].anchors.forEach(([px, py], i) => {
+    const layout = buildingLayout(key, level);
+    layout.anchors.forEach(([px, py], i) => {
       const [x, y] = islandToWorld(px, py);
-      drawGlow(ctx, mv, x, y - h * (key === 'beacons' ? 0.78 : 0.42), Math.max(w, h) * (key === 'beacons' ? 0.4 : 0.55), blinking ? GLOW_RED : GLOW_WARM, strength * (on ? 0.9 : 0.3));
+      const lamp = layout.lamp;
+      const lightX = lamp ? x + (lamp[0] - 0.5) * w * (i > 0 ? -1 : 1) : x;
+      const lightY = lamp ? y - (1 - lamp[1]) * h : y - h * (key === 'beacons' ? 0.78 : 0.42);
+      const intensity = strength * (on ? 0.9 : 0.3) * (key === 'beacons' ? beaconPower : 1);
+      drawGlow(ctx, mv, lightX, lightY, Math.max(w, h) * (key === 'beacons' ? 0.4 : 0.55), blinking ? GLOW_RED : GLOW_WARM, intensity);
       if (i === 0 && !blinking) drawGlow(ctx, mv, x + w * 0.25, y - h * 0.2, w * 0.35, GLOW_WARM, strength * 0.6);
     });
   }

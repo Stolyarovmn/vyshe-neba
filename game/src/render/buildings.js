@@ -4,7 +4,7 @@
 // Все функции рисуют в единицах мира через view; (wx, wy) — точка опоры (низ по центру).
 
 import {
-  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, ISLAND, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
+  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, E0_DELUGE_NOZZLES, ISLAND, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
 } from './manifest.js';
 import { clamp, hash2 } from './util.js';
 import { fillWorldRect } from './painter.js';
@@ -44,12 +44,17 @@ export function isProceduralBuilding(key) {
 
 /** Целевой размер спрайта постройки в единицах мира [ширина, высота] (по sprite_px раскладки острова). */
 export function buildingSize(painter, key, level) {
-  const layout = BUILDING_ANCHORS[key];
+  const layout = buildingLayout(key, level);
   const [px, py] = layout ? layout.size : [100, 100];
   const height = py * ISLAND.unitsPerPx;
   const asset = painter.assets.get(buildingSpriteName(key, level));
   const width = asset ? (height * asset.w) / asset.h : px * ISLAND.unitsPerPx;
   return [width, height];
+}
+
+export function buildingLayout(key, level) {
+  const layout = BUILDING_ANCHORS[key];
+  return level === 1 && layout?.e0 ? layout.e0 : layout;
 }
 
 /**
@@ -59,7 +64,7 @@ export function buildingSize(painter, key, level) {
 export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts = {}) {
   const lv = clamp(level | 0, 1, 6);
   const [width, height] = buildingSize(painter, key, lv);
-  drawShadow(ctx, view, wx, wy, BUILDING_ANCHORS[key], width);
+  drawShadow(ctx, view, wx, wy, buildingLayout(key, lv), width);
   const name = buildingSpriteName(key, lv);
   const building = opts.reveal !== undefined && opts.reveal < 1;
   if (building) {
@@ -412,7 +417,7 @@ export function buildingDrawOrder(profile) {
   for (const key of BUILDING_KEYS) {
     const level = profile && profile.buildings ? profile.buildings[key] | 0 : 0;
     if (level <= 0) continue;
-    BUILDING_ANCHORS[key].anchors.forEach((anchor, index) => {
+    buildingLayout(key, level).anchors.forEach((anchor, index) => {
       const [x, y] = islandToWorld(anchor[0], anchor[1]);
       owned.push({ key, level, x, y, mirror: index > 0 });
     });
@@ -428,7 +433,33 @@ export function buildingDrawOrder(profile) {
  */
 export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, extras, hooks) {
   const items = buildingDrawOrder(profile);
-  const queue = extras && extras.length ? [...items, ...extras].sort((a, b) => a.y - b.y) : items;
+  const additions = [...(extras ?? [])];
+  if (profile?.buildings?.beacons === 1 && (hooks?.build?.('beacons')?.reveal ?? 1) >= 1) {
+    const [x, y] = islandToWorld(388, 310);
+    additions.push({ y, draw: () => painter.sprite(ctx, view, 'beacons_junction_1978', x, y, {
+      w: 13 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, smooth: true,
+    }) });
+  }
+  if (profile?.buildings?.gantry === 1 && (hooks?.build?.('gantry')?.reveal ?? 1) >= 1) {
+    const [x, y] = islandToWorld(443, 367);
+    additions.push({ y, draw: () => painter.sprite(ctx, view, 'gantry_inlet_1978', x, y, {
+      w: 11 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, smooth: true,
+    }) });
+  }
+  const delugeBuild = profile?.buildings?.deluge === 1 ? hooks?.build?.('deluge') : null;
+  if (profile?.buildings?.deluge === 1 && (!delugeBuild || delugeBuild.reveal >= 1)) {
+    const [x, y] = islandToWorld(455, 470);
+    additions.push({ y, draw: () => painter.sprite(ctx, view, 'deluge_manifold_1978', x, y, {
+      w: 15 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, smooth: true,
+    }) });
+    for (const [px, py, direction] of E0_DELUGE_NOZZLES) {
+        const [x, y] = islandToWorld(px, py);
+        additions.push({ y, draw: () => painter.sprite(ctx, view, 'deluge_nozzle_1978', x, y, {
+          w: 9 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, flipX: direction < 0, smooth: false,
+        }) });
+    }
+  }
+  const queue = additions.length ? [...items, ...additions].sort((a, b) => a.y - b.y) : items;
   for (const item of queue) {
     if (item.draw) {
       item.draw();
@@ -438,6 +469,11 @@ export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, e
     if (item.x + w < view.left || item.x - w > view.right || item.y - h > view.bottom || item.y < view.top) continue;
     const build = hooks && hooks.build ? hooks.build(item.key) : null;
     drawBuilding(ctx, painter, view, item.key, item.level, item.x, item.y, time, { mirror: item.mirror, reveal: build ? build.reveal : undefined });
+    if (item.key === 'deluge' && item.level === 1 && (build?.reveal ?? 1) >= 1) {
+      painter.sprite(ctx, view, 'deluge_outlet_1978',
+        item.x - 31 * ISLAND.unitsPerPx, item.y - 22 * ISLAND.unitsPerPx,
+        { w: 9 * ISLAND.unitsPerPx, ax: 0, ay: 0, smooth: true });
+    }
     if (isProceduralBuilding(item.key) && !painter.has(buildingSpriteName(item.key, item.level)) && (!build || build.reveal >= 1)) {
       drawBuildingBadge(ctx, view, item.key, item.x, item.y - h, time);
     }
