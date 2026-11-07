@@ -64,7 +64,8 @@ export function buildingLayout(key, level) {
 export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts = {}) {
   const lv = clamp(level | 0, 1, 6);
   const [width, height] = buildingSize(painter, key, lv);
-  drawShadow(ctx, view, wx, wy, buildingLayout(key, lv), width, lv === 1 && !!BUILDING_ANCHORS[key]?.e0);
+  const layout = buildingLayout(key, lv);
+  drawShadow(ctx, view, wx, wy, layout, width, lv === 1 && !!BUILDING_ANCHORS[key]?.e0);
   const name = buildingSpriteName(key, lv);
   const building = opts.reveal !== undefined && opts.reveal < 1;
   if (building) {
@@ -77,7 +78,7 @@ export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts 
   }
   let drawn = false;
   if (painter.has(name)) {
-    drawn = painter.sprite(ctx, view, name, wx, wy, { h: height, flipX: !!opts.mirror, smooth: true });
+    drawn = painter.sprite(ctx, view, name, wx, wy, { h: height, flipX: !!opts.mirror, smooth: layout?.smooth ?? true });
   } else {
     drawProcedural(ctx, view, key, lv, wx, wy, time, width);
   }

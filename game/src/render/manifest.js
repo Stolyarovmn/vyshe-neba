@@ -402,7 +402,7 @@ export const BUILDING_ANCHORS = {
   },
   weather: {
     zone: 'command_north', anchors: [[1000, 350]], size: [140, 171], footprint: [100, 28],
-    e0: { anchors: [[1060, 280]], size: [9, 11], footprint: [7, 5] },
+    e0: { anchors: [[1060, 280]], size: [7, 13], footprint: [7, 5], smooth: false },
   },
   control: {
     zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34],
