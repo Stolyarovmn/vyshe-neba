@@ -29,43 +29,43 @@
   "specimens": [
     {
       "id": "E4-04-01",
-      "name": "Hollow direct-drive motor",
-      "description": "TOP ROW CELL 1 ONLY. One atomic fragment. annular cutaway with large open bore and visible air gap between segmented stator and rotor. No shaft or gearbox."
+      "name": "Thin annular drive",
+      "description": "PROTECTED INPUT CELL. Preserve supplied revision24 specimen exactly in class, shape, size, position, orientation, connections and physical state. R1C1. Redraw the annular direct-drive joint flipped over to show rear MOUNTING FACE toward viewer. Broad flat annular rear flange with exactly three equally spaced captive counterbored sockets, one asymmetrical indexing key and recessed electrical bank. Dark raised circular locating pilot around central bore distinguishes mounting face. One local notch in outer rim reveals stator coils and encoder reader. Keep thin annulus and central through bore. EXACTLY THREE sockets total. Retain upper left, upper right and lower left sockets. Lower right quadrant is plain solid metal without socket or recess. Keep key, contact bank and raised locating pilot."
     },
     {
       "id": "E4-04-02",
-      "name": "Torque-sensing spoke",
-      "description": "TOP ROW CELL 2 ONLY. One atomic fragment. single sector with one visibly bent radial flexure and two offset mechanical witness marks. No complete ring."
+      "name": "Torque-sensing crescent",
+      "description": "PROTECTED INPUT CELL. Preserve supplied revision24 specimen exactly in class, shape, size, position, orientation, connections and physical state. R1C2. Keep crescent torque flexure and offset witness marks. At its RIGHT end show one small silver target fixed to moving gold flexure, facing RIGHT. On separate fixed housing lip farther right show amber sensor facing LEFT. Clearly expose dark air gap between target and sensor, at least sensor width. Mounts distinguish moving flexure and fixed housing. Move fixed sensor housing slightly RIGHT to open a broad visible dark vertical air slit between amber sensor and silver target. Gap at least amber sensor width. Silver target remains attached to moving flexure, sensor bolted to fixed lip. Do not add any bridge across gap."
     },
     {
       "id": "E4-04-03",
-      "name": "Linear motor carriage",
-      "description": "TOP ROW CELL 3 ONLY. One atomic fragment. short magnetic rail with one side-guided carriage shifted off its stop, exposing magnet row at one end. No screw."
+      "name": "Integrated linear sled",
+      "description": "PROTECTED INPUT CELL. Preserve supplied revision24 specimen exactly in class, shape, size, position, orientation, connections and physical state. TOP ROW CELL 3 ONLY. One isolated physical fragment. Low elongated enclosed sled; small end cutaway exposes magnet row, side slit shows fixed encoder scale and carriage reader. No screw. Make carriage a self-contained replaceable linear-motor cassette. Show one cropped guide track under carriage, direct magnet row and one fixed encoder reader facing scale across narrow gap. At rear end add an integral tapered docking shoe with asymmetric key and recessed service contact bank. No manual adjustment screw or handle. Preserve elongated silhouette."
     },
     {
       "id": "E4-04-04",
-      "name": "Cam compression follower",
-      "description": "TOP ROW CELL 4 ONLY. One cam follower assembly, front view. Cam below roller: unmistakable pointed cam nose is at twelve o clock, directed VERTICALLY UP and exactly centered under roller axis. Its single highest tip touches the lowest point of the roller, with no gap and no flank contact. Show displaced plunger above roller with exposed travel band. No second lobe."
+      "name": "Powered compression cartridge",
+      "description": "PROTECTED INPUT CELL. Preserve supplied revision24 specimen exactly in class, shape, size, position, orientation, connections and physical state. TOP ROW CELL 4 ONLY. Compact motor-driven compression cartridge in frontal cutaway. Left motor shaft drives one gold teardrop cam pointing horizontally RIGHT. To its RIGHT is one circular silver follower roller. The pointed tip of cam at three o clock physically touches leftmost point of roller at nine o clock, all three centers on the same horizontal axis. Roller connects to short rightward plunger with colored travel band. No other cam contact."
     },
     {
       "id": "E4-04-05",
-      "name": "Parking pawl",
-      "description": "BOTTOM ROW CELL 1 ONLY. One atomic fragment. one pawl nose sits between teeth of one short sector. Clear contact with steep locking flank. One transparent flat guard over contact, with pawl engagement visible through it."
+      "name": "Parking lock cassette",
+      "description": "PROTECTED INPUT CELL. Preserve supplied revision24 specimen exactly in class, shape, size, position, orientation, connections and physical state. R2C1. Keep trapezoid sealed cassette and clear glass. Inside window show a GOLD hinged pawl: round pivot pin clearly at UPPER LEFT of gold arm; short arm slopes DOWN RIGHT to a blunt flat nose. Beneath it show SILVER curved ratchet sector with exactly three exposed saw teeth, shallow ramps facing left, steep vertical faces facing right. Nose sits DEEP in valley between middle and right tooth, its flat RIGHT face pressing LEFT face of right tooth along visible straight seam. Air gap under gold arm above shallow ramp. Spring pushes back of hinged arm. Small sealed sensor at right. Glass reflection only at upper left, away from contact. Do not substitute sliding block or flat stop. At engaged nose show a broad short flat contact pad on gold pawl against steep silver tooth flank. Leave two adjacent teeth visible. The contact seam is straight and extends several pixels, not a point touching tooth corner. Keep pivot and spring."
     },
     {
       "id": "E4-04-06",
-      "name": "Finger tendon sector",
-      "description": "BOTTOM ROW CELL 2 ONLY. One atomic fragment. short arcuate pulley sector and one tensioned cable lying in the groove with a captive end ferrule. No finger assembly."
+      "name": "Finger tendon insert",
+      "description": "PROTECTED INPUT CELL. Preserve supplied revision24 specimen exactly in class, shape, size, position, orientation, connections and physical state. R2C2. Redraw one tapered robot fingertip cartridge in a flat SIDE CUTAWAY, nose LEFT heel RIGHT. One silver tendon curves through nose groove and runs horizontally into one gold ferrule at heel. Ferrule rigidly attaches directly to MIDPOINT of one VERTICAL thin steel leaf, whose TOP and BOTTOM ends clamp into heel housing. Leaf bows slightly LEFT from tendon tension. A short silver target tab extends RIGHT from leaf midpoint. One amber pickup fixed farther RIGHT faces target across a wide empty dark horizontal gap. Two captive heel mounting sockets and tapered keyed heel. Everything one continuous exposed cavity. No detached or lower duplicate mechanism."
     },
     {
       "id": "E4-04-07",
-      "name": "Parallel flexure guide",
-      "description": "BOTTOM ROW CELL 3 ONLY. One atomic fragment. one rectangular frame with exactly two parallel thin leaves both deflected equally, keeping moving platform parallel to the base."
+      "name": "Parallel compliance cassette",
+      "description": "PROTECTED INPUT CELL. Preserve supplied revision24 specimen exactly in class, shape, size, position, orientation, connections and physical state. BOTTOM ROW CELL 3 ONLY. One isolated physical fragment. Wide shallow shell; low rectangular window shows two equally bowed parallel leaves and output platform parallel to base."
     },
     {
       "id": "E4-04-08",
-      "name": "Mechanical zero drum",
-      "description": "BOTTOM ROW CELL 4 ONLY. One atomic fragment. short drum with precisely one asymmetric deep notch occupied by a follower roller. No repeating teeth."
+      "name": "Homing drum cartridge",
+      "description": "R2C4. Preserve supplied cylindrical roller, its circular end with centered axle, stationary fork and deep U notch. Add ONE short flat silver rectangle bonded on DARK rotating rim to RIGHT of fork directly BELOW amber sensor. Leave black gap to sensor and dark separation from fork. Do not change other geometry. Plate is rotating with rim, not connected to fork."
     }
   ],
   "global_forbidden": [
@@ -75,11 +75,11 @@
     "photorealism or smooth CAD render"
   ],
   "era_contract": {
-    "character": "Targeted edit of first input. Change only R1C4. Preserve the other seven cells in form, scale, pose, position and physical state.",
+    "character": "ONE LOCAL ADDITION ONLY to supplied revision24. No redesign. In R2C4 place a short flat rectangular index target on rotating dark rim to right of stationary fork, below amber sensor with visible air gap. Entire R1C2 including small sensor shape must be copied from input. The other six cells also copied from input in shape size position state.",
     "required_signals": [
-      "clearly visible air gap and mechanical contact states",
-      "glass guard integrated into parking pawl only",
-      "distinct engineering silhouettes and coherent HD pixel art"
+      "recognizable motor power and feedback interfaces dominate the sheet",
+      "each mechanical state remains legible through a small cutaway",
+      "no manual-looking controls and no exposed demo stands"
     ],
     "replaced_previous_language": [
       "separate E3 motor and gearbox give way to direct drive and integrated feedback",

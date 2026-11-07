@@ -1,0 +1,9 @@
+{
+  "drive_file_id": "1RZmTGk4jowY3DvIvWzYldcVCbviTyp72",
+  "generation_id_status": "not_returned",
+  "returned_filename": "exec-42a9c42c-d116-46e6-9b46-bc991f3b791b.png",
+  "source_sha256": "008a60d4cd6c761df2856a5eed8098683e8c5368f7ff30ac83856b8e52eea935",
+  "tool": "image_gen__imagegen",
+  "generation_id": null,
+  "request_sha256": "30b1eec0a5034625a3ec3f72ab9194b9f71f800d7a5aecb457db51fe7d97a691"
+}

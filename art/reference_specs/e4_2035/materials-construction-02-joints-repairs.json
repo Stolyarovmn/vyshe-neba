@@ -30,7 +30,7 @@
     {
       "id": "E4-02-01",
       "name": "Captive wedge lock with inspection glass",
-      "description": "TOP ROW CELL 1 ONLY. One compact transverse wedge panel lock viewed through a single flat clear glass inspection window. Show one unmistakable hooked wedge tooth on the right, mechanically overlapping the back of a short raised metal bridge. Make the tooth and bridge contrasting metal values so the overlap and contact are visible through the glass. Flush heel at left. No loose parts."
+      "description": "TOP ROW CELL 1 ONLY. Keep the captive transverse wedge lock and clear inspection glass from the input. The hooked tooth must visibly overlap the rear of the raised bridge and remain in contact through the glass. Add exactly one short narrow frosted LED diffuser recessed flush in the solid outer panel edge directly beside the glass. It confirms full locking only once the tooth has passed behind the bridge. Show unlit hardware with no halo. Keep the diffuser off the glass and out of the tooth sightline."
     },
     {
       "id": "E4-02-02",
@@ -80,7 +80,7 @@
     "E3 quarter-turn fasteners, conventional hinge barrels, loose hardware, E5 holograms and levitation"
   ],
   "era_contract": {
-    "character": "TARGETED EDIT OF FIRST INPUT ONLY. Redraw R1C1, R1C4, R2C1, R2C2. Preserve R1C2, R1C3, R2C3, R2C4 in form, size, orientation, state and position. Preserve the grid and neutral background. Other inputs are lineage only.",
+    "character": "TARGETED EDIT of supplied E4 sheet 02 revision 02. Add one inset short LED status diffuser beside the inspection glass in R1C1 only. Preserve the geometry, size, position and state of all eight specimens and the clarity of the glass.",
     "required_signals": [
       "one glass inspection window integrated into the wedge lock only",
       "distinct one-sided fastening and planar alignment mechanisms",
