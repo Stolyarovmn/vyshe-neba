@@ -1,0 +1,27 @@
+{
+  "projection": "island_top_3_4 proxy 73.44deg",
+  "k_px_per_m": 110,
+  "slab_corners_px": {
+    "far_left": [
+      365.675,
+      346.6170369064415
+    ],
+    "far_right": [
+      1170.325,
+      346.6170369064415
+    ],
+    "near_left": [
+      350.0,
+      873.8040208659982
+    ],
+    "near_right": [
+      1186.0,
+      873.8040208659982
+    ]
+  },
+  "far_over_near": 0.9625000000000001,
+  "depth_over_mean_width": 0.6426562447317302,
+  "expected_depth_over_mean_width": 0.6451216778956629,
+  "roof_share_of_slab_target_max": 0.4,
+  "roof_share_of_slab_schema": 0.3263157894736842
+}
