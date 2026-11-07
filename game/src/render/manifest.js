@@ -362,7 +362,13 @@ ISLAND.topUnits = -ISLAND.launchOrigin[1] * ISLAND.unitsPerPx;
 
 // anchors: [[x, y], ...] px острова; size: видимый спрайт [w, h] px; footprint: след на земле [w, глубина] px.
 export const BUILDING_ANCHORS = {
-  beacons: { zone: 'launch_core', anchors: [[284, 396], [492, 396]], size: [44, 89], footprint: [40, 16] },
+  beacons: {
+    zone: 'launch_core', anchors: [[284, 396], [492, 396]], size: [44, 89], footprint: [40, 16],
+    e0: {
+      anchors: [[284, 396], [492, 396]], size: [3.5, 7], footprint: [3.5, 2.5],
+      lamp: [252 / 319, 50 / 644],
+    },
+  },
   gantry: {
     zone: 'launch_core', anchors: [[484, 267]], size: [125, 190], footprint: [108, 32],
     e0: { anchors: [[458, 330]], size: [56, 32], footprint: [56, 30] },

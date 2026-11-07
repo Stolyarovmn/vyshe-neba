@@ -5,7 +5,7 @@
 import { createMapView, drawIslandHd, drawSea } from './islandmap.js';
 import { ensureWorld } from './layout.js';
 import {
-  BUILDING_ANCHORS, ENTRY_KEYS, ISLAND, WORLD_ENTRIES, eraYear, spriteName,
+  BUILDING_ANCHORS, E0_DELUGE_NOZZLES, ENTRY_KEYS, ISLAND, WORLD_ENTRIES, eraYear, spriteName,
 } from './manifest.js';
 import { buildingLayout, buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
 import { powerBalance } from '../rules/base.js';
@@ -84,7 +84,10 @@ export function createHub(painter, shared) {
     { x: 27, y: 21, rate: 5, drift: 1 },
     { x: 0, y: 60, rate: 3, drift: 0 },
   ];
-  // водяная взвесь у сопел охлаждения: сопла башни справа и на две трети высоты, поэтому точка считается по якорю постройки
+  const mistVentsE0 = E0_DELUGE_NOZZLES.map(([px, py, direction]) => {
+    const [x, y] = islandToWorld(px, py);
+    return { x, y, rate: 2, drift: direction * 2 };
+  });
   const mistVent = (() => {
     const spec = BUILDING_ANCHORS.deluge;
     const [wx, wy] = islandToWorld(spec.anchors[0][0], spec.anchors[0][1]);
@@ -384,7 +387,9 @@ export function createHub(painter, shared) {
       // эффекты: стройка, праздник, пар
       fx.update(dt, reduce, (key) => buildBoxes(painter, key, owned[key] | 0), mv);
       fx.steam(dt, vents, reduce ? 0.4 : 1);
-      if (owned.deluge > 0) fx.steam(dt, mistVent, reduce ? 0.3 : 0.8);
+      if (owned.deluge > 0 && (fx.buildState('deluge', reduce)?.reveal ?? 1) >= 1) {
+        fx.steam(dt, owned.deluge === 1 ? mistVentsE0 : mistVent, reduce ? 0.3 : 0.8);
+      }
 
       drawSea(ctx, mv, time, mood);
       drawIslandHd(ctx, painter, mv);
@@ -428,7 +433,8 @@ export function createHub(painter, shared) {
         scaffold: (c, box, build) => drawScaffold(c, mv, box, build.reveal, build.scaffold, time),
       });
       fx.draw(ctx, mv, 0);
-      drawHubDrones(ctx, painter, mv, profile, time);
+      // У E0 нет подтверждённой роли и конструкции автономного летающего сервиса.
+      if (era > 0) drawHubDrones(ctx, painter, mv, profile, time);
       drawHubPlanes(ctx, painter, mv, time, profile);
       if (!reduce) drawBirds(ctx, mv, time);
       drawHubClouds(ctx, painter, mv, time, mood, state.zoom);
@@ -509,6 +515,8 @@ function drawNightLights(ctx, painter, mv, profile, time, strength, era, beaconR
     const blinking = key === 'beacons' || key === 'radar' || key === 'recovery';
     const on = !blinking || Math.floor(time * 1.4 + hash2(key.length, level, 3)) % 2 === 0;
     const layout = buildingLayout(key, level);
+    // В E0 свечение привязано только к подтверждённой физической лампе.
+    if (level === 1 && !layout.lamp) continue;
     layout.anchors.forEach(([px, py], i) => {
       const [x, y] = islandToWorld(px, py);
       const lamp = layout.lamp;

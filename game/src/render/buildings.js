@@ -64,7 +64,7 @@ export function buildingLayout(key, level) {
 export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts = {}) {
   const lv = clamp(level | 0, 1, 6);
   const [width, height] = buildingSize(painter, key, lv);
-  drawShadow(ctx, view, wx, wy, buildingLayout(key, lv), width);
+  drawShadow(ctx, view, wx, wy, buildingLayout(key, lv), width, lv === 1 && !!BUILDING_ANCHORS[key]?.e0);
   const name = buildingSpriteName(key, lv);
   const building = opts.reveal !== undefined && opts.reveal < 1;
   if (building) {
@@ -85,13 +85,13 @@ export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts 
   return drawn;
 }
 
-function drawShadow(ctx, view, wx, wy, layout, width) {
-  const w = width * 0.92;
+function drawShadow(ctx, view, wx, wy, layout, width, frontAnchor = false) {
+  const w = (frontAnchor ? layout.footprint[0] * ISLAND.unitsPerPx : width) * 0.92;
   const depth = layout ? layout.footprint[1] * ISLAND.unitsPerPx : 20;
   const x0 = view.sx(wx - w / 2);
   const x1 = view.sx(wx + w / 2);
-  const y = view.sy(wy - depth * 0.15);
-  const half = Math.max(2, Math.round(view.S * depth * 0.5));
+  const y = view.sy(wy - depth * (frontAnchor ? 0.5 : 0.15));
+  const half = frontAnchor ? Math.max(0.5, view.S * depth * 0.45) : Math.max(2, Math.round(view.S * depth * 0.5));
   ctx.fillStyle = 'rgba(8,16,24,0.28)';
   ctx.beginPath();
   ctx.ellipse((x0 + x1) / 2, y, (x1 - x0) / 2, half, 0, 0, Math.PI * 2);
