@@ -1,0 +1,10 @@
+{
+  "source_sha256": "8a92c39860d028d3a2b6c43710296e400142c079d4c7fcae5a276918897c963d",
+  "original_png_file": "art/raw/placeables/base/feeder_pole/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "18z-AMBNV-TNQ7ssDqU_qbuwYHZ2GhKWq"
+  },
+  "authoring": "deterministic_python_pixel_drawing",
+  "generator": "EN01_POLE_projected.py --feeder"
+}

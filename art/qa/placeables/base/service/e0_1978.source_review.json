@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "df69bd591601aba6c7de46fc0b40b24a81b27aa81a276b9f29136b3c0e7e6e01",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "4da6bcb93a17c532c1cea56b813270a09a15ebc55839e261087926fbde3d5e67",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "У четвёртого исходника видна верхняя поверхность кровли. По ранее размеченным углам дальняя кромка составляет 97% ближней, глубина 56,3% средней ширины. Парные передние стойки опираются на пяты, задняя левая закрыта крышей. Под передним свесом видны верстак, зажатый лист и рукоять тисков. На пробе при якоре (633,381) проезд свободен. Фактический угол камеры не измерен."
+}

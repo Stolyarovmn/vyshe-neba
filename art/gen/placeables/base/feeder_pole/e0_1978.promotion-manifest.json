@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "INFRA_FEEDER_POLE",
+  "asset": "feeder_pole",
+  "production_dir": "art/gen/placeables/base/feeder_pole",
+  "runtime_target": "eras/e0-1978/base/feeder-pole.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/feeder_pole/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "97a56ab71915a288cc5b5d109940e95126c74f2831d02d19d734d18fbd277cd9",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "ca41dd50e58001d97eaa195695bdaa0a6c0c1dcde8540eb6352a14c82e77ae73",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": null
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "e0c9ec7f7527379ec883de5df02c17dc9c754021cb3c57491c44d93564fa666e",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

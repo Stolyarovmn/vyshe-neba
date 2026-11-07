@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "B02-E0-VECTOR",
+  "asset": "tracking_radar_e0_vector",
+  "production_dir": "art/gen/placeables/base/tracking_radar_e0_vector",
+  "runtime_target": "eras/e0-1978/base/radar.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/tracking_radar_e0_vector/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "fbe650ce0168a4b896fbd789fc0ba3ad257315ae944454b9d0c5a596f14ab6d0",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "619a5f667ce32af8a66a4af4872772ddf147edbdb83202c41a2e572cb27b91bf",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": "acbd0ca6a6ba3c0ad66c80ed6dfa4af9b258b9b2b51d66f705167008c48aa4a5"
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "594dfba0b5e9ec6c03ac9e54cb0654768fcc3f27eca9cf80e1dd38d70a24eb8d",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

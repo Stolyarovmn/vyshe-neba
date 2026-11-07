@@ -1,0 +1,12 @@
+{
+  "source_sha256": "2063020034d2c4d719c94391aee16bec6c2942f38bfccfa2aa6a7d0add4e62d1",
+  "original_png_file": "art/raw/placeables/base/gantry/e0_1978_original.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1pIDMoJIRosV1paQfL7CyNhE_q2rzMlul"
+  },
+  "preparation": {
+    "local_original": "BI_GANTRY_E0_attempt09_raw.png",
+    "method": "byte-identical original RGBA input"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "asset": "mission_control",
+  "production_sha256": "ce0460798824242eec13debf9f82a98b01a8ab9e619e24516f114a3342830cf6",
+  "runtime_sha256": "2cd21417648911ace4256b4c50630d2cf591bc102ef50900e52de897ad43ece4",
+  "approved": true,
+  "sha256": "2cd21417648911ace4256b4c50630d2cf591bc102ef50900e52de897ad43ece4",
+  "promotion_manifest_sha256": "8336922359824283475e67538298020c6670544e479176460330eb51edf51803",
+  "approval_scope": "\u0422\u043e\u0447\u043d\u0430\u044f \u043e\u0431\u0440\u0435\u0437\u043a\u0430 \u043f\u0440\u043e\u0437\u0440\u0430\u0447\u043d\u044b\u0445 \u043f\u043e\u043b\u0435\u0439 \u043f\u0440\u0438\u043d\u044f\u0442\u043e\u0433\u043e PNG \u0431\u0435\u0437 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f \u043f\u0438\u043a\u0441\u0435\u043b\u0435\u0439 \u043e\u0431\u044a\u0435\u043a\u0442\u0430.",
+  "crop_bbox": [
+    28,
+    79,
+    293,
+    252
+  ],
+  "runtime_target": "game/assets/eras/e0-1978/base/control.png",
+  "state": "local_preview_only",
+  "runtime_published": false
+}

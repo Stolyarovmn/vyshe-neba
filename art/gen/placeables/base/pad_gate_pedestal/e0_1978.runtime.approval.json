@@ -1,0 +1,26 @@
+{
+  "alpha_crop_bbox": [
+    6,
+    8,
+    78,
+    280
+  ],
+  "anchor": [
+    0.5,
+    0.8970588235294118
+  ],
+  "island_size": [
+    5,
+    20
+  ],
+  "position": [
+    580,
+    376
+  ],
+  "approved": true,
+  "status": "runtime_geometry_verified",
+  "source_sha256": "a31557e795a472422f03fd86170e4676f034e4b044095f0c8718f63367ba0b15",
+  "sha256": "3cd0f842fd0f201377db3b4dd9fe3737f5828363a93c0f25206cc930bc2c744b",
+  "review_sha256": "8bc038698a0340bdffdaefe474b1563b9c5261f1ef492da98fb7fe5aec016bfc",
+  "runtime_published": false
+}

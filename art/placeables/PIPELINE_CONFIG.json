@@ -10,11 +10,79 @@
     "checkpoint_artifact_prefix": "asset-checkpoint-",
     "issue_title_prefix": "[asset-pipeline]",
     "resume_policy": "reuse only when step fingerprint and every recorded output SHA-256 match",
-    "steps": ["generate","edit","archive_original","source_prepare","pixel_snap","normalize","aseprite_index","qa_auto","candidate_manifest","visual_review","promote","publish_runtime","game_tests"]
+    "steps": [
+      "generate",
+      "edit",
+      "archive_original",
+      "source_prepare",
+      "pixel_snap",
+      "normalize",
+      "aseprite_index",
+      "qa_auto",
+      "candidate_manifest",
+      "visual_review",
+      "promote",
+      "publish_runtime",
+      "game_tests"
+    ]
   },
   "assets": {
     "W04": {
-      "asset":"flight_simulator","zone":"workshop","adapter":"presnap_png","source_dir":"art/raw/placeables/workshop/flight_simulator","production_dir":"art/gen/placeables/workshop/flight_simulator","runtime_target":"placeables/workshop/flight_simulator","prompt_file":"art/prompts/w04_flight_simulator.md","colors":32,"pixel_size":8,"canvas":[172,160],"registration":[86,156],"qa":{"min_coverage":0.01,"min_bbox_fraction":0.25},"visual_review":"art/gen/placeables/workshop/flight_simulator/visual_qa.json","eras":[{"stem":"e0_1978","era":"E0","year":1978},{"stem":"e1_1986","era":"E1","year":1986},{"stem":"e2_1998","era":"E2","year":1998},{"stem":"e3_2015","era":"E3","year":2015},{"stem":"e4_2035","era":"E4","year":2035},{"stem":"e5_2060","era":"E5","year":2060}]},
+      "asset": "flight_simulator",
+      "zone": "workshop",
+      "adapter": "presnap_png",
+      "source_dir": "art/raw/placeables/workshop/flight_simulator",
+      "production_dir": "art/gen/placeables/workshop/flight_simulator",
+      "runtime_target": "placeables/workshop/flight_simulator",
+      "prompt_file": "art/prompts/w04_flight_simulator.md",
+      "colors": 32,
+      "pixel_size": 8,
+      "canvas": [
+        172,
+        160
+      ],
+      "registration": [
+        86,
+        156
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.25
+      },
+      "visual_review": "art/gen/placeables/workshop/flight_simulator/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
     "B01": {
       "asset": "weather_complex",
       "zone": "base",
@@ -25,17 +93,50 @@
       "prompt_file": "art/prompts/b01_weather_complex.md",
       "colors": 32,
       "pixel_size": 15,
-      "canvas": [96,122],
-      "registration": [48,118],
-      "qa": {"min_coverage": 0.01,"min_bbox_fraction": 0.25},
+      "canvas": [
+        96,
+        122
+      ],
+      "registration": [
+        48,
+        118
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.25
+      },
       "visual_review": "art/gen/placeables/base/weather_complex/visual_qa.json",
       "eras": [
-        {"stem":"e0_1978","era":"E0","year":1978},
-        {"stem":"e1_1986","era":"E1","year":1986},
-        {"stem":"e2_1998","era":"E2","year":1998},
-        {"stem":"e3_2015","era":"E3","year":2015},
-        {"stem":"e4_2035","era":"E4","year":2035},
-        {"stem":"e5_2060","era":"E5","year":2060}
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
       ]
     },
     "B02": {
@@ -95,10 +196,1257 @@
       ]
     },
     "B03": {
-      "asset":"landing_guidance","zone":"base","adapter":"indexed_transport","source_dir":"art/source_transport/b03_landing_guidance","production_dir":"art/gen/placeables/base/landing_guidance","runtime_target":"placeables/base/landing_guidance","prompt_file":"art/prompts/b03_landing_guidance.md","colors":32,"pixel_size":12,"transport_scale":4,"canvas":[46,82],"registration":[23,78],"qa":{"min_coverage":0.04,"min_bbox_fraction":0.35,"min_visible_width":38,"max_visible_width":42,"min_visible_height":70,"max_visible_height":76},"visual_review":"art/gen/placeables/base/landing_guidance/visual_qa.json","eras":[{"stem":"e0_1978","era":"E0","year":1978,"source_override":{"adapter":"prepared_grid_png","source_dir":"art/source_transport/b03_landing_guidance/prepared"}},{"stem":"e1_1986","era":"E1","year":1986},{"stem":"e2_1998","era":"E2","year":1998},{"stem":"e3_2015","era":"E3","year":2015},{"stem":"e4_2035","era":"E4","year":2035},{"stem":"e5_2060","era":"E5","year":2060}]},
+      "asset": "landing_guidance",
+      "zone": "base",
+      "adapter": "indexed_transport",
+      "source_dir": "art/source_transport/b03_landing_guidance",
+      "production_dir": "art/gen/placeables/base/landing_guidance",
+      "runtime_target": "placeables/base/landing_guidance",
+      "prompt_file": "art/prompts/b03_landing_guidance.md",
+      "colors": 32,
+      "pixel_size": 12,
+      "transport_scale": 4,
+      "canvas": [
+        46,
+        82
+      ],
+      "registration": [
+        23,
+        78
+      ],
+      "qa": {
+        "min_coverage": 0.04,
+        "min_bbox_fraction": 0.35,
+        "min_visible_width": 38,
+        "max_visible_width": 42,
+        "min_visible_height": 70,
+        "max_visible_height": 76
+      },
+      "visual_review": "art/gen/placeables/base/landing_guidance/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978,
+          "source_override": {
+            "adapter": "prepared_grid_png",
+            "source_dir": "art/source_transport/b03_landing_guidance/prepared"
+          }
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
     "R_BODY": {
-      "asset":"rocket_body","zone":"vehicle","adapter":"indexed_transport","source_dir":"art/source_transport/rocket_modular/body","production_dir":"art/gen/rocket_modular/body","runtime_target":"world/rocket_modular/body","prompt_file":"art/prompts/rocket_body.md","colors":32,"pixel_size":5,"transport_scale":2,"canvas":[64,96],"registration":[32,94],"qa":{"min_coverage":0.04,"min_bbox_fraction":0.45},"visual_review":"art/gen/rocket_modular/body/visual_qa.json","eras":[{"stem":"e0_1978","era":"E0","year":1978},{"stem":"e1_1986","era":"E1","year":1986},{"stem":"e2_1998","era":"E2","year":1998},{"stem":"e3_2015","era":"E3","year":2015},{"stem":"e4_2035","era":"E4","year":2035},{"stem":"e5_2060","era":"E5","year":2060}]},
+      "asset": "rocket_body",
+      "zone": "vehicle",
+      "adapter": "indexed_transport",
+      "source_dir": "art/source_transport/rocket_modular/body",
+      "production_dir": "art/gen/rocket_modular/body",
+      "runtime_target": "world/rocket_modular/body",
+      "prompt_file": "art/prompts/rocket_body.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "transport_scale": 2,
+      "canvas": [
+        64,
+        96
+      ],
+      "registration": [
+        32,
+        94
+      ],
+      "qa": {
+        "min_coverage": 0.04,
+        "min_bbox_fraction": 0.45
+      },
+      "visual_review": "art/gen/rocket_modular/body/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
     "R_FINS": {
-      "asset":"rocket_fins","zone":"vehicle","adapter":"indexed_transport","source_dir":"art/source_transport/rocket_modular/fins","production_dir":"art/gen/rocket_modular/fins","runtime_target":"world/rocket_modular/fins","prompt_file":"art/prompts/rocket_fins.md","colors":32,"pixel_size":5,"transport_scale":2,"canvas":[128,64],"registration":[64,62],"qa":{"min_coverage":0.03,"min_bbox_fraction":0.45},"visual_review":"art/gen/rocket_modular/fins/visual_qa.json","eras":[{"stem":"e0_1978","era":"E0","year":1978},{"stem":"e1_1986","era":"E1","year":1986},{"stem":"e2_1998","era":"E2","year":1998},{"stem":"e3_2015","era":"E3","year":2015},{"stem":"e4_2035","era":"E4","year":2035},{"stem":"e5_2060","era":"E5","year":2060}]}
+      "asset": "rocket_fins",
+      "zone": "vehicle",
+      "adapter": "indexed_transport",
+      "source_dir": "art/source_transport/rocket_modular/fins",
+      "production_dir": "art/gen/rocket_modular/fins",
+      "runtime_target": "world/rocket_modular/fins",
+      "prompt_file": "art/prompts/rocket_fins.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "transport_scale": 2,
+      "canvas": [
+        128,
+        64
+      ],
+      "registration": [
+        64,
+        62
+      ],
+      "qa": {
+        "min_coverage": 0.03,
+        "min_bbox_fraction": 0.45
+      },
+      "visual_review": "art/gen/rocket_modular/fins/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "BI-GANTRY": {
+      "asset": "gantry",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/gantry",
+      "production_dir": "art/gen/placeables/base/gantry",
+      "runtime_target": "eras/e0-1978/base/gantry.png",
+      "prompt_file": "art/prompts/bi_gantry_e0.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "canvas": [
+        320,
+        192
+      ],
+      "registration": [
+        160,
+        188
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/gantry/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "BI-DELUGE": {
+      "asset": "deluge",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/deluge",
+      "production_dir": "art/gen/placeables/base/deluge",
+      "runtime_target": "eras/e0-1978/base/deluge.png",
+      "prompt_file": "art/prompts/bi_deluge_e0.md",
+      "colors": 32,
+      "pixel_size": 6,
+      "canvas": [
+        320,
+        320
+      ],
+      "registration": [
+        160,
+        316
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/deluge/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "BI-SERVICE": {
+      "asset": "service",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/service",
+      "production_dir": "art/gen/placeables/base/service",
+      "runtime_target": "eras/e0-1978/base/service.png",
+      "prompt_file": "art/prompts/bi_service_e0.md",
+      "colors": 32,
+      "pixel_size": 6,
+      "canvas": [
+        320,
+        256
+      ],
+      "registration": [
+        160,
+        252
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/service/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "BI-RESCUE": {
+      "asset": "rescue",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/rescue",
+      "production_dir": "art/gen/placeables/base/rescue",
+      "runtime_target": "eras/e0-1978/base/rescue.png",
+      "prompt_file": "art/briefs/BI_RESCUE_E0.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "canvas": [
+        240,
+        280
+      ],
+      "registration": [
+        120,
+        276
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/rescue/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "B05": {
+      "asset": "fuel",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/fuel",
+      "production_dir": "art/gen/placeables/base/fuel",
+      "runtime_target": "eras/e0-1978/base/fuel.png",
+      "prompt_file": "art/prompts/b05_fuel_e0.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "canvas": [
+        320,
+        256
+      ],
+      "registration": [
+        160,
+        252
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/fuel/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "EN01": {
+      "asset": "power_node",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/power_node",
+      "production_dir": "art/gen/placeables/base/power_node",
+      "runtime_target": "eras/e0-1978/base/energy.png",
+      "prompt_file": "art/prompts/en01_energy_e0.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "canvas": [
+        360,
+        280
+      ],
+      "registration": [
+        180,
+        276
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/power_node/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "BI-CONTROL": {
+      "asset": "mission_control",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/mission_control",
+      "production_dir": "art/gen/placeables/base/mission_control",
+      "runtime_target": "eras/e0-1978/base/control.png",
+      "prompt_file": "art/prompts/bi_control_e0.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "canvas": [
+        320,
+        256
+      ],
+      "registration": [
+        160,
+        252
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/mission_control/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "OB01": {
+      "asset": "observation_post",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/observation_post",
+      "production_dir": "art/gen/placeables/base/observation_post",
+      "runtime_target": "eras/e0-1978/base/observation.png",
+      "prompt_file": "art/prompts/ob01_observation_e0.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "canvas": [
+        280,
+        280
+      ],
+      "registration": [
+        140,
+        276
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/observation_post/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "BI-FACTORY": {
+      "asset": "assembly_workshop",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/assembly_workshop",
+      "production_dir": "art/gen/placeables/base/assembly_workshop",
+      "runtime_target": "eras/e0-1978/base/factory.png",
+      "prompt_file": "art/prompts/bi_factory_e0.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        320,
+        256
+      ],
+      "registration": [
+        160,
+        252
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/assembly_workshop/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "B07": {
+      "asset": "cargo_terminal",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/cargo_terminal",
+      "production_dir": "art/gen/placeables/base/cargo_terminal",
+      "runtime_target": "eras/e0-1978/base/logistics.png",
+      "prompt_file": "art/prompts/b07_cargo_e0.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        320,
+        256
+      ],
+      "registration": [
+        160,
+        252
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/cargo_terminal/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "BI-RETURN": {
+      "asset": "capsule_return_station",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/capsule_return_station",
+      "production_dir": "art/gen/placeables/base/capsule_return_station",
+      "runtime_target": "eras/e0-1978/base/recovery.png",
+      "prompt_file": "art/prompts/bi_return_e0.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        320,
+        256
+      ],
+      "registration": [
+        160,
+        252
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/capsule_return_station/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "INFRA_FEEDER_POLE": {
+      "asset": "feeder_pole",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/feeder_pole",
+      "production_dir": "art/gen/placeables/base/feeder_pole",
+      "runtime_target": "eras/e0-1978/base/feeder-pole.png",
+      "colors": 32,
+      "pixel_size": 4,
+      "transport_scale": 4,
+      "canvas": [
+        91,
+        236
+      ],
+      "registration": [
+        45,
+        232
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.25
+      },
+      "visual_review": "art/gen/placeables/base/feeder_pole/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "INFRA_GATE_PEDESTAL": {
+      "asset": "pad_gate_pedestal",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/pad_gate_pedestal",
+      "production_dir": "art/gen/placeables/base/pad_gate_pedestal",
+      "runtime_target": "eras/e0-1978/base/pad-gate-pedestal.png",
+      "prompt_file": "art/prompts/e0_pad_gate.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        84,
+        284
+      ],
+      "registration": [
+        42,
+        280
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/pad_gate_pedestal/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "INFRA_GATE_RECEIVER": {
+      "asset": "pad_gate_receiver",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/pad_gate_receiver",
+      "production_dir": "art/gen/placeables/base/pad_gate_receiver",
+      "runtime_target": "eras/e0-1978/base/pad-gate-receiver.png",
+      "prompt_file": "art/prompts/e0_pad_gate.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        68,
+        73
+      ],
+      "registration": [
+        34,
+        69
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/pad_gate_receiver/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "B01-E0-VECTOR": {
+      "asset": "weather_complex_e0_vector",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/weather_complex_e0_vector",
+      "production_dir": "art/gen/placeables/base/weather_complex_e0_vector",
+      "runtime_target": "eras/e0-1978/base/weather-complex.png",
+      "prompt_file": "art/prompts/e0_weather_vector.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        129,
+        230
+      ],
+      "registration": [
+        64,
+        226
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/weather_complex_e0_vector/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "B02-E0-VECTOR": {
+      "asset": "tracking_radar_e0_vector",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/tracking_radar_e0_vector",
+      "production_dir": "art/gen/placeables/base/tracking_radar_e0_vector",
+      "runtime_target": "eras/e0-1978/base/radar.png",
+      "prompt_file": "art/prompts/e0_radar_vector.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        384,
+        232
+      ],
+      "registration": [
+        192,
+        228
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/tracking_radar_e0_vector/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "B03-E0-VECTOR": {
+      "asset": "landing_guidance_e0_vector",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/landing_guidance_e0_vector",
+      "production_dir": "art/gen/placeables/base/landing_guidance_e0_vector",
+      "runtime_target": "eras/e0-1978/base/beacons.png",
+      "prompt_file": "art/prompts/e0_beacon_vector.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        96,
+        148
+      ],
+      "registration": [
+        48,
+        144
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/landing_guidance_e0_vector/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "ENTRY_SHOP": {
+      "asset": "entry_shop",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/entry_shop",
+      "production_dir": "art/gen/placeables/base/entry_shop",
+      "runtime_target": "eras/e0-1978/base/entry-shop.png",
+      "prompt_file": "art/prompts/e0_entries.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        402,
+        241
+      ],
+      "registration": [
+        201,
+        237
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/entry_shop/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "ENTRY_CONTRACT_BOARD": {
+      "asset": "entry_contract_board",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/entry_contract_board",
+      "production_dir": "art/gen/placeables/base/entry_contract_board",
+      "runtime_target": "eras/e0-1978/base/entry-contract-board.png",
+      "prompt_file": "art/prompts/e0_entries.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        184,
+        109
+      ],
+      "registration": [
+        92,
+        105
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/entry_contract_board/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    }
   }
 }

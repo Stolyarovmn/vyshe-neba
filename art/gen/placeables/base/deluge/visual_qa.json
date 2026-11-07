@@ -1,0 +1,32 @@
+{
+  "asset_id": "BI-DELUGE",
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "0c5729f356b688b8b57f87f4e1911688fa9a7edcd0407568a4feca2b11644d77",
+      "scene_projection": {
+        "candidate_sha256": "0c5729f356b688b8b57f87f4e1911688fa9a7edcd0407568a4feca2b11644d77",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "scene_png_sha256": "c3a148402a1236c7d009be8d51cc09e8867cceface1e5263db8ba7a456e7ffbf",
+        "source_sha256": "6df8f23f374012781e7b61a5007180be2e8d31adfe03861e7bfdc6461e14f4c8",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "reviewer": "Codex",
+        "approval_evidence": "При 100% видны крышка, опоры, лестница и стык бокового выпуска. На 50% сохраняется силуэт бака. Проезд севернее и подход к лестнице свободны. Сценическая проба использует обрезку по альфа-каналу, как текущий игровой спрайт.",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        }
+      }
+    }
+  }
+}

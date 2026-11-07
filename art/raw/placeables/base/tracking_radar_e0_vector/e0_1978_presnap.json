@@ -1,0 +1,16 @@
+{
+  "source_sha256": "ce27bdd6669b05fa8af284c242005d8ee5ecf572b485ff09021b6b17b543d6e9",
+  "original_png_file": "art/raw/placeables/base/tracking_radar_e0_vector/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1VKJOLc0qNvSI4gtdXtkYE4rHKxBY1GGp"
+  },
+  "authoring": "parametric_vector_source",
+  "svg_archive_id": "1UiHi4ZqoCvYunBNtL8U7iGahPX6lHXLn",
+  "authoring_sha256": {
+    "E0_radar_vector.svg": "905f28b0cc99531ab9ca5deb5b2275fbe4311c6bc9ffdfef9ce27daae55c9d1f",
+    "E0_radar_vector.geometry.json": "50ba4f3fd6ea6e0e41620295b3c1c16ae3f6f7bf2b11c3d70f668d828ef16ed5",
+    "E0_radar_vector.py": "d2b4ac16841201d36156d50361fdf913d8513f56e3bd0f73c43fad07d8db5a69",
+    "E0_rigid_scene.py": "e8923e6f972450397d316b6d55f244b5d494872090e0d371e03e980ab1461604"
+  }
+}

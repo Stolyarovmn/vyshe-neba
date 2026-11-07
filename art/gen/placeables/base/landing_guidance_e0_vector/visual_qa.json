@@ -1,0 +1,32 @@
+{
+  "asset_id": "B03-E0-VECTOR",
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "10d3cf0ce8f4a7d4325309f76affc90acfca0c76db36e6e59e62734c0d8c64d4",
+      "scene_projection": {
+        "candidate_sha256": "10d3cf0ce8f4a7d4325309f76affc90acfca0c76db36e6e59e62734c0d8c64d4",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "scene_png_sha256": "c4226e98d45357ac117b45a3340ee27b081f970e64790e72383ab0622ed1bdb4",
+        "source_sha256": "1603e90254f540a1a3c6175b89c95c1ecc76be8d47df15f3444e94ea10aac6da",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "reviewer": "Codex",
+        "approval_evidence": "После обработки полноразмерная маска совпадает с исходником. В паре на площадке основания стоят на покрытии, головки зеркальны. В экспорте 4×7 точка лампы на красном непрозрачном пикселе и корректно зеркалится. Ночной игровой кадр требует отдельной проверки.",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        }
+      }
+    }
+  }
+}

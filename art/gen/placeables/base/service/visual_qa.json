@@ -1,0 +1,32 @@
+{
+  "asset_id": "BI-SERVICE",
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "93047396554006ae68c84c479d7e00babb624468ec9f50d51ac6dd21c4ec09ca",
+      "scene_projection": {
+        "candidate_sha256": "93047396554006ae68c84c479d7e00babb624468ec9f50d51ac6dd21c4ec09ca",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "scene_png_sha256": "18be868a5b859f2d5ae2567378b4d2490c921fa2c34fa11c22e5bfe2283dbf97",
+        "source_sha256": "df69bd591601aba6c7de46fc0b40b24a81b27aa81a276b9f29136b3c0e7e6e01",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "reviewer": "Codex",
+        "approval_evidence": "При якоре (633,381) стойки навеса остаются севернее прямого асфальтового участка. У спасательного бокса сохраняется свободный выезд. При 100% видна передняя рабочая кромка, при 50% сохраняется силуэт навеса, мелкие детали тисков теряются. Проекция соответствует проверенному исходнику. Использована обрезка прозрачных полей по альфа-каналу.",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        }
+      }
+    }
+  }
+}

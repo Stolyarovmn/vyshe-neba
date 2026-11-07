@@ -1,0 +1,16 @@
+{
+  "source_sha256": "dcbcda5de7d212eb85f46bb056eb1adf3b7984fe2e80ed76017819d8c1ff363f",
+  "original_png_file": "art/raw/placeables/base/pad_gate_receiver/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1dBto_O257kdS9EyQyb0M0_Ksq_z8GzeN"
+  },
+  "authoring": "parametric_vector_source",
+  "svg_archive_id": "1qDdJk3vCQUcu5aEr3voJw8YQZNejeNcg",
+  "authoring_sha256": {
+    "E0_pad_gate_receiver.svg": "267c097ae048762226dd938d44cbfa30e588060f593e01030bd2de588f1312d7",
+    "E0_pad_gate_receiver.geometry.json": "6b5ba4553a899d7e1698da125424f7e20725a1313959ce1b16faffbd1d004cda",
+    "E0_pad_gate.py": "823353072fd0bcaa315ed2e28eee4d0baf8c5a58d643e305570ad87499a5cb7e",
+    "E0_rigid_scene.py": "e8923e6f972450397d316b6d55f244b5d494872090e0d371e03e980ab1461604"
+  }
+}

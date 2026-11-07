@@ -1,0 +1,21 @@
+{
+  "source_sha256": "ec61a9d08e74fd5805d38748286dfe5b44c19035e33c9679e98c238468a96002",
+  "candidate_sha256": "5006034a04cab87579f80dcac0e7f51a01166227981a1837a40d9e5d70d58983",
+  "source_bbox": [
+    41,
+    41,
+    279,
+    224
+  ],
+  "candidate_bbox": [
+    41,
+    69,
+    279,
+    252
+  ],
+  "visible_size": [
+    238,
+    183
+  ],
+  "cropped_alpha_exact_match": true
+}

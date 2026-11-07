@@ -1,0 +1,47 @@
+{
+  "asset_id": "B02-E0-VECTOR",
+  "asset": "tracking_radar_e0_vector",
+  "zone": "base",
+  "era": "E0",
+  "year": 1978,
+  "adapter": "prepared_grid_png",
+  "source_gen_id": null,
+  "source_sha256": "ce27bdd6669b05fa8af284c242005d8ee5ecf572b485ff09021b6b17b543d6e9",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1VKJOLc0qNvSI4gtdXtkYE4rHKxBY1GGp"
+  },
+  "transport_sha256": "ce27bdd6669b05fa8af284c242005d8ee5ecf572b485ff09021b6b17b543d6e9",
+  "transport_pixel_sha256": null,
+  "spritefusion_pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "aseprite_version": "1.3.18.6",
+  "aseprite_dithering": "none",
+  "pixel_size": 4,
+  "colors": 32,
+  "target_canvas": [
+    384,
+    232
+  ],
+  "registration_target": [
+    192,
+    228
+  ],
+  "mechanism_pivots": "pending_measured_rig_pass",
+  "output_sha256": "fbe650ce0168a4b896fbd789fc0ba3ad257315ae944454b9d0c5a596f14ab6d0",
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "619a5f667ce32af8a66a4af4872772ddf147edbdb83202c41a2e572cb27b91bf",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": "acbd0ca6a6ba3c0ad66c80ed6dfa4af9b258b9b2b51d66f705167008c48aa4a5"
+  },
+  "publication": {
+    "state": "production",
+    "runtime_published": false,
+    "visual_review": "art/gen/placeables/base/tracking_radar_e0_vector/visual_qa.json",
+    "visual_review_sha256": "594dfba0b5e9ec6c03ac9e54cb0654768fcc3f27eca9cf80e1dd38d70a24eb8d",
+    "hash_bound": true,
+    "runtime_boundary": "separate_main_pr"
+  }
+}

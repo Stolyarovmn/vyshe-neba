@@ -23,6 +23,71 @@
           "target": "game/assets/shared/island/start-island.png"
         }
       ]
+    },
+    "BI-GANTRY": {
+      "status": "ready",
+      "runtime_contract_status": "verified_existing_target",
+      "runtime_main_verified_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
+      "approval_file": "art/gen/placeables/base/gantry/e0_1978.runtime.approval.json",
+      "files": [
+        {
+          "source": "art/gen/placeables/base/gantry/e0_1978.runtime.png",
+          "sha256": "0a5ff95e46ce6d061615e233274e41a99260c937b1bd16154afe5562ead652b6",
+          "target": "game/assets/eras/e0-1978/base/gantry.png"
+        }
+      ]
+    },
+    "BI-DELUGE": {
+      "status": "ready",
+      "runtime_contract_status": "verified_existing_target",
+      "runtime_main_verified_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
+      "approval_file": "art/gen/placeables/base/deluge/e0_1978.runtime.approval.json",
+      "files": [
+        {
+          "source": "art/gen/placeables/base/deluge/e0_1978.runtime.png",
+          "sha256": "548c16abe7ed440573d772bbf2b85fdef42829197ff69d22cb06844c7c84b3a2",
+          "target": "game/assets/eras/e0-1978/base/deluge.png"
+        }
+      ]
+    },
+    "BI-SERVICE": {
+      "status": "ready",
+      "runtime_contract_status": "verified_existing_target",
+      "runtime_main_verified_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
+      "approval_file": "art/gen/placeables/base/service/e0_1978.runtime.approval.json",
+      "files": [
+        {
+          "source": "art/gen/placeables/base/service/e0_1978.runtime.png",
+          "sha256": "1c29713f703626ead94196e9a1dca569a192c3ed263bb14183c74963205ae455",
+          "target": "game/assets/eras/e0-1978/base/service.png"
+        }
+      ]
+    },
+    "BI-RESCUE": {
+      "status": "ready",
+      "runtime_contract_status": "verified_existing_target",
+      "runtime_main_verified_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
+      "approval_file": "art/gen/placeables/base/rescue/e0_1978.runtime.approval.json",
+      "files": [
+        {
+          "source": "art/gen/placeables/base/rescue/e0_1978.runtime.png",
+          "sha256": "ab88ec4b7202fc50034778497ac89e5de4c33d2d4089a4041eed80109e3b20ee",
+          "target": "game/assets/eras/e0-1978/base/rescue.png"
+        }
+      ]
+    },
+    "B05": {
+      "status": "ready",
+      "runtime_contract_status": "verified_existing_target",
+      "runtime_main_verified_sha": "af80ce810fbdc5088cfa01d8a193f94ddbcd2721",
+      "approval_file": "art/gen/placeables/base/fuel/e0_1978.runtime.approval.json",
+      "files": [
+        {
+          "source": "art/gen/placeables/base/fuel/e0_1978.runtime.png",
+          "sha256": "344fe6f973096f518097f42bbd23e8e89aafa64cca069d5e8b204b0f4f3c60b1",
+          "target": "game/assets/eras/e0-1978/base/fuel.png"
+        }
+      ]
     }
   },
   "blocked_assets": {

@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "1603e90254f540a1a3c6175b89c95c1ecc76be8d47df15f3444e94ea10aac6da",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "c4226e98d45357ac117b45a3340ee27b081f970e64790e72383ab0622ed1bdb4",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Парные маяки зеркальны. Физическая лампа отделена от оптики. Ручная рукоять соединена с шарниром, основание сужается к дальнему краю. На острове оба маяка стоят на покрытии, красный пиксель сохраняется при размере 4×7."
+}

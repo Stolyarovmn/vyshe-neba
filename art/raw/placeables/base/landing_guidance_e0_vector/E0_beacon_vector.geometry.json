@@ -1,0 +1,46 @@
+{
+  "authoring": "parametric_vector_source",
+  "status": "prototype_not_approved",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "ground_compression_proxy": 0.9585217890173758,
+  "perspective_taper_per_m": 0.045,
+  "pixels_per_meter": 150,
+  "landmarks": {
+    "ground": {
+      "world_m": [
+        0,
+        0,
+        0
+      ],
+      "screen_px": [
+        78.0,
+        153.0
+      ]
+    },
+    "lamp": {
+      "world_m": [
+        0,
+        0,
+        2.02
+      ],
+      "screen_px": [
+        78.0,
+        66.63916347159721
+      ]
+    },
+    "tilt_pivot": {
+      "world_m": [
+        -0.065,
+        0.078,
+        1.69
+      ],
+      "screen_px": [
+        68.2157775,
+        91.74807964521708
+      ]
+    }
+  },
+  "png_sha256": "1603e90254f540a1a3c6175b89c95c1ecc76be8d47df15f3444e94ea10aac6da",
+  "svg_sha256": "ac649d33140c8eab74781986d3df9f037bfecee4d5c718e2ac6a1f5c98f85f76"
+}

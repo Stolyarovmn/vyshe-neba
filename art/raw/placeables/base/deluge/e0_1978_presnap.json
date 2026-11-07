@@ -1,0 +1,6 @@
+{
+  "source_storage": {"provider": "google_drive", "drive_file_id": "12WvpKrs8W6PImaufGygUJfmcdzA8cCgv"},
+  "source_sha256": "6df8f23f374012781e7b61a5007180be2e8d31adfe03861e7bfdc6461e14f4c8",
+  "original_png_file": "art/raw/placeables/base/deluge/e0_1978_presnap.png",
+  "preparation": {"local_original": "BI_DELUGE_E0_attempt03_raw.png", "method": "byte-identical original RGBA input"}
+}
