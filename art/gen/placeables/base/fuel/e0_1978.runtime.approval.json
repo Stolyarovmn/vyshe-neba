@@ -1,0 +1,22 @@
+{
+  "status": "production_export_verified",
+  "source_sha256": "8c1e92729dcaadcd18f94de6b53d79c23e0dbfd22f08abe8c6e7652263e2d882",
+  "review_sha256": "63161adce895cb561e5050ea80bd2cafc532324b4b3712ca9fcee4f748f400b2",
+  "scene_sha256": "8229bc203ca64cb7368ee68ddd2b45d863f4549ca7d74b5c962fcede4a35fa0f",
+  "alpha_crop_bbox": [
+    32,
+    84,
+    287,
+    252
+  ],
+  "runtime_size": [
+    255,
+    168
+  ],
+  "export_sha256": "344fe6f973096f518097f42bbd23e8e89aafa64cca069d5e8b204b0f4f3c60b1",
+  "runtime_sha256": "344fe6f973096f518097f42bbd23e8e89aafa64cca069d5e8b204b0f4f3c60b1",
+  "runtime_rgba_matches": true,
+  "approved": true,
+  "promotion_manifest_sha256": "711b80c0955169b59ff67bbd8a8d4ddd18ca32bfcea4c21df047d0027e9d389b",
+  "sha256": "344fe6f973096f518097f42bbd23e8e89aafa64cca069d5e8b204b0f4f3c60b1"
+}

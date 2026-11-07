@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "6df8f23f374012781e7b61a5007180be2e8d31adfe03861e7bfdc6461e14f4c8",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "53ea66f599c77158152af4f1283a928e0da97a0516eb10e6b0862d6b374c64d0",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "На исходнике крышка почти круглая и открыта сверху, виден ближний пояс стенки. Опоры попарно симметричны вокруг корпуса, передние пятки крупнее дальних. Лестница по центру поднимается к крышке, слева видны фланец и маховик запорного клапана. Кадр проверяет исходник в контексте острова. Итоговый игровой масштаб и зазор от проезда проверяются после обработки."
+}

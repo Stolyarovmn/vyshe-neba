@@ -1,0 +1,6 @@
+{
+  "source_storage": {"provider": "google_drive", "drive_file_id": "1ovmzbhWTxP8VEXQKMzWwxdBVMaePHuB6"},
+  "source_sha256": "93641a90624899e92a23c3c7ed23599fe1df9518fff10d8ee67529e732fee874",
+  "original_png_file": "art/raw/placeables/base/rescue/e0_1978_presnap.png",
+  "preparation": {"local_original": "BI_RESCUE_E0_attempt03_raw.png", "method": "byte-identical original RGBA input"}
+}

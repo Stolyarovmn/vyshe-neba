@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "BI-RESCUE",
+  "asset": "rescue",
+  "production_dir": "art/gen/placeables/base/rescue",
+  "runtime_target": "eras/e0-1978/base/rescue.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/rescue/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "3cf6995ddde6048a347a7cb477a968bde4c4311e75c8498401463b1c4ee91a73",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "9ff37410a1897eb2ce9c5f06e78813f715af9953f5cb3fd87223af9cb912f6ed",
+    "processor_sha256": "52387a1262ed110f3232d04eaee1a31e3dd0f92a225b815c7e1c12501e45f494",
+    "prompt_sha256": "68388b05100fa557e861a38620d54ea8fd7cc49c19379bc7989ca0d215ee3403"
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "c89e1c2091db76b2d401cfe469d1a1113987eaebde95077c65254d4816ead86e",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}
