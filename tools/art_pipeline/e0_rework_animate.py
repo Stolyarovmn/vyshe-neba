@@ -115,7 +115,27 @@ def factory(base):
                         why='створка ворот уезжает по рельсу, проём открывает выход секции ступени на путь')
 
 
-JOBS = {'cargo_terminal': (cargo, 10), 'capsule_return_station': (recovery, 10), 'assembly_workshop': (factory, 10)}
+def control(base):
+    """Тарелка на мачте наводится на ракету: сдвиг тарелки (облучатель и распорки едут с ней) тремя шагами и остановка."""
+    h, w = base.shape[:2]
+    yy, xx = np.mgrid[0:h, 0:w]
+    ell = ((xx - 77.5) / 24.5) ** 2 + ((yy - 19.0) / 19.8) ** 2 <= 1.0
+    mask = ell & (base[:, :, 3] > 0) & (yy <= 38)
+    clean = base.copy()
+    ys, xs = np.where(mask)
+    for y, x in zip(ys, xs):
+        clean[y, x] = (0, 0, 0, 0) if y < 30 else base[39, x]
+    seq = [(0, 0), (1, 0), (2, 0), (3, -1)]
+    frames = []
+    for dx, dy in seq:
+        f = clean.copy()
+        paste(f, base, mask, dx, dy)
+        frames.append(f)
+    return frames, dict(part='dish_head', box=[53, 0, 102, 39], pivot=[78, 36], motion='translate_xy_steps', range_px=[[0, 0], [3, -1]],
+                        why='тарелка на мачте наводится на ракету тремя шагами и остаётся в конечном положении (приём телеметрии)')
+
+
+JOBS = {'cargo_terminal': (cargo, 10), 'capsule_return_station': (recovery, 10), 'assembly_workshop': (factory, 10), 'mission_control': (control, 8)}
 
 
 def main():

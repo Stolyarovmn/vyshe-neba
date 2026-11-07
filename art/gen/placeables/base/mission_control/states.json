@@ -1,7 +1,7 @@
 {
   "asset": "BI-CONTROL mission_control",
   "era": "E0",
-  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слои частей и pivots ещё не сделаны: pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
+  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слой и pivot части ON сделаны (animation.json); остальные части pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
   "states": {
     "PRESS": {
       "trigger": "tap on the building",
@@ -35,8 +35,24 @@
       "requires_art": "тарелка нарисована отдельной частью с измеренным pivot на оси мачты",
       "why": "основное действие здания видно: центр принимает сигнал ракеты через мачту, а не «работает вообще»",
       "animation": {
-        "file": null,
-        "reason": "тарелка на мачте поворачивается шагами: из плоского спрайта читаемо не вырезается, нужен отдельный слой тарелки (3 ракурса) от генерации или Aseprite-ручной работы"
+        "file": "animation.json",
+        "clip": "ON",
+        "part": "dish_head",
+        "pivot": [
+          78,
+          36
+        ],
+        "range_px": [
+          [
+            0,
+            0
+          ],
+          [
+            3,
+            -1
+          ]
+        ],
+        "motion": "translate_xy_steps"
       }
     },
     "BLOCKED": {
@@ -72,5 +88,5 @@
     "path": "art/gen/placeables/base/mission_control/e0_1978.png",
     "sha256": "f519f4184cb7490c30b27bf86730e82533ecbc1dcf868f8efb5ba4dbd60a519e"
   },
-  "mechanism_pivots": "pending_measured_rig_pass"
+  "mechanism_pivots": "measured_for_ON_part_only (animation.json); remaining parts pending_measured_rig_pass"
 }
