@@ -66,7 +66,8 @@ export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts 
   const [width, height] = buildingSize(painter, key, lv);
   const layout = buildingLayout(key, lv);
   drawShadow(ctx, view, wx, wy, layout, width, lv === 1 && !!BUILDING_ANCHORS[key]?.e0);
-  const name = buildingSpriteName(key, lv);
+  const baseName = buildingSpriteName(key, lv);
+  const name = opts.frameName && painter.has(opts.frameName) ? opts.frameName : baseName;
   const building = opts.reveal !== undefined && opts.reveal < 1;
   if (building) {
     // стройка: здание «вырастает» снизу вверх — видна только нижняя часть спрайта
@@ -525,7 +526,8 @@ export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, e
     const [w, h] = buildingSize(painter, item.key, item.level);
     if (item.x + w < view.left || item.x - w > view.right || item.y - h > view.bottom || item.y < view.top) continue;
     const build = hooks && hooks.build ? hooks.build(item.key) : null;
-    drawBuilding(ctx, painter, view, item.key, item.level, item.x, item.y, time, { mirror: item.mirror, reveal: build ? build.reveal : undefined });
+    const frameName = hooks && hooks.clip ? hooks.clip(item.key, item.level) : null;
+    drawBuilding(ctx, painter, view, item.key, item.level, item.x, item.y, time, { mirror: item.mirror, reveal: build ? build.reveal : undefined, frameName });
     if (item.key === 'deluge' && item.level === 1 && (build?.reveal ?? 1) >= 1) {
       painter.sprite(ctx, view, 'deluge_outlet_1978',
         item.x - 31 * ISLAND.unitsPerPx, item.y - 22 * ISLAND.unitsPerPx,
