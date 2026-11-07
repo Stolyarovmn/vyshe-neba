@@ -1,0 +1,32 @@
+{
+  "asset_id": "BI-CONTROL",
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "ce0460798824242eec13debf9f82a98b01a8ab9e619e24516f114a3342830cf6",
+      "scene_projection": {
+        "candidate_sha256": "ce0460798824242eec13debf9f82a98b01a8ab9e619e24516f114a3342830cf6",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "scene_png_sha256": "288b5b7144871daa1df45f372c4aa2926058f664756c8d1c75017e7eb49b4d82",
+        "source_sha256": "1af4b321cff156d92c2ba11f87df81aa84384e8d459c1ee4d6dda026bebf961c",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "reviewer": "Codex",
+        "approval_evidence": "Обработанный PNG проверен при ширине 44 px в точке (1320,250). Порог и коробка ввода находятся на открытой южной стороне, крыша и низкий фасад сохраняют верхний ракурс. Приёмка относится к зданию центра управления. Масштаб соседнего наблюдательного комплекса и совместное размещение проверяются отдельно.",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        }
+      }
+    }
+  }
+}

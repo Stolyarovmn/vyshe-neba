@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "34b645e6c1b57312b8739b74be75fdb58a57a2ce38444c0a08aa0bccf999ed26",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "0045473719c92039fa692cd9793890d9cb4f166dc58acd9c2dcbf74f824a32e9",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Видимый верхний обод монтажного диска измерен по 24 точкам: глубина/ширина 0,96679, остаток подгонки 3,51 px при ширине 405,66 px. Разметка не восстанавливает скрытый край. Прокси острова 0,958515, фактическая камера неизвестна. Вилка соединена общей осью; окуляр соединён с трубой, виден только его торец. Маховик на рабочей стороне, ввод кабеля вынесен к боковому краю. Проба в текущем runtime при ширине 24 px и (1420,273): опора на грунте, нет наложения на центр управления, ступень обращена к свободному участку. Это статичная проба; направление наблюдения и анимация не добавляются."
+}

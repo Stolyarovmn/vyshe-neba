@@ -653,6 +653,174 @@
           "year": 2060
         }
       ]
+    },
+    "EN01": {
+      "asset": "power_node",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/power_node",
+      "production_dir": "art/gen/placeables/base/power_node",
+      "runtime_target": "eras/e0-1978/base/energy.png",
+      "prompt_file": "art/prompts/en01_energy_e0.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "canvas": [
+        360,
+        280
+      ],
+      "registration": [
+        180,
+        276
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/power_node/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "BI-CONTROL": {
+      "asset": "mission_control",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/mission_control",
+      "production_dir": "art/gen/placeables/base/mission_control",
+      "runtime_target": "eras/e0-1978/base/control.png",
+      "prompt_file": "art/prompts/bi_control_e0.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "canvas": [
+        320,
+        256
+      ],
+      "registration": [
+        160,
+        252
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/mission_control/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "OB01": {
+      "asset": "observation_post",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/observation_post",
+      "production_dir": "art/gen/placeables/base/observation_post",
+      "runtime_target": "eras/e0-1978/base/observation.png",
+      "prompt_file": "art/prompts/ob01_observation_e0.md",
+      "colors": 32,
+      "pixel_size": 5,
+      "canvas": [
+        280,
+        280
+      ],
+      "registration": [
+        140,
+        276
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/observation_post/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
     }
   }
 }

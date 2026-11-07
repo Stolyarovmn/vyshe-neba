@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "1af4b321cff156d92c2ba11f87df81aa84384e8d459c1ee4d6dda026bebf961c",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "975f643d60d1e66bd9c929196a9ed0773fe6601287176b0e520a47d404f960d9",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Дальняя кромка крыши 1162 px между центрами против ближней 1219 px, отношение 95,32%. Передний фасад низкий, дверь и кабельный ввод находятся на доступной южной стороне. В сцене при ширине 44 px и (1320,250) порог опирается на грунт. Соседний наблюдательный комплекс ещё требует собственного масштабирования, поэтому совместная приёмка остаётся отдельной."
+}

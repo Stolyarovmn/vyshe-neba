@@ -1,0 +1,18 @@
+{
+  "asset": "observation_post",
+  "production_sha256": "b2e760e342b456d803f2ae09d97b84c0e90f3128e9af5e7076efc5c1be78efc2",
+  "runtime_sha256": "419da98ed6e2db57f4411e61b07a7c8cb875dcc14ea3350c273ca05f67651738",
+  "approved": true,
+  "sha256": "419da98ed6e2db57f4411e61b07a7c8cb875dcc14ea3350c273ca05f67651738",
+  "promotion_manifest_sha256": "11cad24a2065baadee1cce99fce528fecd7494c3f60cb3877f4a95564b500dba",
+  "approval_scope": "\u0422\u043e\u0447\u043d\u0430\u044f \u043e\u0431\u0440\u0435\u0437\u043a\u0430 \u043f\u0440\u043e\u0437\u0440\u0430\u0447\u043d\u044b\u0445 \u043f\u043e\u043b\u0435\u0439 \u043f\u0440\u0438\u043d\u044f\u0442\u043e\u0433\u043e PNG \u0431\u0435\u0437 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f \u043f\u0438\u043a\u0441\u0435\u043b\u0435\u0439 \u043e\u0431\u044a\u0435\u043a\u0442\u0430.",
+  "crop_bbox": [
+    24,
+    40,
+    255,
+    276
+  ],
+  "runtime_target": "game/assets/eras/e0-1978/base/observation.png",
+  "state": "local_preview_only",
+  "runtime_published": false
+}
