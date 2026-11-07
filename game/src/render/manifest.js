@@ -384,7 +384,7 @@ export const BUILDING_ANCHORS = {
   },
   service: {
     zone: 'service_central', anchors: [[660, 451]], size: [140, 96], footprint: [120, 28],
-    e0: { anchors: [[633, 381]], size: [71, 62], footprint: [68, 31] },
+    e0: { anchors: [[623, 381]], size: [71, 62], footprint: [68, 31] },
   },
   rescue: {
     zone: 'service_central', anchors: [[740, 340]], size: [139, 84], footprint: [120, 26],
