@@ -1,0 +1,47 @@
+{
+  "asset_id": "ENTRY_SHOP",
+  "asset": "entry_shop",
+  "zone": "base",
+  "era": "E0",
+  "year": 1978,
+  "adapter": "prepared_grid_png",
+  "source_gen_id": null,
+  "source_sha256": "7558d5dc3c894f467157f98e378bd85334a298ce5af30414d12edb3f9500480e",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1pnUswAoa4JbDcvLG1ySkkZwlHS_bMaA5"
+  },
+  "transport_sha256": "7558d5dc3c894f467157f98e378bd85334a298ce5af30414d12edb3f9500480e",
+  "transport_pixel_sha256": null,
+  "spritefusion_pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "aseprite_version": "1.3.18.6",
+  "aseprite_dithering": "none",
+  "pixel_size": 4,
+  "colors": 32,
+  "target_canvas": [
+    402,
+    241
+  ],
+  "registration_target": [
+    201,
+    237
+  ],
+  "mechanism_pivots": "pending_measured_rig_pass",
+  "output_sha256": "77071dda53ba338dd7a3bcfdb892769a20a700ac821f8214c220ceb3ee683713",
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "946b672e7f389cd84bac82d03c1b6fb3bc69bc1a2309fdb4940197705ccb7436",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": "c926a707d7530fd764161c22b02ec22cb91bacf8f52c05ef77a15823ba5681ab"
+  },
+  "publication": {
+    "state": "production",
+    "runtime_published": false,
+    "visual_review": "art/gen/placeables/base/entry_shop/visual_qa.json",
+    "visual_review_sha256": "b3afc21832ff5311bc89db711eadcbe90046a9a4541105a2bd1f34950333ccfa",
+    "hash_bound": true,
+    "runtime_boundary": "separate_main_pr"
+  }
+}
