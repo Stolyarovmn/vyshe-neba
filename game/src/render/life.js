@@ -265,10 +265,11 @@ export function drawFoam(ctx, mv, points, time) {
 
 /** Тёплое свечение огня в точке карты (ед. мира): radius — ед. мира; blink — 0/1 для мигающих. */
 export function drawGlow(ctx, mv, x, y, radius, color, strength) {
+  drawGlowScreen(ctx, mv.sx(x), mv.sy(y), radius * mv.s, color, strength);
+}
+
+export function drawGlowScreen(ctx, cx, cy, r, color, strength) {
   if (strength <= 0.02) return;
-  const cx = mv.sx(x);
-  const cy = mv.sy(y);
-  const r = radius * mv.s;
   const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
   g.addColorStop(0, `rgba(${color},${(0.65 * strength).toFixed(3)})`);
   g.addColorStop(0.35, `rgba(${color},${(0.22 * strength).toFixed(3)})`);

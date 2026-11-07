@@ -15,21 +15,30 @@ const AMBER = '#efc263';
 const AMBER_DARK = '#7a5a22';
 const LAMP_OFF = '#2a2418';
 
+export function entryScale(key, era) {
+  return era === 0 ? (WORLD_ENTRIES[key]?.e0Scale ?? 1) : 1;
+}
+
 /** Размер объекта-входа в единицах мира [ширина, высота] по sprite_px. */
 export function entrySize(key, painter, era) {
   const spec = WORLD_ENTRIES[key];
   if (!spec) return [40, 40];
-  const height = spec.size[1] * ISLAND.unitsPerPx;
+  if (era === 0 && spec.e0Size && (!spec.e0Sprite || painter?.has(spec.e0Sprite))) {
+    return spec.e0Size.map(size => size * ISLAND.unitsPerPx);
+  }
+  const scale = entryScale(key, era) * ISLAND.unitsPerPx;
+  const height = spec.size[1] * scale;
   if (key === 'workshop' && painter) {
     const asset = painter.assets.get(`station_service_lift_${eraYear(era)}`);
     if (asset) return [(height * asset.w) / asset.h, height];
   }
-  return [spec.size[0] * ISLAND.unitsPerPx, height];
+  return [spec.size[0] * scale, height];
 }
 
 /** Мировая точка якоря (ед. мира, ось Y вниз) объекта-входа. */
-export function entryWorld(key) {
-  const [px, py] = WORLD_ENTRIES[key].anchors[0];
+export function entryWorld(key, era) {
+  const spec = WORLD_ENTRIES[key];
+  const [px, py] = era === 0 && spec.e0Anchor ? spec.e0Anchor : spec.anchors[0];
   return [(px - ISLAND.launchOrigin[0]) * ISLAND.unitsPerPx, (py - ISLAND.launchOrigin[1]) * ISLAND.unitsPerPx];
 }
 
@@ -44,13 +53,15 @@ function groundShadow(ctx, view, wx, wy, widthUnits, depthUnits) {
 
 function drawWorkshop(ctx, painter, view, wx, wy, time, era) {
   const [width, height] = entrySize('workshop', painter, era);
-  groundShadow(ctx, view, wx, wy, width * 0.95, 12);
+  const scale = entryScale('workshop', era);
+  groundShadow(ctx, view, wx, wy, width * 0.95, 12 * scale);
   const drawn = painter.sprite(ctx, view, `station_service_lift_${eraYear(era)}`, wx, wy, { h: height, ax: 0.5, ay: 1, smooth: true });
   if (!drawn) {
-    const dv = designView(view, wx, wy, ISLAND.unitsPerPx);
+    const dv = designView(view, wx, wy, ISLAND.unitsPerPx * scale);
     designRect(ctx, dv, -34, -150, 68, 150, '#5a626b');
     designRect(ctx, dv, -34, -150, 68, 6, '#8a929b');
   }
+  if (era === 0) return width;
   // сигнальная лампа на верху подъёмника: мастерская «работает»
   const lit = Math.floor(time * 1.6) % 2 === 0;
   const s = view.S;
@@ -100,8 +111,8 @@ function drawSheet(ctx, dv, sheet, time, sway) {
   ctx.restore();
 }
 
-function drawBoard(ctx, view, wx, wy, time, sheets, sway) {
-  const k = ISLAND.unitsPerPx;
+function drawBoard(ctx, view, wx, wy, time, sheets, sway, era) {
+  const k = ISLAND.unitsPerPx * entryScale('board', era);
   const dv = designView(view, wx, wy, k);
   groundShadow(ctx, view, wx, wy, 78 * k, 14 * k);
   const R = (x, y, w, h, color) => designRect(ctx, dv, x, y, w, h, color);
@@ -133,7 +144,7 @@ function drawBoard(ctx, view, wx, wy, time, sheets, sway) {
 // --- Лавка ---------------------------------------------------------------------------------------------
 
 function drawShop(ctx, painter, view, wx, wy, time, era) {
-  const k = ISLAND.unitsPerPx;
+  const k = ISLAND.unitsPerPx * entryScale('shop', era);
   const dv = designView(view, wx, wy, k);
   const year = eraYear(era);
   groundShadow(ctx, view, wx, wy, 118 * k, 18 * k);
@@ -235,8 +246,43 @@ function lamp(ctx, R, dv, x, y, lit, glow) {
   }
 }
 
+function drawE0Monument(ctx, view, wx, wy, time, pulse) {
+  const metre = ISLAND.unitsPerPx * 47 / 6.5;
+  const project = ([x, y, z]) => {
+    const taper = 1 + y * 0.035;
+    return [view.sx(wx + x * metre * taper),
+      view.sy(wy + ((y - 0.78) * 0.958515 - z * 0.285) * metre * taper)];
+  };
+  const face = (points, fill) => {
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    points.map(project).forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    ctx.closePath();
+    ctx.fill();
+  };
+  const block = (w, d, base, top) => {
+    face([[-w, d, base], [w, d, base], [w, d, top], [-w, d, top]], STONE.dark);
+    face([[-w, -d, top], [w, -d, top], [w, d, top], [-w, d, top]], STONE.light);
+  };
+  block(.9, .78, 0, .14);
+  block(.72, .62, .14, .25);
+  block(.47, .39, .25, 1.09);
+  face([[-.56, .38, .98], [.56, .38, .98], [.56, -.43, 1.48], [-.56, -.43, 1.48]], STONE.mid);
+  face([[-.47, .23, 1.07], [.47, .23, 1.07], [.47, -.30, 1.40], [-.47, -.30, 1.40]], '#26312f');
+  const digit = 0.056 * metre;
+  const dv = designView(view, wx, wy - 1.12 * metre, digit);
+  drawYear((x, y, w, h, color) => designRect(ctx, dv, x, y, w, h, color), '1978', -7.5, -2.5, 1, AMBER);
+  const indicator = clamp(pulse + 0.25 + 0.1 * Math.sin(time * 2.4), 0, 1);
+  face([[-.08, .34, 1.01], [.08, .34, 1.01], [.08, .25, 1.06], [-.08, .25, 1.06]],
+    indicator > 0.3 ? AMBER : AMBER_DARK);
+}
+
 function drawMonument(ctx, view, wx, wy, time, era, pulse) {
-  const k = ISLAND.unitsPerPx;
+  if (era === 0) {
+    drawE0Monument(ctx, view, wx, wy, time, pulse);
+    return;
+  }
+  const k = ISLAND.unitsPerPx * entryScale('monument', era);
   const dv = designView(view, wx, wy, k);
   groundShadow(ctx, view, wx, wy, 52 * k, 12 * k);
   const R = (x, y, w, h, color) => designRect(ctx, dv, x, y, w, h, color);
@@ -285,12 +331,18 @@ function drawMonument(ctx, view, wx, wy, time, era, pulse) {
  */
 export function drawEntry(ctx, painter, view, key, wx, wy, time, info) {
   const era = clamp(info.era | 0, 0, 5);
+  const sprite = era === 0 && WORLD_ENTRIES[key]?.e0Sprite;
+  if (sprite && painter.has(sprite)) {
+    const [w, h] = entrySize(key, painter, era);
+    painter.sprite(ctx, view, sprite, wx, wy, { w, h, ax: 0.5, ay: 1, smooth: false });
+    return;
+  }
   switch (key) {
     case 'workshop':
       drawWorkshop(ctx, painter, view, wx, wy, time, era);
       break;
     case 'board':
-      drawBoard(ctx, view, wx, wy, time, clamp((info.contracts | 0) + 2, 3, SHEETS.length), info.sway !== false);
+      drawBoard(ctx, view, wx, wy, time, clamp((info.contracts | 0) + 2, 3, SHEETS.length), info.sway !== false, era);
       break;
     case 'shop':
       drawShop(ctx, painter, view, wx, wy, time, era);

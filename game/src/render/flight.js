@@ -9,8 +9,8 @@ import {
   createMapView, drawGroundShadow, drawIslandHd, drawSea, groundTransform,
 } from './islandmap.js';
 import { drawCloudField, fallbackClouds } from './clouds.js';
-import { drawPlacedBuildings } from './buildings.js';
-import { drawLaunchMount, drawPadRing } from './launchpad.js';
+import { drawPlacedBuildings, islandToWorld } from './buildings.js';
+import { drawLaunchMount, drawPadRing, MOUNT_RADIUS } from './launchpad.js';
 import { drawObjects, drawObjectsFront, drawRadarMarks, warmRings } from './objects.js';
 import { createRingFx } from './rings.js';
 import { drawMagnetField } from './magnet.js';
@@ -27,7 +27,11 @@ import {
   drawLimb, drawRain, drawSky, drawSkyBodies, drawStars, drawSun,
 } from './sky.js';
 import { ensureWorld } from './layout.js';
-import { spriteName } from './manifest.js';
+import { E0_DELUGE_NOZZLES, ISLAND, spriteName } from './manifest.js';
+
+const DELUGE_SOURCES_E0 = E0_DELUGE_NOZZLES.map(([px, py, direction]) =>
+  [...islandToWorld(px, py), direction]);
+const DELUGE_SOURCES_LATER = [[-MOUNT_RADIUS * 0.8, -3, 1], [MOUNT_RADIUS * 0.8, -3, -1]];
 import { clamp, createRng, lerp, smoothstep } from './util.js';
 import { weatherMood } from './weather.js';
 
@@ -59,6 +63,7 @@ export function createFlightRenderer(painter, shared) {
   const groundTr = { s: 1, ox: 0, oy: 0 };
   const shadowBox = { dx: 0, dy: 0, rx: 0, ry: 0 };
   const particles = createParticles(900);
+  const delugeParticles = createParticles(128);
   const fx = createScreenFx();
   const ringFx = createRingFx();
   const sceneInfo = { body: 'earth' };
@@ -99,6 +104,7 @@ export function createFlightRenderer(painter, shared) {
     state.body = flight && flight.body ? flight.body : 'earth';
     state.acc.flame = state.acc.smoke = state.acc.ground = state.acc.damage = state.acc.water = 0;
     particles.clear();
+    delugeParticles.clear();
     for (const piece of pieces) piece.active = false;
     camera.reset();
     fx.flash = 0;
@@ -272,14 +278,20 @@ export function createFlightRenderer(painter, shared) {
       );
     }
     if (body === 'earth' && profile && profile.buildings && (profile.buildings.deluge | 0) > 0 && alt < 40) {
-      state.acc.water += dt * 60 * reduce;
+      const sources = (profile.buildings.deluge | 0) === 1 ? DELUGE_SOURCES_E0 : DELUGE_SOURCES_LATER;
+      state.acc.water += dt * (60 / sources.length) * reduce;
       while (state.acc.water >= 1) {
         state.acc.water -= 1;
-        particles.emit(
-          PARTICLE.SPARK, 235 + (rng() - 0.5) * 14, -26, -(50 + rng() * 70), -(30 + rng() * 55),
-          0.9, 2.2, 1, 150, 0.2, PALETTE_VARIANT.CYAN,
-        );
-        if (rng() < 0.25) particles.emit(PARTICLE.STEAM, 20 + rng() * 90, -3, (rng() - 0.5) * 20, -(8 + rng() * 14), 1.4, 5, 13, -4, 1, 0);
+        for (const [x, y, direction] of sources) {
+          const nozzleX = sources === DELUGE_SOURCES_E0 ? x + direction * 3 * ISLAND.unitsPerPx : x;
+          const speed = 36 + rng() * 18;
+          const travelTime = Math.abs(nozzleX) / speed;
+          delugeParticles.emit(
+            PARTICLE.SPARK, nozzleX, y, direction * speed, 0,
+            travelTime, 2.2, 1, 0, 0, PALETTE_VARIANT.CYAN,
+          );
+          if (rng() < 0.25) delugeParticles.emit(PARTICLE.STEAM, nozzleX * 0.4, y, (rng() - 0.5) * 20, -(8 + rng() * 14), 1.4, 5, 13, -4, 1, 0);
+        }
       }
     }
   }
@@ -407,6 +419,8 @@ export function createFlightRenderer(painter, shared) {
       drawGroundShadow(ctx, mapView, flight.x + g.dx, g.dy, g.rx, g.ry, shadow);
       drawLaunchMount(ctx, mapView, state.era, time);
       if (profile) drawPlacedBuildings(ctx, painter, mapView, profile, time, null);
+      delugeParticles.draw(ctx, mapView, 0);
+      delugeParticles.draw(ctx, mapView, 1);
     }
     ctx.globalAlpha = previous;
   }
@@ -476,6 +490,7 @@ export function createFlightRenderer(painter, shared) {
     emitWreck(dt);
     updatePieces(dt);
     particles.update(dt, 0);
+    delugeParticles.update(dt);
 
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);

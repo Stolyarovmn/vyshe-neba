@@ -203,7 +203,19 @@ function buildAssetFiles() {
   return files;
 }
 
-export const ASSET_FILES = buildAssetFiles();
+export const ASSET_FILES = {
+  ...buildAssetFiles(),
+  deluge_nozzle_1978: `${eraFolder(0)}base/deluge-nozzle.png`,
+  pad_gate_pedestal_1978: `${eraFolder(0)}base/pad-gate-pedestal.png`,
+  pad_gate_receiver_1978: `${eraFolder(0)}base/pad-gate-receiver.png`,
+  deluge_manifold_1978: `${eraFolder(0)}base/deluge-manifold.png`,
+  deluge_outlet_1978: `${eraFolder(0)}base/deluge-outlet.png`,
+  gantry_inlet_1978: `${eraFolder(0)}base/gantry-inlet.png`,
+  beacons_junction_1978: `${eraFolder(0)}base/beacons-junction.png`,
+  feeder_pole_1978: `${eraFolder(0)}base/feeder-pole.png`,
+  entry_shop_1978: `${eraFolder(0)}base/entry-shop.png`,
+  entry_board_1978: `${eraFolder(0)}base/entry-contract-board.png`,
+};
 
 // Размеры [ширина, высота] по эпохам (индекс = эпоха 0..5).
 export const ERA_SPRITE_SIZES = {
@@ -355,29 +367,83 @@ ISLAND.topUnits = -ISLAND.launchOrigin[1] * ISLAND.unitsPerPx;
 
 // anchors: [[x, y], ...] px острова; size: видимый спрайт [w, h] px; footprint: след на земле [w, глубина] px.
 export const BUILDING_ANCHORS = {
-  beacons: { zone: 'launch_core', anchors: [[284, 396], [492, 396]], size: [44, 89], footprint: [40, 16] },
-  gantry: { zone: 'launch_core', anchors: [[484, 267]], size: [125, 190], footprint: [108, 32] },
-  deluge: { zone: 'launch_core', anchors: [[526, 528]], size: [122, 150], footprint: [105, 30] },
-  service: { zone: 'service_central', anchors: [[660, 451]], size: [140, 96], footprint: [120, 28] },
-  rescue: { zone: 'service_central', anchors: [[740, 340]], size: [139, 84], footprint: [120, 26] },
-  fuel: { zone: 'fuel_east', anchors: [[870, 470]], size: [160, 82], footprint: [138, 26] },
-  logistics: { zone: 'logistics_east', anchors: [[1200, 470]], size: [141, 125], footprint: [121, 30] },
-  factory: { zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34] },
-  weather: { zone: 'command_north', anchors: [[1000, 350]], size: [140, 171], footprint: [100, 28] },
-  control: { zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34] },
-  radar: { zone: 'command_north', anchors: [[798, 174]], size: [150, 88], footprint: [92, 24] },
-  energy: { zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30] },
-  observation: { zone: 'perimeter_east', anchors: [[1378, 378]], size: [138, 150], footprint: [119, 30] },
-  recovery: { zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28] },
+  beacons: {
+    zone: 'launch_core', anchors: [[284, 396], [492, 396]], size: [44, 89], footprint: [40, 16],
+    e0: {
+      anchors: [[284, 396], [492, 396]], size: [4, 7], footprint: [4, 3.5],
+      lamp: [2.5 / 4, 0.5 / 7], smooth: false,
+    },
+  },
+  gantry: {
+    zone: 'launch_core', anchors: [[484, 267]], size: [125, 190], footprint: [108, 32],
+    e0: { anchors: [[458, 330]], size: [56, 32], footprint: [56, 30] },
+  },
+  deluge: {
+    zone: 'launch_core', anchors: [[526, 528]], size: [122, 150], footprint: [105, 30],
+    e0: { anchors: [[542, 461]], size: [58, 58], footprint: [58, 32] },
+  },
+  service: {
+    zone: 'service_central', anchors: [[660, 451]], size: [140, 96], footprint: [120, 28],
+    e0: { anchors: [[623, 381]], size: [71, 62], footprint: [68, 31] },
+  },
+  rescue: {
+    zone: 'service_central', anchors: [[740, 340]], size: [139, 84], footprint: [120, 26],
+    e0: { anchors: [[830, 501]], size: [47, 60], footprint: [45, 53] },
+  },
+  fuel: {
+    zone: 'fuel_east', anchors: [[870, 470]], size: [160, 82], footprint: [138, 26],
+    e0: { anchors: [[870, 470]], size: [23, 15], footprint: [23, 11] },
+  },
+  logistics: {
+    zone: 'logistics_east', anchors: [[1200, 470]], size: [141, 125], footprint: [121, 30],
+    e0: { anchors: [[1200, 470]], size: [44, 28], footprint: [44, 28] },
+  },
+  factory: {
+    zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34],
+    e0: { anchors: [[920, 255]], size: [70, 49], footprint: [67, 42] },
+  },
+  weather: {
+    zone: 'command_north', anchors: [[1000, 350]], size: [140, 171], footprint: [100, 28],
+    e0: { anchors: [[1060, 280]], size: [7, 13], footprint: [7, 5], smooth: false },
+  },
+  control: {
+    zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34],
+    e0: { anchors: [[1320, 250]], size: [44, 30], footprint: [43, 24] },
+  },
+  radar: {
+    zone: 'command_north', anchors: [[798, 174]], size: [150, 88], footprint: [92, 24],
+    e0: { anchors: [[830, 265]], size: [27, 16], footprint: [11, 9], smooth: false },
+  },
+  energy: {
+    zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30],
+    e0: { anchors: [[1535, 403]], size: [34, 22], footprint: [32, 18] },
+  },
+  observation: {
+    zone: 'perimeter_east', anchors: [[1378, 378]], size: [138, 150], footprint: [119, 30],
+    e0: { anchors: [[1420, 273]], size: [24, 25], footprint: [24, 23] },
+  },
+  recovery: {
+    zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28],
+    e0: { anchors: [[1505, 440]], size: [41, 32], footprint: [41, 32] },
+  },
 };
+
+export const E0_DELUGE_NOZZLES = [
+  [351, 443, 1], [426, 443, -1],
+  [351, 456, 1], [426, 456, -1],
+];
 
 // Объекты-входы в мире (не покупаются): тап открывает экран. Раздел entries в BASE_ISLAND_LAYOUT.json.
 export const ENTRY_KEYS = ['workshop', 'board', 'shop', 'monument'];
 export const WORLD_ENTRIES = {
-  workshop: { zone: 'launch_core', anchors: [[330, 262]], size: [130, 157], footprint: [114, 28] },
-  monument: { zone: 'launch_core', anchors: [[232, 276]], size: [50, 120], footprint: [44, 22] },
-  board: { zone: 'launch_core', anchors: [[210, 352]], size: [78, 72], footprint: [60, 20] },
-  shop: { zone: 'launch_core', anchors: [[578, 352]], size: [120, 98], footprint: [110, 30] },
+  workshop: { zone: 'launch_core', anchors: [[330, 262]], size: [130, 157], footprint: [114, 28],
+    e0Scale: 0.3, e0Anchor: [365, 270] },
+  monument: { zone: 'launch_core', anchors: [[232, 276]], size: [50, 120], footprint: [44, 22],
+    e0Size: [14, 12], e0Anchor: [295, 307] },
+  board: { zone: 'launch_core', anchors: [[210, 352]], size: [78, 72], footprint: [60, 20],
+    e0Scale: 0.2, e0Anchor: [225, 360], e0Sprite: 'entry_board_1978', e0Size: [13, 7] },
+  shop: { zone: 'launch_core', anchors: [[578, 352]], size: [120, 98], footprint: [110, 30],
+    e0Scale: 0.3, e0Anchor: [542, 369], e0Sprite: 'entry_shop_1978', e0Size: [30, 18] },
 };
 
 // Дороги острова (пиксели острова): по ним ездят машины и летают дроны.

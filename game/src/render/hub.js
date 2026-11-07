@@ -5,13 +5,14 @@
 import { createMapView, drawIslandHd, drawSea } from './islandmap.js';
 import { ensureWorld } from './layout.js';
 import {
-  BUILDING_ANCHORS, ENTRY_KEYS, ISLAND, WORLD_ENTRIES, eraYear, spriteName,
+  BUILDING_ANCHORS, E0_DELUGE_NOZZLES, ENTRY_KEYS, ISLAND, WORLD_ENTRIES, eraYear, spriteName,
 } from './manifest.js';
-import { buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
-import { drawEntry, drawEntryHint, entrySize, entryWorld } from './entries.js';
+import { buildingLayout, buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
+import { powerBalance } from '../rules/base.js';
+import { drawEntry, drawEntryHint, entryScale, entrySize, entryWorld } from './entries.js';
 import { BUILD_DURATION, createHubFx, drawScaffold } from './hubfx.js';
 import {
-  dayOverlay, daylightAt, drawBirds, drawFoam, drawGlow, drawHeadlights, drawVehicles, lightsAt, shorePoints,
+  dayOverlay, daylightAt, drawBirds, drawFoam, drawGlow, drawGlowScreen, drawHeadlights, drawVehicles, lightsAt, shorePoints,
 } from './life.js';
 import { MOUNT_RADIUS, drawLaunchMount } from './launchpad.js';
 import { createRocketPose, drawRocket, stackHeight } from './rocket.js';
@@ -65,6 +66,7 @@ export function createHub(painter, shared) {
     ready: false,
     orientation: '',
     selected: null,
+    buildingLevels: {},
     pending: null,
     lastTime: null,
     devW: 1,
@@ -82,7 +84,10 @@ export function createHub(painter, shared) {
     { x: 27, y: 21, rate: 5, drift: 1 },
     { x: 0, y: 60, rate: 3, drift: 0 },
   ];
-  // водяная взвесь у сопел охлаждения: сопла башни справа и на две трети высоты, поэтому точка считается по якорю постройки
+  const mistVentsE0 = E0_DELUGE_NOZZLES.map(([px, py, direction]) => {
+    const [x, y] = islandToWorld(px, py);
+    return { x, y, rate: 2, drift: direction * 2 };
+  });
   const mistVent = (() => {
     const spec = BUILDING_ANCHORS.deluge;
     const [wx, wy] = islandToWorld(spec.anchors[0][0], spec.anchors[0][1]);
@@ -197,15 +202,17 @@ export function createHub(painter, shared) {
       let y;
       let zoom = clamp(state.devW / 380 / state.sFit, 1, maxZoom());
       if (typeof target === 'string' && BUILDING_ANCHORS[target]) {
-        const anchor = BUILDING_ANCHORS[target].anchors[0];
+        const level = state.buildingLevels[target] || 1;
+        const layout = buildingLayout(target, level);
+        const anchor = layout.anchors[0];
         const [wx, wy] = islandToWorld(anchor[0], anchor[1]);
-        const heightUnits = BUILDING_ANCHORS[target].size[1] * ISLAND.unitsPerPx;
+        const heightUnits = layout.size[1] * ISLAND.unitsPerPx;
         x = wx;
         y = wy - heightUnits * 0.4;
       } else if (typeof target === 'string' && WORLD_ENTRIES[target]) {
-        const [wx, wy] = entryWorld(target);
+        const [wx, wy] = entryWorld(target, state.era);
         x = wx;
-        y = wy - WORLD_ENTRIES[target].size[1] * ISLAND.unitsPerPx * 0.4;
+        y = wy - entrySize(target, painter, state.era)[1] * 0.4;
       } else if (target && typeof target === 'object') {
         x = target.x;
         y = target.y;
@@ -323,6 +330,7 @@ export function createHub(painter, shared) {
      */
     draw(ctx, params) {
       const { profile, time, layout } = params;
+      state.buildingLevels = profile?.buildings ?? {};
       const weather = params.weather || null;
       if (shared) shared.profile = profile;
       if (params.selected !== undefined) state.selected = params.selected;
@@ -372,6 +380,7 @@ export function createHub(painter, shared) {
       const night = lightsAt(daylight);
 
       const era = profile ? clamp(profile.era | 0, 0, 5) : 0;
+      state.era = era;
       const parts = profile && profile.parts ? profile.parts : {};
       const owned = profile && profile.buildings ? profile.buildings : {};
       const ownedCount = Object.keys(owned).filter((key) => (owned[key] | 0) > 0).length;
@@ -379,7 +388,9 @@ export function createHub(painter, shared) {
       // эффекты: стройка, праздник, пар
       fx.update(dt, reduce, (key) => buildBoxes(painter, key, owned[key] | 0), mv);
       fx.steam(dt, vents, reduce ? 0.4 : 1);
-      if (owned.deluge > 0) fx.steam(dt, mistVent, reduce ? 0.3 : 0.8);
+      if (owned.deluge > 0 && (fx.buildState('deluge', reduce)?.reveal ?? 1) >= 1) {
+        fx.steam(dt, owned.deluge === 1 ? mistVentsE0 : mistVent, reduce ? 0.3 : 0.8);
+      }
 
       drawSea(ctx, mv, time, mood);
       drawIslandHd(ctx, painter, mv);
@@ -408,7 +419,7 @@ export function createHub(painter, shared) {
       };
       const contracts = profile && profile.contracts && profile.contracts.active ? profile.contracts.active.length : 0;
       const entryItems = ENTRY_KEYS.map((key) => {
-        const [wx, wy] = entryWorld(key);
+        const [wx, wy] = entryWorld(key, era);
         return {
           y: wy,
           draw() {
@@ -423,7 +434,8 @@ export function createHub(painter, shared) {
         scaffold: (c, box, build) => drawScaffold(c, mv, box, build.reveal, build.scaffold, time),
       });
       fx.draw(ctx, mv, 0);
-      drawHubDrones(ctx, painter, mv, profile, time);
+      // У E0 нет подтверждённой роли и конструкции автономного летающего сервиса.
+      if (era > 0) drawHubDrones(ctx, painter, mv, profile, time);
       drawHubPlanes(ctx, painter, mv, time, profile);
       if (!reduce) drawBirds(ctx, mv, time);
       drawHubClouds(ctx, painter, mv, time, mood, state.zoom);
@@ -444,7 +456,8 @@ export function createHub(painter, shared) {
       if (lightStrength > 0.03) {
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
-        drawNightLights(ctx, painter, mv, profile, time, lightStrength, era);
+        drawNightLights(ctx, painter, mv, profile, time, lightStrength, era,
+          fx.buildState('beacons', reduce)?.reveal ?? 1);
         ctx.restore();
         drawHeadlights(ctx, mv, time, vehicleCount(ownedCount), night);
       }
@@ -474,7 +487,7 @@ export function vehicleCount(ownedCount) {
 
 /** Рамки здания key (ед. мира, y — низ) по его якорям: для стройки и эффектов. */
 function buildBoxes(painter, key, level) {
-  const spec = BUILDING_ANCHORS[key];
+  const spec = buildingLayout(key, level);
   if (!spec || level <= 0) return null;
   const [w, h] = buildingSize(painter, key, level);
   return spec.anchors.map(([px, py]) => {
@@ -487,8 +500,9 @@ const GLOW_WARM = '255,206,120';
 const GLOW_RED = '255,90,70';
 
 /** Ночные огни построек, стола, объектов-входов: ровные и мигающие; strength 0..1. */
-function drawNightLights(ctx, painter, mv, profile, time, strength, era) {
+function drawNightLights(ctx, painter, mv, profile, time, strength, era, beaconReveal) {
   const owned = profile && profile.buildings ? profile.buildings : {};
+  const beaconPower = owned.beacons > 0 ? powerBalance(profile).ratio : 1;
   for (let i = 0; i < 4; i++) {
     const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
     const on = (Math.floor(time * 1.5) + i) % 2 === 0;
@@ -497,23 +511,48 @@ function drawNightLights(ctx, painter, mv, profile, time, strength, era) {
   for (const key of Object.keys(BUILDING_ANCHORS)) {
     const level = owned[key] | 0;
     if (level <= 0) continue;
+    if (key === 'beacons' && beaconReveal < 1) continue;
     const [w, h] = buildingSize(painter, key, level);
     const blinking = key === 'beacons' || key === 'radar' || key === 'recovery';
     const on = !blinking || Math.floor(time * 1.4 + hash2(key.length, level, 3)) % 2 === 0;
-    BUILDING_ANCHORS[key].anchors.forEach(([px, py], i) => {
+    const layout = buildingLayout(key, level);
+    // В E0 свечение привязано только к подтверждённой физической лампе.
+    if (level === 1 && !layout.lamp) continue;
+    layout.anchors.forEach(([px, py], i) => {
       const [x, y] = islandToWorld(px, py);
-      drawGlow(ctx, mv, x, y - h * (key === 'beacons' ? 0.78 : 0.42), Math.max(w, h) * (key === 'beacons' ? 0.4 : 0.55), blinking ? GLOW_RED : GLOW_WARM, strength * (on ? 0.9 : 0.3));
+      const lamp = layout.lamp;
+      const intensity = strength * (on ? 0.9 : 0.3) * (key === 'beacons' ? beaconPower : 1);
+      const radius = Math.max(w, h) * (key === 'beacons' ? 0.4 : 0.55);
+      const color = blinking ? GLOW_RED : GLOW_WARM;
+      if (lamp) {
+        // Совпадает с округлением размера и якоря в painter.blitSource.
+        const width = Math.max(1, Math.round(w * mv.S));
+        const height = Math.max(1, Math.round(h * mv.S));
+        const offsetX = lamp[0] * width - Math.round(width / 2);
+        const lightX = mv.sx(x) + (i > 0 ? -offsetX : offsetX);
+        const lightY = mv.sy(y) - height + lamp[1] * height;
+        drawGlowScreen(ctx, lightX, lightY, radius * mv.s, color, intensity);
+      } else {
+        drawGlow(ctx, mv, x, y - h * (key === 'beacons' ? 0.78 : 0.42), radius, color, intensity);
+      }
       if (i === 0 && !blinking) drawGlow(ctx, mv, x + w * 0.25, y - h * 0.2, w * 0.35, GLOW_WARM, strength * 0.6);
     });
   }
-  const [wx, wy] = entryWorld('workshop');
-  drawGlow(ctx, mv, wx, wy - 50, 34, GLOW_WARM, strength * 0.75);
-  const [sx, sy] = entryWorld('shop');
-  drawGlow(ctx, mv, sx, sy - 32, 46, GLOW_WARM, strength * 0.9);
-  const [mx, my] = entryWorld('monument');
-  const k = ISLAND.unitsPerPx;
-  for (let i = 0; i <= era; i++) drawGlow(ctx, mv, mx + (-11.5 + i * 4.6) * k, my - 62 * k, 8, GLOW_WARM, strength * 0.9);
-  drawGlow(ctx, mv, mx, my - 122 * k, 12, GLOW_WARM, strength);
+  if (era !== 0) {
+    const [wx, wy] = entryWorld('workshop', era);
+    drawGlow(ctx, mv, wx, wy - 50, 34, GLOW_WARM, strength * 0.75);
+  }
+  const [sx, sy] = entryWorld('shop', era);
+  const shopScale = entryScale('shop', era);
+  if (era !== 0 || !painter.has(WORLD_ENTRIES.shop.e0Sprite)) {
+    drawGlow(ctx, mv, sx, sy - 32 * shopScale, 46 * shopScale, GLOW_WARM, strength * 0.9);
+  }
+  if (era !== 0) {
+    const [mx, my] = entryWorld('monument', era);
+    const k = ISLAND.unitsPerPx;
+    for (let i = 0; i <= era; i++) drawGlow(ctx, mv, mx + (-11.5 + i * 4.6) * k, my - 62 * k, 8, GLOW_WARM, strength * 0.9);
+    drawGlow(ctx, mv, mx, my - 122 * k, 12, GLOW_WARM, strength);
+  }
 }
 
 function drawCapsuleOnCart(ctx, painter, mv, era) {
