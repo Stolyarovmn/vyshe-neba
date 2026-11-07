@@ -411,7 +411,10 @@ export const BUILDING_ANCHORS = {
     zone: 'perimeter_east', anchors: [[1378, 378]], size: [138, 150], footprint: [119, 30],
     e0: { anchors: [[1420, 273]], size: [24, 25], footprint: [24, 23] },
   },
-  recovery: { zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28] },
+  recovery: {
+    zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28],
+    e0: { anchors: [[1505, 440]], size: [41, 32], footprint: [41, 32] },
+  },
 };
 
 export const E0_DELUGE_NOZZLES = [
