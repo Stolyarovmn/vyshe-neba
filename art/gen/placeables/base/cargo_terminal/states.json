@@ -1,7 +1,7 @@
 {
   "asset": "B07 cargo_terminal",
   "era": "E0",
-  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слои частей и pivots ещё не сделаны: pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
+  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слой и pivot части ON сделаны (animation.json); остальные части pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
   "states": {
     "PRESS": {
       "trigger": "tap on the hoist or the building",
@@ -26,14 +26,28 @@
         "crate"
       ],
       "motion": "тележка идёт по балке от платформы к приёмной площадке, крюк опускается и поднимается, ящик переходит с платформы на площадку",
-      "frames": 16,
+      "frames": 13,
       "fps": 10,
       "loop": false,
       "reduce_motion": "один конечный кадр: ящик стоит на приёмной площадке",
       "code_fx": [
         "chain_rattle_sound"
       ],
-      "why": "показывает, что груз по контракту действительно перемещён, а не просто засчитан в счётчике"
+      "why": "показывает, что груз по контракту действительно перемещён, а не просто засчитан в счётчике",
+      "animation": {
+        "file": "animation.json",
+        "clip": "ON",
+        "part": "trolley_hoist_hook",
+        "pivot": [
+          150,
+          12
+        ],
+        "range_px": [
+          0,
+          24
+        ],
+        "motion": "translate_x"
+      }
     },
     "BLOCKED": {
       "trigger": "requirement_missing",
@@ -67,5 +81,5 @@
     "path": "art/gen/placeables/base/cargo_terminal/e0_1978.png",
     "sha256": "ae7c00f7d5fc4bf0f8171a4d78158ada84e643c4f8282e35b6e8310d8abd920f"
   },
-  "mechanism_pivots": "pending_measured_rig_pass"
+  "mechanism_pivots": "measured_for_ON_part_only (animation.json); remaining parts pending_measured_rig_pass"
 }

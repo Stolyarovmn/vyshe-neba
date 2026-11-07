@@ -1,7 +1,7 @@
 {
   "asset": "BI-FACTORY assembly_workshop",
   "era": "E0",
-  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слои частей и pivots ещё не сделаны: pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
+  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слой и pivot части ON сделаны (animation.json); остальные части pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
   "states": {
     "PRESS": {
       "trigger": "tap on the workshop",
@@ -24,7 +24,7 @@
         "hoist_hook"
       ],
       "motion": "створка ворот уезжает по рельсу на 2,4 м, крюк тали опускается к секции на седлах и поднимается",
-      "frames": 12,
+      "frames": 13,
       "fps": 10,
       "loop": false,
       "reduce_motion": "один конечный кадр: ворота открыты",
@@ -32,7 +32,21 @@
         "gate_rumble_sound",
         "chimney_smoke_event"
       ],
-      "why": "показывает, что ступень собрана и готова выйти по рельсу; дым трубы — событие кода, а не часть спрайта"
+      "why": "показывает, что ступень собрана и готова выйти по рельсу; дым трубы — событие кода, а не часть спрайта",
+      "animation": {
+        "file": "animation.json",
+        "clip": "ON",
+        "part": "gate_leaf",
+        "pivot": [
+          58,
+          51
+        ],
+        "range_px": [
+          0,
+          30
+        ],
+        "motion": "translate_x"
+      }
     },
     "BLOCKED": {
       "trigger": "requirement_missing",
@@ -67,5 +81,5 @@
     "path": "art/gen/placeables/base/assembly_workshop/e0_1978.png",
     "sha256": "0e0e97ad6d865294cd4ab87d0b8956bc11897cad182e3a2323ab631e7ee53935"
   },
-  "mechanism_pivots": "pending_measured_rig_pass"
+  "mechanism_pivots": "measured_for_ON_part_only (animation.json); remaining parts pending_measured_rig_pass"
 }

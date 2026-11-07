@@ -1,0 +1,63 @@
+{
+  "asset": "cargo_terminal",
+  "era": "E0",
+  "source_sprite": {
+    "path": "art/gen/placeables/base/cargo_terminal/e0_1978.runtime.png",
+    "sha256": "c9a2b53afb5e6f50724e73d0729e3af10b90110e17d6d785e2f8e502646c28ff",
+    "size": [
+      286,
+      116
+    ]
+  },
+  "clips": {
+    "ON": {
+      "trigger": "см. states.json (ON)",
+      "frames": 13,
+      "fps": 10,
+      "loop": false,
+      "frame_size": [
+        286,
+        116
+      ],
+      "sheet": "animation/on_sheet.png",
+      "sheet_sha256": "6611ef5d9d09609f92854dd69b674da626de1bec980c9df39d1f243733434650",
+      "preview_gif": "animation/on.gif",
+      "rest_frame": 0,
+      "reduce_motion_frame": 6,
+      "parts": [
+        {
+          "part": "trolley_hoist_hook",
+          "box": [
+            133,
+            8,
+            167,
+            58
+          ],
+          "pivot": [
+            150,
+            12
+          ],
+          "motion": "translate_x",
+          "range_px": [
+            0,
+            24
+          ],
+          "why": "тележка с цепной талью идёт по балке от стоянки груза к приёмной площадке"
+        }
+      ],
+      "method": "часть вырезана из утверждённого спрайта, фон под ней восстановлен копией соседнего фона того же спрайта, смещение целыми пикселями на той же сетке",
+      "palette_colors": {
+        "base": 32,
+        "all_frames": 32
+      }
+    }
+  },
+  "pivot_policy": "измерены по утверждённому спрайту, указаны в parts[].pivot (пиксели runtime-кадра)",
+  "code_owned": [
+    "свет",
+    "звук",
+    "дым",
+    "тени событий"
+  ],
+  "runtime_integration": "не подключено: рендер берёт статичный кадр; подключение анимации отдельным изменением кода"
+}

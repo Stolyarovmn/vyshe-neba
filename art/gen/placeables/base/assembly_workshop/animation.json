@@ -1,0 +1,63 @@
+{
+  "asset": "assembly_workshop",
+  "era": "E0",
+  "source_sprite": {
+    "path": "art/gen/placeables/base/assembly_workshop/e0_1978.runtime.png",
+    "sha256": "3628aa8292caa242fab3746ecd37c82b9de69f4da7bf682181017fe8aff6786a",
+    "size": [
+      283,
+      207
+    ]
+  },
+  "clips": {
+    "ON": {
+      "trigger": "см. states.json (ON)",
+      "frames": 13,
+      "fps": 10,
+      "loop": false,
+      "frame_size": [
+        283,
+        207
+      ],
+      "sheet": "animation/on_sheet.png",
+      "sheet_sha256": "f7bb5d9cb72f339de7c19682f3b9dab15d212305299c367c18904464c5f07d63",
+      "preview_gif": "animation/on.gif",
+      "rest_frame": 0,
+      "reduce_motion_frame": 6,
+      "parts": [
+        {
+          "part": "gate_leaf",
+          "box": [
+            54,
+            51,
+            141,
+            84
+          ],
+          "pivot": [
+            58,
+            51
+          ],
+          "motion": "translate_x",
+          "range_px": [
+            0,
+            30
+          ],
+          "why": "створка ворот уезжает по рельсу, проём открывает выход секции ступени на путь"
+        }
+      ],
+      "method": "часть вырезана из утверждённого спрайта, фон под ней восстановлен копией соседнего фона того же спрайта, смещение целыми пикселями на той же сетке",
+      "palette_colors": {
+        "base": 32,
+        "all_frames": 32
+      }
+    }
+  },
+  "pivot_policy": "измерены по утверждённому спрайту, указаны в parts[].pivot (пиксели runtime-кадра)",
+  "code_owned": [
+    "свет",
+    "звук",
+    "дым",
+    "тени событий"
+  ],
+  "runtime_integration": "не подключено: рендер берёт статичный кадр; подключение анимации отдельным изменением кода"
+}

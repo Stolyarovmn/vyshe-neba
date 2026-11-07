@@ -1,7 +1,7 @@
 {
   "asset": "BI-RETURN capsule_return_station",
   "era": "E0",
-  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слои частей и pivots ещё не сделаны: pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
+  "status": "Спрайт промотирован в game-production 2026-11-07; состояния описывают рабочие части закрытого списка. Слой и pivot части ON сделаны (animation.json); остальные части pending_measured_rig_pass. Анимация PRESS/ON/DENIED собирается из частей утверждённого спрайта на той же сетке; до этого в игре виден статичный кадр, BLOCKED показывается вариантом покоя.",
   "states": {
     "PRESS": {
       "trigger": "tap on the winch",
@@ -26,14 +26,28 @@
         "winch_drum"
       ],
       "motion": "стрела поворачивается над люлькой, барабан мотает трос, крюковая обойма опускается к капсуле и поднимает её на люльку",
-      "frames": 20,
+      "frames": 9,
       "fps": 10,
       "loop": false,
       "reduce_motion": "один конечный кадр: капсула стоит на люльке",
       "code_fx": [
         "rope_creak_sound"
       ],
-      "why": "возврат капсулы — главная награда здания; игрок должен увидеть, что её подняли и бережно поставили на резину"
+      "why": "возврат капсулы — главная награда здания; игрок должен увидеть, что её подняли и бережно поставили на резину",
+      "animation": {
+        "file": "animation.json",
+        "clip": "ON",
+        "part": "hook_block",
+        "pivot": [
+          126,
+          30
+        ],
+        "range_px": [
+          0,
+          8
+        ],
+        "motion": "translate_y"
+      }
     },
     "BLOCKED": {
       "trigger": "requirement_missing",
@@ -67,5 +81,5 @@
     "path": "art/gen/placeables/base/capsule_return_station/e0_1978.png",
     "sha256": "7819f1d3ebab21d008754a62a344f62fba90927cbb3de8ca0e463d7df7983ac4"
   },
-  "mechanism_pivots": "pending_measured_rig_pass"
+  "mechanism_pivots": "measured_for_ON_part_only (animation.json); remaining parts pending_measured_rig_pass"
 }
