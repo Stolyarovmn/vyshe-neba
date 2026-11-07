@@ -23,7 +23,7 @@ export function entryScale(key, era) {
 export function entrySize(key, painter, era) {
   const spec = WORLD_ENTRIES[key];
   if (!spec) return [40, 40];
-  if (era === 0 && spec.e0Size && painter?.has(spec.e0Sprite)) {
+  if (era === 0 && spec.e0Size && (!spec.e0Sprite || painter?.has(spec.e0Sprite))) {
     return spec.e0Size.map(size => size * ISLAND.unitsPerPx);
   }
   const scale = entryScale(key, era) * ISLAND.unitsPerPx;
@@ -246,7 +246,42 @@ function lamp(ctx, R, dv, x, y, lit, glow) {
   }
 }
 
+function drawE0Monument(ctx, view, wx, wy, time, pulse) {
+  const metre = ISLAND.unitsPerPx * 47 / 6.5;
+  const project = ([x, y, z]) => {
+    const taper = 1 + y * 0.035;
+    return [view.sx(wx + x * metre * taper),
+      view.sy(wy + ((y - 0.78) * 0.958515 - z * 0.285) * metre * taper)];
+  };
+  const face = (points, fill) => {
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    points.map(project).forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    ctx.closePath();
+    ctx.fill();
+  };
+  const block = (w, d, base, top) => {
+    face([[-w, d, base], [w, d, base], [w, d, top], [-w, d, top]], STONE.dark);
+    face([[-w, -d, top], [w, -d, top], [w, d, top], [-w, d, top]], STONE.light);
+  };
+  block(.9, .78, 0, .14);
+  block(.72, .62, .14, .25);
+  block(.47, .39, .25, 1.09);
+  face([[-.56, .38, .98], [.56, .38, .98], [.56, -.43, 1.48], [-.56, -.43, 1.48]], STONE.mid);
+  face([[-.47, .23, 1.07], [.47, .23, 1.07], [.47, -.30, 1.40], [-.47, -.30, 1.40]], '#26312f');
+  const digit = 0.056 * metre;
+  const dv = designView(view, wx, wy - 1.12 * metre, digit);
+  drawYear((x, y, w, h, color) => designRect(ctx, dv, x, y, w, h, color), '1978', -7.5, -2.5, 1, AMBER);
+  const indicator = clamp(pulse + 0.25 + 0.1 * Math.sin(time * 2.4), 0, 1);
+  face([[-.08, .34, 1.01], [.08, .34, 1.01], [.08, .25, 1.06], [-.08, .25, 1.06]],
+    indicator > 0.3 ? AMBER : AMBER_DARK);
+}
+
 function drawMonument(ctx, view, wx, wy, time, era, pulse) {
+  if (era === 0) {
+    drawE0Monument(ctx, view, wx, wy, time, pulse);
+    return;
+  }
   const k = ISLAND.unitsPerPx * entryScale('monument', era);
   const dv = designView(view, wx, wy, k);
   groundShadow(ctx, view, wx, wy, 52 * k, 12 * k);

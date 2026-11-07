@@ -439,7 +439,7 @@ export const WORLD_ENTRIES = {
   workshop: { zone: 'launch_core', anchors: [[330, 262]], size: [130, 157], footprint: [114, 28],
     e0Scale: 0.3, e0Anchor: [365, 270] },
   monument: { zone: 'launch_core', anchors: [[232, 276]], size: [50, 120], footprint: [44, 22],
-    e0Scale: 0.25, e0Anchor: [295, 307] },
+    e0Size: [14, 12], e0Anchor: [295, 307] },
   board: { zone: 'launch_core', anchors: [[210, 352]], size: [78, 72], footprint: [60, 20],
     e0Scale: 0.2, e0Anchor: [225, 360], e0Sprite: 'entry_board_1978', e0Size: [13, 7] },
   shop: { zone: 'launch_core', anchors: [[578, 352]], size: [120, 98], footprint: [110, 30],
