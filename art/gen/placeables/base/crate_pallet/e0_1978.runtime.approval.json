@@ -1,0 +1,18 @@
+{
+  "asset": "crate_pallet",
+  "production_sha256": "5e6794e92da8aafb7620277dd71aa7dc940334246d18f87caa7642359e58b8fa",
+  "runtime_sha256": "705c467a38b5d6d9fda2684edfcecac46c0389dd5c5835b913eaaf4cca476313",
+  "approved": true,
+  "sha256": "705c467a38b5d6d9fda2684edfcecac46c0389dd5c5835b913eaaf4cca476313",
+  "promotion_manifest_sha256": "1b6d9ada7923d1c1bf09579262120bd6fc708b8d1a6ac7c52c0dbe43dced1522",
+  "approval_scope": "Точная обрезка прозрачных полей принятого PNG без изменения пикселей объекта.",
+  "crop_bbox": [
+    4,
+    8,
+    41,
+    36
+  ],
+  "runtime_target": "game/assets/eras/e0-1978/base/crate-pallet.png",
+  "state": "local_preview_only",
+  "runtime_published": false
+}

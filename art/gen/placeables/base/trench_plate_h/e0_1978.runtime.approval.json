@@ -1,0 +1,18 @@
+{
+  "asset": "trench_plate_h",
+  "production_sha256": "763b5922df8b8edbcdd1860cea23ee9b8e0d04d21911cba9ed40018c5a0a6c24",
+  "runtime_sha256": "df29b7321c2f4a97b84399c2b2b5ddd6f8dcfa1f8c9f3f3b75d733d1d0c9aa22",
+  "approved": true,
+  "sha256": "df29b7321c2f4a97b84399c2b2b5ddd6f8dcfa1f8c9f3f3b75d733d1d0c9aa22",
+  "promotion_manifest_sha256": "ddaf9de4e053a96305c5bc924aee315c57e8c1c4cdeeb214ed495861a9130dd6",
+  "approval_scope": "Точная обрезка прозрачных полей принятого PNG без изменения пикселей объекта.",
+  "crop_bbox": [
+    4,
+    5,
+    53,
+    22
+  ],
+  "runtime_target": "game/assets/eras/e0-1978/base/trench-plate-h.png",
+  "state": "local_preview_only",
+  "runtime_published": false
+}

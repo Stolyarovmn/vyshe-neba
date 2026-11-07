@@ -1,0 +1,20 @@
+{
+  "source_sha256": "ee004d8562c98f35db0da06a002d39236825d555c75f22916c6275077f9a2176",
+  "source_original_sha256": "79eabd1f9832f3a98d6daf1928fb3eedce3112363bc16632d6d66eeb994fd229",
+  "original_png_file": "art/raw/placeables/base/trench_plate_h/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1ciA5Rxah-JUkg0T1dqBlr0ZDSqemKn2R",
+    "folder_id": "1idbr23HOmdgq0uocCZ2o63DLHwXVDrPW",
+    "original": "e0_1978_logical.png (авторский, до увеличения x4)"
+  },
+  "parametric": {
+    "builder": "tools/art_pipeline/e0_scenery_build.py",
+    "size": [
+      48,
+      16
+    ],
+    "palette": "E0: сталь серо-зелёная, дерево, болты, ржавчина по кромкам",
+    "light": "верх-лево, тень холодная вниз-вправо, запечённой тени нет"
+  }
+}

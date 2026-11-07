@@ -1447,6 +1447,226 @@
         }
       ],
       "transport_scale": 4
+    },
+    "INFRA_TRENCH_H": {
+      "asset": "trench_plate_h",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/trench_plate_h",
+      "production_dir": "art/gen/placeables/base/trench_plate_h",
+      "runtime_target": "eras/e0-1978/base/trench-plate-h.png",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        56,
+        24
+      ],
+      "registration": [
+        28,
+        22
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.25
+      },
+      "visual_review": "art/gen/placeables/base/trench_plate_h/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "INFRA_TRENCH_V": {
+      "asset": "trench_plate_v",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/trench_plate_v",
+      "production_dir": "art/gen/placeables/base/trench_plate_v",
+      "runtime_target": "eras/e0-1978/base/trench-plate-v.png",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        24,
+        56
+      ],
+      "registration": [
+        12,
+        54
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.25
+      },
+      "visual_review": "art/gen/placeables/base/trench_plate_v/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "INFRA_TRENCH_C": {
+      "asset": "trench_plate_corner",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/trench_plate_corner",
+      "production_dir": "art/gen/placeables/base/trench_plate_corner",
+      "runtime_target": "eras/e0-1978/base/trench-plate-corner.png",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        24,
+        24
+      ],
+      "registration": [
+        12,
+        22
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.25
+      },
+      "visual_review": "art/gen/placeables/base/trench_plate_corner/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
+    },
+    "INFRA_CRATE_PALLET": {
+      "asset": "crate_pallet",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/crate_pallet",
+      "production_dir": "art/gen/placeables/base/crate_pallet",
+      "runtime_target": "eras/e0-1978/base/crate-pallet.png",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        44,
+        38
+      ],
+      "registration": [
+        22,
+        36
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.25
+      },
+      "visual_review": "art/gen/placeables/base/crate_pallet/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ]
     }
   }
 }
