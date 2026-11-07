@@ -368,8 +368,8 @@ export const BUILDING_ANCHORS = {
   beacons: {
     zone: 'launch_core', anchors: [[284, 396], [492, 396]], size: [44, 89], footprint: [40, 16],
     e0: {
-      anchors: [[284, 396], [492, 396]], size: [3.5, 7], footprint: [3.5, 2.5],
-      lamp: [252 / 319, 50 / 644],
+      anchors: [[284, 396], [492, 396]], size: [4, 7], footprint: [4, 3.5],
+      lamp: [2.5 / 4, 0.5 / 7], smooth: false,
     },
   },
   gantry: {
