@@ -1,0 +1,14 @@
+{
+  "source_sha256": "163e3a324349ba69b02b0f6d4c944f3bcc043a0b806e18db097cf05b4949e5d8",
+  "original_png_file": "art/raw/placeables/base/assembly_workshop/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1yIMpQ8XWCQ2AvWRLp9Q3xATwbkGb-aww"
+  },
+  "authoring": "parametric_vector_source",
+  "svg_archive_id": "1JXXYGA4r93rcgk2UoBA0oDkwsoOAqzTH",
+  "svg_sha256": "25d0f0b0a3e51a653db9dd8fd4c60f904326c93087d4458332951f670b9c8de5",
+  "geometry_sha256": "91a64a5f82ca3d5f976473dac09a064eac7b5eadccf04c09ca6011c12208bc01",
+  "generator_script_sha256": "921f7020e94db637b79f5fde57eee9fcbea05b3eb041e1670406cdb11cb051cf",
+  "projection_library_sha256": "1d6d79836f8c8a2713e82a62afc56041b30f29917fee03cde0596ba40d9ef1fc"
+}

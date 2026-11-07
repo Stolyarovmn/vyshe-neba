@@ -1,0 +1,68 @@
+{
+  "authoring": "parametric_vector_source",
+  "status": "prototype_not_approved",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "ground_compression_proxy": 0.9585217890173758,
+  "perspective_taper_per_m": 0.008,
+  "pixels_per_meter": 25,
+  "landmarks": {
+    "far_left": {
+      "world_m": [
+        -4.7,
+        -3.2,
+        2.8
+      ],
+      "screen_px": [
+        45.507999999999996,
+        50.84071564796537
+      ]
+    },
+    "far_right": {
+      "world_m": [
+        4.7,
+        -3.2,
+        2.8
+      ],
+      "screen_px": [
+        274.492,
+        50.84071564796537
+      ]
+    },
+    "near_right": {
+      "world_m": [
+        4.7,
+        3.2,
+        2.8
+      ],
+      "screen_px": [
+        280.50800000000004,
+        203.18269285405313
+      ]
+    },
+    "near_left": {
+      "world_m": [
+        -4.7,
+        3.2,
+        2.8
+      ],
+      "screen_px": [
+        39.49199999999999,
+        203.18269285405313
+      ]
+    },
+    "ground_anchor": {
+      "world_m": [
+        0,
+        3,
+        0
+      ],
+      "screen_px": [
+        160.0,
+        218.61447339653446
+      ]
+    }
+  },
+  "png_sha256": "4909e0d6c427906d835e7e4ceb784fda187907a2bd95bb6a195928ad3ed8254f",
+  "svg_sha256": "af7948f558da8778ed7daed1e7996313a97c7b37c5e85c385432af5cee0c5099"
+}

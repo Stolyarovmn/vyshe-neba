@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "4909e0d6c427906d835e7e4ceb784fda187907a2bd95bb6a195928ad3ed8254f",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "4969696fef6db4e800642abb804700b7c56663ae5a063ee2ac6793f9dbaa2148",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Самостоятельный параметрический SVG/PNG, не исправление AI-оригинала. Кромки карнизов одинаковой физической высоты: дальняя/ближняя ширина 0,950078; сжатие 0,952137 относительно прокси 0,958515. Размеры 9×6 м, карниз 2,8 м, конёк 3,1 м заданы в коде. Ворота 2,4×2,4 м и дверь 0,9×2 м имеют общую вертикальную компрессию камеры. В пробе шириной 70 px, (920,255), фронт выходит на открытый грунт; приборы расположены отдельно, крыша не пересекает деревья. Материалы E0: сталь с фальцами/крепежом, простые ручные запоры, редкие сколы, тихие поверхности; окно не дисплей, ввод не пересекает дверь. Проверка статичная; map-editor и runtime publication отдельно."
+}
