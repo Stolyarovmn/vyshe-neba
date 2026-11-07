@@ -210,6 +210,7 @@ export const ASSET_FILES = {
   deluge_outlet_1978: `${eraFolder(0)}base/deluge-outlet.png`,
   gantry_inlet_1978: `${eraFolder(0)}base/gantry-inlet.png`,
   beacons_junction_1978: `${eraFolder(0)}base/beacons-junction.png`,
+  feeder_pole_1978: `${eraFolder(0)}base/feeder-pole.png`,
 };
 
 // Размеры [ширина, высота] по эпохам (индекс = эпоха 0..5).

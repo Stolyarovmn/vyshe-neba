@@ -426,6 +426,41 @@ export function buildingDrawOrder(profile) {
   return owned;
 }
 
+// Привязки утверждённого экспорта 83×228 в координатах пикселей острова.
+const E0_FEEDER_POLES = [[1514, 378], [1434, 378]];
+const E0_FEEDER_WIRE_Y = [58.18, 30.99, 4.94];
+
+function drawE0Feeder(ctx, painter, view, poles) {
+  const unit = ISLAND.unitsPerPx;
+  const width = 8 * unit;
+  const height = 23 * unit;
+  const anchorX = 42 / 83;
+  const anchorY = 189 / 228;
+  const [[x1, y], [x2]] = poles;
+  const pixelWidth = Math.max(1, Math.round(width * view.S));
+  const pixelHeight = Math.max(1, Math.round(height * view.S));
+  const wireOffsetX = anchorX * pixelWidth - Math.round(anchorX * pixelWidth);
+  const left = view.sx(x2) + wireOffsetX;
+  const right = view.sx(x1) + wireOffsetX;
+  const spriteTop = view.sy(y) - Math.round(anchorY * pixelHeight);
+  ctx.save();
+  ctx.strokeStyle = '#514942';
+  ctx.lineWidth = Math.max(1, unit * view.S);
+  ctx.beginPath();
+  for (const anchor of E0_FEEDER_WIRE_Y) {
+    const wireY = spriteTop + anchor / 228 * pixelHeight;
+    ctx.moveTo(left, wireY);
+    ctx.quadraticCurveTo((left + right) / 2, wireY + 2 * unit * view.S, right, wireY);
+  }
+  ctx.stroke();
+  ctx.restore();
+  for (const [x, poleY] of poles) {
+    painter.sprite(ctx, view, 'feeder_pole_1978', x, poleY, {
+      w: width, h: height, ax: anchorX, ay: anchorY, smooth: false,
+    });
+  }
+}
+
 /**
  * Рисует купленные постройки по якорям острова (мировые единицы, ось Y вниз). onRect(key, x0, y0, x1, y1) —
  * рамка каждой постройки в пикселях устройства (для тапов). extras — [{ y, draw() }]: объекты, которые нужно
@@ -434,6 +469,13 @@ export function buildingDrawOrder(profile) {
 export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, extras, hooks) {
   const items = buildingDrawOrder(profile);
   const additions = [...(extras ?? [])];
+  if (profile?.buildings?.energy === 1 && profile.buildings.control === 1
+      && (hooks?.build?.('energy')?.reveal ?? 1) >= 1
+      && (hooks?.build?.('control')?.reveal ?? 1) >= 1
+      && painter.has('feeder_pole_1978')) {
+    const poles = E0_FEEDER_POLES.map(([x, y]) => islandToWorld(x, y));
+    additions.push({ y: poles[0][1], draw: () => drawE0Feeder(ctx, painter, view, poles) });
+  }
   if (profile?.buildings?.beacons === 1 && (hooks?.build?.('beacons')?.reveal ?? 1) >= 1) {
     const [x, y] = islandToWorld(388, 310);
     additions.push({ y, draw: () => painter.sprite(ctx, view, 'beacons_junction_1978', x, y, {
