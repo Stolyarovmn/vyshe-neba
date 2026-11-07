@@ -54,7 +54,15 @@ def prepare_source(repo,cfg,stem,work,source):
     w,h=map(int,cfg['canvas']); px=int(cfg['pixel_size'])
     if cfg['adapter']=='prepared_grid_png':
         out = work / f"{stem}_presnap.png"
-        shutil.copyfile(source, out)
+        scale = int(cfg.get('transport_scale', 1))
+        if scale < 1:
+            raise ValueError('transport_scale must be positive')
+        if scale == 1:
+            shutil.copyfile(source, out)
+        else:
+            with Image.open(source) as image:
+                image.resize((image.width * scale, image.height * scale),
+                             Image.Resampling.NEAREST).save(out)
         return out
     if cfg['adapter']=='presnap_png':
         out=work/f'{stem}_presnap_grid.png'; im=Image.open(source).convert('RGBA'); target=(w*px,h*px)
@@ -124,10 +132,10 @@ def main():
                 original_sha = meta.get('source_sha256') or meta.get('source_original_sha256')
                 if not original_sha:
                     raise SystemExit(f'SOURCE_PROJECTION_GATE_BLOCKED: {stem} missing original SHA provenance')
-                if cfg['adapter'] == 'presnap_png':
+                original_rel = meta.get('original_png_file')
+                if cfg['adapter'] == 'presnap_png' and not original_rel:
                     raw_original = source
                 else:
-                    original_rel = meta.get('original_png_file')
                     if not original_rel:
                         raise SystemExit(f'SOURCE_PROJECTION_GATE_BLOCKED: {stem} indexed transport requires actual original_png_file')
                     raw_original = (repo / original_rel).resolve()
