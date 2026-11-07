@@ -1276,6 +1276,63 @@
         }
       ],
       "transport_scale": 4
+    },
+    "B03-E0-VECTOR": {
+      "asset": "landing_guidance_e0_vector",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/landing_guidance_e0_vector",
+      "production_dir": "art/gen/placeables/base/landing_guidance_e0_vector",
+      "runtime_target": "eras/e0-1978/base/beacons.png",
+      "prompt_file": "art/prompts/e0_beacon_vector.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        96,
+        148
+      ],
+      "registration": [
+        48,
+        144
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/landing_guidance_e0_vector/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
     }
   }
 }
