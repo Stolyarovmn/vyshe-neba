@@ -540,7 +540,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     if (f.dither) {
       ctx.fillStyle = ditherPattern(f.mid, cc);
       ctx.fillRect(x + cc, y + cc, w - cc * 2, h - cc * 2);
-    } else if (f.tex === 'brushed' || f.tex === 'carbon') {
+    } else if (f.tex === 'brushed' || f.tex === 'carbon' || f.tex === 'rust') {
       ctx.fillStyle = texPattern(f.tex, f, cc);
       ctx.fillRect(x + cc, y + cc, w - cc * 2, h - cc * 2);
     } else rect(x + cc, y + cc, w - cc * 2, h - cc * 2, f.mid);
@@ -569,6 +569,25 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
         const sy = y + cc * 3 + Math.floor((rnd() * (h - cc * 8)) / cc) * cc;
         const len = 1 + Math.floor(rnd() * 3);
         rect(sx, sy, cc * len, cc, rnd() < 0.55 ? f.hi : f.lo);
+      }
+    }
+    // ржавчина и облупившаяся краска (E0): сколы по кромке изнутри рамки, детерминированно по размеру и месту
+    if (f.tex === 'rust' && w >= cc * 12 && h >= cc * 10) {
+      let seed = ((x * 73856093) ^ (y * 19349663) ^ (w * 83492791) ^ (h * 2654435761)) >>> 0 || 1;
+      const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const pal = S.th.c;
+      const rust = [pal.rust[1], pal.rust[0], pal.rust[2]];
+      const n = clamp(Math.floor((w + h) / (cc * 8)), 3, 24);
+      for (let i = 0; i < n; i++) {
+        const side = Math.floor(rnd() * 4);
+        const len = 1 + Math.floor(rnd() * 3);
+        const depth = cc * (1 + Math.floor(rnd() * 2));
+        const col = rust[rnd() < 0.55 ? 0 : rnd() < 0.7 ? 1 : 2];
+        const along = (span, ln) => cc * 3 + Math.floor((rnd() * Math.max(1, span - cc * 6 - ln * cc)) / cc) * cc;
+        if (side === 0) rect(x + along(w, len), y + cc * 2, len * cc, depth, col);
+        else if (side === 1) rect(x + along(w, len), y + h - cc * 2 - depth, len * cc, depth, col);
+        else if (side === 2) rect(x + cc * 2, y + along(h, len), depth, len * cc, col);
+        else rect(x + w - cc * 2 - depth, y + along(h, len), depth, len * cc, col);
       }
     }
     // заклёпки
@@ -602,8 +621,8 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     let p = texCache.get(key);
     if (p) return p;
     const dev = Math.max(1, Math.round(cc * dpr));
-    const tw = kind === 'brushed' ? 6 : 2;
-    const th = 2;
+    const tw = kind === 'brushed' ? 6 : kind === 'rust' ? 16 : 2;
+    const th = kind === 'rust' ? 12 : 2;
     const tile = document.createElement('canvas');
     tile.width = tw * dev;
     tile.height = th * dev;
@@ -616,6 +635,13 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     if (kind === 'brushed') {
       for (const cx of [1, 2, 3]) cellAt(cx, 1, mix(f.mid, f.hi, 0.12));
       cellAt(5, 0, mix(f.mid, f.lo, 0.1));
+    } else if (kind === 'rust') {
+      // шероховатая краска: светлые и тёмные пятна и редкие ржавые крапинки
+      let seed = 20261107;
+      const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      for (let i = 0; i < 26; i++) cellAt(Math.floor(rnd() * tw), Math.floor(rnd() * th), mix(f.mid, f.hi, 0.1 + rnd() * 0.1));
+      for (let i = 0; i < 24; i++) cellAt(Math.floor(rnd() * tw), Math.floor(rnd() * th), mix(f.mid, f.lo, 0.1 + rnd() * 0.12));
+      for (let i = 0; i < 6; i++) cellAt(Math.floor(rnd() * tw), Math.floor(rnd() * th), mix(f.mid, S.th.c.rust[1], 0.32));
     } else {
       const dark = mix(f.mid, '#000000', 0.4);
       cellAt(1, 0, dark);
@@ -662,6 +688,11 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     const size = fs(11);
     const s = String(label);
     const cc = cell();
+    // E0: отметка «есть что сделать» — янтарная сигнальная лампа накаливания, мигает, когда это важно
+    if (S.th.era === 'e0' && s === '!') {
+      lamp(Math.round(cx), Math.round(cy), cc * 5, c.amber, true, pulse && !S.settings.reduceMotion);
+      return;
+    }
     const w = Math.max(cc * 7, text.measure(s, size) + cc * 3);
     const h = cc * 7;
     const x0 = Math.round(cx - w / 2);
@@ -861,12 +892,15 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
   /** Угловая металлическая табличка с пиксельной иконкой и числом. */
   function plate(x, y, w, h, iconName, value, color) {
     const cc = cell();
-    nine('raised', x, y, w, h);
+    nine('plateTag', x, y, w, h);
+    // E0: значок и число — на одном ЭЛТ-мониторе в рамке из крашеного металла
+    const mono = S.th.era === 'e0';
+    const isz = Math.round(h * 0.46);
     const iw = Math.round(Math.min(h * 0.82, w * 0.3)); // ширина области значка: в узкой табличке уступает место числу
-    const scr = { x: x + iw - cc * 2, y: y + cc * 3, w: w - iw - cc, h: h - cc * 6 };
-    icon(iconName, x + iw * 0.5 - cc, y + h / 2, Math.round(h * 0.62), color);
+    const scr = mono ? { x: x + cc * 3, y: y + cc * 3, w: w - cc * 6, h: h - cc * 6 } : { x: x + iw - cc * 2, y: y + cc * 3, w: w - iw - cc, h: h - cc * 6 };
+    if (!mono) icon(iconName, x + iw * 0.5 - cc, y + h / 2, Math.round(h * 0.62), color);
     const size = Math.round(h * 0.34);
-    const room = scr.w - cc * 5;
+    const room = scr.w - cc * 5 - (mono ? isz + cc * 3 : 0);
     let str = typeof value === 'number' ? fmtInt(value) : String(value);
     // число целиком, пока оно помещается не мельче ×2; иначе — самая короткая запись (12К, 1,5М)
     let fitted = text.fit(str, room, size);
@@ -876,6 +910,7 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     }
     // число — на экране эпохи (ЭЛТ, светодиодное табло, плоский дисплей)
     screen(`plate-${iconName}`, scr, () => {
+      if (mono) icon(iconName, scr.x + cc * 3 + isz / 2, y + h / 2, isz, color);
       drawText(str, scr.x + scr.w - cc * 3, y + h / 2, { size: fitted.size, color, align: 'right', maxWidth: room, shadow: true, box: scr });
     });
   }
@@ -953,7 +988,9 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     const pad = Math.max(cc * 3, text.stepFor(size).css * 2 + cc);
     // под индикатор-точку в углу кнопки резервируется место, чтобы точка не заходила на буквы; подпись по центру сдвигается
     // от точки только когда иначе не помещается (значок над подписью центрируется строго — там место с обеих сторон)
-    const lampRes = o.lamp ? (o.stack ? cc * 16 : cc * 8) : 0;
+    // у E0 отметка «!» — сигнальная лампа в углу кнопки: место под неё резервируется так же, как под лампу-индикатор
+    const e0Lamp = S.th.era === 'e0' && badgeText === '!';
+    const lampRes = o.lamp ? (o.stack ? cc * 16 : cc * 8) : e0Lamp && !o.stack ? cc * 8 : 0;
     const labelMax = (o.stack ? body.w - pad * 2 : body.w - pad * 2 - (iconName ? iconSize + size * 0.4 : 0) - (locked ? iconSize : 0)) - lampRes;
     let lbl = label;
     let lblSize = size;
@@ -979,13 +1016,13 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
       const areaH = hasLabel ? labelY - glyphH / 2 - step * 2 - body.y : body.h;
       const is = Math.round(Math.min(areaH * 0.9, body.w * 0.62));
       icon(iconName, cx, body.y + (hasLabel ? areaH / 2 + cc : body.h / 2), is, dim ? c.textMute : iconBase, dim ? 0.6 : 1);
-      if (hasLabel) drawn = drawText(lbl, cx, labelY, { size: lblSize, color: labelColor, align: 'center', maxWidth: body.w - pad * 2, box: body });
+      if (hasLabel) drawn = drawText(lbl, cx, labelY, { size: lblSize, color: labelColor, align: 'center', maxWidth: body.w - pad * 2, box: body, shadow: dim ? undefined : S.th.labelShadow(name) || undefined });
     } else {
       if (iconName) {
         icon(iconName, x + iconSize / 2, midY, iconSize, dim ? c.textMute : iconBase, dim ? 0.6 : 1);
         x += iconSize + (hasLabel ? size * 0.4 : 0);
       }
-      if (hasLabel) drawn = drawText(lbl, x, midY, { size: lblSize, color: labelColor, box: body });
+      if (hasLabel) drawn = drawText(lbl, x, midY, { size: lblSize, color: labelColor, box: body, shadow: dim ? undefined : S.th.labelShadow(name) || undefined });
     }
     if (frameAudit && drawn && !o.solo) (frameAudit.buttons ||= []).push({ id, x: r.x, y: r.y, w: r.w, h: r.h, scale: drawn.scale, label: lbl });
     if (sub) drawText(sub, o.align === 'left' ? startX : cx, cy + size * 0.85, { size: Math.max(9, Math.round(size * 0.7)), color: dim ? c.textMute : labelColor, align: o.align === 'left' ? 'left' : 'center', maxWidth: body.w - pad * 2, box: body });

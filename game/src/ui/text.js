@@ -177,7 +177,7 @@ export function createText() {
       }
     }
     const shadow = o.shadow || o.outline ? (typeof (o.shadow || o.outline) === 'string' ? o.shadow || o.outline : '#05070e') : null;
-    const at = atlasFor(dev, color, shadow ? '#05070e' : null);
+    const at = atlasFor(dev, color, shadow);
     const prevAlpha = ctx.globalAlpha;
     if (alpha !== 1) ctx.globalAlpha = prevAlpha * alpha;
     const prevSmooth = ctx.imageSmoothingEnabled;

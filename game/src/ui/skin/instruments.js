@@ -548,7 +548,8 @@ export function lever(kit, V, o) {
     kit.nine(lv.touched ? 'primaryPress' : 'primary', thumb.x, thumb.y, thumb.w, thumb.h);
     for (let i = 0; i < 2; i++) kit.rect(V.x + cc * 6, ty + thumbH * 0.16 + i * cc * 2, V.w - cc * 12, cc, c.amberDeep);
     kit.lamp(V.x + V.w - cc * 5, V.y + cc * 5, cc * 4, latch ? c.green : c.navy2, latch);
-    return { thumb, label: c.ink };
+    // подпись на рукоятке читается на любой краске «основной» кнопки эпохи (у E0 — тёмная эмаль, у E1 — янтарь)
+    return { thumb, label: kit.readable(c.ink, kit.frameMid(lv.touched ? 'primaryPress' : 'primary')) };
   }
   if (kind === 'digital') {
     // E2: цифровая шкала: частые деления с цветом, рукоятка-«бегунок» и процент на экране
