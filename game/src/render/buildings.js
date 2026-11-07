@@ -4,7 +4,7 @@
 // Все функции рисуют в единицах мира через view; (wx, wy) — точка опоры (низ по центру).
 
 import {
-  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, ISLAND, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
+  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, E0_DELUGE_NOZZLES, ISLAND, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
 } from './manifest.js';
 import { clamp, hash2 } from './util.js';
 import { fillWorldRect } from './painter.js';
@@ -44,12 +44,17 @@ export function isProceduralBuilding(key) {
 
 /** Целевой размер спрайта постройки в единицах мира [ширина, высота] (по sprite_px раскладки острова). */
 export function buildingSize(painter, key, level) {
-  const layout = BUILDING_ANCHORS[key];
+  const layout = buildingLayout(key, level);
   const [px, py] = layout ? layout.size : [100, 100];
   const height = py * ISLAND.unitsPerPx;
   const asset = painter.assets.get(buildingSpriteName(key, level));
   const width = asset ? (height * asset.w) / asset.h : px * ISLAND.unitsPerPx;
   return [width, height];
+}
+
+export function buildingLayout(key, level) {
+  const layout = BUILDING_ANCHORS[key];
+  return level === 1 && layout?.e0 ? layout.e0 : layout;
 }
 
 /**
@@ -59,7 +64,8 @@ export function buildingSize(painter, key, level) {
 export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts = {}) {
   const lv = clamp(level | 0, 1, 6);
   const [width, height] = buildingSize(painter, key, lv);
-  drawShadow(ctx, view, wx, wy, BUILDING_ANCHORS[key], width);
+  const layout = buildingLayout(key, lv);
+  drawShadow(ctx, view, wx, wy, layout, width, lv === 1 && !!BUILDING_ANCHORS[key]?.e0);
   const name = buildingSpriteName(key, lv);
   const building = opts.reveal !== undefined && opts.reveal < 1;
   if (building) {
@@ -72,7 +78,7 @@ export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts 
   }
   let drawn = false;
   if (painter.has(name)) {
-    drawn = painter.sprite(ctx, view, name, wx, wy, { h: height, flipX: !!opts.mirror, smooth: true });
+    drawn = painter.sprite(ctx, view, name, wx, wy, { h: height, flipX: !!opts.mirror, smooth: layout?.smooth ?? true });
   } else {
     drawProcedural(ctx, view, key, lv, wx, wy, time, width);
   }
@@ -80,13 +86,13 @@ export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts 
   return drawn;
 }
 
-function drawShadow(ctx, view, wx, wy, layout, width) {
-  const w = width * 0.92;
+function drawShadow(ctx, view, wx, wy, layout, width, frontAnchor = false) {
+  const w = (frontAnchor ? layout.footprint[0] * ISLAND.unitsPerPx : width) * 0.92;
   const depth = layout ? layout.footprint[1] * ISLAND.unitsPerPx : 20;
   const x0 = view.sx(wx - w / 2);
   const x1 = view.sx(wx + w / 2);
-  const y = view.sy(wy - depth * 0.15);
-  const half = Math.max(2, Math.round(view.S * depth * 0.5));
+  const y = view.sy(wy - depth * (frontAnchor ? 0.5 : 0.15));
+  const half = frontAnchor ? Math.max(0.5, view.S * depth * 0.45) : Math.max(2, Math.round(view.S * depth * 0.5));
   ctx.fillStyle = 'rgba(8,16,24,0.28)';
   ctx.beginPath();
   ctx.ellipse((x0 + x1) / 2, y, (x1 - x0) / 2, half, 0, 0, Math.PI * 2);
@@ -412,13 +418,53 @@ export function buildingDrawOrder(profile) {
   for (const key of BUILDING_KEYS) {
     const level = profile && profile.buildings ? profile.buildings[key] | 0 : 0;
     if (level <= 0) continue;
-    BUILDING_ANCHORS[key].anchors.forEach((anchor, index) => {
+    buildingLayout(key, level).anchors.forEach((anchor, index) => {
       const [x, y] = islandToWorld(anchor[0], anchor[1]);
       owned.push({ key, level, x, y, mirror: index > 0 });
     });
   }
   owned.sort((a, b) => a.y - b.y || a.x - b.x);
   return owned;
+}
+
+// Привязки утверждённого экспорта 83×228 в координатах пикселей острова.
+const E0_FEEDER_POLES = [[1514, 378], [1434, 378]];
+const E0_FEEDER_WIRE_Y = [58.18, 30.99, 4.94];
+// Въезд открыт. Две стойки стоят на разных обочинах маршрута техники.
+const E0_PAD_GATE = [
+  { sprite: 'pad_gate_pedestal_1978', py: 376, width: 5, height: 20, anchorY: 244 / 272 },
+  { sprite: 'pad_gate_receiver_1978', py: 407, width: 4, height: 5, anchorY: 38 / 61 },
+];
+
+function drawE0Feeder(ctx, painter, view, poles) {
+  const unit = ISLAND.unitsPerPx;
+  const width = 8 * unit;
+  const height = 23 * unit;
+  const anchorX = 42 / 83;
+  const anchorY = 189 / 228;
+  const [[x1, y], [x2]] = poles;
+  const pixelWidth = Math.max(1, Math.round(width * view.S));
+  const pixelHeight = Math.max(1, Math.round(height * view.S));
+  const wireOffsetX = anchorX * pixelWidth - Math.round(anchorX * pixelWidth);
+  const left = view.sx(x2) + wireOffsetX;
+  const right = view.sx(x1) + wireOffsetX;
+  const spriteTop = view.sy(y) - Math.round(anchorY * pixelHeight);
+  ctx.save();
+  ctx.strokeStyle = '#514942';
+  ctx.lineWidth = Math.max(1, unit * view.S);
+  ctx.beginPath();
+  for (const anchor of E0_FEEDER_WIRE_Y) {
+    const wireY = spriteTop + anchor / 228 * pixelHeight;
+    ctx.moveTo(left, wireY);
+    ctx.quadraticCurveTo((left + right) / 2, wireY + 2 * unit * view.S, right, wireY);
+  }
+  ctx.stroke();
+  ctx.restore();
+  for (const [x, poleY] of poles) {
+    painter.sprite(ctx, view, 'feeder_pole_1978', x, poleY, {
+      w: width, h: height, ax: anchorX, ay: anchorY, smooth: false,
+    });
+  }
 }
 
 /**
@@ -428,7 +474,49 @@ export function buildingDrawOrder(profile) {
  */
 export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, extras, hooks) {
   const items = buildingDrawOrder(profile);
-  const queue = extras && extras.length ? [...items, ...extras].sort((a, b) => a.y - b.y) : items;
+  const additions = [...(extras ?? [])];
+  if (profile?.buildings?.energy === 1 && profile.buildings.control === 1
+      && (hooks?.build?.('energy')?.reveal ?? 1) >= 1
+      && (hooks?.build?.('control')?.reveal ?? 1) >= 1
+      && painter.has('feeder_pole_1978')) {
+    const poles = E0_FEEDER_POLES.map(([x, y]) => islandToWorld(x, y));
+    additions.push({ y: poles[0][1], draw: () => drawE0Feeder(ctx, painter, view, poles) });
+  }
+  if (profile?.buildings?.beacons === 1 && (hooks?.build?.('beacons')?.reveal ?? 1) >= 1) {
+    const [x, y] = islandToWorld(388, 310);
+    additions.push({ y, draw: () => painter.sprite(ctx, view, 'beacons_junction_1978', x, y, {
+      w: 13 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, smooth: true,
+    }) });
+  }
+  if (profile?.buildings?.gantry === 1 && (hooks?.build?.('gantry')?.reveal ?? 1) >= 1) {
+    const [x, y] = islandToWorld(443, 367);
+    additions.push({ y, draw: () => painter.sprite(ctx, view, 'gantry_inlet_1978', x, y, {
+      w: 11 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, smooth: true,
+    }) });
+  }
+  const delugeBuild = profile?.buildings?.deluge === 1 ? hooks?.build?.('deluge') : null;
+  if (profile?.buildings?.deluge === 1 && (!delugeBuild || delugeBuild.reveal >= 1)) {
+    if (E0_PAD_GATE.every(part => painter.has(part.sprite))) {
+      for (const { sprite, py, width, height, anchorY } of E0_PAD_GATE) {
+        const [x, y] = islandToWorld(580, py);
+        additions.push({ y, draw: () => painter.sprite(ctx, view, sprite, x, y, {
+          w: width * ISLAND.unitsPerPx, h: height * ISLAND.unitsPerPx,
+          ax: 0.5, ay: anchorY, smooth: false,
+        }) });
+      }
+    }
+    const [x, y] = islandToWorld(455, 470);
+    additions.push({ y, draw: () => painter.sprite(ctx, view, 'deluge_manifold_1978', x, y, {
+      w: 15 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, smooth: true,
+    }) });
+    for (const [px, py, direction] of E0_DELUGE_NOZZLES) {
+        const [x, y] = islandToWorld(px, py);
+        additions.push({ y, draw: () => painter.sprite(ctx, view, 'deluge_nozzle_1978', x, y, {
+          w: 9 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, flipX: direction < 0, smooth: false,
+        }) });
+    }
+  }
+  const queue = additions.length ? [...items, ...additions].sort((a, b) => a.y - b.y) : items;
   for (const item of queue) {
     if (item.draw) {
       item.draw();
@@ -438,6 +526,11 @@ export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, e
     if (item.x + w < view.left || item.x - w > view.right || item.y - h > view.bottom || item.y < view.top) continue;
     const build = hooks && hooks.build ? hooks.build(item.key) : null;
     drawBuilding(ctx, painter, view, item.key, item.level, item.x, item.y, time, { mirror: item.mirror, reveal: build ? build.reveal : undefined });
+    if (item.key === 'deluge' && item.level === 1 && (build?.reveal ?? 1) >= 1) {
+      painter.sprite(ctx, view, 'deluge_outlet_1978',
+        item.x - 31 * ISLAND.unitsPerPx, item.y - 22 * ISLAND.unitsPerPx,
+        { w: 9 * ISLAND.unitsPerPx, ax: 0, ay: 0, smooth: true });
+    }
     if (isProceduralBuilding(item.key) && !painter.has(buildingSpriteName(item.key, item.level)) && (!build || build.reveal >= 1)) {
       drawBuildingBadge(ctx, view, item.key, item.x, item.y - h, time);
     }
