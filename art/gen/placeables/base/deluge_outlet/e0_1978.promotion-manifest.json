@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "INFRA_DELUGE_OUTLET",
+  "asset": "deluge_outlet",
+  "production_dir": "art/gen/placeables/base/deluge_outlet",
+  "runtime_target": "eras/e0-1978/base/deluge-outlet.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/deluge_outlet/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "7b6b84cc0c2b441d8bb765ed6141cd7fcf87dd07a2b192fa8251ad9d7a79d5d0",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "fe5a7b655a48307e8c18adc5f6288223ea623e6d06c8ee43b7a479567bf3d2e1",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": null
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "71f75872975ef7553c83bb3dd419f0572af389935e501879657649b0b8e1fe0e",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

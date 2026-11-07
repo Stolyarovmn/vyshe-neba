@@ -1,0 +1,32 @@
+{
+  "asset_id": "INFRA_DELUGE_MANIFOLD",
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "c7349e0e00ca3c5afb904b959f2cffe53d0b570e4d0a40dcdb40e7e92f86cb2e",
+      "scene_projection": {
+        "candidate_sha256": "c7349e0e00ca3c5afb904b959f2cffe53d0b570e4d0a40dcdb40e7e92f86cb2e",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "scene_png_sha256": "b428759ccbcc433c778644e925645289ee9daf0161daf74b0eed6297ccf01519",
+        "source_sha256": "5ea4d6f29000f780d08f1626dacf75028aeca520dc3bbfca69d00238f4e040bc",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "reviewer": "Codex",
+        "approval_evidence": "Низкий тройник расположен южнее площадки, вне проезда. На обычном размере читается Т-образная труба. При 50% сохраняется положение и пятно детали, мелкие элементы теряются. Фактический угол камеры неизвестен.",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        }
+      }
+    }
+  }
+}

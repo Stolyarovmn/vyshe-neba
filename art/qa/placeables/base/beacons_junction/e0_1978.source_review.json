@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "48baf93d2c2a52da40d66c0a1839cef356750c1ed9162767cc8796bcfe6937f1",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "19a86953b190c639c9f2dcb9c6f08c201652c086fd34929b129e32f9998e9651",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Крышка обеспечивает доступ к распределению питания маяков. Низкое основание, дальняя кромка уже ближней, ручка по центру. Проверка относится к статичному размещению в текущем игровом масштабе."
+}

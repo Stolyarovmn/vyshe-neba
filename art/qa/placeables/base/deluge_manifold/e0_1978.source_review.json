@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "5ea4d6f29000f780d08f1626dacf75028aeca520dc3bbfca69d00238f4e040bc",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "bf5eb690f107c7a4ecfd1380937da25604f21cda2f34855903938de1684345f2",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Тройник делит воду на две ветви форсунок. Трубы лежат на низком основании, дальняя кромка уже ближней. Проверка относится к статичному размещению в текущем игровом масштабе."
+}

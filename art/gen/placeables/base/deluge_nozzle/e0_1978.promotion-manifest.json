@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "INFRA_DELUGE_NOZZLE",
+  "asset": "deluge_nozzle",
+  "production_dir": "art/gen/placeables/base/deluge_nozzle",
+  "runtime_target": "eras/e0-1978/base/deluge-nozzle.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/deluge_nozzle/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "37e1cb51920d9d341f880cd69de9532a4b3e3b3e4a4ac5a9a7c507b39239f91c",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "a6b8ec4d77f18b553472992d2829ee3034423bdafd69050cac4561fb12e63f97",
+    "processor_sha256": "52387a1262ed110f3232d04eaee1a31e3dd0f92a225b815c7e1c12501e45f494",
+    "prompt_sha256": null
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "24100c2c26c6498c2cfedfe2ff4e25532d875d0245651bfe4e8c43944f1b39c0",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

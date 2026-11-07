@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "aba803355317ecd668fcd3734f69d0086fe11fca6e0ef117b78347fcc47ef3e0",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "7ae3af19fe48958a7823358fdb0db08cbf4e4c5581940ea7876a597aef705e58",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "На полноразмерном шестом исходнике дальняя кромка чуть уже ближней, четырём анкерам оставлены открытые углы. Низкий кожух закрыт сверху, выпуск расположен под правым свесом. На исходной сцене площадки лежат по сторонам траншеи. Читаемость выпуска после пиксельной обработки требует отдельной проверки."
+}
