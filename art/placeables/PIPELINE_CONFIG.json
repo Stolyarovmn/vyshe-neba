@@ -1048,6 +1048,120 @@
           "year": 2060
         }
       ]
+    },
+    "INFRA_GATE_PEDESTAL": {
+      "asset": "pad_gate_pedestal",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/pad_gate_pedestal",
+      "production_dir": "art/gen/placeables/base/pad_gate_pedestal",
+      "runtime_target": "eras/e0-1978/base/pad-gate-pedestal.png",
+      "prompt_file": "art/prompts/e0_pad_gate.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        84,
+        284
+      ],
+      "registration": [
+        42,
+        280
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/pad_gate_pedestal/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
+    },
+    "INFRA_GATE_RECEIVER": {
+      "asset": "pad_gate_receiver",
+      "zone": "base",
+      "adapter": "prepared_grid_png",
+      "source_dir": "art/raw/placeables/base/pad_gate_receiver",
+      "production_dir": "art/gen/placeables/base/pad_gate_receiver",
+      "runtime_target": "eras/e0-1978/base/pad-gate-receiver.png",
+      "prompt_file": "art/prompts/e0_pad_gate.md",
+      "colors": 32,
+      "pixel_size": 4,
+      "canvas": [
+        68,
+        73
+      ],
+      "registration": [
+        34,
+        69
+      ],
+      "qa": {
+        "min_coverage": 0.01,
+        "min_bbox_fraction": 0.35
+      },
+      "visual_review": "art/gen/placeables/base/pad_gate_receiver/visual_qa.json",
+      "eras": [
+        {
+          "stem": "e0_1978",
+          "era": "E0",
+          "year": 1978
+        },
+        {
+          "stem": "e1_1986",
+          "era": "E1",
+          "year": 1986
+        },
+        {
+          "stem": "e2_1998",
+          "era": "E2",
+          "year": 1998
+        },
+        {
+          "stem": "e3_2015",
+          "era": "E3",
+          "year": 2015
+        },
+        {
+          "stem": "e4_2035",
+          "era": "E4",
+          "year": 2035
+        },
+        {
+          "stem": "e5_2060",
+          "era": "E5",
+          "year": 2060
+        }
+      ],
+      "transport_scale": 4
     }
   }
 }
