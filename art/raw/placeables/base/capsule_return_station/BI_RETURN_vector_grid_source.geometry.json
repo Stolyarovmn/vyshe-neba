@@ -1,0 +1,112 @@
+{
+  "authoring": "parametric_vector_source",
+  "status": "prototype_not_approved",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "ground_compression_proxy": 0.9585217890173758,
+  "perspective_taper_per_m": 0.012,
+  "pixels_per_meter": 42,
+  "landmarks": {
+    "far_left": {
+      "world_m": [
+        -2.75,
+        -2.25,
+        0.06
+      ],
+      "screen_px": [
+        47.6185,
+        41.16650345172994
+      ]
+    },
+    "far_right": {
+      "world_m": [
+        2.75,
+        -2.25,
+        0.06
+      ],
+      "screen_px": [
+        272.3815,
+        41.16650345172994
+      ]
+    },
+    "near_right": {
+      "world_m": [
+        2.75,
+        2.25,
+        0.06
+      ],
+      "screen_px": [
+        278.6185,
+        222.28833615477703
+      ]
+    },
+    "near_left": {
+      "world_m": [
+        -2.75,
+        2.25,
+        0.06
+      ],
+      "screen_px": [
+        41.38150000000002,
+        222.28833615477703
+      ]
+    },
+    "hook_ground": {
+      "world_m": [
+        0.93,
+        -0.79,
+        0
+      ],
+      "screen_px": [
+        198.6897112,
+        98.49774661846044
+      ]
+    },
+    "hook_bottom": {
+      "world_m": [
+        0.93,
+        -0.79,
+        1.7
+      ],
+      "screen_px": [
+        198.6897112,
+        78.34029283633072
+      ]
+    },
+    "cradle_center": {
+      "world_m": [
+        0.4,
+        0.55,
+        0.28
+      ],
+      "screen_px": [
+        176.91088,
+        148.9140409765322
+      ]
+    },
+    "jib_pivot": {
+      "world_m": [
+        -1.45,
+        -0.8,
+        2.64
+      ],
+      "screen_px": [
+        99.68464,
+        66.8033010385083
+      ]
+    },
+    "ground_anchor": {
+      "world_m": [
+        0,
+        2.25,
+        0
+      ],
+      "screen_px": [
+        160.0,
+        223.02597740681983
+      ]
+    }
+  },
+  "png_sha256": "ec61a9d08e74fd5805d38748286dfe5b44c19035e33c9679e98c238468a96002",
+  "svg_sha256": "c19e27a8eaf9a93a3108e5585172546412127159b8dc31316127a496a3cac2af"
+}
