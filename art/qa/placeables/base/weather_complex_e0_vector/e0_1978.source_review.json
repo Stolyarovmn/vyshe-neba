@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "a564e4e1e6ae95eb253d2660355511a139749aa5ed011e04385af155de4fff08",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "6bf17f29c641dc08d563d59abbb1173d2575464b962520031a22f7061ab4021b",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Проверен статичный источник метеостанции на утверждённом острове. Плита сужается к дальнему краю, основание прилегает к открытому грунту. Три чашки ориентированы по касательной, флюгер на отдельной оси, кабель идёт к доступному приборному ящику. При выборке по площади силуэт сохраняет единую связную маску 7×13."
+}
