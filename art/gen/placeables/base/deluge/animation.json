@@ -1,0 +1,63 @@
+{
+  "asset": "deluge",
+  "era": "E0",
+  "source_sprite": {
+    "path": "art/gen/placeables/base/deluge/e0_1978.runtime.png",
+    "sha256": "548c16abe7ed440573d772bbf2b85fdef42829197ff69d22cb06844c7c84b3a2",
+    "size": [
+      230,
+      231
+    ]
+  },
+  "clips": {
+    "ON": {
+      "trigger": "см. states.json (ON)",
+      "frames": 5,
+      "fps": 8,
+      "loop": false,
+      "frame_size": [
+        230,
+        231
+      ],
+      "sheet": "animation/on_sheet.png",
+      "sheet_sha256": "9a000d81c4393da790df2f7938b06ea0bc76a007abe8ab49776bdceae80fe329",
+      "preview_gif": "animation/on.gif",
+      "rest_frame": 0,
+      "reduce_motion_frame": 2,
+      "parts": [
+        {
+          "part": "outlet_valve_wheel",
+          "box": [
+            26,
+            125,
+            47,
+            141
+          ],
+          "pivot": [
+            36,
+            133
+          ],
+          "motion": "rotate_nearest_ellipse",
+          "range_px": [
+            0,
+            60
+          ],
+          "why": "маховик вентиля у отвода бака поворачивается: вода идёт на защиту стола при запуске"
+        }
+      ],
+      "method": "часть вырезана из утверждённого спрайта, фон под ней восстановлен копией соседнего фона того же спрайта, смещение целыми пикселями на той же сетке",
+      "palette_colors": {
+        "base": 30,
+        "all_frames": 30
+      }
+    }
+  },
+  "pivot_policy": "измерены по утверждённому спрайту, указаны в parts[].pivot (пиксели runtime-кадра)",
+  "code_owned": [
+    "свет",
+    "звук",
+    "дым",
+    "тени событий"
+  ],
+  "runtime_integration": "подключено в хаб: E0_BUILDING_CLIPS в game/src/render/manifest.js, кадры game/assets/eras/e0-1978/base/anim/ (runtime PR №144 в main); клип играет один раз при нажатии на постройку и по окончании стройки"
+}

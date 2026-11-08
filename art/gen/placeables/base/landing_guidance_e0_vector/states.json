@@ -1,0 +1,68 @@
+{
+  "asset": "beacons «Стартовые маяки» (B03)",
+  "era": "E0",
+  "status": "Записано 2026-11-08 по ASSET_STATE_SPEC.md. Спрайт принят раньше (PR №126/№134/№137); состояния отражают решения владельца: блокировка и отказ только на карточке «База», нажатие = ON-клип.",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the building",
+      "implementation": "plays_ON_clip",
+      "owner_decision": "решение владельца 2026-11-08: отклик на нажатие = ON-клип (тап по постройке в хабе проигрывает клип один раз) (лампа мигает один раз, кодом)",
+      "why": "игрок получает физический отклик постройки на нажатие; отдельный клип не рисуется"
+    },
+    "ON": {
+      "trigger": "конец стройки; запуск (маяки подсвечивают зону посадки ночью)",
+      "parts": [
+        "lamp"
+      ],
+      "motion": "лампа маяка загорается и мигает; зона посадки проявляется",
+      "loop": false,
+      "code_fx": [
+        "lamp_glow",
+        "hub.fx.buildState(beacons).reveal",
+        "night lights blink (hub.js: drawNightLights)"
+      ],
+      "why": "маяки подсвечивают зону посадки и расширяют допуск посадки; горящая лампа — единственное, что игроку нужно увидеть",
+      "animation": {
+        "file": null,
+        "status": "code_driven",
+        "reason": "свет и «проявление» зоны делает код (system separation: свет принадлежит коду); подвижной механической части у маяка нет"
+      }
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": [
+        "era",
+        "energy (со 2-го уровня)"
+      ],
+      "art_variant": null,
+      "visible": "на острове постройки нет, пока не выполнены условия; причина словами на карточке «База» (reasonFull)",
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок видит, чего не хватает (эпоха, соседняя постройка, энергия), словами из reasonFull на карточке"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "frames": 0,
+      "loop": false,
+      "code_fx": [
+        "bubble_shake",
+        "click_denied_sound"
+      ],
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок получает короткий отказ на заблокированной карточке, состояние постройки не меняется"
+    }
+  },
+  "not_applicable": [
+    "PRESS как отдельный клип: механической части нет, отклик даёт лампа (код)"
+  ],
+  "accessibility": "при «меньше движения» (reduceMotion) клип не проигрывается: остаётся статичный кадр",
+  "sprite": {
+    "path": "art/gen/placeables/base/landing_guidance_e0_vector/e0_1978.runtime.png",
+    "sha256": "8004db22cd26910eec804e105805b3a9638d3efb61480d8ce56c42602563fa6b"
+  },
+  "game_data": {
+    "building_key": "beacons",
+    "dependsOn": [],
+    "source": "game/src/data/buildings.js (main)"
+  },
+  "mechanism_pivots": "pending_measured_rig_pass (см. ON.animation.reason)"
+}

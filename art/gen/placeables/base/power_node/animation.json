@@ -1,0 +1,69 @@
+{
+  "asset": "power_node",
+  "era": "E0",
+  "source_sprite": {
+    "path": "art/gen/placeables/base/power_node/e0_1978.runtime.png",
+    "sha256": "09150c61bf71b188173cee41ed81510a02976f87828a5f2dd8838c778f26bbc9",
+    "size": [
+      274,
+      191
+    ]
+  },
+  "clips": {
+    "ON": {
+      "trigger": "см. states.json (ON)",
+      "frames": 5,
+      "fps": 8,
+      "loop": false,
+      "frame_size": [
+        274,
+        191
+      ],
+      "sheet": "animation/on_sheet.png",
+      "sheet_sha256": "fac4d57fee784e65ccbdf27287fc8528d9b6415a7a33866f8c7bcd1d00d244d4",
+      "preview_gif": "animation/on.gif",
+      "rest_frame": 0,
+      "reduce_motion_frame": 2,
+      "parts": [
+        {
+          "part": "breaker_lever",
+          "box": [
+            205,
+            133,
+            223,
+            150
+          ],
+          "pivot": [
+            212,
+            148
+          ],
+          "motion": "translate_xy_steps",
+          "range_px": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              -3
+            ]
+          ],
+          "why": "рычаг рубильника на щите переводится во включённое положение: узел отдаёт энергию на площадку"
+        }
+      ],
+      "method": "часть вырезана из утверждённого спрайта, фон под ней восстановлен копией соседнего фона того же спрайта, смещение целыми пикселями на той же сетке",
+      "palette_colors": {
+        "base": 32,
+        "all_frames": 32
+      }
+    }
+  },
+  "pivot_policy": "измерены по утверждённому спрайту, указаны в parts[].pivot (пиксели runtime-кадра)",
+  "code_owned": [
+    "свет",
+    "звук",
+    "дым",
+    "тени событий"
+  ],
+  "runtime_integration": "подключено в хаб: E0_BUILDING_CLIPS в game/src/render/manifest.js, кадры game/assets/eras/e0-1978/base/anim/ (runtime PR №144 в main); клип играет один раз при нажатии на постройку и по окончании стройки"
+}

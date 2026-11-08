@@ -1,0 +1,63 @@
+{
+  "asset": "fuel",
+  "era": "E0",
+  "source_sprite": {
+    "path": "art/gen/placeables/base/fuel/e0_1978.runtime.png",
+    "sha256": "344fe6f973096f518097f42bbd23e8e89aafa64cca069d5e8b204b0f4f3c60b1",
+    "size": [
+      255,
+      168
+    ]
+  },
+  "clips": {
+    "ON": {
+      "trigger": "см. states.json (ON)",
+      "frames": 9,
+      "fps": 10,
+      "loop": false,
+      "frame_size": [
+        255,
+        168
+      ],
+      "sheet": "animation/on_sheet.png",
+      "sheet_sha256": "dc82b223b5a4bd96545d245ddc90429ff801974c5aa772d5702cbbd027a1e1b7",
+      "preview_gif": "animation/on.gif",
+      "rest_frame": 0,
+      "reduce_motion_frame": 4,
+      "parts": [
+        {
+          "part": "pump_handle",
+          "box": [
+            194,
+            20,
+            231,
+            42
+          ],
+          "pivot": [
+            190,
+            38
+          ],
+          "motion": "column_shear_y",
+          "range_px": [
+            0,
+            6
+          ],
+          "why": "рукоять ручного насоса качается: топливо перекачивается в ракету вручную (1978 г., без электрического привода)"
+        }
+      ],
+      "method": "часть вырезана из утверждённого спрайта, фон под ней восстановлен копией соседнего фона того же спрайта, смещение целыми пикселями на той же сетке",
+      "palette_colors": {
+        "base": 31,
+        "all_frames": 31
+      }
+    }
+  },
+  "pivot_policy": "измерены по утверждённому спрайту, указаны в parts[].pivot (пиксели runtime-кадра)",
+  "code_owned": [
+    "свет",
+    "звук",
+    "дым",
+    "тени событий"
+  ],
+  "runtime_integration": "подключено в хаб: E0_BUILDING_CLIPS в game/src/render/manifest.js, кадры game/assets/eras/e0-1978/base/anim/ (runtime PR №144 в main); клип играет один раз при нажатии на постройку и по окончании стройки"
+}
