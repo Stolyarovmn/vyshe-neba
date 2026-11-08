@@ -65,5 +65,5 @@
     "дым",
     "тени событий"
   ],
-  "runtime_integration": "подключено в хаб: E0_BUILDING_CLIPS в game/src/render/manifest.js, кадры game/assets/eras/e0-1978/base/anim/ (runtime PR №140 в main); клип играет один раз при нажатии на постройку и по окончании стройки"
+  "runtime_integration": "подключено в хаб: E0_BUILDING_CLIPS в game/src/render/manifest.js, кадры game/assets/eras/e0-1978/base/anim/ (runtime PR №140, main 2981d16); клип играет один раз при нажатии на постройку и по окончании стройки"
 }
