@@ -92,6 +92,7 @@ export default {
       if (clicked) {
         st.sel = on ? null : key;
         st.era = false;
+        if (hard && !built) kit.denyFx(`bld-${key}`); // DENIED: заблокированное здание реагирует, причина видна в выноске
       }
       kit.drawText(built ? String(bs.level) : '–', r.x + r.w - cc * 4, r.y + r.h - cc * 5, { size: kit.fs(11), color: kit.readable(built ? c.amberLight : c.textMute, kit.frameMid(on ? 'cardOn' : built ? 'raised' : 'card')), align: 'right', shadow: true });
       if (hard) kit.icon('lock', r.x + cc * 5, r.y + cc * 5, Math.round(12 * L.ui), c.amber);

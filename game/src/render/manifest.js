@@ -131,6 +131,18 @@ export const E0_BUILDING_CLIPS = {
   factory: { frames: 7, fps: 10, sequence: [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0] },
 };
 
+/**
+ * Плиты подземных трасс E0 (в пикселях острова). Магистрали идут под землёй (решение владельца, BI_GANTRY_E0.md, BI_DELUGE_E0.md),
+ * на поверхности видны только стальные крышки траншей заподлицо. Трасса показывается, пока куплена и достроена постройка requires.
+ */
+export const E0_TRENCH_ROUTES = [
+  { id: 'fuel', requires: 'gantry', points: [[448, 335], [448, 363]], corners: [] },
+  { id: 'cooling', requires: 'deluge', points: [[513, 447], [513, 483], [455, 483], [455, 473]], corners: [[513, 483], [455, 483]] },
+];
+
+/** Поддон с ящиками у логистического терминала: показывается, пока есть активный контракт (contractSlots терминала). */
+export const E0_CRATE_PALLET = { anchor: [1228, 472], width: 10 };
+
 /** Имя спрайта кадра клипа постройки E0: 'bld_control_1978_on2' (кадр 0 — сам bld_control_1978). */
 export function buildingClipFrameName(key, index) {
   return `bld_${key}_${ERA_YEARS[0]}${index > 0 ? `_on${index}` : ''}`;
@@ -241,6 +253,10 @@ export const ASSET_FILES = {
   entry_shop_1978: `${eraFolder(0)}base/entry-shop.png`,
   entry_board_1978: `${eraFolder(0)}base/entry-contract-board.png`,
   ...buildClipFrameFiles(),
+  trench_plate_h_1978: `${eraFolder(0)}base/trench-plate-h.png`,
+  trench_plate_v_1978: `${eraFolder(0)}base/trench-plate-v.png`,
+  trench_plate_corner_1978: `${eraFolder(0)}base/trench-plate-corner.png`,
+  crate_pallet_1978: `${eraFolder(0)}base/crate-pallet.png`,
 };
 
 // Размеры [ширина, высота] по эпохам (индекс = эпоха 0..5).

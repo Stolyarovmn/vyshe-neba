@@ -4,7 +4,7 @@
 // Все функции рисуют в единицах мира через view; (wx, wy) — точка опоры (низ по центру).
 
 import {
-  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, E0_DELUGE_NOZZLES, ISLAND, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
+  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, E0_CRATE_PALLET, E0_DELUGE_NOZZLES, E0_TRENCH_ROUTES, ISLAND, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
 } from './manifest.js';
 import { clamp, hash2 } from './util.js';
 import { fillWorldRect } from './painter.js';
@@ -43,6 +43,28 @@ export function isProceduralBuilding(key) {
 }
 
 /** Целевой размер спрайта постройки в единицах мира [ширина, высота] (по sprite_px раскладки острова). */
+/** Крышки траншей вдоль трассы: прямые плиты по участкам, угловые в местах поворота (координаты в пикселях острова). */
+function drawTrenchRoute(ctx, painter, view, route) {
+  const U = ISLAND.unitsPerPx;
+  const put = (name, ix, iy, w) => {
+    const [x, y] = islandToWorld(ix, iy);
+    painter.sprite(ctx, view, name, x, y, { w: w * U, ax: 0.5, ay: 0.5, smooth: false });
+  };
+  for (let i = 0; i + 1 < route.points.length; i++) {
+    const [x0, y0] = route.points[i];
+    const [x1, y1] = route.points[i + 1];
+    const horizontal = y0 === y1;
+    const length = Math.abs(horizontal ? x1 - x0 : y1 - y0);
+    if (length < 8) continue;
+    const n = Math.max(1, Math.round(length / (horizontal ? 12 : 11.5)));
+    for (let k = 0; k < n; k++) {
+      const t = (k + 0.5) / n;
+      put(horizontal ? 'trench_plate_h_1978' : 'trench_plate_v_1978', x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, horizontal ? 12 : 4);
+    }
+  }
+  for (const [cx, cy] of route.corners ?? []) put('trench_plate_corner_1978', cx, cy, 4);
+}
+
 export function buildingSize(painter, key, level) {
   const layout = buildingLayout(key, level);
   const [px, py] = layout ? layout.size : [100, 100];
@@ -516,6 +538,18 @@ export function drawPlacedBuildings(ctx, painter, view, profile, time, onRect, e
           w: 9 * ISLAND.unitsPerPx, ax: 0.5, ay: 0.5, flipX: direction < 0, smooth: false,
         }) });
     }
+  }
+  for (const route of E0_TRENCH_ROUTES) {
+    if (profile?.buildings?.[route.requires] !== 1 || (hooks?.build?.(route.requires)?.reveal ?? 1) < 1) continue;
+    if (!['trench_plate_h_1978', 'trench_plate_v_1978', 'trench_plate_corner_1978'].every((n) => painter.has(n))) continue;
+    additions.push({ y: -1e6, draw: () => drawTrenchRoute(ctx, painter, view, route) }); // плоские крышки заподлицо: под всем остальным
+  }
+  if (profile?.buildings?.logistics === 1 && (profile?.contracts?.active?.length ?? 0) > 0
+      && (hooks?.build?.('logistics')?.reveal ?? 1) >= 1 && painter.has('crate_pallet_1978')) {
+    const [x, y] = islandToWorld(E0_CRATE_PALLET.anchor[0], E0_CRATE_PALLET.anchor[1]);
+    additions.push({ y, draw: () => painter.sprite(ctx, view, 'crate_pallet_1978', x, y, {
+      w: E0_CRATE_PALLET.width * ISLAND.unitsPerPx, ax: 0.5, ay: 1, smooth: false,
+    }) });
   }
   const queue = additions.length ? [...items, ...additions].sort((a, b) => a.y - b.y) : items;
   for (const item of queue) {

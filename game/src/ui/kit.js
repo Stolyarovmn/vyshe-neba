@@ -1741,6 +1741,13 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     get clickPos() { return S.clickPos; },
     get back() { return S.back; },
     get denied() { return S.denied; },
+    /** Отказ (DENIED): плитка дёргается и щёлкает, состояние не меняется; выбор плитки и выноска с причиной остаются. */
+    denyFx(id) {
+      const a = anim(id);
+      a.shake = 1;
+      S.denied = id;
+      sfx('deny');
+    },
     get emptyTap() { return S.emptyTap; },
     get dragDx() { return S.dragDx; },
     get dragDy() { return S.dragDy; },
