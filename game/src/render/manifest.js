@@ -129,6 +129,10 @@ export const E0_BUILDING_CLIPS = {
   logistics: { frames: 7, fps: 10, sequence: [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0] },
   recovery: { frames: 5, fps: 10, sequence: [0, 1, 2, 3, 4, 3, 2, 1, 0] },
   factory: { frames: 7, fps: 10, sequence: [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0] },
+  fuel: { frames: 5, fps: 10, sequence: [0, 1, 2, 3, 4, 3, 2, 1, 0] },
+  deluge: { frames: 5, fps: 8, sequence: [0, 1, 2, 3, 4, 3, 2, 1, 0] },
+  rescue: { frames: 7, fps: 10, sequence: [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0] },
+  energy: { frames: 4, fps: 8, sequence: [0, 1, 2, 3, 3, 3, 2, 1, 0] },
 };
 
 /**
