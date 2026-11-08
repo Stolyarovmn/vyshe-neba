@@ -1,0 +1,32 @@
+{
+  "asset_id": "INFRA_TRENCH_H",
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "763b5922df8b8edbcdd1860cea23ee9b8e0d04d21911cba9ed40018c5a0a6c24",
+      "scene_projection": {
+        "candidate_sha256": "763b5922df8b8edbcdd1860cea23ee9b8e0d04d21911cba9ed40018c5a0a6c24",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "scene_png_sha256": "4bf205b1c3b58d88075213bc343df53a2d97e1a285d926327e52e4d3a55c6998",
+        "source_sha256": "ee004d8562c98f35db0da06a002d39236825d555c75f22916c6275077f9a2176",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "reviewer": "Claude (по делегированию владельца 2026-11-07; владелец правит точечно после пробной сборки)",
+        "approval_evidence": "Обработанный PNG (32 цвета, бинарная альфа) просмотрен на острове и увеличенно: стальная крышка траншеи заподлицо с грунтом: показывает горизонтальный участок трассы подземной магистрали (охлаждение), BI_DELUGE_E0.md. Сталь серо-зелёная и дерево из палитры E0, болты и ржавчина по кромкам, плоская проекция. Размещение тестовое, приёмка карты за владельцем.",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        }
+      }
+    }
+  }
+}

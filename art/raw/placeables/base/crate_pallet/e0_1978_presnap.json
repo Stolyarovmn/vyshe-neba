@@ -1,0 +1,20 @@
+{
+  "source_sha256": "cafb9c2c83d16b03f3651059237fb396b52791fa4fd0e565ddc857c1db867964",
+  "source_original_sha256": "d552c1ed889bbcf999208bd784dcad43e433cf48eeb73dec8705b938af0e8953",
+  "original_png_file": "art/raw/placeables/base/crate_pallet/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1tAgnOvvMi2C1lhH4DryzMVqJ9CiHgSV1",
+    "folder_id": "1idbr23HOmdgq0uocCZ2o63DLHwXVDrPW",
+    "original": "e0_1978_logical.png (авторский, до увеличения x4)"
+  },
+  "parametric": {
+    "builder": "tools/art_pipeline/e0_scenery_build.py",
+    "size": [
+      36,
+      30
+    ],
+    "palette": "E0: сталь серо-зелёная, дерево, болты, ржавчина по кромкам",
+    "light": "верх-лево, тень холодная вниз-вправо, запечённой тени нет"
+  }
+}

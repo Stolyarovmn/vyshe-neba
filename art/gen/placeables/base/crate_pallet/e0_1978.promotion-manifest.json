@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "INFRA_CRATE_PALLET",
+  "asset": "crate_pallet",
+  "production_dir": "art/gen/placeables/base/crate_pallet",
+  "runtime_target": "eras/e0-1978/base/crate-pallet.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/crate_pallet/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "5e6794e92da8aafb7620277dd71aa7dc940334246d18f87caa7642359e58b8fa",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "754f21b6cd8f9793be68e86b266655ea0b3187da",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "d951dd438f04c245d2881b84d4e6ab80238361c1eae66c5fb4047deb5d7632f4",
+    "processor_sha256": "bcb3a42f96e6c836a1f7f4a3dce8fb5e40d6f95d971b28eaa5b311af23f6bb2c",
+    "prompt_sha256": null
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "2e0672805bcf87ff5c7c08002241663ed771388c99614d22ab34618d42b091dc",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

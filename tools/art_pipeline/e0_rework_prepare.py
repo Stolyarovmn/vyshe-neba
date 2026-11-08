@@ -26,6 +26,10 @@ SPEC = {
     'BI-FACTORY': dict(asset='assembly_workshop', px=4, width=242, scene_w=70, scene_xy=(920, 255), label='Цех'),
     'B07': dict(asset='cargo_terminal', px=4, width=246, scene_w=44, scene_xy=(1200, 470), label='Грузовой терминал'),
     'BI-RETURN': dict(asset='capsule_return_station', px=4, width=238, scene_w=41, scene_xy=(1505, 440), label='Комплекс возврата капсулы'),
+    'INFRA_TRENCH_H': dict(asset='trench_plate_h', px=4, width=48, scene_w=12, scene_xy=(484, 483), label='Плита траншеи'),
+    'INFRA_TRENCH_V': dict(asset='trench_plate_v', px=4, width=16, scene_w=4, scene_xy=(513, 462), label='Плита траншеи (вертикаль)'),
+    'INFRA_TRENCH_C': dict(asset='trench_plate_corner', px=4, width=16, scene_w=4, scene_xy=(513, 483), label='Угловая плита траншеи'),
+    'INFRA_CRATE_PALLET': dict(asset='crate_pallet', px=4, width=36, scene_w=10, scene_xy=(1228, 472), label='Поддон с ящиками'),
 }
 KEY = np.array([255, 0, 255])
 

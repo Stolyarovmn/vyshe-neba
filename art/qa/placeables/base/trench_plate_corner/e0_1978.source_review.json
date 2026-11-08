@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Claude (по делегированию владельца 2026-11-07; владелец правит точечно после пробной сборки)",
+  "source_sha256": "026edc89e42ea9b18e333acd7403748e233bae95dda3c46a9f35fcce36fb1add",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "3ad62aca9d430a73fed7c07de119b3fd86977fd79ef47d120a4c14a24cd53c9c",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Параметрический объект (код e0_scenery_build.py, логическая сетка, 4 лог. px = 1 px острова): угловая крышка в месте поворота трассы, там же стык плит и ревизия. Плоские плиты и низкий поддон: вертикальная проекция 0,285, свет сверху-слева, запечённой тени нет. Сцена 4 px в (513,483), привязка низ-центр, TEST_ONLY; место на карте не утверждено."
+}

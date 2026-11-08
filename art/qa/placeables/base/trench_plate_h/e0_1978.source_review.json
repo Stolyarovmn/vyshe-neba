@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Claude (по делегированию владельца 2026-11-07; владелец правит точечно после пробной сборки)",
+  "source_sha256": "ee004d8562c98f35db0da06a002d39236825d555c75f22916c6275077f9a2176",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "1a03e279abab7e5f5028feded536b2aff7558d07630080504d733abe28786be4",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Параметрический объект (код e0_scenery_build.py, логическая сетка, 4 лог. px = 1 px острова): стальная крышка траншеи заподлицо с грунтом: показывает горизонтальный участок трассы подземной магистрали (охлаждение), BI_DELUGE_E0.md. Плоские плиты и низкий поддон: вертикальная проекция 0,285, свет сверху-слева, запечённой тени нет. Сцена 12 px в (484,483), привязка низ-центр, TEST_ONLY; место на карте не утверждено."
+}
