@@ -1,0 +1,68 @@
+{
+  "asset": "radar «Радар слежения» (B02)",
+  "era": "E0",
+  "status": "Записано 2026-11-08 по ASSET_STATE_SPEC.md. Спрайт принят раньше (PR №126/№134/№137); состояния отражают решения владельца: блокировка и отказ только на карточке «База», нажатие = ON-клип.",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the building",
+      "implementation": "plays_ON_clip",
+      "owner_decision": "решение владельца 2026-11-08: отклик на нажатие = ON-клип (тап по постройке в хабе проигрывает клип один раз) (пока клипа нет)",
+      "why": "игрок получает физический отклик постройки на нажатие; отдельный клип не рисуется"
+    },
+    "ON": {
+      "trigger": "launch_prepare / flight (радар подсвечивает самолёты и обломки)",
+      "parts": [
+        "dish_head"
+      ],
+      "motion": "антенна делает шаг по азимуту; лампа на мачте мигает",
+      "loop": false,
+      "code_fx": [
+        "mast_lamp_blink (hub.js: drawNightLights, key radar)",
+        "sweep_sound"
+      ],
+      "why": "радар сообщает о самолётах и обломках заранее (collisionCut); поворот антенны показывает направление сканирования",
+      "animation": {
+        "file": null,
+        "status": "code_lamp_only_now; part pending",
+        "reason": "спрайт 27×16 px принят владельцем как B02; кодовая лампа мачты мигает уже сейчас, поворот антенны требует отдельного слоя (animation.json B02 рига: pivot null до измеренного прохода)"
+      }
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": [
+        "era",
+        "building:weather",
+        "energy (со 2-го уровня)"
+      ],
+      "art_variant": null,
+      "visible": "на острове постройки нет, пока не выполнены условия; причина словами на карточке «База» (reasonFull)",
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок видит, чего не хватает (эпоха, соседняя постройка, энергия), словами из reasonFull на карточке"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "frames": 0,
+      "loop": false,
+      "code_fx": [
+        "bubble_shake",
+        "click_denied_sound"
+      ],
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок получает короткий отказ на заблокированной карточке, состояние постройки не меняется"
+    }
+  },
+  "not_applicable": [],
+  "accessibility": "при «меньше движения» (reduceMotion) клип не проигрывается: остаётся статичный кадр",
+  "sprite": {
+    "path": "art/gen/placeables/base/tracking_radar_e0_vector/e0_1978.runtime.png",
+    "sha256": "e28123e11607832dfcfa5052271489dcc8c6ad5bcf7ad03e459f8e86281fddc9"
+  },
+  "game_data": {
+    "building_key": "radar",
+    "dependsOn": [
+      "weather"
+    ],
+    "source": "game/src/data/buildings.js (main)"
+  },
+  "mechanism_pivots": "pending_measured_rig_pass (см. ON.animation.reason)"
+}

@@ -1,0 +1,79 @@
+{
+  "asset": "rescue «Спасательная станция»",
+  "era": "E0",
+  "status": "Записано 2026-11-08 по ASSET_STATE_SPEC.md. Спрайт принят раньше (PR №126/№134/№137); состояния отражают решения владельца: блокировка и отказ только на карточке «База», нажатие = ON-клип.",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the building",
+      "implementation": "plays_ON_clip",
+      "owner_decision": "решение владельца 2026-11-08: отклик на нажатие = ON-клип (тап по постройке в хабе проигрывает клип один раз)",
+      "why": "игрок получает физический отклик постройки на нажатие; отдельный клип не рисуется"
+    },
+    "ON": {
+      "trigger": "тап по постройке в хабе; конец стройки (клип проигрывается один раз)",
+      "parts": [
+        "hangar_door_leaf"
+      ],
+      "motion": "створка ангара уезжает влево по рельсу и возвращается",
+      "frames": 13,
+      "fps": 10,
+      "loop": false,
+      "reduce_motion": "один кадр: створка открыта на 15 px",
+      "code_fx": [
+        "door_rumble_sound"
+      ],
+      "why": "открытый ангар показывает, что станция готова выпустить машину к месту аварии (возврат при аварии, обслуживание капсулы)",
+      "animation": {
+        "file": "animation.json",
+        "clip": "ON",
+        "part": "hangar_door_leaf",
+        "pivot": [
+          41,
+          187
+        ],
+        "range_px": [
+          -30,
+          0
+        ],
+        "motion": "translate_x"
+      }
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": [
+        "era",
+        "building:service",
+        "energy (со 2-го уровня)"
+      ],
+      "art_variant": null,
+      "visible": "на острове постройки нет, пока не выполнены условия; причина словами на карточке «База» (reasonFull)",
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок видит, чего не хватает (эпоха, соседняя постройка, энергия), словами из reasonFull на карточке"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "frames": 0,
+      "loop": false,
+      "code_fx": [
+        "bubble_shake",
+        "click_denied_sound"
+      ],
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок получает короткий отказ на заблокированной карточке, состояние постройки не меняется"
+    }
+  },
+  "not_applicable": [],
+  "accessibility": "при «меньше движения» (reduceMotion) клип не проигрывается: остаётся статичный кадр",
+  "sprite": {
+    "path": "art/gen/placeables/base/rescue/e0_1978.runtime.png",
+    "sha256": "ab88ec4b7202fc50034778497ac89e5de4c33d2d4089a4041eed80109e3b20ee"
+  },
+  "game_data": {
+    "building_key": "rescue",
+    "dependsOn": [
+      "service"
+    ],
+    "source": "game/src/data/buildings.js (main)"
+  },
+  "mechanism_pivots": "measured_for_ON_part_only (animation.json)"
+}

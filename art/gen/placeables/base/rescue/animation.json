@@ -1,0 +1,63 @@
+{
+  "asset": "rescue",
+  "era": "E0",
+  "source_sprite": {
+    "path": "art/gen/placeables/base/rescue/e0_1978.runtime.png",
+    "sha256": "ab88ec4b7202fc50034778497ac89e5de4c33d2d4089a4041eed80109e3b20ee",
+    "size": [
+      166,
+      211
+    ]
+  },
+  "clips": {
+    "ON": {
+      "trigger": "см. states.json (ON)",
+      "frames": 13,
+      "fps": 10,
+      "loop": false,
+      "frame_size": [
+        166,
+        211
+      ],
+      "sheet": "animation/on_sheet.png",
+      "sheet_sha256": "f2ecdc5623185fed20dd93849b514727b4da05921aa08fdf8260abd67f7902ea",
+      "preview_gif": "animation/on.gif",
+      "rest_frame": 0,
+      "reduce_motion_frame": 6,
+      "parts": [
+        {
+          "part": "hangar_door_leaf",
+          "box": [
+            41,
+            187,
+            125,
+            204
+          ],
+          "pivot": [
+            41,
+            187
+          ],
+          "motion": "translate_x",
+          "range_px": [
+            -30,
+            0
+          ],
+          "why": "створка ангара уезжает по рельсу, освобождая выезд спасательной машины к месту посадки"
+        }
+      ],
+      "method": "часть вырезана из утверждённого спрайта, фон под ней восстановлен копией соседнего фона того же спрайта, смещение целыми пикселями на той же сетке",
+      "palette_colors": {
+        "base": 30,
+        "all_frames": 30
+      }
+    }
+  },
+  "pivot_policy": "измерены по утверждённому спрайту, указаны в parts[].pivot (пиксели runtime-кадра)",
+  "code_owned": [
+    "свет",
+    "звук",
+    "дым",
+    "тени событий"
+  ],
+  "runtime_integration": "не подключено: рендер берёт статичный кадр; подключение анимации отдельным изменением кода"
+}

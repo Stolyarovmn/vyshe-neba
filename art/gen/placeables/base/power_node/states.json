@@ -1,0 +1,83 @@
+{
+  "asset": "energy «Энергетический узел»",
+  "era": "E0",
+  "status": "Записано 2026-11-08 по ASSET_STATE_SPEC.md. Спрайт принят раньше (PR №126/№134/№137); состояния отражают решения владельца: блокировка и отказ только на карточке «База», нажатие = ON-клип.",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the building",
+      "implementation": "plays_ON_clip",
+      "owner_decision": "решение владельца 2026-11-08: отклик на нажатие = ON-клип (тап по постройке в хабе проигрывает клип один раз)",
+      "why": "игрок получает физический отклик постройки на нажатие; отдельный клип не рисуется"
+    },
+    "ON": {
+      "trigger": "тап по постройке в хабе; конец стройки (клип проигрывается один раз)",
+      "parts": [
+        "breaker_lever"
+      ],
+      "motion": "рычаг рубильника на щите переходит во включённое положение",
+      "frames": 5,
+      "fps": 8,
+      "loop": false,
+      "reduce_motion": "один кадр: рычаг во включённом положении",
+      "code_fx": [
+        "generator_hum_sound",
+        "exhaust_smoke_fx",
+        "lamp_glow"
+      ],
+      "why": "узел даёт мощность всем постройкам; включённый рубильник показывает, что энергия идёт на площадку, а при дефиците эффекты построек слабеют",
+      "animation": {
+        "file": "animation.json",
+        "clip": "ON",
+        "part": "breaker_lever",
+        "pivot": [
+          212,
+          148
+        ],
+        "range_px": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            -3
+          ]
+        ],
+        "motion": "translate_xy_steps"
+      }
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": [
+        "era"
+      ],
+      "art_variant": null,
+      "visible": "на острове постройки нет, пока не выполнены условия; причина словами на карточке «База» (reasonFull)",
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок видит, чего не хватает (эпоха, соседняя постройка, энергия), словами из reasonFull на карточке"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "frames": 0,
+      "loop": false,
+      "code_fx": [
+        "bubble_shake",
+        "click_denied_sound"
+      ],
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок получает короткий отказ на заблокированной карточке, состояние постройки не меняется"
+    }
+  },
+  "not_applicable": [],
+  "accessibility": "при «меньше движения» (reduceMotion) клип не проигрывается: остаётся статичный кадр",
+  "sprite": {
+    "path": "art/gen/placeables/base/power_node/e0_1978.runtime.png",
+    "sha256": "09150c61bf71b188173cee41ed81510a02976f87828a5f2dd8838c778f26bbc9"
+  },
+  "game_data": {
+    "building_key": "energy",
+    "dependsOn": [],
+    "source": "game/src/data/buildings.js (main)"
+  },
+  "mechanism_pivots": "measured_for_ON_part_only (animation.json)"
+}
