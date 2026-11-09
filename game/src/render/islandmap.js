@@ -5,7 +5,7 @@
 // масштаб уменьшается с высотой, а карта «уходит» вниз (см. flight.js).
 
 import { ISLAND } from './manifest.js';
-import { clamp, hash2, mixColor, rgbString } from './util.js';
+import { clamp, hash2, mixColor, rgbString, smoothstep } from './util.js';
 
 /** Преобразование карта -> экран; интерфейс совместим с view из camera.js, чтобы использовать painter. */
 export function createMapView() {
@@ -122,10 +122,17 @@ export function drawSea(ctx, mv, time, mood, haze = 0, hazeColor = null) {
 }
 
 const WAVE_CELL = 46;
+// С высотой карта мельчает (groundScale), а число ячеек волн на экране растёт как 1/s²: на 18 км это ~90 тысяч fillRect за кадр
+// штрихами 2x1 px, то есть «манка» и тормоза. Поэтому волны гаснут, когда ячейка на экране уже WAVE_FADE_FULL px,
+// и не рисуются совсем уже WAVE_FADE_NONE px: число ячеек ограничено (~devW*devH/WAVE_FADE_NONE²).
+const WAVE_FADE_NONE = 14; // px устройства
+const WAVE_FADE_FULL = 34; // px устройства
 
 function drawWaves(ctx, mv, time, mood, calm) {
-  const rough = 1 + mood.rain * 1.2 + mood.storm * 2.5;
   const s = mv.s;
+  const visible = smoothstep(WAVE_FADE_NONE, WAVE_FADE_FULL, WAVE_CELL * s);
+  if (visible <= 0.08) return; // при такой прозрачности штрихи уже не видны, а ячеек ещё тысячи
+  const rough = 1 + mood.rain * 1.2 + mood.storm * 2.5;
   const thickness = Math.max(1, Math.round(s * 1.1));
   const drift = time * (2.4 + mood.storm * 3);
   const x0 = Math.floor((mv.left - drift - 40) / WAVE_CELL);
@@ -142,7 +149,7 @@ function drawWaves(ctx, mv, time, mood, calm) {
       const wx = (ix + hash2(ix, iy, 22)) * WAVE_CELL + drift;
       const wy = (iy + hash2(ix, iy, 23)) * WAVE_CELL + Math.sin(time * 0.8 + h * 20) * 0.8 * rough;
       const length = (9 + 16 * hash2(ix, iy, 24)) * (0.8 + 0.2 * rough);
-      ctx.globalAlpha = 0.16 + 0.2 * hash2(ix, iy, 25);
+      ctx.globalAlpha = (0.16 + 0.2 * hash2(ix, iy, 25)) * visible;
       ctx.fillRect(mv.sx(wx), mv.sy(wy), Math.max(2, Math.round(length * s)), thickness);
     }
   }
