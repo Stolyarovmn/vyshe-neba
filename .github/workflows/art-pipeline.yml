@@ -2,7 +2,7 @@ name: W04 asset candidate
 
 on:
   push:
-    branches: [main]
+    branches: [game-production]
     paths:
       - 'art/raw/placeables/workshop/flight_simulator/**'
   workflow_dispatch:

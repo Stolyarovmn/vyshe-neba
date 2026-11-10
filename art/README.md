@@ -1,33 +1,17 @@
-# ref2game art source
+# art/ — производство арта
 
-В репозитории два связанных производственных потока. Выбор зависит от типа ассета:
+Действующий стандарт для любой картинки в игре — `docs/ART_DIRECTION_HD_PIXEL.md`: HD-пиксель по эталону острова, три камеры (полёт сверху, база изометрия 40°, иконки фронт 3/4), палитра острова плюс акценты эпохи, рецепт генерации и обработки (`tools/hd_pixel/`). Язык эпох — `docs/ERA_DESIGN_MATRIX.md`, состояния объектов — `docs/ASSET_STATE_SPEC.md`, общий текст стиля для запросов — `style_bible.txt`.
 
-| Поток | Для чего | Где описан | Инструменты |
-| --- | --- | --- | --- |
-| **ref2game: world sprites** | самолёты, дроны, природа, небо, фон, посадочные площадки, монеты | этот файл и `art/PROGRESS.md` | `tools/ref2game/{gen,slice,prep}.py`, `ref2game.json` |
-| **Placeables pipeline** | покупаемые и размещаемые объекты базы и мастерской W/B (эпохи E0–E5) | `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `art/docs/ASSET_TASK_TRACKER.md`, `art/placeables/PRODUCTION_MANIFEST.md` | `tools/art_pipeline/*`, workflows `asset-candidate` / `asset-promote` |
+| Папка | Что внутри |
+| --- | --- |
+| `docs/` | контракты и правила (см. `README.md` в корне ветки) |
+| `briefs/` | паспорта построек E0 (B01–B07, BI_*, EN01, OB01) по `docs/ASSET_BRIEF_TEMPLATE.md` |
+| `prompts/` | промпты генераций; `prompts/era_references/` — сгенерированные из `reference_specs/` (не править руками) |
+| `reference_specs/`, `references/eras/` | машинные спецификации и утверждённые наборы era-reference листов E0–E4 |
+| `gen/` | обработанный утверждённый арт и provenance (`*.json`, `*.md`); бинарники только там, где это production-source |
+| `raw/`, `requests/`, `logs/`, `qa/`, `review/` | свидетельства: сырые метаданные, запросы, журналы импорта, QA-отчёты, ревью |
+| `placeables/` | `PRODUCTION_MANIFEST.md` (роли и части), `PIPELINE_CONFIG.json` (порядок трекера и пины инструментов), `BASE_ISLAND_LAYOUT.json` (историческая выгрузка раскладки v3; источник истины — `main:game/src/render/manifest.js`) |
+| `runtime/RUNTIME_EXPORTS.json` | карта production-source → runtime-target для публикации |
+| `aircraft/`, `infrastructure/`, `*.json` | метаданные старых потоков (самолёты, инфраструктура, шары, спутник); актуальные размеры — в `manifest.js` на `main` |
 
-Общее для обоих потоков: `art/style_bible.txt` вставляется дословно в каждый запрос на генерацию; интерактивные ходы подчиняются `art/docs/EXECUTION_TIMEOUT_POLICY.md`. Перед созданием нового/изменяемого ассета выполняется совместимый G0/G1 design+era+projection preflight по `art/docs/PRODUCTION_CONTRACT_V2.md` и заполняется `art/docs/ASSET_BRIEF_TEMPLATE.md`. Новые gates не заменяют различающиеся world/placeables processing flows. Старые пути `outputs/rocket/dist` ниже — исторические, их нельзя считать текущим runtime без проверки выбранной ветки.
-
-Хранение оригиналов: для placeables канонический архив нетронутых генераций находится на Google Drive (`vyshe-neba/art-originals/`), а `art/raw/` необязателен. Для world sprites оригиналы листов дополнительно лежат в `art/raw` и `art/gen`.
-
-`art/style_bible.txt` is the canonical style block and must be prepended verbatim to every future image-generation request.
-
-For the current aircraft pass, the previously generated/sliced pack is being normalized into the ref2game layout. Future regeneration must follow `gen.py prepare -> image generation -> gen.py import -> slice.py -> prep.py` rather than bypassing those stages.
-
-Canonical aircraft source metadata lives under `art/aircraft/`; runtime-ready copies live under `outputs/rocket/dist/assets/aircraft/` until the game is fully migrated to the standard `live/` layout.
-
-
-## World sprite production
-
-The generated sources and original imagegen sheets are retained in `art/gen` and `art/raw`. Requests contain the canonical style bible verbatim; tool imports are recorded in `art/logs`. Preparation is configured by `ref2game.json`; rebuild with `python3 tools/ref2game/prep.py --all` followed by `python3 tools/build-world-manifest.py`.
-
-`live/world-sprites.js` owns physical sprite selection, articulated attachments and effects; build copies it and `live/aircraft.js` to runtime. Game and background integration remain in `outputs/rocket/dist/game.js` and `world-art.js` until the existing game is fully migrated. `npm run build` generates the standalone HTML locally; run `node outputs/rocket/qa-world.cjs` for assembled scene QA.
-
-See `art/PROGRESS.md` for acceptance status and remaining work.
-
-## Buyable / placeable infrastructure
-
-`art/placeables/PRODUCTION_MANIFEST.md` is the canonical production contract for buyable and placeable base/workshop infrastructure. It defines the 17 object families, E0–E5 engineering lineage, target LP footprints, socket classes, articulated parts, event-driven motion contracts, relative economy tiers and generation/QA workflow.
-
-Placeable artwork must follow `art/style_bible.txt` and the ref2game workflow. Design pivots in the manifest are intent only; runtime pivots must be measured from the approved imported artwork before rigging.
+Два потока обработки, которые ещё существуют в инструментах: `tools/ref2game/` (world-спрайты: самолёты, природа) и `tools/art_pipeline/` (placeables: Pixel Snapper → normalize → Aseprite → QA → кандидат). Для спрайтов E0 в ноябре 2026 вместо них использован `tools/hd_pixel/`; какой путь брать для нового объекта, решает `docs/ART_DIRECTION_HD_PIXEL.md` §4.
