@@ -1,0 +1,49 @@
+{
+  "asset_id": "INFRA_TRENCH_H",
+  "asset": "trench_plate_h",
+  "zone": "base",
+  "era": "E0",
+  "year": 1978,
+  "adapter": "prepared_grid_png",
+  "source_gen_id": null,
+  "source_sha256": "ee004d8562c98f35db0da06a002d39236825d555c75f22916c6275077f9a2176",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1ciA5Rxah-JUkg0T1dqBlr0ZDSqemKn2R",
+    "folder_id": "1idbr23HOmdgq0uocCZ2o63DLHwXVDrPW",
+    "original": "e0_1978_logical.png (авторский, до увеличения x4)"
+  },
+  "transport_sha256": "ee004d8562c98f35db0da06a002d39236825d555c75f22916c6275077f9a2176",
+  "transport_pixel_sha256": null,
+  "spritefusion_pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "aseprite_version": "1.3.18.6",
+  "aseprite_dithering": "none",
+  "pixel_size": 4,
+  "colors": 32,
+  "target_canvas": [
+    56,
+    24
+  ],
+  "registration_target": [
+    28,
+    22
+  ],
+  "mechanism_pivots": "pending_measured_rig_pass",
+  "output_sha256": "763b5922df8b8edbcdd1860cea23ee9b8e0d04d21911cba9ed40018c5a0a6c24",
+  "reproducibility": {
+    "git_commit": "754f21b6cd8f9793be68e86b266655ea0b3187da",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "d951dd438f04c245d2881b84d4e6ab80238361c1eae66c5fb4047deb5d7632f4",
+    "processor_sha256": "bcb3a42f96e6c836a1f7f4a3dce8fb5e40d6f95d971b28eaa5b311af23f6bb2c",
+    "prompt_sha256": null
+  },
+  "publication": {
+    "state": "production",
+    "runtime_published": false,
+    "visual_review": "art/gen/placeables/base/trench_plate_h/visual_qa.json",
+    "visual_review_sha256": "a3e431e451303d8df0dca4619543e2f9d04fc6895e30ebc368525a86a10123c8",
+    "hash_bound": true,
+    "runtime_boundary": "separate_main_pr"
+  }
+}

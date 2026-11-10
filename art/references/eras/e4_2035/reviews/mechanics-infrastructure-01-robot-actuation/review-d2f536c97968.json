@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/mechanics-infrastructure-01-robot-actuation.json",
+  "generation_id": null,
+  "returned_filename": "exec-6ea57b90-8ea8-4d90-ba4a-c6274b1d4440.png",
+  "request_sha256": "4d5789088365ed6ddcaa8644880facebc7141edf2d17e838e6a0fbe0ae8269b6",
+  "source": {
+    "sha256": "d2f536c97968f494eac89a888b4f087105af0e333dec292eff6c85d8ded5d574",
+    "bytes": 1895818,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1DdsZ9owHBPnwwSlwKV3YISuWzK1Cscy1",
+    "drive_url": "https://drive.google.com/file/d/1DdsZ9owHBPnwwSlwKV3YISuWzK1Cscy1/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "notes": "Три монтажных гнезда, ключ, контакты и обмотки читаются.",
+      "verdict": "pass",
+      "name": "Thin annular drive",
+      "id": "E4-04-01"
+    },
+    {
+      "notes": "Малый корпус датчика версии24 восстановлен; измерительный зазор открыт.",
+      "verdict": "pass",
+      "name": "Torque-sensing crescent",
+      "id": "E4-04-02"
+    },
+    {
+      "notes": "Линейный привод, магнитный ряд, шкала и кассетная посадка.",
+      "verdict": "pass",
+      "name": "Integrated linear sled",
+      "id": "E4-04-03"
+    },
+    {
+      "notes": "Кулачок касается ролика, толкатель соосен.",
+      "verdict": "pass",
+      "name": "Powered compression cartridge",
+      "id": "E4-04-04"
+    },
+    {
+      "notes": "Шарнирная собачка зацеплена с сектором. Контакт небольшой, функционально читаемый.",
+      "verdict": "pass",
+      "name": "Parking lock cassette",
+      "id": "E4-04-05"
+    },
+    {
+      "notes": "Непрерывная тяга, заделка в центре флексуры и отдельный датчик с зазором.",
+      "verdict": "pass",
+      "name": "Finger tendon insert",
+      "id": "E4-04-06"
+    },
+    {
+      "notes": "Две параллельные упругие пластины и платформа.",
+      "verdict": "pass",
+      "name": "Parallel compliance cassette",
+      "id": "E4-04-07"
+    },
+    {
+      "notes": "Цилиндрический ролик на оси в вилке посажен в вырез. Отдельная плоская индексная пластина на вращающемся ободе с зазором до датчика.",
+      "verdict": "pass",
+      "name": "Homing drum cartridge",
+      "id": "E4-04-08"
+    }
+  ],
+  "reviewer": "Codex и независимый критик sheet04_v19_review",
+  "review_method": "Независимая инженерная проверка всех восьми ячеек и сохранения защищённых деталей.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "preservation_review": {
+    "additional_baseline": "E4_sheet04_rev18.png",
+    "notes": "Корпус датчика R1C2 соответствует24. R1C3 R1C4 R2C3 соответствуют18 по существенной геометрии, масштабу, позиции и состоянию.",
+    "baseline": "E4_sheet04_rev24.png",
+    "verdict": "pass"
+  }
+}

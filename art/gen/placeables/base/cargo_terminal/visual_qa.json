@@ -1,0 +1,32 @@
+{
+  "asset_id": "B07",
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "ae7c00f7d5fc4bf0f8171a4d78158ada84e643c4f8282e35b6e8310d8abd920f",
+      "scene_projection": {
+        "candidate_sha256": "ae7c00f7d5fc4bf0f8171a4d78158ada84e643c4f8282e35b6e8310d8abd920f",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "scene_png_sha256": "d0c8e27837709d9ffd079c6fd556fda9084d7055977f0c75e23fc222c20ac57b",
+        "source_sha256": "6515062a5e79c0606cfffdd39d00a99bcaae1f04af007ec509a5c294c7496f78",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "reviewer": "Claude (по делегированию владельца 2026-11-07; владелец правит точечно после пробной сборки)",
+        "approval_evidence": "Обработанный PNG (32 цвета, бинарная альфа) просмотрен на острове при ширине 44 px в (1200,470) и увеличенно. Портал стоит по краям и перекрывает обе точки груза: дощатую стоянку с двумя ящиками и приёмную площадку; тележка с ручной цепной талью между ними, вертикали по строгой камере коротки. Отклонения приняты владельцем: кромка плиты около 0,924 при пороге 0,94, плита мельче схемы; точечные правки после пробной сборки.",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "source_storage": {"provider": "google_drive", "drive_file_id": "1w4UDm4XbUGfJiDSH9sPo0McWP2IQvUfx"},
+  "source_sha256": "59941a6b81f0e457f531cf367145266098ed58aa87ec0844e5b7c73c8cdc6be8",
+  "original_png_file": "art/raw/placeables/base/fuel/e0_1978_presnap.png",
+  "preparation": {"local_original": "B05_FUEL_E0_attempt04_raw.png", "method": "byte-identical original RGBA input"}
+}

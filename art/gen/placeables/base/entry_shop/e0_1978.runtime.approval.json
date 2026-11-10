@@ -1,0 +1,13 @@
+{
+  "approved": true,
+  "status": "runtime_geometry_verified",
+  "source_sha256": "77071dda53ba338dd7a3bcfdb892769a20a700ac821f8214c220ceb3ee683713",
+  "sha256": "e60280df1704f2c15cdebd5df505f7951d4b0d986bc4b3c125bcf8dc62c3c108",
+  "review_sha256": "b3afc21832ff5311bc89db711eadcbe90046a9a4541105a2bd1f34950333ccfa",
+  "resampling": "box_alpha_threshold_48",
+  "runtime_size": [
+    30,
+    18
+  ],
+  "runtime_published": false
+}

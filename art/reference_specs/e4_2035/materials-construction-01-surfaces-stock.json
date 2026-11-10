@@ -65,7 +65,7 @@
     {
       "id": "E4-01-08",
       "name": "Robot grip window at panel edge",
-      "description": "BOTTOM ROW CELL 4 ONLY. Redraw one cutaway composite edge with integral recessed metal robot pickup. One clear rectangular through aperture. At the midpoint of its LEFT and RIGHT inner walls each has ONE broad rectangular machined jaw land standing proud into the aperture, two opposing flat faces, mirrored lead-in chamfers and flat stop steps. Darken the internal wall behind the lands to make these two solid steps readable by geometry. Leave open background between the lands. No gripper, no separate handle."
+      "description": "BOTTOM ROW CELL 4 ONLY. Keep the existing cutaway composite panel edge with one rectangular through aperture and two opposing rectangular jaw lands. Add one short narrow frosted LED strip in a shallow slot in the OUTER entry bevel above the aperture. It illuminates the pickup entry edge during robot alignment. Show the diffuser seated flush in the bevel, clearly separated from the two contact faces and open gap. Unlit hardware, no halo, no standalone lamp."
     }
   ],
   "global_forbidden": [
@@ -79,7 +79,7 @@
     "E3 uniform honeycomb, exposed T-slot stock, plain flat composite coupons, E5 holograms, levitation and ornamental light lines"
   ],
   "era_contract": {
-    "character": "TARGETED EDIT of the supplied E4 revision 02. REDRAW only R1C4, R2C3 and R2C4 from their new geometry instructions. Keep the enlarged glass in R2C1 and keep R1C1 R1C2 R1C3 R2C2. Copy those five cells unchanged, including their background, pose, size and position.",
+    "character": "TARGETED EDIT of supplied E4 revision 03. Add one narrow recessed LED diffuser along the outer entry bevel of the composite panel in R2C4 only. Preserve its rectangular aperture, both jaw lands and open gap. Preserve the shape, size and position of all seven other specimens.",
     "required_signals": [
       "visible graded lattice, continuous curved fibre paths and local thickness change",
       "architectural glazing limited to one functional retaining edge",

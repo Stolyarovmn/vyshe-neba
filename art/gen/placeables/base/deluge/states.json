@@ -1,0 +1,80 @@
+{
+  "asset": "deluge «Охлаждение площадки»",
+  "era": "E0",
+  "status": "Записано 2026-11-08 по ASSET_STATE_SPEC.md. Спрайт принят раньше (PR №126/№134/№137); состояния отражают решения владельца: блокировка и отказ только на карточке «База», нажатие = ON-клип.",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the building",
+      "implementation": "plays_ON_clip",
+      "owner_decision": "решение владельца 2026-11-08: отклик на нажатие = ON-клип (тап по постройке в хабе проигрывает клип один раз)",
+      "why": "игрок получает физический отклик постройки на нажатие; отдельный клип не рисуется"
+    },
+    "ON": {
+      "trigger": "тап по постройке в хабе; конец стройки (клип проигрывается один раз)",
+      "parts": [
+        "outlet_valve_wheel"
+      ],
+      "motion": "маховик вентиля у отвода бака поворачивается шагами до 60° и возвращается",
+      "frames": 5,
+      "fps": 8,
+      "loop": false,
+      "reduce_motion": "один кадр: маховик повёрнут",
+      "code_fx": [
+        "valve_squeal_sound",
+        "water_spray_fx_on_launch"
+      ],
+      "why": "вентиль отвода бака открывает воду на защиту стола при запуске (BI_DELUGE_E0.md); игрок видит орган, которым управляется защита площадки",
+      "animation": {
+        "file": "animation.json",
+        "clip": "ON",
+        "part": "outlet_valve_wheel",
+        "pivot": [
+          36,
+          133
+        ],
+        "range_px": [
+          0,
+          60
+        ],
+        "motion": "rotate_nearest_ellipse"
+      }
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": [
+        "era",
+        "building:gantry",
+        "energy (со 2-го уровня)"
+      ],
+      "art_variant": null,
+      "visible": "на острове постройки нет, пока не выполнены условия; причина словами на карточке «База» (reasonFull)",
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок видит, чего не хватает (эпоха, соседняя постройка, энергия), словами из reasonFull на карточке"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "frames": 0,
+      "loop": false,
+      "code_fx": [
+        "bubble_shake",
+        "click_denied_sound"
+      ],
+      "owner_decision": "решение владельца 2026-11-08: блокировка и отказ показываются только на карточке «База» (kit.denyFx: дрожание плитки и щелчок), в спрайте не рисуются",
+      "why": "игрок получает короткий отказ на заблокированной карточке, состояние постройки не меняется"
+    }
+  },
+  "not_applicable": [],
+  "accessibility": "при «меньше движения» (reduceMotion) клип не проигрывается: остаётся статичный кадр",
+  "sprite": {
+    "path": "art/gen/placeables/base/deluge/e0_1978.runtime.png",
+    "sha256": "548c16abe7ed440573d772bbf2b85fdef42829197ff69d22cb06844c7c84b3a2"
+  },
+  "game_data": {
+    "building_key": "deluge",
+    "dependsOn": [
+      "gantry"
+    ],
+    "source": "game/src/data/buildings.js (main)"
+  },
+  "mechanism_pivots": "measured_for_ON_part_only (animation.json)"
+}

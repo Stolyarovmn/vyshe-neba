@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "asset_id": "OB01",
+  "slug": "observation_post",
+  "asset_type": "base",
+  "era": "E0",
+  "year": 1978,
+  "generation_kind": "first_isolated_e0_source",
+  "contract_base_sha": "94b0a37e520b786d9d1764b2febad223685037d2",
+  "brief_file": "art/briefs/OB01_OBSERVATION_E0.md",
+  "prompt_file": "art/prompts/ob01_observation_e0.md",
+  "style_bible_file": "art/style_bible.txt",
+  "source_archive": {
+    "provider": "google_drive",
+    "folder_id": "1idbr23HOmdgq0uocCZ2o63DLHwXVDrPW",
+    "verified_present": true,
+    "original_must_be_immutable": true,
+    "sha256_required_before_processing": true
+  },
+  "machine_pipeline": {
+    "configured": false
+  },
+  "camera": {
+    "family": "island_top_3_4",
+    "projection_angle": "UNKNOWN",
+    "projection_review": "pending_source_scene_qa",
+    "projection_calibration_file": "art/gen/environment/start_island_hd.projection.json",
+    "generation_elevation_proxy_deg": 73.44,
+    "generation_tilt_from_top_down_proxy_deg": 16.56,
+    "ground_plane_compression_target": 0.958515,
+    "current_hd_reference_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997"
+  },
+  "runtime_contract": {
+    "asset_key": "observation",
+    "status": "pending_scene_and_runtime_qa"
+  },
+  "generation_gate": {
+    "one_asset_per_call": true,
+    "one_era_per_call": true,
+    "style_bible_verbatim": true,
+    "transparent_background": true,
+    "alpha_strategy": "native_transparent",
+    "can_generate_isolated_candidate": true,
+    "can_scene_approve": false,
+    "can_promote_to_production": false,
+    "can_publish_runtime": false
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/mechanics-infrastructure-02-robot-handling.json",
+  "generation_id": null,
+  "source": {
+    "sha256": "2a27baf4107296f880922860a2ebb91d16060af20fa1d09e3f5841cb5c2c130f",
+    "bytes": 1838939,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1N9nWD03BmFB5CDe66wB6sggzTAJMHl_J",
+    "drive_url": "https://drive.google.com/file/d/1N9nWD03BmFB5CDe66wB6sggzTAJMHl_J/view?usp=drivesdk"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-05-01",
+      "name": "Adaptive jaw shoe",
+      "verdict": "pass",
+      "notes": "Червяк и сектор приводят уравнитель двух опор. Обе подошвы касаются разных ступеней."
+    },
+    {
+      "id": "E4-05-02",
+      "name": "Floating docking nose",
+      "verdict": "pass",
+      "notes": "Носок касается нижней направляющей ответной половины, сверху зазор. Пружины имеют разный шаг. Один рассеиватель на неподвижной стороне, разъём на подвижной."
+    },
+    {
+      "id": "E4-05-03",
+      "name": "Calibration sphere",
+      "verdict": "pass",
+      "notes": "Вертикальная цепь мотор, винт, гайка и каретка. Конусный пояс сферы опирается на седло."
+    },
+    {
+      "id": "E4-05-04",
+      "name": "Contact probe",
+      "verdict": "pass",
+      "notes": "Прямая подача отделена от наклонённого держателя щупа X-образной флексурой. Шар касается эталона."
+    },
+    {
+      "id": "E4-05-05",
+      "name": "Fail safe cassette hook",
+      "verdict": "pass",
+      "notes": "Крюк удерживает проушину. Красный предохранитель перекрывает выход. Втянутый шток отделён от предохранителя."
+    },
+    {
+      "id": "E4-05-06",
+      "name": "Wheel quadrature pickup",
+      "verdict": "pass",
+      "notes": "Прорезь открывает одно окно, зуб перекрывает другое. Показан фрагмент обода."
+    },
+    {
+      "id": "E4-05-07",
+      "name": "Spring loaded rail guide roller",
+      "verdict": "pass",
+      "notes": "Ролик касается рельса. Видны пружина и рычаг, мишень отделена от датчика."
+    },
+    {
+      "id": "E4-05-08",
+      "name": "Collision breakaway wrist",
+      "verdict": "pass",
+      "notes": "Привод соединён с общей тарелкой. Верхняя доля раскрыта, две нижние посажены."
+    }
+  ],
+  "reviewer": "Codex и mechanics_design_audit",
+  "review_method": "Независимая инженерная проверка и сравнение защищённых ячеек. Слепая проверка роли, раунд 15.",
+  "final_verdict": "pass",
+  "rejection_reasons": [],
+  "returned_filename": "exec-ab316c42-0009-4f7e-9db6-b8090087f487.png",
+  "request_sha256": "c2f201db046e9adf7926082d3edb9351368e43f4ee5f40cfb832e87c5448a078",
+  "preservation_review": {
+    "verdict": "pass",
+    "notes": "Независимый критик подтвердил сохранность остальных семи ячеек.",
+    "baseline": "E4_sheet05_rev19.png"
+  }
+}

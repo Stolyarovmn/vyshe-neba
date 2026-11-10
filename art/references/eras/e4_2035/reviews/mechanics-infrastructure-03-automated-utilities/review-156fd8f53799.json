@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/mechanics-infrastructure-03-automated-utilities.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "156fd8f53799716495cd5adeca81cdb518056447bf8e369d40c922e580e8634d",
+    "bytes": 1813666,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1Oh8W2qLXTDOsJ23v3gK6VFEXLap2jkiK",
+    "drive_url": "https://drive.google.com/file/d/1Oh8W2qLXTDOsJ23v3gK6VFEXLap2jkiK/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-06-01",
+      "name": "Recessed power comb",
+      "verdict": "pass",
+      "notes": "Утопленные ламели"
+    },
+    {
+      "id": "E4-06-02",
+      "name": "Dual coolant face coupling",
+      "verdict": "pass",
+      "notes": "Две тарелки и толкатели"
+    },
+    {
+      "id": "E4-06-03",
+      "name": "Vacuum service bell",
+      "verdict": "pass",
+      "notes": "Обжатая кромка у плиты"
+    },
+    {
+      "id": "E4-06-04",
+      "name": "Optical data feedthrough",
+      "verdict": "pass",
+      "notes": "D-ключ и два окна"
+    },
+    {
+      "id": "E4-06-05",
+      "name": "Leak witness annulus",
+      "verdict": "pass",
+      "notes": "Кольцевой канал и радиальный отвод"
+    },
+    {
+      "id": "E4-06-06",
+      "name": "Spiral rotary ribbon",
+      "verdict": "pass",
+      "notes": "Одна непрерывная лента между двумя зажимами"
+    },
+    {
+      "id": "E4-06-07",
+      "name": "Closed branch spool",
+      "verdict": "pass",
+      "notes": "Золотник перекрывает два окна"
+    },
+    {
+      "id": "E4-06-08",
+      "name": "Slit lubrication septum",
+      "verdict": "pass",
+      "notes": "Мембрана закрыта, канюля отведена"
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Визуальная сверка восьми ячеек и защищённых образцов",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

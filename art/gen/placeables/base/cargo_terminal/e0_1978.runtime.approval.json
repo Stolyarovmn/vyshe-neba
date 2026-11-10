@@ -1,0 +1,21 @@
+{
+  "asset": "cargo_terminal",
+  "production_sha256": "ae7c00f7d5fc4bf0f8171a4d78158ada84e643c4f8282e35b6e8310d8abd920f",
+  "runtime_sha256": "c9a2b53afb5e6f50724e73d0729e3af10b90110e17d6d785e2f8e502646c28ff",
+  "approved": true,
+  "sha256": "c9a2b53afb5e6f50724e73d0729e3af10b90110e17d6d785e2f8e502646c28ff",
+  "promotion_manifest_sha256": "7fb8ad8417c9c4e7a2863bbd3a46a85ed32f981cd2c9fb690bedde15f31d62e9",
+  "approval_scope": "Точная обрезка прозрачных полей принятого PNG без изменения пикселей объекта.",
+  "crop_bbox": [
+    17,
+    136,
+    303,
+    252
+  ],
+  "runtime_target": "game/assets/eras/e0-1978/base/logistics.png",
+  "state": "published_to_main",
+  "runtime_published": true,
+  "runtime_main_sha": "2981d16e3e8fac20fb8df536f10c525e273cd931",
+  "runtime_pr": "https://github.com/Stolyarovmn/vyshe-neba/pull/140",
+  "runtime_bytes_verified": "main:game/assets/eras/e0-1978/base/logistics.png совпадает побайтно с runtime.png"
+}

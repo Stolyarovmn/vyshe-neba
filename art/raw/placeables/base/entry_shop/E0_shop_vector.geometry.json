@@ -1,0 +1,35 @@
+{
+  "authoring": "parametric_vector_source",
+  "status": "prototype_not_approved",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "ground_compression_proxy": 0.9585217890173758,
+  "perspective_taper_per_m": 0.025,
+  "pixels_per_meter": 95,
+  "landmarks": {
+    "counter": {
+      "world_m": [
+        0,
+        0.8,
+        1.12
+      ],
+      "screen_px": [
+        235.0,
+        258.3720385672854
+      ]
+    },
+    "ground": {
+      "world_m": [
+        0,
+        0.95,
+        0
+      ],
+      "screen_px": [
+        235.0,
+        303.5611230059651
+      ]
+    }
+  },
+  "png_sha256": "7558d5dc3c894f467157f98e378bd85334a298ce5af30414d12edb3f9500480e",
+  "svg_sha256": "4fd60190b5b7d626fff835b2d50ab2f5606e7abbc85cac8a7427b24d4de89b7d"
+}

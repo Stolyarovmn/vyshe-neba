@@ -1,0 +1,20 @@
+{
+  "source_sha256": "1f9d1b1459c5ccbd6cad6c693e53deeab9bdf43f5e64843aefd669b0726fe269",
+  "original_png_file": "art/raw/placeables/base/capsule_return_station/e0_1978_presnap.png",
+  "source_original_sha256": "bf6e302526a259de37d134bca2cb9fa992ff9f777961bbb8eb22eabe812e207f",
+  "source_keyed_transport_sha256": "db2f2f6e92c46464b1cf11e453faf8a0feac2fc0a79bb431d2d308c47f72d922",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "15VdtgJkQhuKCWoXuPpUE9G9BAuTCc5ow"
+  },
+  "rework": {
+    "date": "2026-11-07",
+    "attempt": 3,
+    "generator": "chatgpt_imagegen_games_project",
+    "preparer": "tools/art_pipeline/e0_rework_prepare.py",
+    "key_tolerance": "±8 по каналам, принято владельцем",
+    "logical_width": 238,
+    "pixel_size": 4,
+    "slab_edge_ratio_measured": 0.946
+  }
+}

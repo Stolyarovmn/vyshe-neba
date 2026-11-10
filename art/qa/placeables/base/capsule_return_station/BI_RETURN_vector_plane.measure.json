@@ -1,0 +1,12 @@
+{
+  "source_sha256": "ec61a9d08e74fd5805d38748286dfe5b44c19035e33c9679e98c238468a96002",
+  "method": "Четыре вручную отмеченных угла верхней плоскости; размеры — проектные, фактический угол камеры неизвестен.",
+  "far_width": 224.76300000000003,
+  "near_width": 237.23699999999997,
+  "far_near_ratio": 0.9474196689386566,
+  "normalized_ground_compression": 0.9583165751483972,
+  "compression_proxy": 0.958515,
+  "taper_check": true,
+  "compression_check": true,
+  "visual_review_required": true
+}

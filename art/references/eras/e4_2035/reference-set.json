@@ -1,0 +1,339 @@
+{
+  "era": "E4",
+  "year": 2035,
+  "status": "approved_visual_reference_set",
+  "sheets": [
+    {
+      "file": "E4_sheet01_rev04.png",
+      "role": "materials-construction",
+      "sheet": "01-surfaces-stock",
+      "sha256": "fb14dc22db2e42afcccc92c91bd175e590bfdca03153c366059f59dc5e88061c",
+      "bytes": 1795351,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1_o81AiFz5NDhGbnvOFFaNkkzAGeGmMEx",
+      "drive_url": "https://drive.google.com/file/d/1_o81AiFz5NDhGbnvOFFaNkkzAGeGmMEx/view?usp=drivesdk",
+      "spec_file": "art/reference_specs/e4_2035/materials-construction-01-surfaces-stock.json",
+      "review_file": "art/references/eras/e4_2035/reviews/materials-construction-01-surfaces-stock/review-fb14dc22db2e.json",
+      "request_sha256": "dbc24a46729d98cc44b1b7c4eb5041d49d8163f1c8350726aafa75eac44c96bc",
+      "specimen_ids": [
+        "E4-01-01",
+        "E4-01-02",
+        "E4-01-03",
+        "E4-01-04",
+        "E4-01-05",
+        "E4-01-06",
+        "E4-01-07",
+        "E4-01-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/materials-construction-01-surfaces-stock.md",
+      "canonical_set_approved": true,
+      "generation_id": null,
+      "invocation_file": "art/references/eras/e4_2035/reviews/materials-construction-01-surfaces-stock/invocation-fb14dc22db2e.json"
+    },
+    {
+      "file": "E4_sheet02_rev03.png",
+      "role": "materials-construction",
+      "sheet": "02-joints-repairs",
+      "sha256": "008a60d4cd6c761df2856a5eed8098683e8c5368f7ff30ac83856b8e52eea935",
+      "bytes": 1708558,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1RZmTGk4jowY3DvIvWzYldcVCbviTyp72",
+      "drive_url": "https://drive.google.com/file/d/1RZmTGk4jowY3DvIvWzYldcVCbviTyp72/view?usp=drivesdk",
+      "spec_file": "art/reference_specs/e4_2035/materials-construction-02-joints-repairs.json",
+      "review_file": "art/references/eras/e4_2035/reviews/materials-construction-02-joints-repairs/review-008a60d4cd6c.json",
+      "request_sha256": "30b1eec0a5034625a3ec3f72ab9194b9f71f800d7a5aecb457db51fe7d97a691",
+      "specimen_ids": [
+        "E4-02-01",
+        "E4-02-02",
+        "E4-02-03",
+        "E4-02-04",
+        "E4-02-05",
+        "E4-02-06",
+        "E4-02-07",
+        "E4-02-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/materials-construction-02-joints-repairs.md",
+      "canonical_set_approved": true,
+      "generation_id": null,
+      "invocation_file": "art/references/eras/e4_2035/reviews/materials-construction-02-joints-repairs/invocation-008a60d4cd6c.json"
+    },
+    {
+      "file": "E4_sheet03_rev03.png",
+      "role": "materials-construction",
+      "sheet": "03-service-architecture",
+      "sha256": "c3201a97c84dcee8d31858118c43060aa212a35016818d799ad3bacd19c89306",
+      "bytes": 1784219,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1MauKn6uwWLHtszrLHTBzafbPVmqgK63S",
+      "drive_url": "https://drive.google.com/file/d/1MauKn6uwWLHtszrLHTBzafbPVmqgK63S/view",
+      "spec_file": "art/reference_specs/e4_2035/materials-construction-03-service-architecture.json",
+      "review_file": "art/references/eras/e4_2035/reviews/materials-construction-03-service-architecture/review-c3201a97c84d.json",
+      "request_sha256": "a52e90abf0cdc5207b1156677f3b44d88dcbcfc0b72256c691e118c9d200a0ab",
+      "specimen_ids": [
+        "E4-03-01",
+        "E4-03-02",
+        "E4-03-03",
+        "E4-03-04",
+        "E4-03-05",
+        "E4-03-06",
+        "E4-03-07",
+        "E4-03-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/materials-construction-03-service-architecture.md",
+      "canonical_set_approved": true,
+      "generation_id": "UNKNOWN_UNAVAILABLE"
+    },
+    {
+      "file": "E4_sheet04_rev28.png",
+      "role": "mechanics-infrastructure",
+      "sheet": "01-robot-actuation",
+      "sha256": "d2f536c97968f494eac89a888b4f087105af0e333dec292eff6c85d8ded5d574",
+      "bytes": 1895818,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1DdsZ9owHBPnwwSlwKV3YISuWzK1Cscy1",
+      "drive_url": "https://drive.google.com/file/d/1DdsZ9owHBPnwwSlwKV3YISuWzK1Cscy1/view?usp=drivesdk",
+      "spec_file": "art/reference_specs/e4_2035/mechanics-infrastructure-01-robot-actuation.json",
+      "review_file": "art/references/eras/e4_2035/reviews/mechanics-infrastructure-01-robot-actuation/review-d2f536c97968.json",
+      "request_sha256": "4d5789088365ed6ddcaa8644880facebc7141edf2d17e838e6a0fbe0ae8269b6",
+      "specimen_ids": [
+        "E4-04-01",
+        "E4-04-02",
+        "E4-04-03",
+        "E4-04-04",
+        "E4-04-05",
+        "E4-04-06",
+        "E4-04-07",
+        "E4-04-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/mechanics-infrastructure-01-robot-actuation.md",
+      "canonical_set_approved": true,
+      "generation_id": null,
+      "invocation_file": "art/references/eras/e4_2035/reviews/mechanics-infrastructure-01-robot-actuation/invocation-d2f536c97968.json"
+    },
+    {
+      "file": "E4_sheet05_rev21.png",
+      "role": "mechanics-infrastructure",
+      "sheet": "02-robot-handling",
+      "sha256": "2a27baf4107296f880922860a2ebb91d16060af20fa1d09e3f5841cb5c2c130f",
+      "bytes": 1838939,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1N9nWD03BmFB5CDe66wB6sggzTAJMHl_J",
+      "drive_url": "https://drive.google.com/file/d/1N9nWD03BmFB5CDe66wB6sggzTAJMHl_J/view?usp=drivesdk",
+      "spec_file": "art/reference_specs/e4_2035/mechanics-infrastructure-02-robot-handling.json",
+      "review_file": "art/references/eras/e4_2035/reviews/mechanics-infrastructure-02-robot-handling/review-2a27baf41072.json",
+      "request_sha256": "c2f201db046e9adf7926082d3edb9351368e43f4ee5f40cfb832e87c5448a078",
+      "specimen_ids": [
+        "E4-05-01",
+        "E4-05-02",
+        "E4-05-03",
+        "E4-05-04",
+        "E4-05-05",
+        "E4-05-06",
+        "E4-05-07",
+        "E4-05-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/mechanics-infrastructure-02-robot-handling.md",
+      "canonical_set_approved": true,
+      "generation_id": null,
+      "invocation_file": "art/references/eras/e4_2035/reviews/mechanics-infrastructure-02-robot-handling/invocation-2a27baf41072.json"
+    },
+    {
+      "file": "E4_sheet06_rev21.png",
+      "role": "mechanics-infrastructure",
+      "sheet": "03-automated-utilities",
+      "sha256": "de089cabbc20f2aacc87904f214937965b65240978326e3b18917a62103c14ba",
+      "bytes": 1659913,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1iSpJLWfFcS2ixYrhwSbdI5LH7To8Rbr5",
+      "drive_url": "https://drive.google.com/file/d/1iSpJLWfFcS2ixYrhwSbdI5LH7To8Rbr5/view?usp=drivesdk",
+      "spec_file": "art/reference_specs/e4_2035/mechanics-infrastructure-03-automated-utilities.json",
+      "review_file": "art/references/eras/e4_2035/reviews/mechanics-infrastructure-03-automated-utilities/review-de089cabbc20.json",
+      "request_sha256": "1f829654bca2b1aefea700866c5c3ebb281982c7a3ee72cc7c62cfea0d8b2e39",
+      "specimen_ids": [
+        "E4-06-01",
+        "E4-06-02",
+        "E4-06-03",
+        "E4-06-04",
+        "E4-06-05",
+        "E4-06-06",
+        "E4-06-07",
+        "E4-06-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/mechanics-infrastructure-03-automated-utilities.md",
+      "canonical_set_approved": true,
+      "generation_id": null,
+      "invocation_file": "art/references/eras/e4_2035/reviews/mechanics-infrastructure-03-automated-utilities/invocation-de089cabbc20.json"
+    },
+    {
+      "file": "E4_sheet07_rev03.png",
+      "role": "controls-displays",
+      "sheet": "01-local-override",
+      "sha256": "f8ba9ab82a5a21af39f48a4e6d4208bc45f3ff90fcc0bbd3dc35a9bc08f566e9",
+      "bytes": 1764197,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1l469ldR3R4-OlcM8sAUBIkrbxw5otteQ",
+      "drive_url": "https://drive.google.com/file/d/1l469ldR3R4-OlcM8sAUBIkrbxw5otteQ/view",
+      "spec_file": "art/reference_specs/e4_2035/controls-displays-01-local-override.json",
+      "review_file": "art/references/eras/e4_2035/reviews/controls-displays-01-local-override/review-f8ba9ab82a5a.json",
+      "request_sha256": "5c1202faa2c148b4e27640d250b629ebda5d9f4f6324f4b0d85ce4849475586f",
+      "specimen_ids": [
+        "E4-07-01",
+        "E4-07-02",
+        "E4-07-03",
+        "E4-07-04",
+        "E4-07-05",
+        "E4-07-06",
+        "E4-07-07",
+        "E4-07-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/controls-displays-01-local-override.md",
+      "canonical_set_approved": true,
+      "generation_id": "UNKNOWN_UNAVAILABLE"
+    },
+    {
+      "file": "E4_sheet08_rev02.png",
+      "role": "controls-displays",
+      "sheet": "02-context-diagnostics",
+      "sha256": "92023f5119426c6f531e249aac01924da12ba8a7d358cbc346a6cf6d62e89d67",
+      "bytes": 1644502,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1RWEr4z1siqnfoRRwIrxpnkCddPb7Bxo5",
+      "drive_url": "https://drive.google.com/file/d/1RWEr4z1siqnfoRRwIrxpnkCddPb7Bxo5/view",
+      "spec_file": "art/reference_specs/e4_2035/controls-displays-02-context-diagnostics.json",
+      "review_file": "art/references/eras/e4_2035/reviews/controls-displays-02-context-diagnostics/review-92023f511942.json",
+      "request_sha256": "343f307c425726137dd8008fd602744868b4b31b1e900a02158427a88563ed6a",
+      "specimen_ids": [
+        "E4-08-01",
+        "E4-08-02",
+        "E4-08-03",
+        "E4-08-04",
+        "E4-08-05",
+        "E4-08-06",
+        "E4-08-07",
+        "E4-08-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/controls-displays-02-context-diagnostics.md",
+      "canonical_set_approved": true,
+      "generation_id": "UNKNOWN_UNAVAILABLE"
+    },
+    {
+      "file": "E4_sheet09_rev02.png",
+      "role": "lighting-signals",
+      "sheet": "01-task-architectural-optics",
+      "sha256": "20882231848a28b5533c1802349d5db7672ef8f324bb4ac21a8eff44e291bbb1",
+      "bytes": 1788098,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1ec8uJE7fe5LJCyqzH-YRxLi75PQeRiyi",
+      "drive_url": "https://drive.google.com/file/d/1ec8uJE7fe5LJCyqzH-YRxLi75PQeRiyi/view",
+      "spec_file": "art/reference_specs/e4_2035/lighting-signals-01-task-architectural-optics.json",
+      "review_file": "art/references/eras/e4_2035/reviews/lighting-signals-01-task-architectural-optics/review-20882231848a.json",
+      "request_sha256": "1418a540ffcd5f5bf409064a45f54e46cb1a04e4db2ed60eb85edde4fe99039a",
+      "specimen_ids": [
+        "E4-09-01",
+        "E4-09-02",
+        "E4-09-03",
+        "E4-09-04",
+        "E4-09-05",
+        "E4-09-06",
+        "E4-09-07",
+        "E4-09-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/lighting-signals-01-task-architectural-optics.md",
+      "canonical_set_approved": true,
+      "generation_id": "UNKNOWN_UNAVAILABLE"
+    },
+    {
+      "file": "E4_sheet10_rev03.png",
+      "role": "lighting-signals",
+      "sheet": "02-docking-passage-signals",
+      "sha256": "686ae2478e06759731c720b984866610193856af76da3780cba1e04dead84825",
+      "bytes": 1561074,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "drive_file_id": "1luBei5SW621c9K4sBvceRnRD4AgPuMZC",
+      "drive_url": "https://drive.google.com/file/d/1luBei5SW621c9K4sBvceRnRD4AgPuMZC/view",
+      "spec_file": "art/reference_specs/e4_2035/lighting-signals-02-docking-passage-signals.json",
+      "review_file": "art/references/eras/e4_2035/reviews/lighting-signals-02-docking-passage-signals/review-686ae2478e06.json",
+      "request_sha256": "48a84dc10c28d750ab53c84267c8e6f6e160bc3533828295b5284c4f45887062",
+      "specimen_ids": [
+        "E4-10-01",
+        "E4-10-02",
+        "E4-10-03",
+        "E4-10-04",
+        "E4-10-05",
+        "E4-10-06",
+        "E4-10-07",
+        "E4-10-08"
+      ],
+      "status": "exact_sha_visual_review_pass",
+      "prompt_file": "art/prompts/era_references/e4_2035/lighting-signals-02-docking-passage-signals.md",
+      "canonical_set_approved": true,
+      "generation_id": "UNKNOWN_UNAVAILABLE"
+    }
+  ],
+  "schema_version": 2,
+  "name": "Орбитальная эра",
+  "required_roles": [
+    "materials-construction",
+    "mechanics-infrastructure",
+    "controls-displays",
+    "lighting-signals"
+  ],
+  "raw_archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "authority": {
+    "rules": "art/docs/ERA_DESIGN_MATRIX.md",
+    "reference_contract": "art/docs/ERA_REFERENCE_CONTRACT.md",
+    "style": "art/style_bible.txt",
+    "previous_era_reference": "art/references/eras/e3_2015/reference-set.json",
+    "anchor_era_reference": "art/references/eras/e0_1978/reference-set.json"
+  },
+  "cross_era_review_file": "art/references/eras/e4_2035/cross-era-e3-e4-review.json",
+  "approval_gate": {
+    "technical_review": "pass",
+    "exact_sha_visual_review": "pass",
+    "role_completeness": "pass",
+    "cross_era_review": "pass"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "OB01",
+  "asset": "observation_post",
+  "production_dir": "art/gen/placeables/base/observation_post",
+  "runtime_target": "eras/e0-1978/base/observation.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/observation_post/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "b2e760e342b456d803f2ae09d97b84c0e90f3128e9af5e7076efc5c1be78efc2",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "2f5e5863ec2b3d437bc7a848a358098b5a90952c7332026ec62c0446fca97e49",
+    "processor_sha256": "dc438082d356e2a665431010a7c50ed52755c687aab98ca8363962e61a3e792c",
+    "prompt_sha256": "c38ea359cba1d189af463a55cf742cce7304f43bf8a0a2ef8ef3ab76746a3fe8"
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "806860fccf71f8527517206dc1da2c26e40b7106863285e26c9212a553b21a80",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

@@ -1,0 +1,32 @@
+{
+  "asset_id": "B05",
+  "overall_status": "approved",
+  "eras": {
+    "e0_1978": {
+      "status": "approved",
+      "sha256": "8c1e92729dcaadcd18f94de6b53d79c23e0dbfd22f08abe8c6e7652263e2d882",
+      "scene_projection": {
+        "candidate_sha256": "8c1e92729dcaadcd18f94de6b53d79c23e0dbfd22f08abe8c6e7652263e2d882",
+        "scene_png": "e0_1978.candidate_scene.png",
+        "scene_png_sha256": "8229bc203ca64cb7368ee68ddd2b45d863f4549ca7d74b5c962fcede4a35fa0f",
+        "source_sha256": "59941a6b81f0e457f531cf367145266098ed58aa87ec0844e5b7c73c8cdc6be8",
+        "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+        "tilt_proxy_deg": 16.56,
+        "elevation_proxy_deg": 73.44,
+        "ground_compression_proxy": 0.958515,
+        "actual_camera_angle": "UNKNOWN",
+        "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+        "status": "pass",
+        "reviewer": "Codex",
+        "approval_evidence": "При якоре (870,470) и высоте 15 px видны две красные бочки на общем поддоне. Южный подход свободен, грунтовая дорожка проходит севернее. На 50% сохраняется парный силуэт. Детали рукояти насоса различимы только при увеличении. Размер сохранён по сравнению с боксом, чтобы бочки не становились чрезмерно крупными.",
+        "checks": {
+          "projection_match": "pass",
+          "era_style_match": "pass",
+          "gameplay_scale": "pass",
+          "base_grounding_visual": "pass",
+          "silhouette_readability": "pass"
+        }
+      }
+    }
+  }
+}

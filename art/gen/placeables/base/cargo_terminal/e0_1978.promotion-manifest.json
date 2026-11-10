@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "B07",
+  "asset": "cargo_terminal",
+  "production_dir": "art/gen/placeables/base/cargo_terminal",
+  "runtime_target": "eras/e0-1978/base/logistics.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/cargo_terminal/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "ae7c00f7d5fc4bf0f8171a4d78158ada84e643c4f8282e35b6e8310d8abd920f",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "780512eadf8f4c00ba98097630a112df435b9447",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "f37e7f7d98fee52ce8dd1cd5b7d6bc4fd3c5ad45c47e4bd224aa628b3390b60d",
+    "processor_sha256": "bcb3a42f96e6c836a1f7f4a3dce8fb5e40d6f95d971b28eaa5b311af23f6bb2c",
+    "prompt_sha256": "9435e1d4fc732d0f5f6875237472d3e5780e3ffe8fe39630897736cb7028fa77"
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "7695b7638f66e490d30062d90159f3d7ee935e27fa116031afa1843dab458a75",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

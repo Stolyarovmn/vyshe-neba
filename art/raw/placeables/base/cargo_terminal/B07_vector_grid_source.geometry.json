@@ -1,0 +1,123 @@
+{
+  "authoring": "parametric_vector_source",
+  "status": "prototype_not_approved",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "ground_compression_proxy": 0.9585217890173758,
+  "perspective_taper_per_m": 0.012,
+  "pixels_per_meter": 40,
+  "landmarks": {
+    "far_left": {
+      "world_m": [
+        -3,
+        -2,
+        0.06
+      ],
+      "screen_px": [
+        42.879999999999995,
+        49.490989593113625
+      ]
+    },
+    "far_right": {
+      "world_m": [
+        3,
+        -2,
+        0.06
+      ],
+      "screen_px": [
+        277.12,
+        49.490989593113625
+      ]
+    },
+    "near_right": {
+      "world_m": [
+        3,
+        2,
+        0.06
+      ],
+      "screen_px": [
+        282.88,
+        202.82164161685722
+      ]
+    },
+    "near_left": {
+      "world_m": [
+        -3,
+        2,
+        0.06
+      ],
+      "screen_px": [
+        37.120000000000005,
+        202.82164161685722
+      ]
+    },
+    "beam_ground": {
+      "world_m": [
+        0,
+        -0.7,
+        0
+      ],
+      "screen_px": [
+        160.0,
+        98.38683423229037
+      ]
+    },
+    "hoist_ground": {
+      "world_m": [
+        0.1,
+        -0.3,
+        0
+      ],
+      "screen_px": [
+        163.9856,
+        113.53914667307704
+      ]
+    },
+    "hand_chain_bottom": {
+      "world_m": [
+        0.1,
+        -0.3,
+        0.85
+      ],
+      "screen_px": [
+        163.9856,
+        103.88337810682418
+      ]
+    },
+    "load_hook_bottom": {
+      "world_m": [
+        -0.04,
+        -0.34,
+        1.67
+      ],
+      "screen_px": [
+        158.406528,
+        93.0556836832689
+      ]
+    },
+    "trolley_pivot": {
+      "world_m": [
+        0,
+        -0.7,
+        2.48
+      ],
+      "screen_px": [
+        160.0,
+        70.35042424629971
+      ]
+    },
+    "ground_anchor": {
+      "world_m": [
+        0,
+        2,
+        0
+      ],
+      "screen_px": [
+        160.0,
+        203.52210495630345
+      ]
+    }
+  },
+  "png_sha256": "e04e2d29b2cc7bc46d517dcca89146626c7c8b9bc546f53622347612cdf31a26",
+  "svg_sha256": "af7d7c2e15d5c68cc5b064b6ef6f142b53c74901b5b90a0602a1dbc74382ed66"
+}

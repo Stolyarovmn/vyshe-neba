@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Claude (по делегированию владельца 2026-11-07; владелец правит точечно после пробной сборки)",
+  "source_sha256": "6515062a5e79c0606cfffdd39d00a99bcaae1f04af007ec509a5c294c7496f78",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "5e1af5ef165daddb77fc2f50dfbd3eec42ca220bc66c3654ac39616aa6528caa",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Грузовой терминал: переделка по правилам E0_CLAUDE_PROMPT_STYLE.md (камера 73°, крыша <=40 % плиты, начинка на дворе и крыше). Оригинал imagegen попытка 4 SHA-256 dc19d9873c1796ed0aba294a62202df76811a58dcf109b300100ad17d956cd72 (Drive 1PUlSXm5RxWoKjj9rBQ6BfO0BjcBBJuWo); ключ приведён к точному #FF00FF с допуском ±8 (принято владельцем). Дальняя/ближняя кромка плиты 0.924 при пороге 0,94-0,99: отклонение принято владельцем 2026-11-07. Сцена 44 px в (1200,470), привязка низ-центр, TEST_ONLY. "
+}

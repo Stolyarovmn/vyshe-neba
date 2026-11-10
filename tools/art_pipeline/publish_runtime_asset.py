@@ -29,6 +29,18 @@ def git_head(root: Path) -> str:
     ).strip()
 
 
+def git_branch(root: Path) -> str:
+    return subprocess.check_output(
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=root, text=True
+    ).strip()
+
+
+def git_dirty(root: Path) -> bool:
+    return bool(subprocess.check_output(
+        ["git", "status", "--porcelain"], cwd=root, text=True
+    ).strip())
+
+
 def safe_rel(value: str, prefix: str) -> PurePosixPath:
     p = PurePosixPath(value)
     if p.is_absolute() or ".." in p.parts or not value.startswith(prefix):
@@ -152,9 +164,13 @@ def main() -> int:
 
     report = {
         "asset_id": args.asset,
-        "production_branch": cfg["production_branch"],
+        "production_branch": git_branch(prod),
+        "expected_production_branch": cfg["production_branch"],
+        "production_worktree_dirty": git_dirty(prod),
         "production_commit": git_head(prod),
-        "runtime_branch": cfg["runtime_branch"],
+        "runtime_branch": git_branch(runtime),
+        "expected_runtime_branch": cfg["runtime_branch"],
+        "runtime_worktree_dirty": git_dirty(runtime),
         "runtime_base_commit": git_head(runtime),
         "mode": "replace_in_place",
         "files": report_files,

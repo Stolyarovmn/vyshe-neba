@@ -1,0 +1,13 @@
+{
+  "status": "generation_geometry_reference",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "platform_diameter_m": 3,
+  "mount_plate_diameter_m": 1.14,
+  "barrel_length_m": 1,
+  "mount_plate_screen_depth_width": 0.9572848054182558,
+  "operator_landing": "south",
+  "objective_direction": "north",
+  "eyepiece_glass_visible": true,
+  "objective_glass_visible": false
+}

@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "2063020034d2c4d719c94391aee16bec6c2942f38bfccfa2aa6a7d0add4e62d1",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "abf768b7d5dd7282d159cf0ccea1a469ef85959f03de1459e289663d3185ca6f",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "Дальняя кромка бетонной плиты уже ближней, сверху открыта большая часть плиты, передний торец низкий. Парные фланцы и крепления опираются на плиту, маховик стоит на корпусе запорного клапана, стрелочный манометр вынесен на одну сторону трубы. В пробе на острове плита следует покрытию, узел читается как низкая стационарная арматура. Проверка относится к визуальному соответствию исходника, без измерения фактического угла камеры."
+}

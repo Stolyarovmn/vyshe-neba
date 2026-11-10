@@ -1,0 +1,34 @@
+{
+  "status": "candidate",
+  "sprite": "EN01_POLE_feeder_candidate.png",
+  "sha256": "8a92c39860d028d3a2b6c43710296e400142c079d4c7fcae5a276918897c963d",
+  "pixels_per_meter": 72,
+  "pole_centers": [
+    [
+      1514,
+      378
+    ],
+    [
+      1434,
+      378
+    ]
+  ],
+  "ground_anchor": [
+    42,
+    189
+  ],
+  "wire_anchors": [
+    [
+      42.0,
+      58.18
+    ],
+    [
+      42.0,
+      30.99
+    ],
+    [
+      42.0,
+      4.94
+    ]
+  ]
+}

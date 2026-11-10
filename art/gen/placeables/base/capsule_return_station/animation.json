@@ -1,0 +1,63 @@
+{
+  "asset": "capsule_return_station",
+  "era": "E0",
+  "source_sprite": {
+    "path": "art/gen/placeables/base/capsule_return_station/e0_1978.runtime.png",
+    "sha256": "8257765983878bfed1568da807f06986ca4dd13e80223040ebff8276eb349a24",
+    "size": [
+      271,
+      112
+    ]
+  },
+  "clips": {
+    "ON": {
+      "trigger": "см. states.json (ON)",
+      "frames": 9,
+      "fps": 10,
+      "loop": false,
+      "frame_size": [
+        271,
+        112
+      ],
+      "sheet": "animation/on_sheet.png",
+      "sheet_sha256": "174a53a5aa87ca056cdf81a68178c0151170d486274841df431aea00336e0e4d",
+      "preview_gif": "animation/on.gif",
+      "rest_frame": 0,
+      "reduce_motion_frame": 4,
+      "parts": [
+        {
+          "part": "hook_block",
+          "box": [
+            118,
+            30,
+            143,
+            63
+          ],
+          "pivot": [
+            126,
+            30
+          ],
+          "motion": "translate_y",
+          "range_px": [
+            0,
+            8
+          ],
+          "why": "крюковая обойма опускается на канате к люльке и поднимается обратно"
+        }
+      ],
+      "method": "часть вырезана из утверждённого спрайта, фон под ней восстановлен копией соседнего фона того же спрайта, смещение целыми пикселями на той же сетке",
+      "palette_colors": {
+        "base": 32,
+        "all_frames": 32
+      }
+    }
+  },
+  "pivot_policy": "измерены по утверждённому спрайту, указаны в parts[].pivot (пиксели runtime-кадра)",
+  "code_owned": [
+    "свет",
+    "звук",
+    "дым",
+    "тени событий"
+  ],
+  "runtime_integration": "подключено в хаб: E0_BUILDING_CLIPS в game/src/render/manifest.js, кадры game/assets/eras/e0-1978/base/anim/ (runtime PR №140, main 2981d16); клип играет один раз при нажатии на постройку и по окончании стройки"
+}

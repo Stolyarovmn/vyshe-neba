@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "spec_file": "art/reference_specs/e4_2035/controls-displays-01-local-override.json",
+  "generation_id": "UNKNOWN_UNAVAILABLE",
+  "source": {
+    "sha256": "f8ba9ab82a5a21af39f48a4e6d4208bc45f3ff90fcc0bbd3dc35a9bc08f566e9",
+    "bytes": 1764197,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "dimension_delta_px": [
+      0,
+      0
+    ],
+    "dimension_tolerance_px": 1,
+    "technical_verdict": "pass",
+    "technical_errors": [],
+    "drive_file_id": "1l469ldR3R4-OlcM8sAUBIkrbxw5otteQ",
+    "drive_url": "https://drive.google.com/file/d/1l469ldR3R4-OlcM8sAUBIkrbxw5otteQ/view"
+  },
+  "global_gates": {
+    "scope_atomic_only": "pass",
+    "exact_specimen_count": "pass",
+    "no_unlisted_specimen_class": "pass",
+    "style_family": "pass",
+    "era_language": "pass",
+    "sheet_readability": "pass",
+    "no_text_or_pseudotext": "pass",
+    "no_baked_cast_shadow_or_fx": "pass",
+    "no_previous_era_regression": "pass"
+  },
+  "specimens": [
+    {
+      "id": "E4-07-01",
+      "name": "Three-position enabling bail",
+      "verdict": "pass",
+      "notes": "Скоба под рукояткой с зазором до упора."
+    },
+    {
+      "id": "E4-07-02",
+      "name": "Emergency pull bar",
+      "verdict": "pass",
+      "notes": "Вытянутая планка на двух направляющих, виден фиксатор."
+    },
+    {
+      "id": "E4-07-03",
+      "name": "Gated mode selector",
+      "verdict": "pass",
+      "notes": "Воротник перекрывает выход из кармана."
+    },
+    {
+      "id": "E4-07-04",
+      "name": "Isometric nudge key",
+      "verdict": "pass",
+      "notes": "Цельная клавиша на центральной опоре, боковые просветы равны."
+    },
+    {
+      "id": "E4-07-05",
+      "name": "Authorization token pocket",
+      "verdict": "pass",
+      "notes": "Токен заподлицо, зуб над выемкой."
+    },
+    {
+      "id": "E4-07-06",
+      "name": "Pneumatic service request pad",
+      "verdict": "pass",
+      "notes": "Мембрана вдавлена, сбоку виден канал."
+    },
+    {
+      "id": "E4-07-07",
+      "name": "Mechanical handover witness",
+      "verdict": "pass",
+      "notes": "Пластина ребром в одном окне, второе закрыто."
+    },
+    {
+      "id": "E4-07-08",
+      "name": "Confirmation interlock guard",
+      "verdict": "pass",
+      "notes": "Ось слева, пятка справа в выемке, поперечина над стеклом."
+    }
+  ],
+  "reviewer": "Codex",
+  "review_method": "Визуальная сверка восьми ячеек и шести защищённых образцов с версией 02",
+  "final_verdict": "pass",
+  "rejection_reasons": []
+}

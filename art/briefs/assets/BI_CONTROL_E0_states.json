@@ -1,0 +1,42 @@
+{
+  "asset": "BI-CONTROL mission_control",
+  "era": "E0",
+  "status": "draft until the exact approved sprite exists; parts below are the closed PARTS list of the brief",
+  "states": {
+    "PRESS": {
+      "trigger": "tap on the building",
+      "parts": ["door_lever"],
+      "motion": "рычаг двери утапливается на 1 логический пиксель и возвращается; выноска телеметрии открывается у здания",
+      "frames": 2, "fps": 12, "loop": false,
+      "code_fx": ["lamp_blink_once", "click_sound"],
+      "why": "игрок получает физический отклик здания и понимает, что к нему можно подойти за данными"
+    },
+    "ON": {
+      "trigger": "launch_prepare / flight (приём телеметрии ракеты)",
+      "parts": ["dish_head"],
+      "motion": "тарелка на мачте поворачивается тремя шагами по 15° в сторону ракеты; мачта и крыша неподвижны",
+      "frames": 4, "fps": 8, "loop": false,
+      "reduce_motion": "один конечный кадр: тарелка повёрнута к ракете",
+      "code_fx": ["door_lamp_on", "hum_sound"],
+      "requires_art": "тарелка нарисована отдельной частью с измеренным pivot на оси мачты",
+      "why": "основное действие здания видно: центр принимает сигнал ракеты через мачту, а не «работает вообще»"
+    },
+    "BLOCKED": {
+      "trigger": "requirement_missing",
+      "reasons": ["building:radar", "building:observation", "era"],
+      "visible": "шкаф со стороны недостающего объекта закрыт засовом, лампа над дверью обесточена; шкаф со стороны построенного объекта открыт",
+      "art_variant": "idle_locked",
+      "why": "по шкафу видно, какого кабеля не хватает: радар слева, пост наблюдения справа"
+    },
+    "DENIED": {
+      "trigger": "tap_while_blocked",
+      "parts": ["cabinet_bolt"],
+      "motion": "засов запертого шкафа дёргается на 1 px и возвращается",
+      "frames": 2, "fps": 12, "loop": false,
+      "code_fx": ["red_lamp_blink_once", "bubble_shake"],
+      "why": "отказ показан тем же шкафом, чьего подключения не хватает"
+    }
+  },
+  "not_applicable": [],
+  "accessibility": "при «меньше движения» остаётся один конечный кадр каждого состояния"
+}

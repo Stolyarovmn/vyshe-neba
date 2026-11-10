@@ -1,0 +1,20 @@
+{
+  "source_sha256": "6515062a5e79c0606cfffdd39d00a99bcaae1f04af007ec509a5c294c7496f78",
+  "original_png_file": "art/raw/placeables/base/cargo_terminal/e0_1978_presnap.png",
+  "source_original_sha256": "dc19d9873c1796ed0aba294a62202df76811a58dcf109b300100ad17d956cd72",
+  "source_keyed_transport_sha256": "2a23900b9bc3dd63ee834963d7a2cbd540e4ec898888502036e8966a78f538df",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1PUlSXm5RxWoKjj9rBQ6BfO0BjcBBJuWo"
+  },
+  "rework": {
+    "date": "2026-11-07",
+    "attempt": 4,
+    "generator": "chatgpt_imagegen_games_project",
+    "preparer": "tools/art_pipeline/e0_rework_prepare.py",
+    "key_tolerance": "±8 по каналам, принято владельцем",
+    "logical_width": 246,
+    "pixel_size": 4,
+    "slab_edge_ratio_measured": 0.924
+  }
+}

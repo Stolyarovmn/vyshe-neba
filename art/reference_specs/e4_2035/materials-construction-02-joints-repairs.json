@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "kind": "era_reference_sheet",
+  "era": "E4",
+  "year": 2035,
+  "role": "materials-construction",
+  "sheet": "02-joints-repairs",
+  "title": "One-sided robotic assembly and repair joints",
+  "expected_specimen_count": 8,
+  "generation": {
+    "size": [
+      1536,
+      1024
+    ],
+    "layout": [
+      4,
+      2
+    ],
+    "one_role_per_call": true,
+    "one_era_per_call": true
+  },
+  "prompt_file": "art/prompts/era_references/e4_2035/materials-construction-02-joints-repairs.md",
+  "style_bible_file": "art/style_bible.txt",
+  "archive": {
+    "provider": "google_drive",
+    "folder_id": "1fX_SZbBURQ0itt4wBf9fZsehseYRNKXo",
+    "folder_name": "E4_2035"
+  },
+  "specimens": [
+    {
+      "id": "E4-02-01",
+      "name": "Captive wedge lock with inspection glass",
+      "description": "TOP ROW CELL 1 ONLY. Keep the captive transverse wedge lock and clear inspection glass from the input. The hooked tooth must visibly overlap the rear of the raised bridge and remain in contact through the glass. Add exactly one short narrow frosted LED diffuser recessed flush in the solid outer panel edge directly beside the glass. It confirms full locking only once the tooth has passed behind the bridge. Show unlit hardware with no halo. Keep the diffuser off the glass and out of the tooth sightline."
+    },
+    {
+      "id": "E4-02-02",
+      "name": "Induction-welded thermoplastic lap",
+      "description": "TOP ROW CELL 2 ONLY. One closed stepped lap cross-section with shoulders seated and a thin embedded perforated induction susceptor visible along the faying surface. No external wires or stepped adhesive scarf."
+    },
+    {
+      "id": "E4-02-03",
+      "name": "Open ball-to-V datum",
+      "description": "TOP ROW CELL 3 ONLY. One sphere attached to one cropped mounting pad, seated in a V groove on another cropped pad. Sphere touches both sloped faces; clear gap beneath. No pin, socket or glass suspension."
+    },
+    {
+      "id": "E4-02-04",
+      "name": "Upset blind threaded insert",
+      "description": "TOP ROW CELL 4 ONLY. One blind rivet nut in a thin horizontal sheet, near frontal cutaway. Small threaded bore, hex neck seated tightly in sheet, thin head above. DIRECTLY below sheet the same sleeve buckles outward into two clearly visible fat lateral lobes that touch and clamp the UNDERSIDE of the sheet. No separate lower cup, no air gap at contact, no potted core."
+    },
+    {
+      "id": "E4-02-05",
+      "name": "Pull-release bond seam",
+      "description": "BOTTOM ROW CELL 1 ONLY. One very low dark opaque asymmetrical triangular repair overlay bonded to a light substrate. Both are fully opaque; NO GLASS. A tiny flat woven closed pull-loop exits horizontally from the thin adhesive line at the narrow tip. Overlay is shallow, broad and angular; loop much smaller than overlay. No long transparent tongue or pane."
+    },
+    {
+      "id": "E4-02-06",
+      "name": "Flat living hinge",
+      "description": "BOTTOM ROW CELL 2 ONLY. One short asymmetric polypropylene living hinge shown end-on: left thick panel edge horizontal, right thick panel edge tilted upward 45 degrees, joined at adjacent tips by an extremely short and THIN flexible polymer crease. The crease is thinner than one fifth of the panels and tucked at the vertex. No arch, hump, omega fold, barrel, pin or metallic membrane."
+    },
+    {
+      "id": "E4-02-07",
+      "name": "Expanding spline seam",
+      "description": "BOTTOM ROW CELL 3 ONLY. One assembled straight seam cross-section with two opposed panel edges and a captive longitudinal mushroom spline spreading two seal lips. Show the mushroom head wedged between both lips. No flat transverse wedge lock or passive corner gasket."
+    },
+    {
+      "id": "E4-02-08",
+      "name": "Spent crush link",
+      "description": "BOTTOM ROW CELL 4 ONLY. One short metallic sacrificial strip between two mounting ears, permanently folded at exactly two weakened necks, visibly continuous. Show sharp plastic creases, no spring, fracture or abrasion strip."
+    }
+  ],
+  "global_forbidden": [
+    "text, labels, letters, numbers, logos or pseudo-writing",
+    "any ninth specimen, extra fragment, repeated object class, substituted, merged or omitted specimen",
+    "whole building, room, facade, vehicle, spacecraft, radar, machinery, control panel, catalog application board or staged scene",
+    "baked cast/contact shadows, studio-product shadows, glow, bloom, rays, live display graphics or temporary FX",
+    "photorealistic PBR material-catalog rendering, rendered CAD/studio 3D look, photographic materials or filtered 3D render",
+    "generic smooth image devoid of intentional HD pixel-art clusters, missing dark chromatic selective outlines or continuous-airbrush gradients",
+    "motors, buttons, standalone connectors, lights, dashboards or any other role's standalone hardware",
+    "E2 beige rack and dense external wiring, E4 curtain-wall structures, E5 transparent holograms and levitation",
+    "E3 quarter-turn fasteners, conventional hinge barrels, loose hardware, E5 holograms and levitation"
+  ],
+  "era_contract": {
+    "character": "TARGETED EDIT of supplied E4 sheet 02 revision 02. Add one inset short LED status diffuser beside the inspection glass in R1C1 only. Preserve the geometry, size, position and state of all eight specimens and the clarity of the glass.",
+    "required_signals": [
+      "one glass inspection window integrated into the wedge lock only",
+      "distinct one-sided fastening and planar alignment mechanisms",
+      "visible physical seating and service states",
+      "quiet off-white and graphite HD pixel-art family"
+    ],
+    "replaced_previous_language": [
+      "quarter-turn head replaced by a transverse wedge with a locked-state witness",
+      "bonded scarf replaced by a stepped induction weld",
+      "cylindrical dowel replaced by an open ball-V datum",
+      "potted insert replaced by a sheet upset insert",
+      "pinned hinge replaced by continuous flexure"
+    ],
+    "forbidden_regressions": [
+      "recolored E3 joint",
+      "extra loose parts or whole assemblies",
+      "baked light or spatial display"
+    ]
+  },
+  "presentation": {
+    "isolated_specimens": true,
+    "non_overlapping": true,
+    "neutral_background": true,
+    "no_labels_or_text": true,
+    "no_scenery": true,
+    "no_cast_shadow": true,
+    "no_baked_fx": true
+  }
+}

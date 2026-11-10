@@ -1,0 +1,22 @@
+{
+  "source_gate": "PASS",
+  "reviewer": "Codex",
+  "source_sha256": "d31f9c86dc7f31d782ece2a78417102642aa6607878395c17e77926796888f46",
+  "scene_preview_png": "e0_1978.source_scene.png",
+  "scene_preview_sha256": "4c30d345e71438b21a0085819ac0415cc1b56407411453516e333badf08893a5",
+  "island_sha256": "2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997",
+  "actual_camera_angle": "UNKNOWN",
+  "elevation_proxy_deg": 73.44,
+  "tilt_proxy_deg": 16.56,
+  "ground_compression_proxy": 0.958515,
+  "placement_scope": "TEST_ONLY_NON_AUTHORITATIVE",
+  "checks": {
+    "era": "pass",
+    "readability": "pass",
+    "engineering_parts": "pass",
+    "identity": "pass",
+    "base_grounding_visual": "pass",
+    "projection_match": "pass"
+  },
+  "review_evidence": "На статичной сцене две стойки стоят по краям действующего проезда и не пересекают маршрут техники. Дальние кромки оснований уже ближних. Поднятая стрела отклонена к обочине, различимы полосы и корпус шарнира. Длина стрелы и положение седла сверены по одной метрической шкале."
+}
