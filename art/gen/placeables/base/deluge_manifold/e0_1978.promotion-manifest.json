@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "asset_id": "INFRA_DELUGE_MANIFOLD",
+  "asset": "deluge_manifold",
+  "production_dir": "art/gen/placeables/base/deluge_manifold",
+  "runtime_target": "eras/e0-1978/base/deluge-manifold.png",
+  "state": "production",
+  "visual_review": "art/gen/placeables/base/deluge_manifold/visual_qa.json",
+  "files": [
+    {
+      "stem": "e0_1978",
+      "era": "E0",
+      "year": 1978,
+      "png": "e0_1978.png",
+      "sha256": "c7349e0e00ca3c5afb904b959f2cffe53d0b570e4d0a40dcdb40e7e92f86cb2e",
+      "qa": "e0_1978.qa.json",
+      "pipeline": "e0_1978.pipeline.json"
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "174bd16a3e86700946cd8871358a514a886c1be73baf9f3e79a906e5dcb3ec82",
+    "processor_sha256": "52387a1262ed110f3232d04eaee1a31e3dd0f92a225b815c7e1c12501e45f494",
+    "prompt_sha256": null
+  },
+  "checkpoint": {
+    "state_dir": ".tracker",
+    "resume": true,
+    "eras": [
+      "e0_1978"
+    ]
+  },
+  "visual_review_sha256": "647c5ec4b92a2073a537c9cb98340bc209b65073668f501e18e38ab8aefb879f",
+  "runtime_published": false,
+  "runtime_branch": "main",
+  "runtime_publication": "BLOCKED until explicit art/runtime/RUNTIME_EXPORTS.json mapping and separate runtime PR"
+}

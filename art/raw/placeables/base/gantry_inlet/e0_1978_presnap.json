@@ -1,0 +1,10 @@
+{
+  "source_sha256": "0a9c3c80cdf29ad907bb342b3364dfd0071305c032593aef89d15d96607be012",
+  "original_png_file": "art/raw/placeables/base/gantry_inlet/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "12l-acCjaH1k8qu8yVr9XSoK5b_SlBPUs"
+  },
+  "authoring": "deterministic_python_pixel_drawing",
+  "generator": "E0_BASE_scene.py"
+}

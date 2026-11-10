@@ -1,0 +1,10 @@
+{
+  "source_sha256": "04cc7469f5ce7641e58a8536709b75cd93e05b7bfa4c35202a7b920653013271",
+  "original_png_file": "art/raw/placeables/base/deluge_nozzle/e0_1978_presnap.png",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1MF6DjD-pTTj3eo1UxEr6iHVK-3HGQIJ6"
+  },
+  "authoring": "deterministic_python_pixel_drawing",
+  "generator": "E0_BASE_scene.py"
+}

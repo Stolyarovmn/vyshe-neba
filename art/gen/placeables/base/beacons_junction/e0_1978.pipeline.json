@@ -1,0 +1,47 @@
+{
+  "asset_id": "INFRA_BEACONS_JUNCTION",
+  "asset": "beacons_junction",
+  "zone": "base",
+  "era": "E0",
+  "year": 1978,
+  "adapter": "prepared_grid_png",
+  "source_gen_id": null,
+  "source_sha256": "48baf93d2c2a52da40d66c0a1839cef356750c1ed9162767cc8796bcfe6937f1",
+  "source_storage": {
+    "provider": "google_drive",
+    "drive_file_id": "1s9Ji3H1zCLZx6FnWxfjLiqB2HsGdisb7"
+  },
+  "transport_sha256": "48baf93d2c2a52da40d66c0a1839cef356750c1ed9162767cc8796bcfe6937f1",
+  "transport_pixel_sha256": null,
+  "spritefusion_pixel_snapper_revision": "ae20461f60fb39e75d15f184bab1ebec1219511c",
+  "aseprite_version": "1.3.18.6",
+  "aseprite_dithering": "none",
+  "pixel_size": 1,
+  "colors": 32,
+  "target_canvas": [
+    60,
+    48
+  ],
+  "registration_target": [
+    30,
+    44
+  ],
+  "mechanism_pivots": "pending_measured_rig_pass",
+  "output_sha256": "1da5a2726f9f5e105b00cb3097dd473e2010c2beaefa997d9b9fc044735579e7",
+  "reproducibility": {
+    "git_commit": "94b0a37e520b786d9d1764b2febad223685037d2",
+    "style_bible_sha256": "214684575bab453e7357d2c2e7f2deb83fcdc62e525c7874a5bcde06054addea",
+    "production_manifest_sha256": "0964048fccc90d9545c59883973a8bb8e3863f0b4a2ba85dcaf7193400f57704",
+    "pipeline_config_sha256": "174bd16a3e86700946cd8871358a514a886c1be73baf9f3e79a906e5dcb3ec82",
+    "processor_sha256": "52387a1262ed110f3232d04eaee1a31e3dd0f92a225b815c7e1c12501e45f494",
+    "prompt_sha256": null
+  },
+  "publication": {
+    "state": "production",
+    "runtime_published": false,
+    "visual_review": "art/gen/placeables/base/beacons_junction/visual_qa.json",
+    "visual_review_sha256": "e22a8713a42fb24048ab4214e30545566aab1c7b668d76c12b7cb6ad308ca988",
+    "hash_bound": true,
+    "runtime_boundary": "separate_main_pr"
+  }
+}
