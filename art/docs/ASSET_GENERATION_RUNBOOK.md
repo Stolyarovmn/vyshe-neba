@@ -1,5 +1,8 @@
 # Production asset generation runbook
 
+> **Статус 2026-11-10.** Раздел 2 (projection gate) относится к сцене полёта; для сцены базы действует изометрия 40° (`ART_DIRECTION_HD_PIXEL.md` §3). Разделы 7–8 — исторические свидетельства B03 (октябрь 2026), не текущее состояние.
+
+
 This runbook is the execution layer for `PRODUCTION_CONTRACT_V2.md`. Branch/storage/publication semantics are governed by `RUNTIME_BRANCH_CONTRACT.md`; tracker order is governed by `PIPELINE_CONFIG.json` + `ASSET_TASK_TRACKER.md`; era visual/engineering language is governed by `ERA_DESIGN_MATRIX.md`; approved era visual evidence is indexed under `art/references/eras/`.
 
 ## 0. Non-negotiable preflight

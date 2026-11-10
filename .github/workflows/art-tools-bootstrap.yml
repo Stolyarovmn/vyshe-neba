@@ -2,7 +2,7 @@ name: Art tools bootstrap
 
 on:
   push:
-    branches: [main]
+    branches: [game-production]
     paths:
       - 'tools/art_pipeline/setup_art_tools.sh'
       - '.github/workflows/art-tools-bootstrap.yml'

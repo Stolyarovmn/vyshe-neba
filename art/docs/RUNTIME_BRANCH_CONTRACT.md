@@ -1,5 +1,8 @@
 # Runtime / production branch contract
 
+> **Статус 2026-11-10.** Разделы «Current verified branch state — 2026-10-30» и «Remaining blockers» — исторические свидетельства; текущие SHA закреплять заново перед работой. Тесты и документы рантайма (`game/test`, `game/tools/economy-bot*`, `game/docs`) с ноября 2026 живут в `main`.
+
+
 ## Purpose
 
 This contract separates art production history from the clean game build/runtime tree.

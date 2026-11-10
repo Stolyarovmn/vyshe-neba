@@ -1,5 +1,8 @@
 # «Выше неба» — Production Contract v2
 
+> **Статус 2026-11-10.** Раздел 5 (проекция наземных ассетов) дополнен решением владельца от 2026-11-09: сцена базы использует вторую камеру — изометрию 40° из рельефа того же острова (`ART_DIRECTION_HD_PIXEL.md` §3); `island_top_3_4` остаётся камерой сцены полёта. Ветки `game-build`/`clean-src` не являются runtime; карта веток — `AGENTS.md` §1.
+
+
 **Статус:** нормативное дополнение к `ASSET_PRODUCTION_PIPELINE.md` для новых/изменяемых ассетов. Branch/storage/publication semantics задаёт `RUNTIME_BRANCH_CONTRACT.md`; tracker order и tool pins задаёт `PIPELINE_CONFIG.json`; visual/engineering language эпох E0–E5 задаёт `ERA_DESIGN_MATRIX.md`. Этот документ не отменяет exact-SHA approval, immutable originals, measured pivots или ref2game.
 
 Термины: **MUST / ОБЯЗАТЕЛЬНО** — блокирующее требование; **SHOULD / ЖЕЛАТЕЛЬНО** — отклонение допустимо только с записанной причиной; **UNKNOWN** — данных нет, запрещено подставлять догадку.

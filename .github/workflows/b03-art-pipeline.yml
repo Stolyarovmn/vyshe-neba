@@ -2,7 +2,7 @@ name: B03 asset candidate
 
 on:
   push:
-    branches: [main]
+    branches: [game-production]
     paths:
       - 'art/source_transport/b03_landing_guidance/**'
   workflow_dispatch:
