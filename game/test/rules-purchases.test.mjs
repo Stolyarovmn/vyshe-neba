@@ -162,7 +162,7 @@ function readyForEraZero(patch = {}) {
     coins: ERAS[0].advance.coins,
     data: ERAS[0].advance.data,
     buildings: { fuel: 1, beacons: 1, gantry: 1, deluge: 1, service: 1, rescue: 1, logistics: 1, factory: 1 },
-    milestones: { maxAlt: 3000, softLandings: 1 },
+    milestones: { maxAlt: 6000, softLandings: 3 },
     ...patch,
   });
 }
@@ -193,8 +193,8 @@ test('advanceEra: every condition blocks it', () => {
   const cases = {
     coins: readyForEraZero({ coins: 10 }),
     data: readyForEraZero({ data: 0 }),
-    'milestone altitude': readyForEraZero({ milestones: { maxAlt: 2999, softLandings: 1 } }),
-    'milestone landing': readyForEraZero({ milestones: { maxAlt: 3000, softLandings: 0 } }),
+    'milestone altitude': readyForEraZero({ milestones: { maxAlt: 5999, softLandings: 3 } }),
+    'milestone landing': readyForEraZero({ milestones: { maxAlt: 6000, softLandings: 2 } }),
     buildings: readyForEraZero({ buildings: { fuel: 1, beacons: 0 } }),
   };
   for (const [name, profile] of Object.entries(cases)) {
@@ -207,7 +207,7 @@ test('advanceEra: every condition blocks it', () => {
 
 test('advanceEra: later eras ask for their own milestone and building level', () => {
   const need = ERAS[1].advance;
-  const base = makeProfile({ era: 1, coins: need.coins, data: need.data, milestones: { maxAlt: 30000, softLandings: 1 }, buildings: { fuel: 2, beacons: 2, service: 2, energy: 2, gantry: 2, deluge: 2, rescue: 2, logistics: 2 } });
+  const base = makeProfile({ era: 1, coins: need.coins, data: need.data, milestones: { maxAlt: 30000, maxLandAlt: 20000, softLandings: 3 }, buildings: { fuel: 2, beacons: 2, service: 2, energy: 2, gantry: 2, deluge: 2, rescue: 2, logistics: 2 } });
   assert.equal(advanceEra(base).ok, true);
   assert.equal(advanceEra({ ...base, buildings: { ...base.buildings, energy: 1 } }).ok, false, 'eight buildings of level 2 are required');
   const moon = makeProfile({ era: 3, coins: 1e9, data: 1e9, buildings: Object.fromEntries(Object.keys(BUILDINGS).map((k) => [k, 4])) });

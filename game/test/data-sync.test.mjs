@@ -144,8 +144,8 @@ test('DESIGN 4.2: milestones and the number of buildings per transition', () => 
     assert.equal(Number(row[2]), ERAS[index].advance.buildings.count, `transition ${row[0]}: building count`);
   });
   const altitudes = rows.map((row) => /высота ≥ (\d+) км/.exec(row[1])?.[1]);
-  assert.deepEqual(altitudes, ['3', '30', '100', undefined, undefined]);
-  assert.equal(ERAS[0].advance.milestone.items.find((i) => i.type === 'maxAlt').min, 3000);
+  assert.deepEqual(altitudes, ['6', '30', '100', undefined, undefined]);
+  assert.equal(ERAS[0].advance.milestone.items.find((i) => i.type === 'maxAlt').min, 6000);
   assert.equal(ERAS[1].advance.milestone.items.find((i) => i.type === 'maxAlt').min, 30000);
   assert.equal(ERAS[2].advance.milestone.items.find((i) => i.type === 'maxAlt').min, 100000);
   assert.ok(ERAS[0].advance.milestone.items.some((i) => i.type === 'softLandings'));

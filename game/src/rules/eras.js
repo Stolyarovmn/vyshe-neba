@@ -9,7 +9,7 @@ import { applyProgress } from './progress.js';
 function milestoneItem(profile, item) {
   switch (item.type) {
     case 'softLandings':
-      return { type: item.type, ok: profile.milestones.softLandings >= item.min, have: profile.milestones.softLandings, need: item.min, text: 'Нужна мягкая посадка' };
+      return { type: item.type, ok: profile.milestones.softLandings >= item.min, have: profile.milestones.softLandings, need: item.min, text: `Мягких посадок: ${profile.milestones.softLandings}/${item.min}` };
     case 'maxAlt':
       return {
         type: item.type,
@@ -18,6 +18,8 @@ function milestoneItem(profile, item) {
         need: item.min,
         text: `Нужна высота ${item.min / 1000} км`,
       };
+    case 'landAlt':
+      return { type: item.type, ok: profile.milestones.maxLandAlt >= item.min, have: profile.milestones.maxLandAlt, need: item.min, text: `Поднимись на ${item.min / 1000} км и сядь` };
     case 'moonLanding':
       return { type: item.type, ok: profile.milestones.moonLanding, have: profile.milestones.moonLanding ? 1 : 0, need: 1, text: 'Нужна мягкая посадка на Луне' };
     case 'marsLanding':

@@ -8,6 +8,7 @@ import { ERAS, PARTS, TRANSFER_COST } from '../data/index.js';
 import { STAGE_DEFAULTS } from '../sim/config.js';
 import { deriveBase } from './base.js';
 import { availableDestinations } from './destinations.js';
+import { flightGoal } from './next-steps.js';
 
 const round = (value, digits = 2) => Math.round(value * 10 ** digits) / 10 ** digits;
 
@@ -135,6 +136,7 @@ export function makeFlightConfig(profile, { destination = 'earth', consumables =
     seed: Math.floor(seed),
     era: profile.era,
     destination,
+    goalAlt: flightGoal(profile),
     skin: profile.skin,
     stages: rocket.stages,
     hull: rocket.hull,

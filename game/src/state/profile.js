@@ -4,7 +4,7 @@
 import { ACHIEVEMENTS, BUILDING_KEYS, CONTRACT_TEMPLATES, PART_IDS, SKINS } from '../data/index.js';
 import { MAX_BUILDING_LEVEL, MAX_ERA, MAX_PART_LEVEL, START_COINS, START_DATA } from '../data/economy.js';
 
-export const PROFILE_VERSION = 1;
+export const PROFILE_VERSION = 2;
 
 const INVENTORY_KEYS = ['chute', 'repair', 'canister', 'magnet'];
 const STAT_KEYS = ['flights', 'landings', 'crashes', 'perfect', 'streak', 'bestStreak', 'distance', 'earned',
@@ -35,12 +35,13 @@ export function fresh() {
     coins: START_COINS,
     data: START_DATA,
     era: 0,
+    lastCrashReason: null,
     parts: zeros(PART_IDS),
     buildings: zeros(BUILDING_KEYS),
     inventory: zeros(INVENTORY_KEYS),
     skins: ['classic'],
     skin: 'classic',
-    milestones: { maxAlt: 0, softLandings: 0, moonLanding: false, marsLanding: false },
+    milestones: { maxAlt: 0, maxLandAlt: 0, softLandings: 0, moonLanding: false, marsLanding: false },
     stats: zeros(STAT_KEYS),
     achievements: [],
     contracts: { active: [], done: [], seed: 1 },
@@ -141,6 +142,7 @@ export function normalizeProfile(raw) {
     coins: int(raw.coins, 0, Number.MAX_SAFE_INTEGER, base.coins, issues, 'coins'),
     data: int(raw.data, 0, Number.MAX_SAFE_INTEGER, base.data, issues, 'data'),
     era: int(raw.era, 0, MAX_ERA, 0, issues, 'era'),
+    lastCrashReason: typeof raw.lastCrashReason === 'string' ? raw.lastCrashReason : null,
     parts: levels(raw.parts, PART_IDS, MAX_PART_LEVEL, issues, 'parts'),
     buildings: levels(raw.buildings, BUILDING_KEYS, MAX_BUILDING_LEVEL, issues, 'buildings'),
     inventory: levels(raw.inventory, INVENTORY_KEYS, 99, issues, 'inventory'),
@@ -148,6 +150,7 @@ export function normalizeProfile(raw) {
     skin: skins.includes(raw.skin) ? raw.skin : 'classic',
     milestones: {
       maxAlt: int(rawMilestones.maxAlt, 0, Number.MAX_SAFE_INTEGER, 0, issues, 'milestones.maxAlt'),
+      maxLandAlt: int(rawMilestones.maxLandAlt, 0, Number.MAX_SAFE_INTEGER, 0, issues, 'milestones.maxLandAlt'),
       softLandings: int(rawMilestones.softLandings, 0, Number.MAX_SAFE_INTEGER, 0, issues, 'milestones.softLandings'),
       moonLanding: bool(rawMilestones.moonLanding, false),
       marsLanding: bool(rawMilestones.marsLanding, false),

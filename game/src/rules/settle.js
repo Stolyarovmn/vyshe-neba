@@ -47,6 +47,9 @@ function explainCrash(profile, result, config, body) {
   const legs = config?.legs ?? deriveRocket(profile).legs;
   const landing = result.landing ?? {};
   const hint = CRASH_HINTS[result.reason];
+  if (result.reason === 'lost-in-space') {
+    return { code: result.reason, part: 'fins', level: 9, text: 'Стабилизаторы ур. 9: разворот в космосе' };
+  }
   if (!hint) {
     return { code: result.reason ?? 'crash', part: 'hull', text: 'Ракета разбита. Прочная обшивка и ремонт сохраняют корпус.' };
   }
@@ -75,13 +78,21 @@ export function settleFlight(profile, result, config = null) {
   // Coins.
   let travel = outcome === 'abandoned' ? 0 : travelPay(altM, distM, body, base.flight.income);
   if (crashed) travel = Math.round(travel * PAYOUT.crashTravelShare);
-  const loot = Math.round(num(result.coinsPicked));
+  const collected = Math.round(num(result.coinsPicked));
+  const loot = crashed ? Math.round(collected * PAYOUT.crashLootShare) : collected;
   const eraScale = 1 + PAYOUT.eraScale * era;
   const landing = landed ? Math.round(PAYOUT.landingBonus * eraScale) : 0;
   const perfect = landed && result.perfect ? Math.round(PAYOUT.perfectBonus * eraScale * base.flight.perfectBonus) : 0;
   const expedition = landed && body !== 'earth' ? Math.round(PAYOUT.body[body].expedition * (1 + effects.expeditionPay)) : 0;
   const storm = landed && num(result.stormTime) > 0 ? Math.round(travel * effects.stormBonus * Math.min(1, num(result.stormTime) / 20)) : 0;
-  const gross = travel + loot + landing + perfect + expedition + storm;
+  const ringCount = Math.floor(num(result.rings));
+  const centers = Math.min(ringCount, Math.floor(num(result.ringsCenter ?? result.ringsCentered)));
+  const rings = outcome === 'abandoned' ? 0 : Math.round(PAYOUT.ringBonus * (ringCount + centers) * eraScale);
+  const near = landed ? Math.min(PAYOUT.nearMax, PAYOUT.nearBonus * Math.floor(num(result.near))) : 0;
+  const fuelSaving = landed && num(result.fuelLeft01) >= PAYOUT.fuelSavingThreshold ? Math.round(travel * PAYOUT.fuelSavingShare) : 0;
+  const goalAlt = num(result.goalAlt);
+  const goal = landed && goalAlt > 0 && altM >= goalAlt ? Math.round(PAYOUT.goalBonus * eraScale) : 0;
+  const gross = travel + loot + landing + perfect + expedition + storm + rings + near + fuelSaving + goal;
 
   // Data: lump sums for new altitude zones and first landings, a trickle for every landing.
   const dataMult = base.flight.dataMult;
@@ -111,13 +122,14 @@ export function settleFlight(profile, result, config = null) {
       st.landings += 1;
       st.streak += 1;
       st.bestStreak = Math.max(st.bestStreak, st.streak);
-      st.saved += potentialLoss;
+      st.saved += potentialLoss + collected - Math.round(collected * PAYOUT.crashLootShare);
       if (result.perfect) st.perfect += 1;
       if (result.usedChute) st.parachutes += 1;
       if (body === 'moon') st.moon += 1;
       if (body === 'mars') st.mars += 1;
       if (stormLanding) st.storm += 1;
     } else if (crashed) {
+      draft.lastCrashReason = result.reason ?? 'crash';
       st.crashes += 1;
       st.streak = 0;
     }
@@ -130,7 +142,10 @@ export function settleFlight(profile, result, config = null) {
 
     const ms = draft.milestones;
     ms.maxAlt = Math.max(ms.maxAlt, Math.round(altM));
-    if (landed) ms.softLandings += 1;
+    if (landed) {
+      ms.softLandings += 1;
+      ms.maxLandAlt = Math.max(ms.maxLandAlt, Math.round(altM));
+    }
     if (landed && body === 'moon') ms.moonLanding = true;
     if (landed && body === 'mars') ms.marsLanding = true;
 
@@ -146,8 +161,8 @@ export function settleFlight(profile, result, config = null) {
     body,
     reason: result.reason ?? null,
     perfect: landed && !!result.perfect,
-    hint: crashed ? explainCrash(profile, result, config, body) : null,
-    coins: { travel, loot, landing, perfect, expedition, storm, gross, charged, saved: landed ? potentialLoss : 0 },
+    hint: crashed ? { ...explainCrash(profile, result, config, body), savedIfLanded: charged + collected - loot } : null,
+    coins: { travel, loot, landing, perfect, expedition, storm, rings, near, fuelSaving, goal, gross, charged, saved: landed ? potentialLoss + collected - Math.round(collected * PAYOUT.crashLootShare) : 0 },
     multipliers: { income: base.flight.income, perfectBonus: base.flight.perfectBonus, dataMult, expeditionPay: effects.expeditionPay, stormBonus: effects.stormBonus },
     data: { zones: zoneData, body: bodyData, trickle, total: dataGain },
     newZones: zones.map(({ id, name, data }) => ({ id, name, data })),

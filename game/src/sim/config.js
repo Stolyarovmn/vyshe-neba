@@ -12,7 +12,7 @@ export const STAGE_DEFAULTS = {
 export const START_STAGE_IDS = ['core', 'capsule'];
 
 // Attitude control of the unimproved rocket: slow turns and only a slight lean until the RCS module is bought.
-export const FINS_DEFAULT = { turn: 0.5, maxTilt: 0.2 };
+export const FINS_DEFAULT = { turn: 0.22, maxTilt: 0.12 };
 
 const BASE_DEFAULTS = {
   radar: 0,
@@ -83,6 +83,7 @@ export function normalizeConfig(input = {}) {
     seed: Math.floor(num(input.seed, 1)),
     era: Math.max(0, Math.min(5, Math.floor(num(input.era, 0)))),
     destination: ['earth', 'moon', 'mars'].includes(input.destination) ? input.destination : 'earth',
+    goalAlt: Math.max(0, num(input.goalAlt, 0)),
     skin: typeof input.skin === 'string' ? input.skin : 'classic',
     stages: stageInputs.map(normalizeStage),
     hull: section(input.hull, { hp: 100, debrisResist: 0 }),

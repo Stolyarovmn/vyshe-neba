@@ -31,12 +31,12 @@ function playedProfile() {
 
 test('fresh(): the profile of ARCHITECTURE 3', () => {
   const profile = fresh();
-  assert.equal(profile.v, 1);
+  assert.equal(profile.v, 2);
   assert.deepEqual(Object.keys(profile.parts).sort(), Object.keys(PARTS).sort());
   assert.deepEqual(Object.keys(profile.buildings).sort(), Object.keys(BUILDINGS).sort());
   assert.deepEqual(profile.inventory, { chute: 0, repair: 0, canister: 0, magnet: 0 });
   assert.deepEqual(profile.skins, ['classic']);
-  assert.deepEqual(profile.milestones, { maxAlt: 0, softLandings: 0, moonLanding: false, marsLanding: false });
+  assert.deepEqual(profile.milestones, { maxAlt: 0, maxLandAlt: 0, softLandings: 0, moonLanding: false, marsLanding: false });
   assert.deepEqual(Object.keys(profile.stats).sort(), ['airtime', 'bestStreak', 'crashes', 'distance', 'earned', 'flights', 'landings', 'mars', 'moon', 'near', 'perfect', 'pickups', 'parachutes', 'rings', 'saved', 'storm', 'streak'].sort());
   assert.deepEqual(profile.contracts, { active: [], done: [], seed: 1 });
   assert.equal(profile.settings.controlMode, 'arcade');
@@ -125,7 +125,7 @@ test('migration: a newer version is refused, the table is ready for the next ver
   const result = parseSave(JSON.stringify({ ...playedProfile(), v: 99 }));
   assert.equal(result.ok, false);
   assert.match(result.issues[0], /новой версии/);
-  assert.deepEqual(MIGRATIONS, {}, 'no migrations are needed while the version is 1');
+  assert.deepEqual(Object.keys(MIGRATIONS), ['1'], 'Есть миграция версии 1 в 2');
 });
 
 function legacySave(overrides = {}) {
