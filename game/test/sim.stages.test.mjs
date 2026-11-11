@@ -30,7 +30,7 @@ test('fuel balance: idle engine burns nothing, turning burns a little, afterburn
   const used = turning.stages[0].maxFuel - turning.stages[0].fuel;
   assert.ok(Math.abs(used - 0.2 * turning.stages[0].burnRate * 2) < 1e-6, `RCS used ${used}`);
 
-  const leaning = airborne(5000);
+  const leaning = airborne(5000, { fins: { turn: 0.5, maxTilt: 0.2 } });
   advance(leaning, { throttle: 0, tilt: 1 }, 2);
   assert.ok(leaning.stages[0].maxFuel - leaning.stages[0].fuel < used * 0.6, 'a limited hull spends less: the jets only hold it against the restoring moment');
 

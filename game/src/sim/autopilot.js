@@ -10,6 +10,7 @@
 import { BODIES, SPACE_ALT, densityAt, gravityAt } from './bodies.js';
 import { clamp, wrapAngle } from './math.js';
 import { createRngState, gaussian, hashSeed, range } from './rng.js';
+import { TILT_FREE } from './rocket.js';
 
 const IDLE = Object.freeze({
   throttle: 0, tilt: 0, stabilize: false, boost: false, parachute: false, canister: false, repair: false, transfer: false, pause: false,
@@ -20,6 +21,8 @@ const BRAKE_SHARE = 0.65; // share of the available deceleration the landing pla
 const SPEED_GAIN = 4; // 1/s: vertical speed error to acceleration
 const LOOKAHEAD = 0.2; // seconds: begin braking early to cover throttle spool-up
 const HOVER_WINDOW = 2; // units above the ground where the plan reaches touchdown speed
+// Кольца дают импульс после сброса тяги; без разворота оставляем запас внутри предела SPACE_ALT − 200.
+export const NO_FLIP_CEILING = SPACE_ALT - 2000;
 
 // Height the rocket reaches if the engine is cut now (gravity and drag, straight up).
 function predictApogee(s) {
@@ -27,12 +30,16 @@ function predictApogee(s) {
   const dt = 0.1;
   let alt = s.alt;
   let climb = s.climb;
-  for (let i = 0; i < 400 && climb > 0; i++) {
+  for (let i = 0; i < 4000 && climb > 0; i++) {
+    // У самой границы колодца подъём может длиться минуты; короткий прогноз его пропускал.
+    if (alt >= body.wellRadius) return Infinity;
+    const residual = s.throttle * Math.max(0, 1 - i * dt * 4) * s.maxAccel;
+    climb += residual * dt;
     climb -= gravityAt(body, alt) * dt;
     climb *= Math.exp(-densityAt(body, alt) * 0.22 * (1 - s.cfg.fins.dragCut) * dt);
     alt += climb * dt;
   }
-  return alt;
+  return climb > 0 ? Infinity : alt;
 }
 
 // Sideways speed that steps out of the way of the most imminent hazard (0 when the path is clear).
@@ -84,6 +91,24 @@ function ringAim(s) {
   return clamp(best.dx / Math.max(0.6, best.up / Math.max(15, s.climb)), -40, 40);
 }
 
+// Перед краем колодца ограниченная РСУ не сможет отменить импульс кольца: обходим ворота заранее.
+function avoidRing(s) {
+  if (s.climb <= 0) return null;
+  let nearest = null;
+  for (const o of s.objects) {
+    if (o.kind !== 'ring' || !o.active) continue;
+    const up = -o.y - s.alt - Math.cos(s.angle) * 26;
+    if (up < -20 || up > 700) continue;
+    const time = Math.max(0.5, up / Math.max(5, s.climb));
+    if (Math.abs(s.x + s.vx * time - o.x) > o.halfWidth + 80) continue;
+    if (!nearest || up < nearest.up) nearest = { o, up, time };
+  }
+  if (!nearest) return null;
+  const { o, time } = nearest;
+  const side = s.x < o.x ? -1 : 1;
+  return clamp((o.x + side * (o.halfWidth + 100) - s.x) / time, -60, 60);
+}
+
 export function createAutopilot(options = {}) {
   const skill = clamp(options.skill ?? 1, 0, 1);
   const sloppy = 1 - skill;
@@ -119,7 +144,8 @@ export function createAutopilot(options = {}) {
   // Horizontal guidance toward the pad: returns the angle to hold.
   function steerAngle(s, climbing = false) {
     const dx = s.x - s.pad.x;
-    const aim = climbing && takeRings && leanCap(s) >= 0.3 ? ringAim(s) : null;
+    const protectingReturn = s.cfg.fins.maxTilt < TILT_FREE && s.alt > SPACE_ALT * 0.6;
+    const aim = protectingReturn ? avoidRing(s) : climbing && takeRings && leanCap(s) >= 0.3 ? ringAim(s) : null;
     const reach = Math.max(1.5, s.g * 0.4 * Math.tan(Math.min(0.4, leanCap(s)))); // sideways acceleration the tilt can really give
     const maxSpeed = Math.min(60, 3 + 0.35 * s.alt, Math.sqrt(2 * 0.6 * reach * Math.abs(dx)));
     const wanted = (aim ?? -Math.sign(dx) * maxSpeed) + dodgeFor(s);
@@ -140,14 +166,17 @@ export function createAutopilot(options = {}) {
     const brake = Math.max(0.5, (s.maxAccel - s.g) * planFactor);
     const alt = s.alt - LOOKAHEAD * Math.max(0, s.vy);
     const above = Math.max(0, alt - HOVER_WINDOW);
-    const planned = Math.min(Math.sqrt(touchSpeed * touchSpeed + 2 * brake * above), Math.max(descentCap(s), touchSpeed));
-    const feedForward = brake * clamp(above / 4, 0, 1);
+    const brakingSpeed = Math.sqrt(touchSpeed * touchSpeed + 2 * brake * above);
+    const cruiseSpeed = Math.max(descentCap(s), touchSpeed);
+    const planned = Math.min(brakingSpeed, cruiseSpeed);
+    // На участке бокового возврата держим постоянную скорость; лишнее торможение вызывало зависание.
+    const feedForward = brakingSpeed <= cruiseSpeed ? brake * clamp(above / 4, 0, 1) : 0;
     const wantedAccel = feedForward + SPEED_GAIN * (s.vy - planned);
     return clamp((s.g + wantedAccel) / (s.maxAccel * Math.cos(s.angle)), 0, 1);
   }
 
   // Turning the nose all the way down needs free rotation.
-  const canFlip = (s) => s.cfg.fins.maxTilt >= 2.9;
+  const canFlip = (s) => s.cfg.fins.maxTilt >= TILT_FREE;
 
   function decide(s) {
     const out = { ...IDLE };
@@ -156,10 +185,14 @@ export function createAutopilot(options = {}) {
     if (mode === null) mode = s.approach || mission === 'land' ? 'descend' : 'climb';
     if (s.approach && mode !== 'descend') mode = 'descend';
 
-    const spaceGoal = mission === 'space';
-    const goalAlt = spaceGoal ? SPACE_ALT + 150 : targetAlt;
+    const spaceGoal = mission === 'space' && canFlip(s);
+    // Без разворота оставляем запас на случайный разгон кольцами у края колодца.
+    const safeCeiling = canFlip(s) ? SPACE_ALT - 200 : NO_FLIP_CEILING;
+    const goalAlt = spaceGoal ? Math.max(SPACE_ALT + 150, targetAlt) : Math.min(targetAlt, safeCeiling);
+    if (s.phase === 'space' && s.cfg.destination === 'earth' && canFlip(s) && mode === 'descend' && s.climb > -5) mode = 'flip';
 
     if (mode === 'climb' || mode === 'coast') {
+      if (s.phase === 'space' && s.cfg.destination === 'earth' && canFlip(s)) mode = 'flip';
       if (s.liftedOff && s.climb < 0 && !spaceGoal) mode = 'descend';
       else if (spaceGoal && s.phase === 'space') mode = s.cfg.destination === 'earth' && canFlip(s) ? 'flip' : 'wait';
       else if (s.liftedOff && s.climb < 0 && s.phase === 'descent') mode = 'descend';
@@ -191,6 +224,11 @@ export function createAutopilot(options = {}) {
     }
 
     // descend
+    if (s.phase === 'space' && s.cfg.destination === 'earth') {
+      // До возвращения притяжения держим нос вверх, сохраняя скорость возврата.
+      out.tilt = tiltToward(s, 0);
+      return out;
+    }
     if (s.fuelTotal <= 0 && s.vy > 0) out.parachute = true;
     out.tilt = tiltToward(s, s.alt > 4 || s.vy > 0 ? steerAngle(s) : 0);
     if (s.climb > 0 && s.alt > 10) out.throttle = 0;

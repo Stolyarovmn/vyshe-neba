@@ -9,7 +9,7 @@ import {
 } from './landing.js';
 import { clamp } from './math.js';
 import {
-  BOOST, activeStage, addFuel, burnFuel, createStages, fuelCapacity, fuelTotal, spoolThrottle, stageAccel,
+  BOOST, TILT_FREE, activeStage, addFuel, burnFuel, createStages, fuelCapacity, fuelTotal, spoolThrottle, stageAccel,
   updateAttitude, updateBoost, warn,
 } from './rocket.js';
 import { CANISTER_SHARE, CONSUMABLE_REPAIR } from './pickups.js';
@@ -107,6 +107,7 @@ export function createFlight(config) {
     ringBoost: 0,
     approach: false,
     transferred: false,
+    returnedFromSpace: false,
     touch: null,
     maxAlt: 0,
     distance: 0,
@@ -345,7 +346,10 @@ function updatePhase(s, events) {
   if (s.phase === 'ascent' && s.vy > 2 && alt > LIFTOFF_ALT) s.phase = 'descent';
   if (s.body === 'earth') {
     if (alt >= SPACE_ALT && (s.phase === 'ascent' || s.phase === 'descent')) s.phase = 'space';
-    else if (s.phase === 'space' && alt < SPACE_ALT - 100) s.phase = 'descent';
+    else if (s.phase === 'space' && alt < SPACE_ALT - 100) {
+      s.phase = 'descent';
+      s.returnedFromSpace = true;
+    }
   }
   const zone = zoneAt(s.body, alt);
   if (zone !== s.zone) {
@@ -396,6 +400,10 @@ function touchDown(s, events) {
 }
 
 function updateWarnings(s, events) {
+  if (s.phase === 'space' && s.climb > 0 && s.fuelTotal > 0 && Math.cos(s.angle) > 0) {
+    warn(s, s.cfg.fins.maxTilt >= TILT_FREE ? 'space-turn' : 'space-fins', events, 6);
+  }
+  if (s.returnedFromSpace && s.phase === 'descent' && s.climb < 0) warn(s, 'space-brake', events, 8);
   const landing = s.landing;
   if (s.liftedOff && s.vy > landing.vTol * 1.2 && s.alt < 600 && s.fuel > 0) {
     const net = s.maxAccel - s.g;
@@ -465,6 +473,7 @@ export function summarize(s) {
     destination: s.cfg.destination,
     body: s.body,
     maxAlt: s.maxAlt,
+    goalAlt: s.cfg.goalAlt,
     distance: s.distance,
     time: airTime,
     fuelLeft01: s.fuelTotal / Math.max(1e-9, fuelCapacity(s)),
@@ -472,6 +481,7 @@ export function summarize(s) {
     coinsPicked: s.coins,
     rings: s.rings,
     ringsCentered: s.ringsCentered,
+    ringsCenter: s.ringsCentered,
     pickups: s.pickups,
     near: s.near,
     stormTime: s.stormTime,

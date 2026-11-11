@@ -182,7 +182,7 @@ test('without the RCS module the lean from vertical never passes the soft limit,
   ];
   for (const [name, state] of cases) {
     const limit = state.cfg.fins.maxTilt;
-    assert.equal(limit, 0.2, 'default limit is 0.2 rad (about 11 degrees)');
+    assert.equal(limit, 0.12, 'Стартовый наклон ограничен 0,12 рад (около 7°)');
     let worst = 0;
     for (const tilt of [1, -1, 1, 1, -1]) {
       advance(state, { tilt, throttle: 0.2 }, 3, (s) => { worst = Math.max(worst, Math.abs(s.angle)); });
@@ -193,7 +193,7 @@ test('without the RCS module the lean from vertical never passes the soft limit,
 });
 
 test('the limit is soft: no sudden stop, the turn just slows down and the hull settles back when the stick is released', () => {
-  const state = airborne(3000);
+  const state = airborne(3000, {}, { fins: { turn: 0.5, maxTilt: 0.2 } });
   const rate = state.turnRate || state.stages[0].turn * state.cfg.fins.turn;
   const angles = [];
   advance(state, { tilt: 1 }, 2, (s) => angles.push(s.angle));

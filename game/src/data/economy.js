@@ -19,8 +19,8 @@ export const START_DATA = 0;
 export const BASE_POWER_SUPPLY = 12;
 
 // Base prices of modules and buildings are multiplied by these before rounding.
-export const PART_PRICE_SCALE = 0.5;
-export const BUILDING_PRICE_SCALE = 0.58;
+export const PART_PRICE_SCALE = 0.8;
+export const BUILDING_PRICE_SCALE = 0.93;
 
 // The sum of all discounts (era, factory, service) never exceeds this share of the price.
 export const MAX_DISCOUNT = 0.5;
@@ -31,9 +31,16 @@ export const PAYOUT = {
   travelOffsetKm: 0.3,
   travelExp: 0.85,
   distanceK: 0.2,
-  landingBonus: 12, // soft touchdown, before the era scale
-  perfectBonus: 20, // extra for a perfect touchdown, multiplied by the beacon bonus
+  landingBonus: 40, // Мягкая посадка, до множителя эпохи
+  perfectBonus: 60, // Доплата за идеальную посадку с множителем маяков
   crashTravelShare: 0.5, // share of the path payout kept after a crash
+  ringBonus: 8,
+  nearBonus: 5,
+  nearMax: 30,
+  fuelSavingShare: 0.1,
+  fuelSavingThreshold: 0.2,
+  goalBonus: 20,
+  crashLootShare: 0.5,
   eraScale: 0.2, // every era adds this share to landing bonuses
   body: {
     earth: { mult: 1, expedition: 0 },
@@ -43,7 +50,7 @@ export const PAYOUT = {
 };
 
 // Crash loss: a share of everything ever spent on rocket modules, never more than half of the purse.
-export const CRASH_LOSS = { partValueShare: 0.045, minimum: 12, purseShare: 0.5 };
+export const CRASH_LOSS = { partValueShare: 0.12, minimum: 20, purseShare: 0.5 };
 
 // Data. A flight yields a trickle on landing; first-time zones and first body landings pay lump sums.
 export const DATA_GAIN = {

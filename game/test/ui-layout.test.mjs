@@ -1,6 +1,8 @@
 // Раскладки интерфейса: цели нажатия ≥ 48 px, безопасные зоны, отсутствие перекрытий, доля приборов HUD < 10%.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createText } from '../src/ui/text.js';
+import { t } from '../src/i18n/index.js';
 import {
   computeLayout, mergeLayouts, hudLayout, hudTouchTargets, dockLayout, chromeLayout, screenFrame, rocketLayout, baseLayout,
   launchLayout, resultsLayout, journalLayout, shopLayout, settingsLayout, splitBody, assignLanes, intersect, MIN_TOUCH, DOCK_ITEMS, ROCKET_SPOTS, BUILD_COUNT,
@@ -205,6 +207,20 @@ test('splitBody: в портрете сверху/снизу, в ландшаф�
   assert.ok(p.a.y < p.b.y && p.a.x === p.b.x);
   const l = splitBody(computeLayout(812, 375, 1), body, 0.5);
   assert.ok(l.a.x < l.b.x && l.a.y === l.b.y);
+});
+
+test('цель вылета помещается на пульте с переносом и не перекрывает органы управления', () => {
+  const text = createText();
+  text.setDpr(2);
+  for (const { w, h, L } of layouts()) {
+    const g = launchLayout(L);
+    assert.ok(inside(g.goal, g.panel), `${w}×${h}: цель внутри пульта`);
+    for (const r of [g.start, g.lamps, g.cons, g.destArea]) assert.ok(!overlaps(g.goal, r), `${w}×${h}: цель не перекрывает управление`);
+    for (const alt of ['1 км', '3,4 км', '100 км', '123,4 км']) {
+      const label = t('launch.goal', { alt, bonus: 40 });
+      assert.ok(text.blockHeight(label, g.goal.w, Math.round(12 * L.ui), 1.25) <= g.goal.h, `${w}×${h}: ${label}`);
+    }
+  }
 });
 
 test('assignLanes: маркеры одной полосы не перекрываются', () => {

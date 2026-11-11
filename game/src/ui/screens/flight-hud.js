@@ -10,10 +10,12 @@ import { tutorialHint, drawTutorialPointer } from './onboarding.js';
 import { mix } from '../theme.js';
 import * as inst from '../skin/instruments.js';
 import { magnetActive } from '../../render/magnet.js';
+import { kmText } from '../../rules/next-steps.js';
+import { PAYOUT } from '../../data/economy.js';
 
-const DANGER_WARNS = ['brake', 'tilt', 'drift', 'hazard', 'chute-air', 'overheat', 'hull'];
-const WARN_KEYS = { brake: 'hint.brake', tilt: 'hint.tilt', drift: 'hint.drift', hazard: 'hint.hazard', 'chute-air': 'hint.chuteAir', overheat: 'hint.overheat', hull: 'hint.hull' };
-const WARN_ICON = { brake: 'up', tilt: 'target', drift: 'wind', hazard: 'warn', 'chute-air': 'chute', overheat: 'boost', hull: 'shield' };
+const DANGER_WARNS = ['brake', 'tilt', 'drift', 'hazard', 'chute-air', 'overheat', 'hull', 'space-turn', 'space-fins', 'space-brake'];
+const WARN_KEYS = { brake: 'hint.brake', tilt: 'hint.tilt', drift: 'hint.drift', hazard: 'hint.hazard', 'chute-air': 'hint.chuteAir', overheat: 'hint.overheat', hull: 'hint.hull', 'space-turn': 'hint.spaceTurn', 'space-fins': 'hint.spaceFins', 'space-brake': 'hint.spaceBrake' };
+const WARN_ICON = { brake: 'up', tilt: 'target', drift: 'wind', hazard: 'warn', 'chute-air': 'chute', overheat: 'boost', hull: 'shield', 'space-turn': 'down', 'space-fins': 'fins', 'space-brake': 'up' };
 const KEY_LEGEND = [
   { keys: ['W', '↑'], label: 'legend.thrust' },
   { keys: ['A', 'D'], label: 'legend.tilt' },
@@ -184,6 +186,10 @@ function drawStrip(app, kit, L, f, hud, radar) {
     const passed = f.maxAlt >= z.from;
     kit.rect(inner.x, y, inner.w, cc, passed ? c.amber : c.steel1);
   }
+  if (f.body === 'earth' && f.cfg.goalAlt > 0) {
+    const gy = Math.round(pos(f.cfg.goalAlt / 10));
+    kit.rect(inner.x - cc, gy - cc, inner.w + cc * 2, cc * 3, f.maxAlt * 10 >= f.cfg.goalAlt ? c.green : c.cyan);
+  }
   // указатель слева от шкалы: ступенчатый треугольник
   for (let i = 0; i < 4; i++) kit.rect(r.x - cc * (4 - i) - cc, py - cc * (3 - i), cc * 2, cc * (3 - i) * 2 + cc, c.white);
   // подпись ближайшего рубежа слева от шкалы
@@ -286,6 +292,16 @@ function drawPredict(app, kit, L, f) {
 function pickHint(app, s, f, tut) {
   const now = app.time;
   const out = [];
+  const goal = f.cfg.goalAlt;
+  if (goal > 0) {
+    if (f.maxAlt * 10 >= goal && s.goalDoneAt === undefined) s.goalDoneAt = now;
+    const bonus = Math.round(PAYOUT.goalBonus * (1 + PAYOUT.eraScale * f.cfg.era));
+    if (s.goalDoneAt !== undefined && now - s.goalDoneAt < 2.4) {
+      out.push({ pri: 2.6, key: 'goalDone', text: t('hint.goalDone', { bonus }), icon: 'check', kind: 'good' });
+    } else if (s.goalDoneAt === undefined && f.climb >= 0) {
+      out.push({ pri: 0.5, key: 'goal', text: t('hint.goal', { alt: kmText(goal) }), icon: 'target', kind: 'tip' });
+    }
+  }
   for (const kind of DANGER_WARNS) {
     if (s.warn[kind] !== undefined && now - s.warn[kind] < 2.4) out.push({ pri: 3, key: `w:${kind}`, text: t(WARN_KEYS[kind]), icon: WARN_ICON[kind], kind: 'bad' });
   }

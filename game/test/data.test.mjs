@@ -71,17 +71,18 @@ test('parts: the stock rocket equals the simulation reference stages', () => {
   assert.equal(PARTS.booster.levels[0].stats.fuel > STAGE_DEFAULTS.booster.fuel, true);
 });
 
-test('fins: tilt and turn grow with the level (0.2 rad -> free rotation, 0.45 -> 2.2)', () => {
+test('Стабилизаторы: наклон от 0,12 рад до свободного вращения, поворот от 0,22 до 2,4', () => {
   const fins = PARTS.fins;
   const at = (level) => (level === 0 ? fins.base : fins.levels[level - 1].stats);
-  assert.equal(at(0).maxTilt, 0.2);
-  assert.equal(at(0).turn, 0.45);
-  assert.ok(Math.abs(at(8).maxTilt - 1.2) < 1e-9 && Math.abs(at(8).turn - 1.1) < 1e-9, 'about the middle');
-  assert.equal(at(12).maxTilt, Math.PI, 'free rotation from level 12');
-  assert.ok(Math.abs(at(12).turn - 1.6) < 1e-9);
-  assert.ok(Math.abs(at(18).turn - 2.2) < 1e-9);
-  for (let level = 13; level <= 18; level++) assert.equal(at(level).maxTilt, Math.PI);
-  for (let level = 1; level <= 12; level++) assert.ok(at(level).maxTilt > at(level - 1).maxTilt, `tilt grows at level ${level}`);
+  assert.equal(at(0).maxTilt, 0.12);
+  assert.equal(at(0).turn, 0.22);
+  assert.equal(at(6).maxTilt, 0.9);
+  assert.equal(at(6).turn, 1);
+  assert.equal(at(9).maxTilt, Math.PI, 'Свободное вращение с ур. 9');
+  assert.ok(Math.abs(at(12).turn - 2) < 1e-9);
+  assert.ok(Math.abs(at(18).turn - 2.4) < 1e-9);
+  for (let level = 10; level <= 18; level++) assert.equal(at(level).maxTilt, Math.PI);
+  for (let level = 1; level <= 9; level++) assert.ok(at(level).maxTilt > at(level - 1).maxTilt, `tilt grows at level ${level}`);
   for (let level = 13; level <= 18; level++) {
     assert.ok(at(level).turn > at(level - 1).turn && at(level).dragCut > at(level - 1).dragCut, `turn and drag cut grow at level ${level}`);
   }

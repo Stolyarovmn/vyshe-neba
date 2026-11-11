@@ -1,8 +1,8 @@
 // Saving and loading. Everything that touches storage is wrapped in try/catch and takes an injectable
 // storage object (getItem/setItem/removeItem), so tests never need a browser.
 //
-// File format: { format: 'vyshe-neba-save', v: 1, savedAt, profile }. A bare Profile and the previous
-// edition's save are accepted on import as well.
+// Формат: { format: 'vyshe-neba-save', v: 2, savedAt, profile }. Импорт принимает и профиль без обёртки,
+// и сохранение предыдущей игры.
 
 import { fresh, normalizeProfile, PROFILE_VERSION } from './profile.js';
 import { importLegacySave, isLegacySave } from './legacy.js';
@@ -11,8 +11,10 @@ export const SAVE_FORMAT = 'vyshe-neba-save';
 export const SAVE_KEY = 'vyshe-neba:save';
 
 // Migrations from an older profile version to the next one: { [fromVersion]: (profile) => profile }.
-// The current version is 1, so the table is empty; a bump adds one entry and the loop below applies it.
-export const MIGRATIONS = {};
+// Версия 2 хранит рекорд высоты вылета с посадкой; старый рекорд его не доказывает.
+export const MIGRATIONS = {
+  1: (profile) => ({ ...profile, v: 2, milestones: { ...profile.milestones, maxLandAlt: 0 } }),
+};
 
 // Modules that were removed from Profile.parts without a version bump. The parachute is now a shop
 // consumable (inventory.chute). Old saves load without error: normalizeProfile ignores unknown part keys.

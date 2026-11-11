@@ -24,7 +24,7 @@ test('makeFlightConfig follows ARCHITECTURE 6.1 and survives the simulation norm
   assert.deepEqual(Object.keys(config.hull).sort(), ['debrisResist', 'hp']);
   assert.deepEqual(Object.keys(config.legs).sort(), ['angTol', 'hTol', 'vTol']);
   assert.deepEqual(Object.keys(config.fins).sort(), ['dragCut', 'maxTilt', 'turn']);
-  assert.deepEqual(config.fins, { turn: 0.45, dragCut: 0, maxTilt: 0.2 }, 'the stock stabilizers steer weakly');
+  assert.deepEqual(config.fins, { turn: 0.22, dragCut: 0, maxTilt: 0.12 }, 'the stock stabilizers steer weakly');
   assert.equal('parachute' in config, false, 'the parachute is only a consumable');
   assert.deepEqual(config.avionics, { predict: 0, assist: 0 });
   assert.deepEqual(Object.keys(config.transferCost).sort(), ['mars', 'moon']);
@@ -73,9 +73,9 @@ test('modules and the base feed the config', () => {
 
 test('fins steer: the tilt limit shows in config and in the rocket summary in degrees', () => {
   const fins = (level) => makeProfile({ buildings: { service: 3 }, parts: { fins: level } });
-  assert.equal(makeFlightConfig(fins(0)).fins.maxTilt, 0.2);
-  assert.equal(deriveRocket(fins(0)).summary.maxTiltDeg, 11);
-  assert.equal(deriveRocket(fins(8)).summary.maxTiltDeg, 69);
+  assert.equal(makeFlightConfig(fins(0)).fins.maxTilt, 0.12);
+  assert.equal(deriveRocket(fins(0)).summary.maxTiltDeg, 7);
+  assert.equal(deriveRocket(fins(6)).summary.maxTiltDeg, 52);
   assert.equal(makeFlightConfig(fins(12)).fins.maxTilt, Math.PI);
   assert.equal(deriveRocket(fins(12)).summary.maxTiltDeg, 180);
   assert.equal(deriveRocket(fins(12)).fins.maxTilt, Math.PI);
@@ -126,7 +126,7 @@ test('settleFlight: a soft landing pays, counts and opens milestones', () => {
   const { profile: after, report } = settleFlight(profile, landedResult({ maxAlt: 320, distance: 700, perfect: true, rings: 1, pickups: 3, near: 1 }));
   assert.equal(report.outcome, 'landed');
   assert.ok(report.coins.travel > 0 && report.coins.loot === 12 && report.coins.landing > 0 && report.coins.perfect > 0);
-  assert.equal(report.coins.gross, report.coins.travel + report.coins.loot + report.coins.landing + report.coins.perfect + report.coins.expedition + report.coins.storm);
+  assert.equal(report.coins.gross, report.coins.travel + report.coins.loot + report.coins.landing + report.coins.perfect + report.coins.expedition + report.coins.storm + report.coins.rings + report.coins.near + report.coins.fuelSaving + report.coins.goal);
   assert.equal(after.stats.flights, 1);
   assert.equal(after.stats.landings, 1);
   assert.equal(after.stats.perfect, 1);

@@ -367,11 +367,12 @@ export function launchLayout(L) {
   const p = R(L.pad * 0.9);
   const startH = Math.max(72, R(76 * L.ui));
   const lampsH = R(26 * L.ui);
+  const goalH = R(44 * L.ui);
   const consH = Math.max(MIN_TOUCH + 12, R(70 * L.ui));
   if (L.portrait) {
     // корпус пульта подгоняется под содержимое: ряд ламп, планеты на всю доступную высоту, гнёзда и ПУСК без пустот между ними
     const cw = Math.min(body.w, R(760 * L.ui));
-    const fixedH = lampsH + consH + startH + L.gap * 4;
+    const fixedH = lampsH + goalH + consH + startH + L.gap * 5;
     const maxInnerH = body.h - p * 2;
     const destH = clamp(maxInnerH - fixedH, R(140 * L.ui), R(300 * L.ui));
     const innerH = Math.min(maxInnerH, fixedH + destH);
@@ -381,8 +382,9 @@ export function launchLayout(L) {
     const lamps = rect(inner.x, inner.y, inner.w, lampsH);
     const start = rect(inner.x, bottom(inner) - startH, inner.w, startH);
     const cons = rect(inner.x, start.y - L.gap - consH, inner.w, consH);
-    const destArea = rect(inner.x, bottom(lamps) + L.gap, inner.w, Math.max(0, cons.y - L.gap - bottom(lamps) - L.gap));
-    return { panel, inner, lamps, destArea, dest: row(destArea, 3, L.gap), cons, consSlots: row(cons, 4, L.gap), start };
+    const goal = rect(inner.x, bottom(lamps) + L.gap, inner.w, goalH);
+    const destArea = rect(inner.x, bottom(goal) + L.gap, inner.w, Math.max(0, cons.y - L.gap - bottom(goal) - L.gap));
+    return { panel, inner, lamps, goal, destArea, dest: row(destArea, 3, L.gap), cons, consSlots: row(cons, 4, L.gap), start };
   }
   const panel = centerCard(L, body, 760, 2000);
   const inner = rect(panel.x + p, panel.y + p, panel.w - p * 2, panel.h - p * 2);
@@ -390,9 +392,11 @@ export function launchLayout(L) {
   const leftW = inner.w - rightW - L.gap;
   const lamps = rect(inner.x, inner.y, leftW, lampsH);
   const cons = rect(inner.x, bottom(inner) - consH, leftW, consH);
+  const goal = rect(inner.x + leftW + L.gap, inner.y, rightW, goalH);
   const destArea = rect(inner.x, bottom(lamps) + L.gap, leftW, Math.max(0, cons.y - L.gap - bottom(lamps) - L.gap));
-  const start = rect(inner.x + leftW + L.gap, inner.y + R(inner.h / 2 - startH * 0.9), rightW, startH * 1.8);
-  return { panel, inner, lamps, destArea, dest: row(destArea, 3, L.gap), cons, consSlots: row(cons, 4, L.gap), start };
+  const startHeight = Math.min(startH * 1.8, inner.h - goalH - L.gap);
+  const start = rect(inner.x + leftW + L.gap, bottom(goal) + L.gap + R((inner.h - goalH - L.gap - startHeight) / 2), rightW, startHeight);
+  return { panel, inner, lamps, goal, destArea, dest: row(destArea, 3, L.gap), cons, consSlots: row(cons, 4, L.gap), start };
 }
 
 // --- итоги: бланк ---

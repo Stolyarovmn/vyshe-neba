@@ -28,7 +28,7 @@ test('a new game: nothing to pay for yet, so the first step is a flight and the 
   const steps = getNextSteps(makeProfile());
   assert.equal(steps.length, 4);
   assert.deepEqual(steps[0], {
-    kind: 'fly', id: 'landing', cost: 0, affordable: true, reasons: [], text: 'Полёт: сядь мягко', goal: { type: 'landing', have: 0, need: 1 },
+    kind: 'fly', id: 'altitude', cost: 0, affordable: true, reasons: [], text: 'Полёт: поднимись на 6 км (рекорд 0 км)', goal: { type: 'altitude', have: 0, need: 6000 },
   });
   assert.ok(steps.slice(1).every((s) => s.kind === 'buy-building' && !s.affordable));
   assert.ok(steps.slice(1).every((s, i, all) => i === 0 || s.cost >= all[i - 1].cost), 'cheapest first');
@@ -37,17 +37,18 @@ test('a new game: nothing to pay for yet, so the first step is a flight and the 
   assert.match(steps[1].text, /^Построить: /);
 });
 
-test('with some coins the buildings the player can pay for come first, cheapest first', () => {
+test('with some coins the buildings the player can pay for come first: flight-effect class, then cheapest', () => {
   const steps = getNextSteps(makeProfile({ coins: 60 }), 6);
   const affordable = steps.filter((s) => s.affordable);
   assert.ok(affordable.length >= 2);
   assert.deepEqual(steps.slice(0, affordable.length), affordable, 'affordable steps lead the list');
-  assert.ok(affordable.every((s, i) => i === 0 || s.cost >= affordable[i - 1].cost));
+  // Класс 1 (эффект в полёте: маяки, топливо, охлаждение) раньше класса 2 (сервис, цех, спасение), внутри класса по цене.
+  assert.deepEqual(affordable.map((s) => s.id), ['beacons', 'fuel', 'deluge', 'service', 'factory', 'rescue']);
   assert.ok(affordable.every((s) => s.cost <= 60 && s.reasons.length === 0));
   const waiting = steps.slice(affordable.length);
   assert.ok(waiting.every((s) => !s.affordable && s.cost > 60));
   // Example texts: «Построить: Стартовые маяки», «Построить: Сервисная команда».
-  assert.deepEqual(affordable.slice(0, 2).map((s) => s.text), ['Построить: Стартовые маяки', 'Построить: Сервисная команда']);
+  assert.deepEqual(affordable.slice(0, 2).map((s) => s.text), ['Построить: Стартовые маяки', 'Построить: Топливный комплекс']);
 });
 
 test('only what is buildable now is offered: modules appear when the base allows them', () => {
@@ -84,7 +85,7 @@ test('data shortage: the item stays on the list with a data reason', () => {
 });
 
 test('only data missing for the era: the flight goal is to collect data', () => {
-  const profile = everythingOfTheEra(makeProfile({ era: 1, milestones: { maxAlt: 30000, softLandings: 1 } }), ERAS[1].advance.coins, 0);
+  const profile = everythingOfTheEra(makeProfile({ era: 1, milestones: { maxAlt: 30000, maxLandAlt: 20000, softLandings: 3 } }), ERAS[1].advance.coins, 0);
   const steps = getNextSteps(profile);
   assert.deepEqual(steps.map((s) => s.kind), ['fly', 'era']);
   assert.equal(steps[0].id, 'data');
@@ -93,13 +94,13 @@ test('only data missing for the era: the flight goal is to collect data', () => 
 });
 
 test('everything of the era bought: the era card shows what is missing, with the altitude progress', () => {
-  const profile = deepFreeze(everythingOfTheEra(makeProfile({ milestones: { maxAlt: 1200, softLandings: 1 } }), 100, 3));
+  const profile = deepFreeze(everythingOfTheEra(makeProfile({ milestones: { maxAlt: 1200, softLandings: 3 } }), 100, 3));
   const steps = getNextSteps(profile);
   assert.deepEqual(steps.map((s) => s.kind), ['fly', 'era']);
   const [fly, era] = steps;
   assert.equal(fly.id, 'altitude');
-  assert.equal(fly.text, 'Полёт: поднимись на 3 км (рекорд 1,2 км)');
-  assert.deepEqual(fly.goal, { type: 'altitude', have: 1200, need: 3000 });
+  assert.equal(fly.text, 'Полёт: поднимись на 6 км (рекорд 1,2 км)');
+  assert.deepEqual(fly.goal, { type: 'altitude', have: 1200, need: 6000 });
   assert.equal(era.id, 1);
   assert.equal(era.cost, ERAS[0].advance.coins);
   assert.equal(era.affordable, false);
@@ -107,24 +108,24 @@ test('everything of the era bought: the era card shows what is missing, with the
   assert.deepEqual(kinds, ['coins', 'data', 'milestone']);
   assert.match(era.reasons[0].text, /^Нужно ещё \d+ монет[аы]?$/);
   assert.equal(era.reasons[1].text, `Нужно ещё ${ERAS[0].advance.data - 3} данных`);
-  assert.equal(era.reasons[2].text, 'Высота 3 км: сейчас 1,2 км');
+  assert.equal(era.reasons[2].text, 'Высота 6 км: сейчас 1,2 км');
   assert.equal(era.reasons[2].have, 1200);
-  assert.equal(era.reasons[2].need, 3000);
+  assert.equal(era.reasons[2].need, 6000);
   assert.match(era.text, /^Эпоха 1986: /);
 });
 
 test('the milestone of the first landing asks for a flight too', () => {
-  const profile = everythingOfTheEra(makeProfile(), 1e6, 1e6);
+  const profile = everythingOfTheEra(makeProfile({ milestones: { maxAlt: 6000 } }), 1e6, 1e6);
   const steps = getNextSteps(profile);
   assert.equal(steps[0].kind, 'fly');
   assert.equal(steps[0].id, 'landing');
   const era = steps.find((s) => s.kind === 'era');
-  assert.deepEqual(era.reasons.map((r) => r.kind), ['milestone', 'milestone']);
-  assert.deepEqual(era.reasons.map((r) => r.type), ['softLandings', 'maxAlt']);
+  assert.deepEqual(era.reasons.map((r) => r.kind), ['milestone']);
+  assert.deepEqual(era.reasons.map((r) => r.type), ['softLandings']);
 });
 
 test('only coins missing: the flight goal is to earn them', () => {
-  const profile = everythingOfTheEra(makeProfile({ milestones: { maxAlt: 3000, softLandings: 1 } }), 10, ERAS[0].advance.data);
+  const profile = everythingOfTheEra(makeProfile({ milestones: { maxAlt: 6000, softLandings: 3 } }), 10, ERAS[0].advance.data);
   const steps = getNextSteps(profile);
   assert.deepEqual(steps.map((s) => s.kind), ['fly', 'era']);
   assert.equal(steps[0].id, 'coins');
@@ -133,7 +134,7 @@ test('only coins missing: the flight goal is to earn them', () => {
 });
 
 test('the era card is ready when every condition holds, and it stays visible behind cheap purchases', () => {
-  const ready = everythingOfTheEra(makeProfile({ milestones: { maxAlt: 3000, softLandings: 1 } }), ERAS[0].advance.coins, ERAS[0].advance.data);
+  const ready = everythingOfTheEra(makeProfile({ milestones: { maxAlt: 6000, softLandings: 3 } }), ERAS[0].advance.coins, ERAS[0].advance.data);
   const steps = getNextSteps(ready);
   assert.deepEqual(steps.map((s) => s.kind), ['era']);
   assert.equal(steps[0].affordable, true);
@@ -142,7 +143,7 @@ test('the era card is ready when every condition holds, and it stays visible beh
   assert.equal(steps[0].cost, ERAS[0].advance.coins);
 
   // The same player one era later has 38 new things to buy; the ready card must not disappear.
-  const crowded = makeProfile({ era: 0, coins: 1e6, data: 1e6, milestones: { maxAlt: 3000, softLandings: 1 }, buildings: { beacons: 1, gantry: 1, deluge: 1, service: 1, rescue: 1, fuel: 1, logistics: 1, factory: 1 } });
+  const crowded = makeProfile({ era: 0, coins: 1e6, data: 1e6, milestones: { maxAlt: 6000, softLandings: 3 }, buildings: { beacons: 1, gantry: 1, deluge: 1, service: 1, rescue: 1, fuel: 1, logistics: 1, factory: 1 } });
   const list = getNextSteps(crowded, 4);
   assert.equal(list.length, 4);
   assert.equal(list[3].kind, 'era', 'the ready card replaces the last slot');
