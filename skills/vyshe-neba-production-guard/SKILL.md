@@ -11,7 +11,7 @@ Its purpose is to remove avoidable production mistakes by making the generation 
 
 ## Sources of truth
 
-Before use, follow `AGENTS.md` and read the current mandatory production documents at the pinned `game-production` SHA. Branch/storage/publication semantics remain governed by `art/docs/RUNTIME_BRANCH_CONTRACT.md`; era language by `art/docs/ERA_DESIGN_MATRIX.md`; era-reference shape by `art/docs/ERA_REFERENCE_CONTRACT.md`; style by `art/style_bible.txt`; gameplay identity/parts by `art/placeables/PRODUCTION_MANIFEST.md`.
+Перед использованием прочитать `AGENTS.md` и обязательные производственные документы на закреплённом SHA `game-production`. Ветки и публикацию определяет `art/docs/RUNTIME_BRANCH_CONTRACT.md`; язык эпох — `art/docs/ERA_DESIGN_MATRIX.md`; формат справочных листов — `art/docs/ERA_REFERENCE_CONTRACT.md`; стиль — `art/style_bible.txt`; роли и эффекты — `main:game/src/data/buildings.js` и `main:game/docs/DESIGN.md` §4.4; части — паспорт объекта; идеи, rig и родословные — `art/placeables/IDEA_BANK_PLACEABLES.md`.
 
 This guard never promotes an inference above those sources.
 

@@ -6,9 +6,9 @@
 
 | Постройка в игре | Ключ | Семейство | Footprint (LP) | Манифест |
 | --- | --- | --- | --- | --- |
-| Радар слежения | `radar` | B02 `tracking_radar` | 134×118 | `art/placeables/PRODUCTION_MANIFEST.md` |
-| Система возврата | `recovery` | B04 `recovery_complex` | 164×92 | `art/placeables/PRODUCTION_MANIFEST.md` |
-| Логистический терминал | `logistics` | B07 `cargo_terminal` | 178×126 | `art/placeables/PRODUCTION_MANIFEST.md` |
+| Радар слежения | `radar` | B02 `tracking_radar` | 134×118 | `art/placeables/IDEA_BANK_PLACEABLES.md` |
+| Система возврата | `recovery` | B04 `recovery_complex` | 164×92 | `art/placeables/IDEA_BANK_PLACEABLES.md` |
+| Логистический терминал | `logistics` | B07 `cargo_terminal` | 178×126 | `art/placeables/IDEA_BANK_PLACEABLES.md` |
 | Энергетический узел | `energy` | EN01 `power_node` | 120×110 | новая запись, описана в промптах |
 | Наблюдательный комплекс | `observation` | OB01 `observatory` | 130×150 | новая запись, описана в промптах |
 
@@ -48,7 +48,7 @@
 | W01 service_lift | E2 1998 | `art/gen/placeables/workshop/service_lift/e2_1998.png` | `art/prompts/w01_service_lift.txt` |
 | W01 service_lift | E3 2015 | `art/gen/placeables/workshop/service_lift/e3_2015.png` | `art/prompts/w01_service_lift.txt` |
 | W01 service_lift | E5 2060 | `art/gen/placeables/workshop/service_lift/e5_2060.png` | `art/prompts/w01_service_lift.txt` |
-| W05 manufacturing_cell | E1 1986 | `art/gen/placeables/workshop/manufacturing_cell/e1_1986.png` | запись W05 в `art/placeables/PRODUCTION_MANIFEST.md` + рецепт промпта (раздел 6) |
-| W03 telemetry_post | E2 1998 | `art/gen/placeables/workshop/telemetry_post/e2_1998.png` | запись W03 в `art/placeables/PRODUCTION_MANIFEST.md` + рецепт промпта (раздел 6) |
+| W05 manufacturing_cell | E1 1986 | `art/gen/placeables/workshop/manufacturing_cell/e1_1986.png` | запись W05 в `art/placeables/IDEA_BANK_PLACEABLES.md` + рецепт промпта (раздел 6) |
+| W03 telemetry_post | E2 1998 | `art/gen/placeables/workshop/telemetry_post/e2_1998.png` | запись W03 в `art/placeables/IDEA_BANK_PLACEABLES.md` + рецепт промпта (раздел 6) |
 
 Генерируйте эпоху по цепочке от соседних целых эпох того же семейства (они лежат рядом в `art/gen/placeables/workshop/<семейство>/`), как для остальных семейств.

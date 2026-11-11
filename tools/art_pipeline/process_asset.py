@@ -113,7 +113,7 @@ def main():
     if not pixel_snapper.is_file(): raise SystemExit('pixel snapper not found: '+str(pixel_snapper))
     if not aseprite.is_file(): raise SystemExit('aseprite not found: '+str(aseprite))
     toolchain=config_root['toolchain']; normalizer=repo/'tools/art_pipeline/normalize_sprite.py'; qa_script=repo/'tools/art_pipeline/qa_sprite.py'; decoder=repo/'tools/art_pipeline/decode_indexed_transport.py'; prompt=repo/cfg.get('prompt_file','') if cfg.get('prompt_file') else None
-    common={'git_commit':git_commit(repo),'style_bible_sha256':maybe_sha(repo/'art/style_bible.txt'),'production_manifest_sha256':maybe_sha(repo/'art/placeables/PRODUCTION_MANIFEST.md'),'pipeline_config_sha256':sha(config_path),'processor_sha256':sha(Path(__file__).resolve()),'prompt_sha256':maybe_sha(prompt) if prompt else None}
+    common={'git_commit':git_commit(repo),'style_bible_sha256':maybe_sha(repo/'art/style_bible.txt'),'production_manifest_sha256':maybe_sha(repo/'art/placeables/IDEA_BANK_PLACEABLES.md'),'pipeline_config_sha256':sha(config_path),'processor_sha256':sha(Path(__file__).resolve()),'prompt_sha256':maybe_sha(prompt) if prompt else None}
     eras=[x for x in cfg['eras'] if not a.era or x['stem']==a.era]
     if not eras: raise SystemExit(f'unknown era {a.era!r} for {a.asset}')
 

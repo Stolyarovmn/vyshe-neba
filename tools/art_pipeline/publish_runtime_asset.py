@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Copy exact approved production bytes into an existing clean runtime target.
+"""Локальный помощник для PR, workflow удалены 2026-11-11.
 
-This script enforces Boundary B from RUNTIME_BRANCH_CONTRACT.md:
-production (`game-production`) -> runtime (`main`) by replacement in place only.
-It never invents target paths and never creates backup/history copies in runtime.
+Копирует утверждённые байты production в существующий канонический runtime-путь
+путём замены на месте и проверки SHA. Не создаёт резервных копий или истории
+в runtime. Публикация и приёмка выполняются по RUNTIME_BRANCH_CONTRACT.md.
 """
 from __future__ import annotations
 

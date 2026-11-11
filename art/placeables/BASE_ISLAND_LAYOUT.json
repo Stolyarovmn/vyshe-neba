@@ -1,8 +1,8 @@
 {
-  "version": 3,
+  "version": 4,
   "world": {
-    "island_asset": "art/gen/environment/start_island_hd.png",
-    "land_mask": "art/gen/environment/start_island_hd.land.json",
+    "island_asset": "game/assets/shared/island/start-island.png",
+    "land_mask": "game/assets/shared/island/start-island.land.json",
     "island_size_px": [
       1916,
       821
@@ -12,6 +12,8 @@
       375
     ],
     "units_per_px": 0.665,
+    "coordinates": "Пиксели острова: начало слева сверху, Y вниз; якорь — низ спрайта по центру. Мир: (px − launch_origin_px) × units_per_px. UV: px / размер острова.",
+    "sea": "Море рисует код; бирюзовая кайма входит в арт острова.",
     "pad_core": {
       "center_px": [
         388,
@@ -24,19 +26,16 @@
         405,
         486
       ]
-    },
-    "coordinates": "px: пиксели HD-острова, начало слева сверху, ось Y вниз; якорь — низ спрайта по центру. world: единицы мира относительно launch_origin_px (1 ед. = 10 м), ось Y вниз; uv: доли размера острова.",
-    "sea": "код рисует море вокруг острова; бирюзовая кайма входит в арт острова"
+    }
   },
   "rules": {
-    "starter_scene": "Есть только стартовая площадка с чистым столом; башня и все покупаемые расширения появляются после покупки.",
-    "placement": "У каждой покупки зарезервирован якорь на суше. След (footprint_px) не выходит за остров, не пересекает ракету, пламенный канал и другие постройки.",
-    "water": "Море вокруг острова рисует код с подобранным цветом и реакцией на погоду; бирюзовая кайма мелководья — часть арта острова.",
-    "sprite_scale": "sprite_px — целевой видимый размер спрайта в пикселях острова (пропорционален footprint из art/placeables/PRODUCTION_MANIFEST.md, 1 LP ≈ 1.45 px)."
+    "starter_scene": "Покупаемые постройки появляются после покупки.",
+    "placement": "Координаты и размеры выгружаются из manifest.js; геометрическую допустимость проверяют в игре.",
+    "water": "Море и реакция на погоду — код.",
+    "sprite_scale": "sprite_px = size, footprint_px = footprint; e0 содержит отдельные переопределения из manifest.js."
   },
   "purchases": {
     "beacons": {
-      "name": "Стартовые маяки",
       "zone": "launch_core",
       "anchors": [
         [
@@ -61,25 +60,64 @@
       "anchors_world": [
         [
           -69.16,
-          13.96
+          13.965
         ],
         [
           69.16,
-          13.96
+          13.965
         ]
       ],
       "sprite_px": [
-        72,
-        140
+        44,
+        89
       ],
       "footprint_px": [
-        62,
-        22
+        40,
+        16
       ],
-      "reason": "По обе стороны стартовой площадки, на уровне ракеты."
+      "e0": {
+        "zone": "launch_core",
+        "anchors": [
+          [
+            284,
+            396
+          ],
+          [
+            492,
+            396
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.14823,
+            0.48234
+          ],
+          [
+            0.25678,
+            0.48234
+          ]
+        ],
+        "anchors_world": [
+          [
+            -69.16,
+            13.965
+          ],
+          [
+            69.16,
+            13.965
+          ]
+        ],
+        "sprite_px": [
+          4,
+          7
+        ],
+        "footprint_px": [
+          4,
+          3.5
+        ]
+      }
     },
     "gantry": {
-      "name": "Башня обслуживания",
       "zone": "launch_core",
       "anchors": [
         [
@@ -107,10 +145,37 @@
         108,
         32
       ],
-      "reason": "У северо-восточного края площадки, вне траектории ракеты."
+      "e0": {
+        "zone": "launch_core",
+        "anchors": [
+          [
+            458,
+            330
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.23904,
+            0.40195
+          ]
+        ],
+        "anchors_world": [
+          [
+            46.55,
+            -29.925
+          ]
+        ],
+        "sprite_px": [
+          56,
+          32
+        ],
+        "footprint_px": [
+          56,
+          30
+        ]
+      }
     },
     "deluge": {
-      "name": "Охлаждение площадки",
       "zone": "launch_core",
       "anchors": [
         [
@@ -127,7 +192,7 @@
       "anchors_world": [
         [
           91.77,
-          101.75
+          101.745
         ]
       ],
       "sprite_px": [
@@ -138,10 +203,37 @@
         105,
         30
       ],
-      "reason": "У юго-восточного края площадки, рядом с пламенным каналом."
+      "e0": {
+        "zone": "launch_core",
+        "anchors": [
+          [
+            542,
+            461
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.28288,
+            0.56151
+          ]
+        ],
+        "anchors_world": [
+          [
+            102.41,
+            57.19
+          ]
+        ],
+        "sprite_px": [
+          58,
+          58
+        ],
+        "footprint_px": [
+          58,
+          32
+        ]
+      }
     },
     "service": {
-      "name": "Сервисная команда",
       "zone": "service_central",
       "anchors": [
         [
@@ -169,10 +261,37 @@
         120,
         28
       ],
-      "reason": "На бетонной дороге к востоку от площадки."
+      "e0": {
+        "zone": "service_central",
+        "anchors": [
+          [
+            623,
+            381
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.32516,
+            0.46407
+          ]
+        ],
+        "anchors_world": [
+          [
+            156.275,
+            3.99
+          ]
+        ],
+        "sprite_px": [
+          71,
+          62
+        ],
+        "footprint_px": [
+          68,
+          31
+        ]
+      }
     },
     "rescue": {
-      "name": "Спасательная станция",
       "zone": "service_central",
       "anchors": [
         [
@@ -189,7 +308,7 @@
       "anchors_world": [
         [
           234.08,
-          -23.28
+          -23.275
         ]
       ],
       "sprite_px": [
@@ -200,10 +319,37 @@
         120,
         26
       ],
-      "reason": "Конец бетонной дороги: быстрый выезд к старту."
+      "e0": {
+        "zone": "service_central",
+        "anchors": [
+          [
+            830,
+            501
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.43319,
+            0.61023
+          ]
+        ],
+        "anchors_world": [
+          [
+            293.93,
+            83.79
+          ]
+        ],
+        "sprite_px": [
+          47,
+          60
+        ],
+        "footprint_px": [
+          45,
+          53
+        ]
+      }
     },
     "fuel": {
-      "name": "Топливный комплекс",
       "zone": "fuel_east",
       "anchors": [
         [
@@ -220,7 +366,7 @@
       "anchors_world": [
         [
           320.53,
-          63.18
+          63.175
         ]
       ],
       "sprite_px": [
@@ -231,10 +377,37 @@
         138,
         26
       ],
-      "reason": "Грунтовая площадка, отделена от старта сервисной зоной."
+      "e0": {
+        "zone": "fuel_east",
+        "anchors": [
+          [
+            870,
+            470
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.45407,
+            0.57247
+          ]
+        ],
+        "anchors_world": [
+          [
+            320.53,
+            63.175
+          ]
+        ],
+        "sprite_px": [
+          23,
+          15
+        ],
+        "footprint_px": [
+          23,
+          11
+        ]
+      }
     },
     "logistics": {
-      "name": "Логистический терминал",
       "zone": "logistics_east",
       "anchors": [
         [
@@ -251,7 +424,7 @@
       "anchors_world": [
         [
           539.98,
-          63.18
+          63.175
         ]
       ],
       "sprite_px": [
@@ -262,10 +435,37 @@
         121,
         30
       ],
-      "reason": "Центральная грунтовая площадка с выездом к берегу."
+      "e0": {
+        "zone": "logistics_east",
+        "anchors": [
+          [
+            1200,
+            470
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.6263,
+            0.57247
+          ]
+        ],
+        "anchors_world": [
+          [
+            539.98,
+            63.175
+          ]
+        ],
+        "sprite_px": [
+          44,
+          18
+        ],
+        "footprint_px": [
+          44,
+          18
+        ]
+      }
     },
     "factory": {
-      "name": "Производственный цех",
       "zone": "industrial_east",
       "anchors": [
         [
@@ -293,10 +493,37 @@
         171,
         34
       ],
-      "reason": "Большая площадка вверху, дальше от старта."
+      "e0": {
+        "zone": "industrial_east",
+        "anchors": [
+          [
+            920,
+            255
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.48017,
+            0.3106
+          ]
+        ],
+        "anchors_world": [
+          [
+            353.78,
+            -79.8
+          ]
+        ],
+        "sprite_px": [
+          70,
+          51
+        ],
+        "footprint_px": [
+          68,
+          43
+        ]
+      }
     },
     "weather": {
-      "name": "Метеостанция",
       "zone": "command_north",
       "anchors": [
         [
@@ -313,21 +540,48 @@
       "anchors_world": [
         [
           406.98,
-          -16.62
+          -16.625
         ]
       ],
       "sprite_px": [
-        142,
-        180
+        140,
+        171
       ],
       "footprint_px": [
         100,
         28
       ],
-      "reason": "Вершина скального холма без экранирования."
+      "e0": {
+        "zone": "command_north",
+        "anchors": [
+          [
+            1060,
+            280
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.55324,
+            0.34105
+          ]
+        ],
+        "anchors_world": [
+          [
+            446.88,
+            -63.175
+          ]
+        ],
+        "sprite_px": [
+          7,
+          13
+        ],
+        "footprint_px": [
+          7,
+          5
+        ]
+      }
     },
     "control": {
-      "name": "Центр управления",
       "zone": "command_north",
       "anchors": [
         [
@@ -344,7 +598,7 @@
       "anchors_world": [
         [
           619.78,
-          -83.12
+          -83.125
         ]
       ],
       "sprite_px": [
@@ -355,10 +609,37 @@
         153,
         34
       ],
-      "reason": "Площадка вверху справа с прямой видимостью старта."
+      "e0": {
+        "zone": "command_north",
+        "anchors": [
+          [
+            1320,
+            250
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.68894,
+            0.30451
+          ]
+        ],
+        "anchors_world": [
+          [
+            619.78,
+            -83.125
+          ]
+        ],
+        "sprite_px": [
+          44,
+          37
+        ],
+        "footprint_px": [
+          43,
+          30
+        ]
+      }
     },
     "radar": {
-      "name": "Радар слежения",
       "zone": "command_north",
       "anchors": [
         [
@@ -375,21 +656,48 @@
       "anchors_world": [
         [
           272.65,
-          -133.67
+          -133.665
         ]
       ],
       "sprite_px": [
-        124,
-        170
+        150,
+        88
       ],
       "footprint_px": [
-        107,
-        30
+        92,
+        24
       ],
-      "reason": "Высокая гряда на северо-западе с открытым горизонтом."
+      "e0": {
+        "zone": "command_north",
+        "anchors": [
+          [
+            830,
+            265
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.43319,
+            0.32278
+          ]
+        ],
+        "anchors_world": [
+          [
+            293.93,
+            -73.15
+          ]
+        ],
+        "sprite_px": [
+          27,
+          16
+        ],
+        "footprint_px": [
+          11,
+          9
+        ]
+      }
     },
     "energy": {
-      "name": "Энергетический узел",
       "zone": "utility_east",
       "anchors": [
         [
@@ -406,7 +714,7 @@
       "anchors_world": [
         [
           739.48,
-          3.33
+          3.325
         ]
       ],
       "sprite_px": [
@@ -417,10 +725,37 @@
         120,
         30
       ],
-      "reason": "Большая площадка справа, между потребителями."
+      "e0": {
+        "zone": "utility_east",
+        "anchors": [
+          [
+            1535,
+            403
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.80115,
+            0.49086
+          ]
+        ],
+        "anchors_world": [
+          [
+            762.755,
+            18.62
+          ]
+        ],
+        "sprite_px": [
+          34,
+          22
+        ],
+        "footprint_px": [
+          32,
+          18
+        ]
+      }
     },
     "observation": {
-      "name": "Наблюдательный комплекс",
       "zone": "perimeter_east",
       "anchors": [
         [
@@ -437,7 +772,7 @@
       "anchors_world": [
         [
           658.35,
-          2.0
+          1.995
         ]
       ],
       "sprite_px": [
@@ -448,10 +783,37 @@
         119,
         30
       ],
-      "reason": "Скальный холм справа с обзором стартовой площадки."
+      "e0": {
+        "zone": "perimeter_east",
+        "anchors": [
+          [
+            1420,
+            273
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.74113,
+            0.33252
+          ]
+        ],
+        "anchors_world": [
+          [
+            686.28,
+            -67.83
+          ]
+        ],
+        "sprite_px": [
+          24,
+          25
+        ],
+        "footprint_px": [
+          24,
+          23
+        ]
+      }
     },
     "recovery": {
-      "name": "Система возврата",
       "zone": "recovery_east",
       "anchors": [
         [
@@ -468,7 +830,7 @@
       "anchors_world": [
         [
           812.63,
-          68.5
+          68.495
         ]
       ],
       "sprite_px": [
@@ -479,12 +841,39 @@
         120,
         28
       ],
-      "reason": "Берег справа внизу, у дальней береговой логистики."
+      "e0": {
+        "zone": "recovery_east",
+        "anchors": [
+          [
+            1505,
+            440
+          ]
+        ],
+        "anchors_uv": [
+          [
+            0.78549,
+            0.53593
+          ]
+        ],
+        "anchors_world": [
+          [
+            742.805,
+            43.225
+          ]
+        ],
+        "sprite_px": [
+          41,
+          17
+        ],
+        "footprint_px": [
+          41,
+          17
+        ]
+      }
     }
   },
   "entries": {
     "workshop": {
-      "name": "Мастерская",
       "zone": "launch_core",
       "anchors": [
         [
@@ -501,7 +890,7 @@
       "anchors_world": [
         [
           -38.57,
-          -75.15
+          -75.145
         ]
       ],
       "sprite_px": [
@@ -512,10 +901,13 @@
         114,
         28
       ],
-      "reason": "Сервисный подъёмник эпохи к северу от площадки: отсюда собирают ракету."
+      "e0Anchor": [
+        365,
+        270
+      ],
+      "e0Scale": 0.3
     },
     "monument": {
-      "name": "Памятник эпох",
       "zone": "launch_core",
       "anchors": [
         [
@@ -532,7 +924,7 @@
       "anchors_world": [
         [
           -103.74,
-          -65.84
+          -65.835
         ]
       ],
       "sprite_px": [
@@ -543,10 +935,16 @@
         44,
         22
       ],
-      "reason": "Обелиск на северо-западной косе: лампы по пройденным эпохам; спрайт не заходит на доску контрактов."
+      "e0Anchor": [
+        295,
+        307
+      ],
+      "e0Size": [
+        14,
+        12
+      ]
     },
     "board": {
-      "name": "Доска контрактов",
       "zone": "launch_core",
       "anchors": [
         [
@@ -563,7 +961,7 @@
       "anchors_world": [
         [
           -118.37,
-          -15.3
+          -15.295
         ]
       ],
       "sprite_px": [
@@ -574,10 +972,18 @@
         60,
         20
       ],
-      "reason": "У западного края площадки, рядом со стартовой зоной, ниже памятника."
+      "e0Anchor": [
+        225,
+        360
+      ],
+      "e0Size": [
+        13,
+        7
+      ],
+      "e0Scale": 0.2,
+      "e0Sprite": "entry_board_1978"
     },
     "shop": {
-      "name": "Лавка",
       "zone": "launch_core",
       "anchors": [
         [
@@ -594,7 +1000,7 @@
       "anchors_world": [
         [
           126.35,
-          -15.3
+          -15.295
         ]
       ],
       "sprite_px": [
@@ -605,7 +1011,16 @@
         110,
         30
       ],
-      "reason": "Прилавок у начала дороги, между площадкой и сервисным двором."
+      "e0Anchor": [
+        542,
+        369
+      ],
+      "e0Size": [
+        30,
+        18
+      ],
+      "e0Scale": 0.3,
+      "e0Sprite": "entry_shop_1978"
     }
   },
   "asset_families": {
@@ -630,12 +1045,17 @@
       "zone": "fuel_east"
     },
     "B06_deep_comms": {
-      "purchase": "control",
-      "zone": "command_north"
+      "purchase": "logistics",
+      "zone": "logistics_east"
     },
     "B07_cargo_terminal": {
       "purchase": "logistics",
       "zone": "logistics_east"
     }
+  },
+  "source": {
+    "branch": "main",
+    "file": "game/src/render/manifest.js",
+    "sha": "da026dc9fddbb49b7804b4cfbc9b61dec2541dd0"
   }
 }

@@ -6,12 +6,12 @@
 
 Он используется вместе с:
 
-- `art/placeables/PRODUCTION_MANIFEST.md` — gameplay role, физические части и lineage конкретного объекта;
+- `art/placeables/IDEA_BANK_PLACEABLES.md` — банк идей, правила rig и родословные; роль и эффекты — `main:game/src/data/buildings.js` и `main:game/docs/DESIGN.md` §4.4;
 - `art/docs/PRODUCTION_CONTRACT_V2.md` — обязательные design/projection/runtime gates;
 - `art/style_bible.txt` — общий визуальный язык, свет и pixel-art правила;
 - asset brief/prompt — конкретная реализация выбранной эпохи.
 
-Если краткое описание эпохи в старом prompt/manifest противоречит этой матрице по **era visual/engineering language**, эта матрица имеет приоритет. Gameplay role, footprint, parts, sockets и конкретная lineage объекта остаются за `PRODUCTION_MANIFEST.md`.
+Если краткое описание эпохи в старом промпте противоречит этой матрице по визуально-инженерному языку, матрица имеет приоритет. Роли и эффекты определяет код игры, размеры и якоря — `main:game/src/render/manifest.js`; паспорт фиксирует части, банк идей сохраняет родословную.
 
 Эпоха не является recolor/filter. Каждый объект должен выглядеть так, будто его действительно спроектировали, изготовили, обслуживали и использовали именно в этой стадии мира игры.
 

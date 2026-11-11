@@ -8,7 +8,8 @@
     "mode": "replace_in_place",
     "require_existing_target": true,
     "forbid_runtime_history_copies": true,
-    "rollback": "git_history_or_revert_pr"
+    "rollback": "git_history_or_revert_pr",
+    "description": "справочная карта production-source → runtime-target; не обязательна для публикации"
   },
   "assets": {
     "ENV_START_ISLAND_HD": {
@@ -91,7 +92,6 @@
     }
   },
   "blocked_assets": {
-    "B03": "runtime asset key beacons, logical names bld_beacons_<year>, draw consumer and existing canonical base/beacons.png targets are verified on main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721; publication remains blocked because current runtime semantics widen landing tolerances while PRODUCTION_MANIFEST targets touchdown/corridor tracking with a rigged head/lamp, and no replacement E0-E5 production lineage is approved yet",
     "W04": "runtime mapping not verified against current main",
     "R_BODY": "modular rocket body runtime mapping not verified against current main",
     "R_FINS": "modular rocket fins runtime mapping not verified against current main"
