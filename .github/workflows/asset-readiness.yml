@@ -174,20 +174,15 @@ jobs:
           assert approval['approved'] is True
           assert approval['approved_sha256'] == expected
           print('PASS: exact island production source is present, approved and runtime-export metadata is ready')
-
-          b03=exports['blocked_assets']['B03']
-          assert 'main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721' in b03
-          assert 'bld_beacons_<year>' in b03
-          assert 'base/beacons.png' in b03
-          assert 'current runtime semantics widen landing tolerances' in b03
-          print('PASS: B03 runtime export remains fail-closed for semantic/rig integration')
+          assert 'B03' not in exports['blocked_assets'], 'B03 beacons are published in main; stale blocked record must not return'
+          print('PASS: B03 runtime export is not blocked (beacons live in main from approved sources)')
           PY
 
       - name: Readiness boundary
         run: |
           echo 'PASS: isolated B03 E0 production imagegen request is ready with measured projection proxy.'
           echo 'PASS: approved HD island production source is present and its explicit runtime export metadata is ready.'
-          echo 'NOTE: B03 all six runtime targets/consumer are verified; runtime publication is blocked by a semantics/rig integration mismatch, not by unknown paths.'
+          echo 'NOTE: B03 beacons are already published in main (base/beacons.png, approved by the owner); publication is a PR to main, see RUNTIME_BRANCH_CONTRACT.md.'
           echo 'NOTE: 73.44 degrees is a reference-equivalent generation proxy, not a proven original 3D camera angle.'
           echo 'NOTE: production promotion may become available after candidate QA/approval even while runtime publication remains BLOCKED.'
           echo 'NOTE: this is NOT full runtime/game regression.'
