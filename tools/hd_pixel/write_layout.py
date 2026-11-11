@@ -26,8 +26,9 @@ layout = {
     'size': proj['size'],
     'elev': proj['elev'],
     'pad': {'x': pts['pad'][0], 'y': pts['pad'][1], 'rocketScale': round(1 / UNITS_PER_PX, 4)},
-    # стартовый вид: стол и ближние поляны крупно; minZoom 2.2 — остров не мельчит до точки (как прежний хаб)
-    'camera': {'home': [pts['pad'][0] + 330, pts['pad'][1] - 20], 'minZoom': 2.2, 'maxZoom': 7},
+    # стартовый вид: на широком экране вся застройка (hub-iso.js считает зум по полосе построек, не мельче minZoom 1.3);
+    # на узком — стол и ближние поляны крупно (portraitZoom 2.2, как прежний хаб)
+    'camera': {'home': [pts['pad'][0] + 330, pts['pad'][1] - 20], 'minZoom': 1.3, 'portraitZoom': 2.2, 'maxZoom': 7},
     'buildings': buildings,
 }
 out = root / 'game/assets/shared/island/base-iso.json'
