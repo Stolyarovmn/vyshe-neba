@@ -54,11 +54,11 @@ export function createText() {
   const unitCache = new Map();
 
   /** Масштаб шрифта (CSS-пикселей на пиксель глифа) по «размеру» в CSS px: не меньше ×2 — мельче текст не рисуется никогда. */
-  const scaleFor = (size) => Math.max(2, Math.round(size / 7));
+  const scaleFor = (size, minScale = 2) => Math.max(minScale, Math.round(size / 7));
 
   /** Пикселей устройства на пиксель глифа и тот же шаг в CSS-пикселях. */
-  function stepFor(size) {
-    const dev = Math.max(1, Math.round(scaleFor(size) * dpr));
+  function stepFor(size, minScale = 2) {
+    const dev = Math.max(1, Math.round(scaleFor(size, minScale) * dpr));
     return { dev, css: dev / dpr };
   }
 
@@ -143,6 +143,18 @@ export function createText() {
     return s * 7;
   }
 
+  /** Подбор полного глифа по двум осям; барабанам разрешён ×1 вместо обрезки боковин цифр. */
+  function fitBox(str, maxWidth, maxHeight, size, minScale = 2) {
+    let scale = scaleFor(size, minScale);
+    while (scale > minScale) {
+      const { css } = stepFor(scale * GLYPH_H, minScale);
+      // Запас на привязку центра к пикселям устройства, в том числе при дробном DPR.
+      if (units(normalize(str)) * css + 1 / dpr <= maxWidth && GLYPH_H * css + 1 / dpr <= maxHeight) break;
+      scale--;
+    }
+    return { size: scale * GLYPH_H, minScale };
+  }
+
   /**
    * Одна строка. Возвращает { w, h }. o: size, color, align (left|center|right), baseline (top|middle|bottom),
    * shadow (цвет тени), maxWidth (ужать/обрезать), alpha.
@@ -158,16 +170,16 @@ export function createText() {
       text = normalize(f.str);
       size = f.size;
     }
-    const { dev, css } = stepFor(size);
+    const { dev, css } = stepFor(size, o.minScale ?? 2);
     const total = units(text) * css;
     const lineH = size * 1.2;
     const glyphH = GLYPH_H * css;
     const top = baseline === 'top' ? y + (lineH - glyphH) / 2 : baseline === 'bottom' ? y - (lineH + glyphH) / 2 : y - glyphH / 2;
     let cx = align === 'center' ? x - total / 2 : align === 'right' ? x - total : x;
-    const scale = scaleFor(size);
+    const scale = scaleFor(size, o.minScale ?? 2);
     if (audit && !o.noAudit) {
       const rect = { x: cx, y: top, w: total, h: glyphH, str: text, clip, scale, color: ctx.globalAlpha * alpha >= 0.99 ? color : null };
-      if (scale < 2) audit.issues.push({ kind: 'tiny', str: text, rect });
+      if (scale < (o.minScale ?? 2)) audit.issues.push({ kind: 'tiny', str: text, rect });
       audit.rects.push(rect);
       if (text !== original && !o.allowCut) audit.issues.push({ kind: 'truncated', str: original, shown: text, rect });
       if (o.box) {
@@ -220,7 +232,7 @@ export function createText() {
   }
 
   return {
-    draw, block, blockHeight, measure, wrap, fit, fitWords, setDpr, scaleFor, stepFor, setAudit, setClip, lineStep, clear: () => atlases.clear(),
+    draw, block, blockHeight, measure, wrap, fit, fitWords, fitBox, setDpr, scaleFor, stepFor, setAudit, setClip, lineStep, clear: () => atlases.clear(),
     get cacheSize() { return atlases.size; },
   };
 }

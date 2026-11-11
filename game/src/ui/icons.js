@@ -5,7 +5,7 @@
 // Вызов один: draw(ctx, имя, cx, cy, размер, цвет, alpha). Имя 'bld:<ключ>:<уровень>' — спрайт постройки по эпохе.
 
 import { mix, nearestPalette, PALETTE } from './theme.js';
-import { spriteName, buildingSpriteName } from '../render/manifest.js';
+import { MODULE_IDS, E0_ITEM_ICON_IDS, spriteName, buildingSpriteName } from '../render/manifest.js';
 
 export const ICON_GRID = 32;
 
@@ -132,6 +132,10 @@ const SPRITE_OF = {
   chute: 'canopy', parachute: 'canopy', capsule: 'capsule', booster: 'booster',
 };
 
+// Явные item:<id> сохраняют прежний вид лавки без PNG, включая прицел магнитного импульса.
+const ITEM_FALLBACK = { chute: 'chute', repair: 'repair', canister: 'canister', magnet: 'target' };
+const fallbackName = (name) => name.startsWith('item:') ? ITEM_FALLBACK[name.slice(5)] || 'info' : name;
+
 // запасные векторные иконки построек, пока для них нет спрайта эпохи
 const BUILDING_FALLBACK = {
   beacons: 'target', gantry: 'building', deluge: 'fuel', service: 'repair', rescue: 'shield', fuel: 'canister', logistics: 'cart',
@@ -139,7 +143,7 @@ const BUILDING_FALLBACK = {
 };
 
 export const ICON_NAMES = Object.keys(ICONS);
-export const hasIcon = (name) => name in ICONS || name.startsWith('bld:') || name.startsWith('ui_');
+export const hasIcon = (name) => name in ICONS || name.startsWith('bld:') || name.startsWith('ui_') || (name.startsWith('item:') && E0_ITEM_ICON_IDS.includes(name.slice(5)));
 
 const FIXED = { gold: '#ffd23f', cyan: '#52d8ff', red: '#f0584a', amber: '#e6a020', green: '#3aa860', w: '#f6f1e4', k: '#0b0f1a' };
 
@@ -262,10 +266,21 @@ export function createIcons() {
 
   function spriteFor(name) {
     if (!painter) return null;
+    // Модули запрашиваются по id через partIcon(); расходники — по id или item:<id>.
+    if (era === 0) {
+      const itemId = name.startsWith('item:') ? name.slice(5) : name;
+      const base = MODULE_IDS.includes(name) ? `icon_module_${name}`
+        : E0_ITEM_ICON_IDS.includes(itemId) ? `icon_item_${itemId}` : null;
+      const icon = base && painter.assets.get(spriteName(base, era));
+      if (icon) return icon;
+    }
+    name = fallbackName(name);
     let sprite = null;
     if (name.startsWith('ui_')) sprite = name;
     else if (name.startsWith('bld:')) {
       const [, key, lv] = name.split(':');
+      const icon = painter.assets.get(spriteName(`icon_${key}`, era));
+      if (icon) return icon;
       sprite = buildingSpriteName(key, Math.max(1, Number(lv) || era + 1));
     } else if (SPRITE_FLAT[name]) sprite = SPRITE_FLAT[name];
     else if (SPRITE_OF[name]) sprite = spriteName(SPRITE_OF[name], era);
@@ -290,13 +305,23 @@ export function createIcons() {
     const asset = spriteFor(name);
     let actual = size;
     if (asset) {
-      const k = Math.min(size / asset.w, size / asset.h);
-      const wDev = Math.max(1, Math.round(asset.w * k * dpr));
-      const hDev = Math.max(1, Math.round(asset.h * k * dpr));
-      const src = painter.source(asset, wDev, hDev);
+      const isIcon = asset.name.startsWith('icon_');
+      const fit = Math.min(size * dpr / asset.w, size * dpr / asset.h);
+      const k = isIcon && fit >= 1 ? Math.floor(fit) : fit;
+      const wDev = Math.max(1, Math.round(asset.w * k));
+      const hDev = Math.max(1, Math.round(asset.h * k));
+      const src = isIcon ? asset.img : painter.source(asset, wDev, hDev);
+      const prevSmooth = ctx.imageSmoothingEnabled;
+      const prevQuality = ctx.imageSmoothingQuality;
+      if (isIcon) {
+        ctx.imageSmoothingEnabled = k < 1;
+        if (k < 1) ctx.imageSmoothingQuality = 'high';
+      }
       ctx.drawImage(src, Math.round((cx - wDev / dpr / 2) * dpr) / dpr, Math.round((cy - hDev / dpr / 2) * dpr) / dpr, wDev / dpr, hDev / dpr);
+      ctx.imageSmoothingEnabled = prevSmooth;
+      ctx.imageSmoothingQuality = prevQuality;
     } else {
-      const vname = name.startsWith('bld:') ? BUILDING_FALLBACK[name.split(':')[1]] || 'building' : name;
+      const vname = name.startsWith('bld:') ? BUILDING_FALLBACK[name.split(':')[1]] || 'building' : fallbackName(name);
       const N = PIX + PAD * 2;
       const k = Math.max(1, Math.round((size * dpr) / PIX));
       const bm = vector(vname in ICONS ? vname : 'info', color, k);

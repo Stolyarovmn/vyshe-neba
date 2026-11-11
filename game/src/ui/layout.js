@@ -261,7 +261,7 @@ export function rocketLayout(L, opts = {}) {
   const stripH = standH + L.gap * 2;
   const flameRoom = R(Math.min(schematic.h, schematic.w * 1.05) * 0.1);
   const rocketH = Math.min(schematic.h - stripH - flameRoom - L.gap * 2, R(schematic.w * (L.portrait ? 1.05 : 1.2)), R(400 * L.ui));
-  const rocketW = R((rocketH * ASSEMBLY_WIDTH) / ASSEMBLY_HEIGHT);
+  const rocketW = R((rocketH * (opts.assembly?.width ?? ASSEMBLY_WIDTH)) / (opts.assembly?.height ?? ASSEMBLY_HEIGHT));
   const cx = schematic.x + schematic.w / 2;
   const roomy = schematic.h > 5 * spot + 4 * L.gap + L.gap * 3;
   const top = schematic.y + (roomy ? L.gap * 1.5 : 1);
@@ -273,7 +273,8 @@ export function rocketLayout(L, opts = {}) {
   const spots = {};
   let compact = false;
   const bySide = { '-1': [], 1: [] };
-  for (const s of ROCKET_SPOTS) bySide[s.side].push(s);
+  for (const s of ROCKET_SPOTS) bySide[s.side].push({ ...s, t: opts.assembly?.modules[s.id]?.tAnchor ?? s.t });
+  for (const list of Object.values(bySide)) list.sort((p, q) => p.t - q.t);
   for (const list of Object.values(bySide)) {
     // в тесной раскладке лишние точки уходят во второй столбец дальше от ракеты
     for (let start = 0, col = 0; start < list.length; start += perCol, col++) {

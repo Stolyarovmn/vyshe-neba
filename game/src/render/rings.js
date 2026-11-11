@@ -5,7 +5,7 @@
 // пролетает «сквозь» отверстие. После пролёта sim удаляет кольцо, а ringFx оставляет его «призрак»: разрастается и гаснет.
 
 import {
-  ERA_SPECS, MASTER_HALF_WIDTH_PX, RING_EXTENT, TORUS, lampScreenPosition, masterSize, renderRingMaster,
+  ERA_SPECS, MASTER_HALF_WIDTH_PX, RING_EXTENT, TORUS, RING_ASSET_HALF, ringAssetPair, lampScreenPosition, masterSize, renderRingMaster,
 } from './ringart.js';
 import { clamp, smoothstep } from './util.js';
 
@@ -14,13 +14,16 @@ const GHOST_DURATION_CALM = 0.3; // при reduceMotion: без расширен
 const GLINT_COLORS = { center: '255,214,110', edge: '120,225,255' };
 
 /** Высота отрисовки кольца в долях его полуширины: (2 * HH) / (2 * HW) по мастер-текстуре. */
-export function ringAspect() {
+export function ringAspect(era = 0, assets) {
+  const art = ringAssetPair(assets, era);
+  if (art) return art.height / art.width;
   const [w, h] = masterSize();
   return h / w;
 }
 
 /** Мировая ширина мастер-текстуры для кольца с полушириной halfWidth (ед. мира): учитывает поля и хомуты. */
-export function ringSpriteWidth(halfWidth) {
+export function ringSpriteWidth(halfWidth, era = 0, assets) {
+  if (ringAssetPair(assets, era)) return 2 * halfWidth * RING_ASSET_HALF;
   const [w] = masterSize();
   return (w * halfWidth) / MASTER_HALF_WIDTH_PX;
 }
@@ -39,7 +42,7 @@ function toCanvas(makeCanvas, pixels, width, height) {
 }
 
 /** Кэш мастер-текстур колец: по одной паре слоёв (back/front) на эпоху, строятся при первом обращении. */
-export function createRingCache(makeCanvas) {
+export function createRingCache(makeCanvas, assets) {
   const entries = new Map();
   return {
     get size() {
@@ -56,6 +59,12 @@ export function createRingCache(makeCanvas) {
       const key = clamp(era | 0, 0, 5);
       let entry = entries.get(key);
       if (!entry) {
+        const art = ringAssetPair(assets, key);
+        if (art) {
+          entry = { era: key, ...art, assetHalf: RING_ASSET_HALF, lamps: [] };
+          entries.set(key, entry);
+          return entry;
+        }
         const master = renderRingMaster(key);
         const { width, height } = master;
         const asset = (layer, pixels) => ({
@@ -161,12 +170,12 @@ function drawLamps(ctx, painter, view, o, entry, time, front) {
 }
 
 /** Мягкое свечение «ворот» позади кольца: дышит, чтобы кольцо хотелось пролететь. */
-export function ringGlow(ctx, view, o, time) {
+export function ringGlow(ctx, view, o, time, era = 0, assets) {
   const pulse = 0.5 + 0.5 * Math.sin(time * 2.6 + (o.id | 0));
   const sx = view.sx(o.x);
   const sy = view.sy(o.y);
   const rx = (o.halfWidth || 40) * 1.18 * view.S;
-  const ry = rx * ringAspect() * 1.1;
+  const ry = rx * ringAspect(era, assets) * 1.1;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.translate(sx, sy);
@@ -186,7 +195,7 @@ export function drawRingLayer(ctx, painter, view, cache, o, era, time, layer, ex
   const entry = cache.get(era);
   const front = layer === 'front';
   const half = (o.halfWidth || 38) * (extra && extra.scale ? extra.scale : 1);
-  const scale = half / MASTER_HALF_WIDTH_PX;
+  const scale = entry.assetHalf ? 2 * half * entry.assetHalf / entry.width : half / MASTER_HALF_WIDTH_PX;
   const uw = entry.width * scale;
   const uh = entry.height * scale;
   const alpha = extra && extra.alpha !== undefined ? extra.alpha : 1;
@@ -201,7 +210,7 @@ export function drawRingLayer(ctx, painter, view, cache, o, era, time, layer, ex
   } else {
     painter.blit(ctx, view, asset, sx, sy, uw, uh, 0.5, 0.5, { alpha, smooth: false });
   }
-  if (!extra) drawLamps(ctx, painter, view, o, entry, time, front);
+  if (!extra && entry.lamps.length) drawLamps(ctx, painter, view, o, entry, time, front);
 }
 
 /** Вспышки пролёта (призраки): слой 'back' или 'front'; ряби и луч рисуются в заднем слое. */
@@ -215,15 +224,18 @@ export function drawRingGhosts(ctx, painter, view, cache, fx, layer, time) {
     const grow = g.reduce ? 1 : 1 + 0.4 * ease;
     drawRingLayer(ctx, painter, view, cache, o, g.era, time, layer, { scale: grow, alpha: fade, additive: false });
     drawRingLayer(ctx, painter, view, cache, o, g.era, time, layer, { scale: grow, alpha: Math.min(1, fade * 1.25), additive: true });
-    if (layer === 'back' && !g.reduce) drawRipple(ctx, view, g, k, ease);
+    if (layer === 'back' && !g.reduce) {
+      const entry = cache.get(g.era);
+      drawRipple(ctx, view, g, k, ease, entry.height / entry.width);
+    }
   }
 }
 
-function drawRipple(ctx, view, g, k, ease) {
+function drawRipple(ctx, view, g, k, ease, textureAspect) {
   const color = GLINT_COLORS[g.quality];
   const sx = view.sx(g.x);
   const sy = view.sy(g.y);
-  const aspect = ringAspect() * 1.05;
+  const aspect = textureAspect * 1.05;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.lineWidth = Math.max(1, Math.round(view.S * (g.quality === 'center' ? 2.4 : 1.6) * (1 - k * 0.6)));

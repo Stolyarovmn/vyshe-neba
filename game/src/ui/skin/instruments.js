@@ -152,12 +152,14 @@ function drumCounter(kit, r, meters, digits) {
   const cc = kit.cell();
   const n = digits;
   const pad = cc * 3;
-  const dw = Math.min(Math.floor((r.w - pad * 2) / n), Math.round(r.h * 0.62));
+  const dw = Math.floor((r.w - cc * 2) / n);
   const dh = r.h - pad * 2;
   const total = dw * n;
   const x0 = Math.round(r.x + (r.w - total) / 2);
   const y0 = r.y + pad;
-  const size = kit.text.fit('8', dw - cc * 2, Math.round(dh * 0.8)).size;
+  // Декоративные края остаются за окном цифры; размер учитывает и ширину, и высоту.
+  const inset = Math.min(cc, Math.max(0, Math.floor((dw - 5) / 2)));
+  const font = kit.text.fitBox('8', dw - inset * 2, dh - inset * 2, Math.round(dh * 0.8), 1);
   const value = Math.max(0, meters);
   for (let i = 0; i < n; i++) {
     const power = n - 1 - i;
@@ -168,17 +170,19 @@ function drumCounter(kit, r, meters, digits) {
     const frac = (value / unit) % 1;
     const roll = power === 0 ? frac : clamp((frac - 0.9) * 10, 0, 1);
     kit.rect(wx, y0, dw, dh, c.ink);
-    kit.pushClip({ x: wx + cc, y: y0 + cc, w: dw - cc * 2, h: dh - cc * 2 });
-    const step = dh - cc * 2;
+    kit.pushClip({ x: wx + inset, y: y0 + inset, w: dw - inset * 2, h: dh - inset * 2 });
+    const step = dh - inset * 2;
     const cy = y0 + dh / 2 - roll * step;
-    kit.drawText(String(digit), wx + dw / 2, cy, { size, color: c.white, align: 'center', noAudit: true });
-    if (roll > 0.001) kit.drawText(String((digit + 1) % 10), wx + dw / 2, cy + step, { size, color: c.white, align: 'center', noAudit: true });
+    kit.drawText(String(digit), wx + dw / 2, cy, { ...font, color: c.white, align: 'center', noAudit: true });
+    if (roll > 0.001) kit.drawText(String((digit + 1) % 10), wx + dw / 2, cy + step, { ...font, color: c.white, align: 'center', noAudit: true });
     kit.popClip();
     // объём барабана: затенённые края и блик по центру
-    kit.rect(wx + cc, y0 + cc, cc, dh - cc * 2, mix(c.navy1, '#000000', 0.2));
-    kit.rect(wx + dw - cc * 2, y0 + cc, cc, dh - cc * 2, mix(c.navy1, '#000000', 0.2));
-    kit.rect(wx + cc, y0 + cc, dw - cc * 2, cc, c.navy1);
-    kit.rect(wx + cc, y0 + dh - cc * 2, dw - cc * 2, cc, c.navy1);
+    if (inset >= cc) {
+      kit.rect(wx, y0, cc, dh, mix(c.navy1, '#000000', 0.2));
+      kit.rect(wx + dw - cc, y0, cc, dh, mix(c.navy1, '#000000', 0.2));
+    }
+    kit.rect(wx, y0, dw, cc, c.navy1);
+    kit.rect(wx, y0 + dh - cc, dw, cc, c.navy1);
   }
 }
 

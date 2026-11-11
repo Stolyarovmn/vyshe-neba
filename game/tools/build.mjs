@@ -14,13 +14,26 @@ const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp',
 async function collectAssetPaths() {
   const manifest = await import(pathToFileURL(path.join(gameDir, 'src', 'render', 'manifest.js')).href);
   const files = manifest.ASSET_FILES || {};
-  return [...new Set(Object.values(files).map((f) => (typeof f === 'string' ? f : f.file)))];
+  const paths = new Map();
+  for (const spec of Object.values(files)) {
+    const file = typeof spec === 'string' ? spec : spec.file;
+    const optional = typeof spec !== 'string' && !!spec.optional;
+    paths.set(file, (paths.get(file) ?? true) && optional);
+  }
+  return paths;
 }
 
 async function embedAssets(paths) {
   const table = {};
-  for (const rel of paths) {
-    const data = await readFile(path.join(root, rel));
+  for (const [rel, optional] of paths) {
+    let data;
+    try {
+      data = await readFile(path.join(root, rel));
+    } catch (err) {
+      // Отсутствующий новый арт не мешает встраиванию остальных ассетов.
+      if (optional && err.code === 'ENOENT') continue;
+      throw err;
+    }
     const mime = MIME[path.extname(rel).toLowerCase()] || 'application/octet-stream';
     table[rel] = `data:${mime};base64,${data.toString('base64')}`;
   }

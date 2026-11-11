@@ -19,6 +19,7 @@ import results from './screens/results.js';
 import settings from './screens/settings.js';
 import { drawFallbackBackground, buildingShort, buildingIcon, ERA_YEARS } from './screens/common.js';
 import { drawNewCard } from './screens/newcards.js';
+import { LAUNCH_AT, launchTransitionAlpha } from './launch-transition.js';
 
 export const DT = 1 / 120;
 const MAX_FRAME = 0.1;
@@ -378,7 +379,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     c.t += dt;
     c.n = 3 - Math.floor(c.t / step);
     if (c.n !== prevN && c.n > 0) sfx('tick');
-    if (c.t >= step * 3 + 0.35) {
+    if (c.t >= LAUNCH_AT) {
       sfx('go');
       app.countdown = null;
       beginFlight(c.config, c);
@@ -399,6 +400,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       destination: c.destination,
       consumables: c.consumables,
       startedAt: app.time,
+      isoLaunch: renderer.hub.mode?.() === 'iso',
       hint: null,
       hintUntil: 0,
       shake: 0,
@@ -692,7 +694,6 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     L.hud.touchVisible = app.touchUi;
     kit.icons.setEra(app.profile.era);
     kit.icons.setPainter(renderer.painter);
-    kit.setToastAnchor(...toastAnchor(L));
     if (app.countdown) tickCountdown(dt);
     if (app.screen === 'flight') flightTick(dt);
     else if (app.standFrame) {
@@ -710,6 +711,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     if (!app.refit) app.skinEra = app.profile.era;
     kit.S.auditScreen = app.screen;
     kit.begin(ctx, { L, settings: app.settings, time: app.time, dt, events, era: app.skinEra ?? app.profile.era });
+    // fs() читает раскладку и настройки текущего кадра: до begin() они ещё могут отсутствовать.
+    kit.setToastAnchor(...toastAnchor(L));
     try {
       const t0 = performance.now();
       drawBackground(app.screen);
@@ -737,6 +740,19 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     drawIris(dt);
     kit.end();
     app.uiDrawing = false;
+    // На стыке проекций весь кадр закрыт цветом неба; сам рендер полёта не меняется.
+    if (renderer.hub.mode?.() === 'iso') {
+      const alpha = launchTransitionAlpha(app.countdown?.t,
+        app.screen === 'flight' && app.session?.isoLaunch ? app.time - app.session.startedAt : null);
+      if (alpha > 0) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#162c46';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+    }
     canvas.style.cursor = kit.cursor;
 
     if (!app.session && app.screen !== 'flight') {

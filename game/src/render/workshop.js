@@ -1,11 +1,10 @@
 // Станции мастерской вокруг схемы ракеты: рисуются по бокам прямоугольника, центр остаётся свободным.
 // Как и backdrop.js, работают в текущем преобразовании ctx (CSS-пиксели интерфейса).
 
-import { STATION_SIZES, eraYear, spriteName, spriteSize } from './manifest.js';
-import { ASSEMBLY_HEIGHT, ASSEMBLY_WIDTH, MODULE_VIEW, assemblyParts } from './rocket-view.js';
+import { MODULE_IDS, STATION_SIZES, eraYear, spriteName, spriteSize } from './manifest.js';
+import { assemblyLayout } from './rocket-view.js';
 
-/** Девять модулей ракеты в порядке сборки снизу вверх. */
-export const MODULE_IDS = ['engine', 'tank', 'hull', 'booster', 'capsule', 'legs', 'fins', 'parachute', 'avionics'];
+export { MODULE_IDS };
 
 /** Модули, за которые отвечает станция мастерской (рамка станции — основной хитбокс); остальные — части самой ракеты. */
 export const MODULE_STATIONS = {
@@ -70,21 +69,24 @@ export function layoutStations(rect) {
  * Рамка сборки по умолчанию в rect (когда UI не передал свою): по центру, пропорции ASSEMBLY_WIDTH:ASSEMBLY_HEIGHT.
  * Приблизительна — для точных рамок передавайте params.rocket (та же рамка, что идёт в drawAssembly).
  */
-export function defaultRocketRect(rect) {
+export function defaultRocketRect(rect, assets, era = 0) {
+  const layout = assemblyLayout(assets, era);
   const h = Math.min(rect.h * 0.8, rect.w * 1.2, 400);
-  const w = (h * ASSEMBLY_WIDTH) / ASSEMBLY_HEIGHT;
+  const w = (h * layout.width) / layout.height;
   return { x: rect.x + (rect.w - w) / 2, y: rect.y + rect.h * 0.05, w, h };
 }
 
 /** Рамки ступеней сборки в координатах rocket (как drawAssembly): { booster, core, capsule } -> { x, y, w, h }. */
-function stageRects(rocket, era) {
-  const scale = rocket.h / ASSEMBLY_HEIGHT;
+function stageRects(rocket, era, assets) {
+  const layout = assemblyLayout(assets, era);
+  const scale = rocket.h / layout.height;
   const cx = rocket.x + rocket.w / 2;
   const out = {};
-  for (const part of assemblyParts({})) {
-    const size = spriteSize(spriteName(part.base, era));
+  for (const part of layout.parts) {
+    const asset = assets?.get(part.name || spriteName(part.base, era));
+    const size = asset ? [asset.w, asset.h] : spriteSize(spriteName(part.base, era));
     const h = part.h * scale;
-    const w = size ? (h * size[0]) / size[1] : h * 0.5;
+    const w = part.w ? part.w * scale : size ? (h * size[0]) / size[1] : h * 0.5;
     out[part.base] = { x: cx - w / 2, y: rocket.y + rocket.h - part.bottom * scale - h, w, h };
   }
   return out;
@@ -99,13 +101,14 @@ function stageRects(rocket, era) {
  */
 export function moduleBoxes(params) {
   const { era = 0, rect } = params;
-  const rocket = params.rocket || defaultRocketRect(rect);
-  const stages = stageRects(rocket, era);
+  const rocket = params.rocket || defaultRocketRect(rect, params.assets, era);
+  const stages = stageRects(rocket, era, params.assets);
+  const modules = assemblyLayout(params.assets, era).modules;
   const stations = params.stations === false ? [] : layoutStations(rect);
   const out = {};
   for (const id of MODULE_IDS) {
     const owner = stages[MODULE_OWNER[id]];
-    const [t0, t1] = MODULE_VIEW[id].region;
+    const [t0, t1] = modules[id].region;
     const spread = owner.w * (SPREAD[id] || 0);
     const y0 = rocket.y + t0 * rocket.h;
     const y1 = rocket.y + t1 * rocket.h;
@@ -122,7 +125,7 @@ export function moduleBoxes(params) {
 export function createWorkshop(painter) {
   return {
     layoutStations,
-    moduleBoxes,
+    moduleBoxes: (params) => moduleBoxes({ ...params, assets: painter.assets }),
 
     /**
      * params: { era, rect:{x,y,w,h}, time, rocket?:{x,y,w,h}, stations?:boolean }. Рисует станции эпохи и возвращает их
@@ -150,7 +153,7 @@ export function createWorkshop(painter) {
         drawIndicator(ctx, item, time);
       }
       ctx.restore();
-      items.modules = moduleBoxes({ era, rect, rocket: params.rocket, stations: params.stations });
+      items.modules = moduleBoxes({ era, rect, rocket: params.rocket, stations: params.stations, assets: painter.assets });
       return items;
     },
   };

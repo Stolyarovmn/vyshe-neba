@@ -8,7 +8,8 @@ import { mix } from '../theme.js';
 
 const DEST_ICON = { earth: 'earth', moon: 'moon', mars: 'mars' };
 const CONS = ['chute', 'repair', 'canister', 'magnet'];
-const CONS_ICON = { chute: 'chute', repair: 'repair', canister: 'canister', magnet: 'target' };
+// item:<id> берёт PNG-иконку расходника эпохи (icons/item_<id>.png), без неё — прежние пиксельные значки.
+const CONS_ICON = { chute: 'item:chute', repair: 'item:repair', canister: 'item:canister', magnet: 'item:magnet' };
 const READY_PARTS = ['engine', 'tank', 'hull', 'capsule'];
 
 function state(app) {

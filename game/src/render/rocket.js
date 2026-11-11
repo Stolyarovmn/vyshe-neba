@@ -15,6 +15,30 @@ export const ROCKET_SIZE = {
   packW: 24,
 };
 
+// Номинальный стек: 28 + 52 + 27 - 2 × 1,5 = 104, как прежний booster + core.
+// Для нового арта высоты считаются по PNG при общей ширине STACK_W.
+// Все три PNG стека одной ширины холста (корпус 120 px на холсте 146 px), поэтому STACK_W задаёт и толщину корпуса.
+export const STACK_W = 24;
+export const STACK_H = Object.freeze({ booster: 28, core: 52, capsule: 27 });
+export const STACK_OVERLAP = 1.5;
+// Глубина стыка в пикселях PNG: на сколько часть, стоящая выше, утоплена в эту. Сопло ядра (28 px) уходит в открытую
+// юбку разгонного блока целиком, поэтому до отделения его не видно; кабина садится на ядро встык.
+export const STACK_JOINT_PX = Object.freeze({ booster: 36, core: 4 });
+
+/** Цельный стек включается только при наличии всех трёх частей одной эпохи. */
+export function stackGeometry(assets, era = 0) {
+  const geometry = {};
+  for (const base of Object.keys(STACK_H)) {
+    const name = spriteName(`stack_${base}`, era);
+    const asset = assets?.get(name);
+    if (!asset || !(asset.w > 0 && asset.h > 0)) return null;
+    const k = STACK_W / asset.w; // мировых единиц на пиксель PNG
+    const joint = STACK_JOINT_PX[base] !== undefined ? STACK_JOINT_PX[base] * k : STACK_OVERLAP;
+    geometry[base] = { name, w: STACK_W, h: asset.h * k, joint };
+  }
+  return geometry;
+}
+
 export const SKIN_HUE = Object.freeze({ classic: 0, wasp: 45, arctic: 170, cosmos: 270 });
 
 /** Какая часть ракеты сейчас активна: 'booster' (разгонный блок + ядро), 'core' или 'capsule'. */
@@ -25,7 +49,18 @@ export function activeKind(stageIds, stageIndex) {
 }
 
 /** Детали стека снизу вверх: { base: 'booster'|'core'|'capsule', h, bottom } (bottom — локальная y низа, вверх отрицательна). */
-export function stackParts(kind) {
+export function stackParts(kind, assets, era = 0) {
+  const geometry = stackGeometry(assets, era);
+  if (geometry) {
+    const bases = kind === 'capsule' ? ['capsule'] : kind === 'core' ? ['core', 'capsule'] : ['booster', 'core', 'capsule'];
+    let bottom = 0;
+    // Без купленной кабины этот же нос служит обтекателем, поэтому он всегда виден.
+    return bases.map((base) => {
+      const part = { base, ...geometry[base], bottom };
+      bottom -= part.h - part.joint;
+      return part;
+    });
+  }
   if (kind === 'booster') {
     return [
       { base: 'booster', h: ROCKET_SIZE.boosterH, bottom: 0 },
@@ -36,14 +71,15 @@ export function stackParts(kind) {
   return [{ base: 'core', h: ROCKET_SIZE.coreH, bottom: ROCKET_SIZE.coreFeetDrop }];
 }
 
-export function stackHeight(kind) {
-  const parts = stackParts(kind);
+export function stackHeight(kind, assets, era = 0) {
+  const parts = stackParts(kind, assets, era);
   const top = parts[parts.length - 1];
   return -(top.bottom - top.h);
 }
 
 /** Смещение сопла от опорной точки вдоль оси ракеты (вниз положительно). */
-export function nozzleOffset(kind) {
+export function nozzleOffset(kind, assets, era = 0) {
+  if (stackGeometry(assets, era)) return 0;
   return kind === 'core' ? ROCKET_SIZE.coreFeetDrop : 0;
 }
 
@@ -95,19 +131,22 @@ export function drawRocket(ctx, painter, view, pose, time) {
   ctx.save();
   ctx.translate(view.sx(pose.x), view.sy(pose.y));
   if (pose.angle) ctx.rotate(pose.angle);
-  if (pose.throttle > 0.02) drawFlame(ctx, view, pose, time);
+  if (pose.throttle > 0.02) drawFlame(ctx, view, pose, time, painter.assets);
   const hue = SKIN_HUE[pose.skin] || 0;
-  for (const part of stackParts(pose.kind)) {
-    const name = spriteName(part.base, pose.era);
+  const parts = stackParts(pose.kind, painter.assets, pose.era);
+  // Нижняя юбка перекрывает стык и сопло верхней части.
+  if (parts[0].name) parts.reverse();
+  for (const part of parts) {
+    const name = part.name || spriteName(part.base, pose.era);
     const asset = painter.assets.get(name);
     if (asset) {
-      const uw = part.h * asset.w / asset.h;
+      const uw = part.w ?? part.h * asset.w / asset.h;
       painter.blit(ctx, view, asset, 0, Math.round(part.bottom * S), uw, part.h, 0.5, 1, { hue });
     } else {
       fallbackBody(ctx, S, part);
     }
   }
-  drawRcs(ctx, view, pose, time);
+  drawRcs(ctx, view, pose, time, painter.assets);
   ctx.restore();
 }
 
@@ -122,13 +161,13 @@ function row(ctx, S, half, y, h, color) {
   ctx.fillRect(Math.round(-w * S / 2), Math.round(y * S), Math.round(w * S), Math.max(1, Math.round(h * S)));
 }
 
-function drawFlame(ctx, view, pose, time) {
+function drawFlame(ctx, view, pose, time, assets) {
   const S = view.S;
   const palette = FLAME_PALETTES[clamp(pose.era | 0, 0, 5)];
   const shape = flameShape(pose.throttle, pose.atmo, pose.boost, pose.kind);
   const flick = 1 + 0.12 * Math.sin(time * 43) + 0.05 * Math.sin(time * 71);
   const length = shape.length * flick;
-  const origin = nozzleOffset(pose.kind);
+  const origin = nozzleOffset(pose.kind, assets, pose.era);
   const vacuum = pose.atmo < 0.35;
 
   // Свечение у сопла: ярче при форсаже и тяге.
@@ -166,12 +205,13 @@ function drawFlame(ctx, view, pose, time) {
 }
 
 /** Струйки РСУ по бокам верхней части: короткие светлые клинья, мигающие по времени. */
-function drawRcs(ctx, view, pose, time) {
+function drawRcs(ctx, view, pose, time, assets) {
   if (pose.rcsLeft <= 0 && pose.rcsRight <= 0) return;
   const S = view.S;
-  const h = stackHeight(pose.kind);
-  const y = -(pose.kind === 'capsule' ? 0.62 : 0.6) * h + (pose.kind === 'core' ? ROCKET_SIZE.coreFeetDrop : 0);
-  const x = pose.kind === 'capsule' ? 11 : 13;
+  const h = stackHeight(pose.kind, assets, pose.era);
+  const geometry = stackGeometry(assets, pose.era);
+  const y = geometry ? -h + geometry.capsule.h * 0.55 : -(pose.kind === 'capsule' ? 0.62 : 0.6) * h + (pose.kind === 'core' ? ROCKET_SIZE.coreFeetDrop : 0);
+  const x = geometry ? STACK_W * 0.36 : pose.kind === 'capsule' ? 11 : 13;
   const len = 5 + 3 * Math.sin(time * 32) ** 2;
   ctx.fillStyle = '#bbf4ff';
   for (const side of [-1, 1]) {
@@ -201,7 +241,7 @@ export function drawChute(ctx, painter, view, pose, time) {
   if (pose.chute <= 0.001 || !pose.visible) return;
   const p = clamp(pose.chute, 0, 1);
   const era = pose.era;
-  const h = stackHeight(pose.kind);
+  const h = stackHeight(pose.kind, painter.assets, pose.era);
   const topX = pose.x + Math.sin(pose.angle) * h;
   const topY = pose.y - Math.cos(pose.angle) * h;
   const sway = Math.sin(time * 2.7) * 3 * p;

@@ -3,7 +3,7 @@
 
 import { t } from '../../i18n/index.js';
 import { rocketLayout } from '../layout.js';
-import { drawAssembly, MODULE_VIEW } from '../../render/rocket-view.js';
+import { drawAssembly, assemblyLayout } from '../../render/rocket-view.js';
 import { clamp } from '../format.js';
 import { drawChrome, infoCallout, isFundsReason, partIcon, partShort, deltaRows, PART_KEYS } from './common.js';
 
@@ -44,14 +44,16 @@ export default {
   draw(app, kit, L, dt) {
     const st = state(app);
     // открытая выноска в портрете занимает низ экрана: схема ракеты уходит вверх, чтобы все восемь узлов остались видны
-    const full = rocketLayout(L);
+    const assembly = assemblyLayout(app.renderer.painter.assets, app.profile.era, app.profile.parts);
+    const full = rocketLayout(L, { assembly });
     let reserve = 0;
     if (st.selected && L.portrait) {
       const m = infoCallout(app, kit, { ...partSpec(app, kit, L, st.selected), bounds: full.body, measureOnly: true });
       const minScheme = full.spot * 4 + L.gap * 8;
       reserve = clamp(m.h + L.gap * 3, 0, Math.max(0, full.body.h - minScheme));
     }
-    const G = reserve ? rocketLayout(L, { reserveBottom: reserve }) : full;
+    const G = reserve ? rocketLayout(L, { reserveBottom: reserve, assembly }) : full;
+    G.modules = assembly.modules;
     drawChrome(app, kit, { back: true });
 
     // изменение уровней → вспышка на сборке
@@ -134,7 +136,7 @@ function drawScene(app, kit, L, G, st, thr) {
   }
 
   // выбранный модуль: мигающие пиксельные уголки вокруг его области на сборке
-  const view = st.selected ? MODULE_VIEW[st.selected] : null;
+  const view = st.selected ? G.modules[st.selected] : null;
   if (view) {
     const cc = kit.cell();
     const on = app.settings.reduceMotion || Math.floor(app.time * 4) % 2 === 0;
@@ -176,7 +178,7 @@ function drawNodes(app, kit, L, G, st) {
     const upgradable = ps.next && !ps.locked.length;
     const lockedReq = ps.next && ps.locked.some((x) => !isFundsReason(x));
     // пунктирная линия-выноска от узла к детали
-    const mark = { x: cx + r.side * G.rocket.w * 0.3, y: G.rocket.y + MODULE_VIEW[id].tAnchor * G.rocket.h };
+    const mark = { x: cx + r.side * G.rocket.w * 0.3, y: G.rocket.y + G.modules[id].tAnchor * G.rocket.h };
     kit.line(r.side < 0 ? r.x + r.w : r.x, r.y + r.h / 2, mark.x, mark.y, on ? c.amber : c.steel2, { dash: true });
     kit.rect(Math.round(mark.x - cc), Math.round(mark.y - cc), cc * 2, cc * 2, on ? c.amberLight : c.steel3);
 

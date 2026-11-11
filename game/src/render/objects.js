@@ -222,7 +222,7 @@ const ringCaches = new WeakMap();
 export function ringCacheFor(painter) {
   let cache = ringCaches.get(painter);
   if (!cache) {
-    cache = createRingCache(painter.makeCanvas);
+    cache = createRingCache(painter.makeCanvas, painter.assets);
     ringCaches.set(painter, cache);
   }
   return cache;
@@ -260,7 +260,7 @@ function drawVerticalRing(ctx, painter, view, o, era, time) {
 
 function drawRing(ctx, painter, view, o, era, time) {
   if (isHorizontalRing(o)) {
-    ringGlow(ctx, view, o, time);
+    ringGlow(ctx, view, o, time, era, painter.assets);
     drawRingLayer(ctx, painter, view, ringCacheFor(painter), o, era, time, 'back');
   } else {
     drawVerticalRing(ctx, painter, view, o, era, time);

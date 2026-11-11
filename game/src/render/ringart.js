@@ -7,6 +7,18 @@
 // внешняя полуширина кольца (с хомутами) = 1.
 
 import { TAU, clamp, smoothstep } from './util.js';
+import { spriteName } from './manifest.js';
+
+// Внешняя полуширина готового арта относительно полуширины ворот в симуляции.
+export const RING_ASSET_HALF = 1.0;
+
+/** Половины готового кольца принимаются только парой на одинаковом холсте. */
+export function ringAssetPair(assets, era = 0) {
+  const back = assets?.get(spriteName('ring_h_back', era));
+  const front = assets?.get(spriteName('ring_h_front', era));
+  return back && front && back.w > 0 && back.h > 0 && back.w === front.w && back.h === front.h
+    ? { back, front, width: back.w, height: back.h } : null;
+}
 
 export const TORUS = {
   tilt: 0.36, // sin угла возвышения камеры: вид под небольшим углом сверху

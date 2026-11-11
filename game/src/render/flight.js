@@ -21,7 +21,7 @@ import {
 } from './overlays.js';
 import { PALETTE_VARIANT, PARTICLE, createParticles } from './particles.js';
 import {
-  ROCKET_SIZE, createRocketPose, drawChute, drawRocket, nozzleOffset, stackHeight,
+  ROCKET_SIZE, createRocketPose, drawChute, drawRocket, nozzleOffset, stackHeight, stackGeometry,
 } from './rocket.js';
 import {
   drawLimb, drawRain, drawSky, drawSkyBodies, drawStars, drawSun,
@@ -145,14 +145,15 @@ export function createFlightRenderer(painter, shared) {
   function spawnPiece(e) {
     const piece = pieces.find((p) => !p.active) || pieces[0];
     const base = e.stage === 'capsule' ? 'capsule' : e.stage === 'booster' ? 'booster' : 'core';
-    const h = base === 'booster' ? ROCKET_SIZE.boosterH : base === 'capsule' ? ROCKET_SIZE.capsuleH : ROCKET_SIZE.coreH;
+    const stack = stackGeometry(painter.assets, state.era);
+    const h = stack ? stack[base].h : base === 'booster' ? ROCKET_SIZE.boosterH : base === 'capsule' ? ROCKET_SIZE.capsuleH : ROCKET_SIZE.coreH;
     const angle = e.angle || 0;
     const flight = state.flight;
     const x = e.x !== undefined ? e.x : flight ? flight.x : 0;
     const y = e.y !== undefined ? e.y : flight ? flight.y : 0;
     // Центр отделившейся ступени; её опора — исходная точка ракеты.
     piece.active = true;
-    piece.base = base;
+    piece.base = stack ? `stack_${base}` : base;
     piece.era = state.era;
     piece.h = h;
     piece.hue = 0;
@@ -223,7 +224,7 @@ export function createFlightRenderer(painter, shared) {
     const reduce = state.reduce ? 0.6 : 1;
     const sin = Math.sin(pose.angle);
     const cos = Math.cos(pose.angle);
-    const off = nozzleOffset(pose.kind) + 1;
+    const off = nozzleOffset(pose.kind, painter.assets, pose.era) + 1;
     const nx = pose.x - sin * off;
     const ny = pose.y + cos * off;
     const dirX = -sin;
@@ -317,7 +318,7 @@ export function createFlightRenderer(painter, shared) {
     state.acc.damage += dt * (1 - hpFrac * 2) * 22;
     while (state.acc.damage >= 1) {
       state.acc.damage -= 1;
-      const h = stackHeight(pose.kind);
+      const h = stackHeight(pose.kind, painter.assets, pose.era);
       const sin = Math.sin(pose.angle);
       const cos = Math.cos(pose.angle);
       const along = h * (0.2 + rng() * 0.5);
@@ -365,7 +366,7 @@ export function createFlightRenderer(painter, shared) {
 
   function updateCamera(flight, dt, layout, reduce) {
     target.x = flight.x;
-    target.y = flight.y - stackHeight(pose.kind) * 0.5;
+    target.y = flight.y - stackHeight(pose.kind, painter.assets, pose.era) * 0.5;
     target.vx = flight.vx || 0;
     target.vy = flight.vy || 0;
     target.alt = flight.alt ?? -flight.y;
