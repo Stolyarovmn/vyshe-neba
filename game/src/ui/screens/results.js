@@ -155,14 +155,20 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
   const compact = !L.portrait && L.h < 460;
   if (crashed && report.hint) {
     y += kit.paragraph(report.hint.text, x, y, w, { size: kit.fs(12), color: M.ink, lineHeight: 1.25 }) + L.gap * 0.5;
+    if (report.hint.savedIfLanded !== undefined) y += kit.paragraph(t('results.savedIfLanded', { n: fmtInt(report.hint.savedIfLanded) }), x, y, w, { size: kit.fs(12), color: M.bad, lineHeight: 1.25 }) + L.gap * 0.5;
   }
   const lg = result.landing;
   if ((crashed || landed) && lg && lg.vTol) y += drawTolerances(kit, L, x, y, w, lg) + L.gap * 0.5;
   if (crashed && report.hint) {
     const chips = [];
-    if (report.hint.part && report.hint.part !== 'parachute') chips.push({ id: 'results-goto-part', label: partShort(app, report.hint.part), icon: partIcon(report.hint.part), go: () => app.go('rocket', { select: report.hint.part }, { push: true }) });
+    const part = report.hint.part;
+    if (part && part !== 'parachute') {
+      const name = part === 'fins' ? t('results.fins') : partShort(app, part);
+      const label = report.reason === 'lost-in-space' ? t('results.spaceFins') : t('results.upgrade', { part: name, level: report.hint.level ?? Math.min(18, res.before.parts[part] + 1) });
+      chips.push({ id: 'results-goto-part', label, icon: partIcon(part), go: () => app.go('rocket', { select: part }, { push: true }) });
+    }
     // парашют теперь расходник: после аварии без него подсказываем лавку
-    if (report.hint.part === 'parachute' || !res.consumables?.chute) chips.push({ id: 'results-goto-shop', label: t('dock.shop'), icon: 'chute', go: () => app.go('shop', {}, { push: true }) });
+    if (report.hint.shop === 'chute') chips.push({ id: 'results-goto-shop', label: t('cons.chute'), icon: 'chute', go: () => app.go('shop', {}, { push: true }) });
     if (report.hint.building) chips.push({ id: 'results-goto-building', label: buildingShort(app, report.hint.building), icon: buildingIcon(report.hint.building, 1), go: () => app.go('base', { select: report.hint.building }, { push: true }) });
     if (chips.length) {
       // кнопки-переходы раскладываются рядами по ширине листа: сначала со значками, иначе без; шрифт не мельчится
@@ -192,10 +198,18 @@ function drawFlightColumn(app, kit, L, col, top, res, elapsed) {
       const bh = L.touch(compact ? 44 : 46);
       for (const row of rows) {
         const bw = (w - L.gap * (row.length - 1)) / row.length;
+        const pad = Math.max(cc * 3, kit.text.stepFor(csize).css * 2 + cc);
+        const iconW = showIcons ? csize * 1.9 : 0;
+        const textW = bw - pad * 2 - iconW;
+        const rowHeight = Math.max(bh, ...row.map((ch) => kit.text.blockHeight(ch.label, textW, csize, 1.25) + pad * 2));
         row.forEach((ch, i) => {
-          if (kit.button(ch.id, { x: x + i * (bw + L.gap), y, w: bw, h: bh }, { label: ch.label, icon: showIcons ? ch.icon : undefined, variant: 'btn', size: csize, fixedScale: true })) ch.go();
+          const bx = x + i * (bw + L.gap);
+          if (kit.button(ch.id, { x: bx, y, w: bw, h: rowHeight }, { tip: ch.label, variant: 'btn', size: csize, fixedScale: true })) ch.go();
+          const color = kit.readable(c.text, kit.frameMid('btn'));
+          if (showIcons) kit.icon(ch.icon, bx + pad + csize * 0.75, y + rowHeight / 2, csize * 1.5, color);
+          kit.paragraph(ch.label, bx + pad + iconW, y + pad, textW, { size: csize, color, lineHeight: 1.25 });
         });
-        y += bh + L.gap * (compact ? 0.5 : 1);
+        y += rowHeight + L.gap * (compact ? 0.5 : 1);
       }
     }
   }
@@ -273,7 +287,7 @@ function drawTolerances(kit, L, x, y, w, lg) {
 
 // ---------- правая колонка: награды ----------
 
-const CHIP_ICON = { 'results.c.travel': 'altitude', 'results.c.loot': 'coin', 'results.c.landing': 'check', 'results.c.perfect': 'star', 'results.c.expedition': 'target', 'results.c.storm': 'wind' };
+const CHIP_ICON = { 'results.c.travel': 'altitude', 'results.c.loot': 'coin', 'results.c.landing': 'check', 'results.c.perfect': 'star', 'results.c.expedition': 'target', 'results.c.storm': 'wind', 'results.c.rings': 'fins', 'results.c.near': 'shield', 'results.c.fuelSaving': 'fuel', 'results.c.goal': 'target' };
 
 function drawRewardsColumn(app, kit, L, col, top, res, st, elapsed, dt) {
   const c = kit.c;
@@ -289,23 +303,28 @@ function drawRewardsColumn(app, kit, L, col, top, res, st, elapsed, dt) {
   // значки наград: иконка и число по очереди
   const lines = Object.keys(CHIP_ICON).map((k) => [k, coin[k.replace('results.c.', '')]]).filter(([, v]) => v);
   const chipH = Math.round(30 * U(L));
-  const cols = Math.max(1, Math.min(lines.length || 1, Math.floor(w / Math.round(86 * U(L)))));
-  const cw = (w - L.gap * (cols - 1)) / cols;
+  // Каждая выплата подписана; переносы учитываются в высоте прокручиваемого бланка.
   lines.forEach(([key, value], i) => {
     const k = easeOutCubic(clamp((elapsed - 0.6 - i * 0.22) / 0.4, 0, 1));
     if (k > 0 && i >= st.ticked) {
       st.ticked = i + 1;
       app.sfx('coin');
     }
-    const r = { x: x + (i % cols) * (cw + L.gap), y: y + Math.floor(i / cols) * (chipH + L.gap * 0.6), w: cw, h: chipH };
+    const label = t(key, { n: fmtInt(value), count: res.result.rings ?? 0 });
+    const size = kit.fs(12);
+    const textW = w - chipH - cc * 4;
+    const height = Math.max(chipH, kit.text.blockHeight(label, textW, size, 1.25));
+    const r = { x, y, w, h: height };
+    y += height + L.gap * 0.6;
     if (k <= 0) return;
     kit.S.ctx.globalAlpha = k;
     kit.nine('screen', r.x, r.y, r.w, r.h);
     kit.icon(CHIP_ICON[key], r.x + chipH * 0.55, r.y + r.h / 2, Math.round(chipH * 0.62), c.amberLight);
-    kit.drawText(`+${fmtCompact(value * k)}`, r.x + r.w - cc * 3, r.y + r.h / 2, { size: kit.fs(12), color: c.gold, align: 'right', maxWidth: r.w - chipH });
+    kit.paragraph(label, r.x + chipH, r.y, textW, { size, color: c.gold, lineHeight: 1.25 });
     kit.S.ctx.globalAlpha = 1;
   });
-  y += Math.ceil(Math.max(lines.length, 1) / cols) * (chipH + L.gap * 0.6) + L.gap * 0.4;
+  y += L.gap * 0.4;
+  if (coin.saved) y += kit.paragraph(t('results.saved', { n: fmtInt(coin.saved) }), x, y, w, { size: kit.fs(12), color: M.good, lineHeight: 1.25 }) + L.gap * 0.5;
   if (coin.charged) {
     kit.icon('warn', x + cc * 6, y + chipH / 2, Math.round(chipH * 0.6), M.bad);
     kit.drawText(`−${fmtCompact(coin.charged)}`, x + cc * 12 + chipH * 0.5, y + chipH / 2, { size: kit.fs(13), color: M.bad });

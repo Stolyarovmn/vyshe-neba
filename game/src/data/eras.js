@@ -17,18 +17,19 @@ function era(id, year, name, desc, bonus, advance) {
 
 // Milestone items: every item must hold. Altitudes are meters, `maxAlt` is the best altitude of any flight.
 const alt = (min) => ({ type: 'maxAlt', min });
+const landAlt = (min) => ({ type: 'landAlt', min });
 const soft = (min) => ({ type: 'softLandings', min });
 
 export const ERAS = [
   era(0, 1978, 'Гаражная мечта', 'Ручная сборка. Сарай, бетон и мечта.',
     { fuel: 0, income: 0, discount: 0 },
-    { coins: 560, data: 8, buildings: { count: 8, level: 1 }, milestone: { text: 'Мягкая посадка и высота 3 км', items: [soft(1), alt(3000)] } }),
+    { coins: 560, data: 8, buildings: { count: 8, level: 1 }, milestone: { text: 'Высота 6 км и 3 мягкие посадки', items: [alt(6000), soft(3)] } }),
   era(1, 1986, 'Своя мастерская', 'Подъёмник, бак и первые станки.',
     { fuel: 0.04, income: 0.05, discount: 0.02 },
-    { coins: 2140, data: 40, buildings: { count: 8, level: 2 }, milestone: { text: 'Высота 30 км', items: [alt(30000)] } }),
+    { coins: 2140, data: 40, buildings: { count: 8, level: 2 }, milestone: { text: 'Высота 30 км и посадка с 20 км', items: [alt(30000), landAlt(20000)] } }),
   era(2, 1998, 'Испытательный центр', 'Кран, радар и кирпичные цехи.',
     { fuel: 0.08, income: 0.1, discount: 0.04 },
-    { coins: 2490, data: 150, buildings: { count: 10, level: 3 }, milestone: { text: 'Линия космоса: высота 100 км', items: [alt(100000)] } }),
+    { coins: 2490, data: 150, buildings: { count: 10, level: 3 }, milestone: { text: 'Высота 100 км и возврат на Землю', items: [alt(100000), landAlt(100000)] } }),
   era(3, 2015, 'Космический порт', 'Центр управления и солнечные поля.',
     { fuel: 0.12, income: 0.15, discount: 0.06 },
     { coins: 28500, data: 300, buildings: { count: 12, level: 4 }, milestone: { text: 'Мягкая посадка на Луне', items: [{ type: 'moonLanding' }] } }),

@@ -22,8 +22,8 @@ function nice(value) {
 // (era + 1) can carry every unlocked building of that level.
 const POWER_CURVE = [2, 4, 7, 11, 16, 22];
 // Data needed from level 5 on, multiplied by the building weight.
-const DATA_CURVE = [0, 0, 0, 0, 6, 20];
-const COST_GROWTH = 2.85;
+const DATA_CURVE = [0, 0, 0, 4, 10, 20];
+const COST_GROWTH = 2.6;
 
 // Supply of the energy node per level; the launch table adds BASE_POWER_SUPPLY on top.
 const ENERGY_SUPPLY = [17, 48, 96, 162, 236, 330];

@@ -8,16 +8,27 @@
 //   kind 'fly'                        a flight is needed: `goal` says what for (altitude, landing, moon, mars,
 //                                     coins, data) with the current value and the target;
 //   kind 'wait'                       nothing left to do in this era.
-// Order: purchases the player can pay for now (cheapest first), the era card when the project is ready, a flight
-// when nothing can be bought, purchases that wait for coins or data (cheapest first), the era card with its gaps.
+// Порядок: доступные покупки по классу эффекта и цене, готовая эпоха, нужный полёт,
+// покупки с нехваткой ресурсов по тому же приоритету, условия эпохи.
 // Items locked by the base or the era cap are not offered: they are not the "nearest" action.
 
 import { BUILDINGS, BUILDING_KEYS, ERAS, PARTS, PART_IDS } from '../data/index.js';
 import { getBuildingState, getPartState } from './purchases.js';
 import { coinsText } from './common.js';
 import { getEraState } from './eras.js';
+import { SPACE_LINE_M } from '../data/economy.js';
 
 const RESOURCE_LOCKS = new Set(['coins', 'data']);
+
+// Цель хранится в метрах, как рекорды профиля; симуляция переводит только maxAlt.
+export function flightGoal(profile) {
+  if (profile.stats.flights === 0) return 1000;
+  const record = profile.milestones.maxAlt;
+  let goal = Math.max(record * 1.05, record + 200);
+  const milestone = ERAS[profile.era].advance?.milestone.items.find((item) => item.type === 'maxAlt' && record < item.min);
+  if (milestone) goal = Math.min(goal, milestone.min, SPACE_LINE_M);
+  return Math.ceil(goal / 100) * 100;
+}
 
 export function kmText(meters) {
   const km = Math.round(meters / 100) / 10;
@@ -45,7 +56,15 @@ function collectPurchases(profile) {
     if (state.maxed || state.locked.some((lock) => !RESOURCE_LOCKS.has(lock.kind))) continue;
     out.push(purchase('buy-part', id, state));
   }
-  const byCost = (a, b) => a.cost - b.cost || (a.kind === b.kind ? 0 : a.kind === 'buy-building' ? -1 : 1) || a.id.localeCompare(b.id);
+  const effectClass = (step) => {
+    if (step.kind === 'buy-part') {
+      if (['engine', 'tank', 'booster', 'capsule'].includes(step.id)) return 0;
+      if (step.id === 'fins' && step.level <= 3) return 0;
+      if (step.id === 'legs' && profile.lastCrashReason?.startsWith('landing-')) return 0;
+    } else if (['beacons', 'gantry', 'deluge', 'fuel', 'radar', 'weather'].includes(step.id)) return 1;
+    return 2;
+  };
+  const byCost = (a, b) => effectClass(a) - effectClass(b) || a.cost - b.cost || a.id.localeCompare(b.id);
   return {
     affordable: out.filter((step) => step.affordable).sort(byCost),
     waiting: out.filter((step) => !step.affordable).sort(byCost),
@@ -81,7 +100,9 @@ function milestoneReason(item) {
     case 'maxAlt':
       return { kind: 'milestone', type: item.type, have: item.have, need: item.need, text: `Высота ${kmText(item.need)}: сейчас ${kmText(item.have)}` };
     case 'softLandings':
-      return { kind: 'milestone', type: item.type, have: item.have, need: item.need, text: 'Нужна мягкая посадка' };
+      return { kind: 'milestone', type: item.type, have: item.have, need: item.need, text: `Мягких посадок: ${item.have}/${item.need}` };
+    case 'landAlt':
+      return { kind: 'milestone', type: item.type, have: item.have, need: item.need, text: `Поднимись на ${kmText(item.need)} и сядь` };
     case 'moonLanding':
       return { kind: 'milestone', type: item.type, have: 0, need: 1, text: 'Нужна посадка на Луне' };
     case 'marsLanding':
@@ -103,10 +124,11 @@ function eraStep(profile, state) {
 function flyStep(eraState, reasons, waiting) {
   const milestone = reasons.find((r) => r.kind === 'milestone');
   if (milestone) {
-    const goalType = { maxAlt: 'altitude', softLandings: 'landing', moonLanding: 'moon', marsLanding: 'mars' }[milestone.type] ?? 'milestone';
+    const goalType = { maxAlt: 'altitude', landAlt: 'landAlt', softLandings: 'landing', moonLanding: 'moon', marsLanding: 'mars' }[milestone.type] ?? 'milestone';
     const text = {
       altitude: `Полёт: поднимись на ${kmText(milestone.need)} (рекорд ${kmText(milestone.have)})`,
       landing: 'Полёт: сядь мягко',
+      landAlt: `Полёт: поднимись на ${kmText(milestone.need)} и сядь`,
       moon: 'Полёт: сядь на Луне',
       mars: 'Полёт: сядь на Марсе',
     }[goalType] ?? `Полёт: ${milestone.text}`;

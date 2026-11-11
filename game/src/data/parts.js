@@ -59,18 +59,23 @@ function buildPart(spec) {
 // `factor` converts the stored value to the displayed one (radians -> degrees).
 const stat = (key, label, unit, dir, digits = 0, factor = 1) => ({ key, label, unit, dir, digits, factor });
 
-// Soft tilt limit of the stabilizers, radians: 0.20 at level 0, 1.2 at level 8, free rotation (PI) from level 12.
-function finsTilt(level) {
-  if (level <= 8) return round(0.2 + 0.125 * level, 3);
-  if (level < 12) return round(1.2 + ((Math.PI - 1.2) / 4) * (level - 8), 3);
-  return Math.PI;
+// Линейная интерполяция между заданными уровнями стабилизаторов.
+function finsCurve(level, points) {
+  for (let i = 1; i < points.length; i++) {
+    const [hi, value] = points[i];
+    const [lo, previous] = points[i - 1];
+    if (level <= hi) return round(previous + (value - previous) * (level - lo) / (hi - lo), 3);
+  }
+  return points.at(-1)[1];
 }
 
-// Rotation speed multiplier: 0.45 at level 0, 1.1 at level 8, 1.6 at level 12, 2.2 at level 18.
-function finsTurn(level) {
-  if (level <= 8) return round(0.45 + 0.08125 * level, 3);
-  if (level <= 12) return round(1.1 + 0.125 * (level - 8), 3);
-  return round(1.6 + 0.1 * (level - 12), 3);
+export function finsTilt(level) {
+  if (level >= 9) return Math.PI;
+  return finsCurve(level, [[0, 0.12], [3, 0.45], [6, 0.9], [9, Math.PI]]);
+}
+
+export function finsTurn(level) {
+  return finsCurve(level, [[0, 0.22], [3, 0.55], [6, 1], [9, 1.5], [12, 2], [18, 2.4]]);
 }
 
 export const PARTS = {
