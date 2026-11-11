@@ -368,6 +368,12 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     }
     app.countdown = { t: 0, n: 3, config, destination, consumables };
     app.go('launch', { countdown: true });
+    // Изометрическая база за отсчёт подводит камеру к кадру полёта: стык без скачка, затем подъём камеры в полёте.
+    if (renderer.hub.mode?.() === 'iso' && renderer.hub.matchPad && renderer.flight?.restFraming) {
+      const kind = (app.profile.parts?.booster | 0) > 0 ? 'booster' : 'core';
+      const f = renderer.flight.restFraming(app.layout, canvas.width, canvas.height, kind, app.profile.era | 0);
+      renderer.hub.matchPad(f.ax, f.feetY, f.pxPerUnit);
+    }
     return true;
   };
 
@@ -600,6 +606,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
   };
 
   app.finishFlight = () => {
+    renderer.hub.reset?.();
     const s = app.session;
     if (!s || s.finished) return;
     s.finished = true;
@@ -740,8 +747,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     drawIris(dt);
     kit.end();
     app.uiDrawing = false;
-    // На стыке проекций весь кадр закрыт цветом неба; сам рендер полёта не меняется.
-    if (renderer.hub.mode?.() === 'iso') {
+    // Без кадров подъёма камеры стык проекций закрыт цветом неба; с ними полёт сам поднимает камеру.
+    if (renderer.hub.mode?.() === 'iso' && !renderer.flight?.hasTilt?.()) {
       const alpha = launchTransitionAlpha(app.countdown?.t,
         app.screen === 'flight' && app.session?.isoLaunch ? app.time - app.session.startedAt : null);
       if (alpha > 0) {
@@ -872,6 +879,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     const r = { x: L.w / 2 - L.touch(70), y: L.h - L.area.y - L.touch(64) - L.gap, w: L.touch(140), h: L.touch(48) };
     if (kit.button('countdown-cancel', r, { label: t('common.cancel'), variant: 'btn' })) {
       app.countdown = null;
+      renderer.hub.reset?.();
       app.go('launch', {});
     }
   }

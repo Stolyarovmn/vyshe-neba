@@ -104,6 +104,16 @@ export function createIsoHub(painter, shared, layout) {
       if (key && key !== state.selected) startClip(key);
       state.selected = key || null;
     },
+    /**
+     * Подвести камеру к кадру полёта: стол в экранной точке (ax, feetY) px устройства, pxPerUnit — экранных px на
+     * единицу мира. После этого первый кадр полёта совпадает с последним кадром базы.
+     */
+    matchPad(ax, feetY, pxPerUnit, immediate = false) {
+      if (!state.ready || !(pxPerUnit > 0)) return;
+      const z = zoomLimit(pxPerUnit / layout.pad.rocketScale / state.fit);
+      const sc = state.fit * z;
+      hub.focus({ x: layout.pad.x - (ax - state.devW / 2) / sc, y: layout.pad.y - (feetY - state.devH / 2) / sc, zoom: z }, immediate);
+    },
     reset(immediate = false) {
       [state.tx, state.ty] = homeCenter();
       state.tz = homeZoom();

@@ -9,7 +9,7 @@ import {
   createMapView, drawGroundShadow, drawIslandHd, drawSea, groundTransform,
 } from './islandmap.js';
 import { drawCloudField, fallbackClouds } from './clouds.js';
-import { drawPlacedBuildings, islandToWorld } from './buildings.js';
+import { buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
 import { drawLaunchMount, drawPadRing, MOUNT_RADIUS } from './launchpad.js';
 import { drawObjects, drawObjectsFront, drawRadarMarks, warmRings } from './objects.js';
 import { createRingFx } from './rings.js';
@@ -27,7 +27,7 @@ import {
   drawLimb, drawRain, drawSky, drawSkyBodies, drawStars, drawSun,
 } from './sky.js';
 import { ensureWorld } from './layout.js';
-import { E0_DELUGE_NOZZLES, ISLAND, spriteName } from './manifest.js';
+import { BUILDING_ANCHORS, E0_DELUGE_NOZZLES, ISLAND, buildingSpriteName, spriteName } from './manifest.js';
 
 const DELUGE_SOURCES_E0 = E0_DELUGE_NOZZLES.map(([px, py, direction]) =>
   [...islandToWorld(px, py), direction]);
@@ -42,6 +42,44 @@ const BODY_GRAVITY = { earth: 45, moon: 9, mars: 20 };
 const PIECE_COUNT = 10;
 const CAMERA_JUMP = 1500;
 const HAZE_COLOR = [150, 205, 236];
+/** Подъём камеры после старта: изометрия базы (40°) → промежуточные ракурсы → карта полёта, секунд. */
+export const LIFT_TIME = 0.9;
+
+/**
+ * Кадры подъёма камеры: [изометрия базы, ракурсы из tilt.json по возрастанию угла, карта полёта].
+ * У каждого: asset, size [w, h] px кадра, pad [x, y] px стола, buildings { ключ: [[x, y], ...] } px якорей.
+ * null, если изометрии или кадров нет: тогда полёт начинается сразу с карты.
+ */
+export function tiltFrames(assets) {
+  const iso = assets.json?.('base_iso_layout');
+  const tilt = assets.json?.('island_tilt_layout');
+  const start = assets.get('island_start');
+  const base = assets.get('island_base_iso');
+  if (!iso || !tilt || !start || !base || !iso.pad || !iso.buildings) return null;
+  const isoBuildings = {};
+  const isoSize = {};
+  for (const [key, b] of Object.entries(iso.buildings)) {
+    isoBuildings[key] = Array.isArray(b.anchors) ? b.anchors : [b.anchor];
+    isoSize[key] = b.size;
+  }
+  const frames = [{ asset: base, size: iso.size, pad: [iso.pad.x, iso.pad.y], buildings: isoBuildings, isoSize }];
+  for (const f of [...(tilt.frames || [])].sort((a, b) => a.elev - b.elev)) {
+    const asset = assets.get(f.asset);
+    if (asset && Array.isArray(f.size) && Array.isArray(f.pad)) frames.push({ asset, size: f.size, pad: f.pad, buildings: f.buildings || {} });
+  }
+  const plan = {};
+  for (const [key, spec] of Object.entries(BUILDING_ANCHORS)) plan[key] = (spec.e0 || spec).anchors;
+  frames.push({ asset: start, size: [ISLAND.width, ISLAND.height], pad: ISLAND.launchOrigin, buildings: plan });
+  return frames.length >= 3 ? frames : null;
+}
+
+/** Положение в ряду кадров по ходу подъёма u (0..1): индекс нижнего кадра и доля следующего. */
+export function liftBlend(u, count) {
+  const n = Math.max(1, count - 1);
+  const f = Math.min(n - 1e-6, Math.max(0, u) * n);
+  const i = Math.floor(f);
+  return { i, b: f - i };
+}
 
 function activeStageId(flight) {
   const stages = flight.stages;
@@ -91,6 +129,8 @@ export function createFlightRenderer(painter, shared) {
     crashY: 0,
     crashT: 0,
     acc: { flame: 0, smoke: 0, ground: 0, damage: 0, water: 0 },
+    tilt: null,
+    liftStart: null,
   };
 
   function resetState(flight) {
@@ -103,6 +143,8 @@ export function createFlightRenderer(painter, shared) {
     state.crashT = 0;
     state.body = flight && flight.body ? flight.body : 'earth';
     state.acc.flame = state.acc.smoke = state.acc.ground = state.acc.damage = state.acc.water = 0;
+    state.tilt = flight ? tiltFrames(painter.assets) : null;
+    state.liftStart = null;
     particles.clear();
     delugeParticles.clear();
     for (const piece of pieces) piece.active = false;
@@ -411,7 +453,11 @@ export function createFlightRenderer(painter, shared) {
     const previous = ctx.globalAlpha;
     ctx.globalAlpha = previous * seaAlpha;
     drawSea(ctx, mapView, time, mood, smoothstep(120, 1400, altitude) * 0.8, HAZE_COLOR);
-    if (landAlpha > 0.01) {
+    const lift = liftProgress(time);
+    if (landAlpha > 0.01 && lift < 1) {
+      ctx.globalAlpha = previous * landAlpha;
+      drawTilt(ctx, lift, profile, time);
+    } else if (landAlpha > 0.01) {
       ctx.globalAlpha = previous * landAlpha;
       drawIslandHd(ctx, painter, mapView);
       // тень видна только ниже shadowRange (400 м), размер и смещение соответствуют высоте 1:1
@@ -424,6 +470,75 @@ export function createFlightRenderer(painter, shared) {
       delugeParticles.draw(ctx, mapView, 1);
     }
     ctx.globalAlpha = previous;
+  }
+
+  /** Ход подъёма камеры 0..1 от первого кадра полёта; 1, если кадров подъёма нет. */
+  function liftProgress(time) {
+    if (!state.tilt) return 1;
+    if (state.liftStart === null) state.liftStart = time;
+    return clamp((time - state.liftStart) / LIFT_TIME, 0, 1);
+  }
+
+  /**
+   * Подъём камеры: соседние кадры ряда растворяются один в другой, стол каждого кадра стоит в мировом нуле,
+   * масштаб кадра равен масштабу карты полёта. Постройки едут между якорями кадров; на середине подъёма
+   * изометрический спрайт сменяется спрайтом карты.
+   */
+  function drawTilt(ctx, u, profile, time) {
+    const frames = state.tilt;
+    const { i, b } = liftBlend(u, frames.length);
+    const lo = frames[i];
+    const hi = frames[i + 1];
+    // px кадра = px карты острова; экранных px на px кадра = px на единицу * единиц на px карты
+    const sImg = mapView.s * ISLAND.unitsPerPx;
+    const px0 = mapView.sx(0);
+    const py0 = mapView.sy(0);
+    const prev = ctx.globalAlpha;
+    const was = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    const blit = (fr, alpha) => {
+      ctx.globalAlpha = prev * alpha;
+      ctx.drawImage(fr.asset.img, px0 - fr.pad[0] * sImg, py0 - fr.pad[1] * sImg, fr.size[0] * sImg, fr.size[1] * sImg);
+    };
+    blit(lo, 1);
+    if (b > 0.001) blit(hi, b);
+    ctx.imageSmoothingEnabled = was;
+    const w = smoothstep(0.35, 0.7, u);
+    if (w > 0.001) {
+      ctx.globalAlpha = prev * w;
+      drawLaunchMount(ctx, mapView, state.era, time);
+    }
+    ctx.globalAlpha = prev;
+    const owned = profile?.buildings || {};
+    const items = [];
+    for (const key of Object.keys(frames[0].buildings)) {
+      const level = owned[key] | 0;
+      const a0 = lo.buildings[key];
+      const a1 = hi.buildings[key];
+      if (level <= 0 || !a0 || !a1) continue;
+      for (let k = 0; k < a0.length; k++) {
+        const p0 = a0[k];
+        const p1 = a1[k] || a1[0];
+        const x = lerp(p0[0] - lo.pad[0], p1[0] - hi.pad[0], b);
+        const y = lerp(p0[1] - lo.pad[1], p1[1] - hi.pad[1], b);
+        items.push({ key, level, sx: px0 + x * sImg, sy: py0 + y * sImg });
+      }
+    }
+    items.sort((p, q) => p.sy - q.sy);
+    for (const it of items) {
+      const isoName = `iso_${it.key}_1978`;
+      const isoSize = frames[0].isoSize[it.key];
+      if (w < 0.999 && isoSize && painter.has(isoName)) {
+        painter.spriteScreen(ctx, view, isoName, it.sx, it.sy, isoSize[1] * sImg, { ax: 0.5, ay: 1, alpha: 1 - w, smooth: true });
+      }
+      const topName = buildingSpriteName(it.key, it.level);
+      if (w > 0.001 && painter.has(topName)) {
+        const [, h] = buildingSize(painter, it.key, it.level);
+        painter.spriteScreen(ctx, view, topName, it.sx, it.sy, h * mapView.s, { ax: 0.5, ay: 1, alpha: w, smooth: true });
+      }
+    }
+    ctx.globalAlpha = prev;
   }
 
   function drawGround(ctx, flight, profile, time) {
@@ -575,6 +690,23 @@ export function createFlightRenderer(painter, shared) {
     /** Начало полёта: сбрасывает камеру, частицы и отделённые ступени. */
     start(flight) {
       resetState(flight || null);
+    },
+
+    /** Есть ли кадры подъёма камеры (тогда стык база → полёт идёт без затемнения). */
+    hasTilt() {
+      return !!tiltFrames(painter.assets);
+    },
+
+    /**
+     * Кадр покоя на столе: экранный якорь ракеты, экранная y её опорной точки и px устройства на единицу мира.
+     * База подводит к нему камеру во время отсчёта, чтобы первый кадр полёта совпал с последним кадром базы.
+     */
+    restFraming(layout, devW, devH, kind = 'core', era = 0) {
+      const world = ensureWorld(layout);
+      const devPerCss = devW / layout.w;
+      const anchor = layout.rocketAnchor || { x: layout.w * 0.5, y: layout.h * 0.62 };
+      const h = stackHeight(kind, painter.assets, era);
+      return { ax: anchor.x * devPerCss, feetY: anchor.y * devPerCss + h * 0.5 * world.px, pxPerUnit: world.px };
     },
 
     reset() {

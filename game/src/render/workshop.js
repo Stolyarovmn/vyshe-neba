@@ -10,7 +10,6 @@ export { MODULE_IDS };
 export const MODULE_STATIONS = {
   engine: 'engine_test_stand',
   hull: 'hull_diagnostics',
-  avionics: 'telemetry_post',
 };
 
 /** Какая ступень сборки несёт модуль: от неё берутся ширина и положение рамки. */
@@ -21,15 +20,13 @@ const MODULE_OWNER = {
 };
 const SPREAD = { fins: 0.2, legs: 0.2 }; // лапы и стабилизаторы выступают за корпус: доля ширины ступени с каждой стороны
 
-/** Колонки станций, снизу вверх. Имена спрайтов: bld_factory/bld_control переиспользуют арт построек. */
+/** Колонки станций, снизу вверх. Только станции мастерской: спрайты построек базы в ангаре не рисуются (решение владельца 2026-11-11). */
 export const STATION_COLUMNS = {
-  left: ['manufacturing_cell', 'hull_diagnostics', 'telemetry_post'],
+  left: ['hull_diagnostics'],
   right: ['engine_test_stand', 'service_lift'],
 };
 
 const SPRITE_OF = {
-  manufacturing_cell: (year) => `bld_factory_${year}`,
-  telemetry_post: (year) => `bld_control_${year}`,
   hull_diagnostics: (year) => `station_hull_diagnostics_${year}`,
   engine_test_stand: (year) => `station_engine_test_stand_${year}`,
   service_lift: (year) => `station_service_lift_${year}`,
@@ -95,8 +92,8 @@ function stageRects(rocket, era, assets) {
 /**
  * Хитбоксы девяти модулей для выносок и нажатий. params: { era, rect (рамка схемы), rocket (рамка сборки, CSS px),
  * stations (станции нарисованы? по умолчанию true) }. Возвращает { engine: { x, y, w, h, source, station, part }, ... }:
- * source 'station' — рамка станции мастерской (engine -> engine_test_stand, hull -> hull_diagnostics,
- * avionics -> telemetry_post), иначе 'rocket' — часть самой ракеты (по спрайтам капсулы, бака/корпуса, ног,
+ * source 'station' — рамка станции мастерской (engine -> engine_test_stand, hull -> hull_diagnostics),
+ * иначе 'rocket' — часть самой ракеты (по спрайтам капсулы, бака/корпуса, ног,
  * стабилизаторов, парашюта). part — всегда рамка узла на самой ракете, station — id станции или null.
  */
 export function moduleBoxes(params) {

@@ -260,6 +260,11 @@ export const ASSET_FILES = {
   ...buildAssetFiles(),
   island_base_iso: { file: `${SHARED}island/base-iso.png`, optional: true },
   base_iso_layout: { file: `${SHARED}island/base-iso.json`, kind: 'json', optional: true },
+  // Подъём камеры база → полёт: промежуточные ракурсы острова (tools/hd_pixel/bake_tilt.py), кадры в tilt.json.
+  island_tilt_52: { file: `${SHARED}island/tilt-52.webp`, optional: true },
+  island_tilt_64: { file: `${SHARED}island/tilt-64.webp`, optional: true },
+  island_tilt_73: { file: `${SHARED}island/tilt-73.webp`, optional: true },
+  island_tilt_layout: { file: `${SHARED}island/tilt.json`, kind: 'json', optional: true },
   ...Object.fromEntries(BUILDING_KEYS.map((key) => [
     `iso_${key}_1978`, { file: `${eraFolder(0)}iso/${key}.png`, optional: true },
   ])),

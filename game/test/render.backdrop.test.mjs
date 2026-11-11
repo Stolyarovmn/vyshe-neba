@@ -81,8 +81,9 @@ test('drawStations рисует все станции эпохи и возвра
   const workshop = createWorkshop(painter);
   const ctx = stubContext(800, 600);
   const items = workshop.drawStations(ctx, { era: 3, rect: { x: 0, y: 100, w: 390, h: 400 }, time: 2 });
-  assert.equal(items.length, 5);
-  assert.ok(ctx.calls.drawImage >= 5);
+  const stationCount = STATION_COLUMNS.left.length + STATION_COLUMNS.right.length;
+  assert.equal(items.length, stationCount);
+  assert.ok(ctx.calls.drawImage >= stationCount);
 });
 
 const within = (a, b) => a.x >= b.x - 1e-6 && a.y >= b.y - 1e-6 && a.x + a.w <= b.x + b.w + 1e-6 && a.y + a.h <= b.y + b.h + 1e-6;
@@ -90,7 +91,7 @@ const sameBox = (a, b) => ['x', 'y', 'w', 'h'].every((k) => Math.abs(a[k] - b[k]
 
 test('хитбоксы модулей: девять модулей, станции у двигателя, корпуса и электроники, остальное — части ракеты', () => {
   assert.deepEqual([...MODULE_IDS].sort(), Object.keys(MODULE_VIEW).sort());
-  assert.deepEqual(MODULE_STATIONS, { engine: 'engine_test_stand', hull: 'hull_diagnostics', avionics: 'telemetry_post' });
+  assert.deepEqual(MODULE_STATIONS, { engine: 'engine_test_stand', hull: 'hull_diagnostics' });
   for (const rect of [{ x: 0, y: 0, w: 390, h: 500 }, { x: 40, y: 80, w: 844, h: 300 }, { x: 0, y: 0, w: 1280, h: 560 }]) {
     for (const era of [0, 3, 5]) {
       const boxes = moduleBoxes({ era, rect });
@@ -152,7 +153,7 @@ test('drawStations возвращает массив станций с .modules 
   const rect = { x: 0, y: 100, w: 844, h: 300 };
   const rocket = { x: 400, y: 110, w: 40, h: 280 };
   const items = workshop.drawStations(ctx, { era: 4, rect, time: 1, rocket });
-  assert.ok(Array.isArray(items) && items.length === 5);
+  assert.ok(Array.isArray(items) && items.length === STATION_COLUMNS.left.length + STATION_COLUMNS.right.length);
   assert.ok(items.every((item) => item.id && item.side && Number.isFinite(item.w)));
   assert.deepEqual(Object.keys(items.modules).sort(), [...MODULE_IDS].sort());
   assert.equal(items.modules.engine.station, 'engine_test_stand');
