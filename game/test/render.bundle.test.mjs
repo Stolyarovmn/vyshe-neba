@@ -27,10 +27,13 @@ test('модуль render собирается esbuild в IIFE (без top-level
 
 test('ассеты в сборку берутся только из каталога манифеста; суммарный вес в разумных пределах', () => {
   let bytes = 0;
-  const files = new Set(Object.values(ASSET_FILES).map(spec => typeof spec === 'string' ? spec : spec.file));
+  const files = new Set(Object.values(ASSET_FILES)
+    .filter((spec) => !(spec.optional && !fs.existsSync(path.join(repoRoot, spec.file))))
+    .map(spec => typeof spec === 'string' ? spec : spec.file));
   for (const file of files) {
     bytes += fs.statSync(path.join(repoRoot, file)).size;
   }
   // Предупреждение для сборки: base64 увеличивает вес на треть.
-  assert.ok(bytes < 14 * 1024 * 1024, `ассеты весят ${(bytes / 1048576).toFixed(1)} МБ`);
+  // Срез E0 добавил Blender-рельеф базы (2,5 МБ) и изометрические спрайты: порог 16 МБ.
+  assert.ok(bytes < 16 * 1024 * 1024, `ассеты весят ${(bytes / 1048576).toFixed(1)} МБ`);
 });

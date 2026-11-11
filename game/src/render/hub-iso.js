@@ -27,7 +27,17 @@ export function isoLayout(assets) {
     .filter((points) => Array.isArray(points) && points.length >= 2 && points.every(pair))
     .map((points) => ({ points }))
     .filter((road) => road.points.some((p) => p[0] !== road.points[0][0] || p[1] !== road.points[0][1]));
-  return { size: data.size, pad: data.pad, buildings, roads, camera: data.camera || {} };
+  // Полоса застройки: все спрайты построек и стол; стартовый вид на широком экране показывает её целиком.
+  const xs = [data.pad.x];
+  const ys = [data.pad.y];
+  for (const b of Object.values(buildings)) {
+    for (const a of [b.anchor, ...(Array.isArray(b.anchors) ? b.anchors.slice(1).filter(pair) : [])]) {
+      xs.push(a[0] - b.size[0] / 2, a[0] + b.size[0] / 2);
+      ys.push(a[1] - b.size[1], a[1]);
+    }
+  }
+  const strip = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+  return { size: data.size, pad: data.pad, buildings, roads, camera: data.camera || {}, strip };
 }
 
 /** Собирает общую очередь: глубина здания и ракеты определяется низом спрайта. */
@@ -51,6 +61,16 @@ export function createIsoHub(painter, shared, layout) {
   const minZoom = Number.isFinite(camera.minZoom) && camera.minZoom > 0 ? camera.minZoom : 1;
   const maxZoom = Math.max(minZoom, Number.isFinite(camera.maxZoom) && camera.maxZoom > 0 ? camera.maxZoom : 6);
   const home = pair(camera.home) ? camera.home : [width / 2, height / 2];
+  const strip = layout.strip;
+  /** Широкий экран: вся застройка в кадре (не мельче minZoom); узкий — крупный план стола, как прежде. */
+  const homeZoom = () => {
+    if (!strip || state.devW <= state.devH) return zoomLimit(camera.portraitZoom ?? 2.2);
+    const z = Math.min(state.devW * 0.96 / ((strip.x1 - strip.x0) * state.fit),
+      state.devH * 0.72 / ((strip.y1 - strip.y0) * state.fit));
+    return zoomLimit(z);
+  };
+  const homeCenter = () => (strip && state.devW > state.devH
+    ? center((strip.x0 + strip.x1) / 2, home[1]) : center(...home));
   const routes = { roads: layout.roads, origin: [0, 0], unitsPerPx: 1 };
   const state = { ready: false, cx: home[0], cy: home[1], tx: home[0], ty: home[1], zoom: 1, tz: 1,
     fit: 1, devW: 1, devH: 1, dpr: 1, time: null, selected: null, daylight: null, pending: null };
@@ -85,8 +105,8 @@ export function createIsoHub(painter, shared, layout) {
       state.selected = key || null;
     },
     reset(immediate = false) {
-      [state.tx, state.ty] = center(...home);
-      state.tz = zoomLimit(1);
+      [state.tx, state.ty] = homeCenter();
+      state.tz = homeZoom();
       if (immediate) { state.cx = state.tx; state.cy = state.ty; state.zoom = state.tz; }
     },
     pan(dxCss, dyCss = 0) {
@@ -108,7 +128,7 @@ export function createIsoHub(painter, shared, layout) {
     },
     toggleZoom(xCss = state.devW / state.dpr / 2, yCss = state.devH / state.dpr / 2) {
       if (!state.ready) return;
-      if (state.tz > zoomLimit(1) * 1.35) { hub.reset(); return; }
+      if (state.tz > homeZoom() * 1.35) { hub.reset(); return; }
       hub.focus({ x: state.cx + (xCss * state.dpr - state.devW / 2) / scale(),
         y: state.cy + (yCss * state.dpr - state.devH / 2) / scale(), zoom: zoomLimit(state.zoom * 2.4) });
     },
