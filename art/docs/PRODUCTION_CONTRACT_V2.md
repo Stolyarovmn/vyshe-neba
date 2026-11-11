@@ -26,16 +26,16 @@
 | Ref workflow | current `studioigor/ref2game/codex/SKILL.md` |
 | Visual language | `art/style_bible.txt` |
 | **Era visual/engineering language E0–E5** | **`art/docs/ERA_DESIGN_MATRIX.md`** |
-| Gameplay design / parts / object lineage | `art/placeables/PRODUCTION_MANIFEST.md` |
+| Роли и эффекты / части / идеи и родословные | `main:game/src/data/buildings.js`, `main:game/docs/DESIGN.md` §4.4 / паспорт объекта / `art/placeables/IDEA_BANK_PLACEABLES.md` |
 | Tool pins / tracker order | `art/placeables/PIPELINE_CONFIG.json` |
-| Island layout / anchors / footprint | `art/placeables/BASE_ISLAND_LAYOUT.json` |
+| Раскладка / якоря / след на земле | `main:game/src/render/manifest.js`; `art/placeables/BASE_ISLAND_LAYOUT.json` — его выгрузка v4 |
 | Current runtime names/paths/consumers | pinned `main:game/src/render/manifest.js` + corresponding code/checks |
 | Approved geometry | exact approved PNG + SHA-256 + measured metadata |
 | Immutable generation source | Google Drive original + SHA-256 + provenance |
 
-При конфликте нельзя выбирать удобный источник. Зафиксировать обе версии, pinned refs/SHA, owner решения и blocker. Runtime code describes current implementation; production manifest remains a design target until integration is proven.
+При конфликте нельзя выбирать удобный источник. Зафиксировать обе версии, SHA, решения владельца и препятствие. Код игры определяет текущие роли и эффекты; банк идей не задаёт дополнительные обязательные механики.
 
-`ERA_DESIGN_MATRIX.md` отвечает за общий язык эпох; `PRODUCTION_MANIFEST.md` отвечает за функцию и конкретную родословную объекта. Матрица не разрешает менять gameplay role или добавлять случайные parts; manifest не разрешает игнорировать era-language.
+`ERA_DESIGN_MATRIX.md` отвечает за общий язык эпох; `IDEA_BANK_PLACEABLES.md` — за идеи, общие правила rig и родословные. Функция берётся из кода игры, части — из паспорта. Родословная не разрешает менять роль или игнорировать язык эпохи.
 
 ## 3. G0 — design/runtime preflight
 

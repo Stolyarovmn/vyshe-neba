@@ -1,6 +1,6 @@
 # W02 — Испытательный стенд двигателя (`engine_test_stand`)
 
-Канонический anchor-art покупаемого объекта мастерской. Источники правил: `art/style_bible.txt`, `art/placeables/PRODUCTION_MANIFEST.md`, `ref2game`.
+Канонический anchor-art покупаемого объекта мастерской. Источники правил: `art/style_bible.txt`, `art/placeables/IDEA_BANK_PLACEABLES.md`, `ref2game`.
 
 ## Соответствие эпох
 

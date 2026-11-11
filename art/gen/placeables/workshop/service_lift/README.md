@@ -1,6 +1,6 @@
 # W01 — Сервисный подъёмник (`service_lift`)
 
-Нарезанный anchor-art для покупаемого объекта мастерской. Источник — утверждённый 3×2 atlas imagegen; стиль определяется `art/style_bible.txt`, роль и gameplay contract — `art/placeables/PRODUCTION_MANIFEST.md`.
+Нарезанный anchor-art для покупаемого объекта мастерской. Источник — утверждённый 3×2 atlas imagegen; стиль определяется `art/style_bible.txt`, роль и gameplay contract — `art/placeables/IDEA_BANK_PLACEABLES.md`.
 
 ## Соответствие эпох
 

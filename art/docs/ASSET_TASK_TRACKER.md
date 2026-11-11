@@ -2,6 +2,8 @@
 
 Этот документ является обязательным дополнением к `ASSET_PRODUCTION_PIPELINE.md`, `RUNTIME_BRANCH_CONTRACT.md` и ref2game production flow. Его задача — не начинать дорогую генерацию/обработку ассета заново после обрыва чата, CI job или новой сессии и отдельно фиксировать production approval и runtime publication.
 
+**Уточнение 2026-11-11:** стадии трекера сохранены для совместимости; две обязательные границы и командные workflow — история процесса. Публикация — PR в `main` по `RUNTIME_BRANCH_CONTRACT.md`, без командных веток и обязательной записи в `RUNTIME_EXPORTS.json`. Роли и эффекты задают `main:game/src/data/buildings.js` и `main:game/docs/DESIGN.md` §4.4, геометрию — `main:game/src/render/manifest.js`; `IDEA_BANK_PLACEABLES.md` — идеи, rig и родословные.
+
 ## Durable state
 
 Для каждого `asset_id / era` ведётся checkpoint:
@@ -56,7 +58,7 @@ generate
 Значение последних стадий:
 
 - `promote` — exact-SHA approved candidate подготовлен/опубликован в production history (`game-production`, canonical `art/gen` + provenance/QA). Это **не означает**, что картинка уже попала в игру.
-- `publish_runtime` — exact approved bytes прошли отдельную Boundary B: replacement PR в чистую runtime/build ветку `main`, только по подтверждённым canonical `game/assets/...` путям. До merge/подтверждения runtime PR шаг не должен считаться окончательно опубликованным.
+- `publish_runtime` — точные утверждённые байты опубликованы PR в runtime-ветку `main` по подтверждённым каноническим путям `game/assets/...`. До слияния и подтверждения SHA результата шаг не считается завершённой публикацией; отдельный workflow для этого не нужен.
 - `game_tests` — проверки чистого runtime/build дерева на том commit, который реально содержит заменённый runtime asset. Production docs/config smoke не заменяет этот шаг.
 
 Старые checkpoint автоматически мигрируются вперёд: новый `publish_runtime` появляется как `pending`; предыдущие успешные шаги сохраняются, если их fingerprint/output SHA-256 всё ещё совпадают.
@@ -173,34 +175,28 @@ python3 tools/art_pipeline/task_tracker.py \
 
 Tracker использует lock на `asset/era`; GitHub Actions дополнительно использует `concurrency` по asset id, поэтому два writer'а не должны одновременно менять один candidate.
 
-## Boundary A — production promotion
+## Стадия promote — сохранение в производстве
 
-`asset-promote.yml` должен:
+Прежнее название Boundary A относится к исторической схеме; `asset-promote.yml` удалён 2026-11-11. Для сохранения утверждённого результата:
 
-1. работать из `game-production`, а не из `main`;
-2. восстановить последний checkpoint;
-3. повторно вызвать processor с `--resume`;
-4. проверить hash-bound visual approval;
-5. stage только canonical production art/provenance (`art/gen/...`);
-6. отметить `promote` после подтверждённого production staging;
-7. создать PR **в `game-production`**, без runtime-файлов;
-8. сохранить checkpoint и обновить tracker issue.
+1. восстановить последний checkpoint; обработку повторять только при изменении входов или отсутствии подтверждённого результата;
+2. проверить визуальную приёмку, связанную с точным SHA;
+3. сохранить утверждённый арт, происхождение и QA в `game-production`, не включая runtime-файлы;
+4. отметить подтверждённый результат в `promote` и сохранить checkpoint.
 
-Production promotion не имеет права коммитить `game/assets`, `outputs/rocket` runtime mirrors или менять `main`.
+Эта стадия не публикует арт в `main`. Командная ветка для её выполнения не требуется.
 
-## Boundary B — runtime publication
+## Стадия publish_runtime — публикация в main
 
-Отдельный runtime-publish должен:
+Прежнее название Boundary B и workflow `asset-publish-runtime.yml` — история; workflow удалён 2026-11-11. Текущий порядок задаёт `RUNTIME_BRANCH_CONTRACT.md`:
 
-1. pin exact production commit и exact runtime `main` base commit;
-2. прочитать SHA-bound `art/runtime/RUNTIME_EXPORTS.json`;
-3. проверить source SHA/approval;
-4. разрешить target только под `game/assets/...` и только если он уже существует на pinned `main`;
-5. заменить файл **на том же canonical runtime path**;
-6. запретить backup/history copies (`*_old`, `backup`, `v2`, parallel mirrors);
-7. проверить, что runtime diff содержит только явно разрешённые replacement targets;
-8. выполнить доступный build/runtime gate;
-9. создать отдельный PR в `main`.
+1. закрепить production-коммит и базовый коммит `main`, проверить исходник, SHA, приёмку и runtime-потребителя;
+2. заменить активные файлы по объявленным каноническим путям `game/assets/...`; новые пути требуют явного подключения потребителя в проверяемом PR;
+3. исключить резервные и исторические копии (`*_old`, `backup`, параллельные зеркала);
+4. создать PR в `main` с перечнем заменённых путей, скриншотом из игры и строкой «байты = SHA»;
+5. выполнить применимые проверки игры и сборки на получившемся дереве и указать реальные результаты.
+
+`art/runtime/RUNTIME_EXPORTS.json` — необязательная справочная карта источников и целей. Командные ветки не требуются. Скриншот из игры должен быть принят владельцем.
 
 `publish_runtime=success` допускается только после подтверждения фактической runtime публикации/merge exact approved bytes. Само создание PR не равно merge и не должно ложно закрывать шаг. Rollback выполняется Git revert/history, а не второй копией PNG в runtime tree.
 

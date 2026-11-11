@@ -1,89 +1,30 @@
-# Стартовый остров и размещение расширений базы
+# Раскладка острова
 
-> **Статус 2026-11-10.** Числа якорей ниже — выгрузка версии 3 (октябрь 2026). Источник истины для якорей и размеров — `main:game/src/render/manifest.js` (`BUILDING_ANCHORS`, `ISLAND`); якоря базы в изометрии — `main:game/assets/shared/island/base-iso.json`, который строится из манифеста скриптом `tools/hd_pixel/write_layout.py`.
+Источник истины сцены полёта — [main:manifest.js](https://github.com/Stolyarovmn/vyshe-neba/blob/da026dc9fddbb49b7804b4cfbc9b61dec2541dd0/game/src/render/manifest.js), `ISLAND` и `BUILDING_ANCHORS`. [BASE_ISLAND_LAYOUT.json](../placeables/BASE_ISLAND_LAYOUT.json) версии 4 — воспроизводимая выгрузка из манифеста. SHA источника: `da026dc9fddbb49b7804b4cfbc9b61dec2541dd0`.
 
+Пиксели острова [1916, 821]: начало слева сверху, Y вниз; якорь — низ спрайта по центру. Начало мира — [388, 375]; `world = (px − launch_origin_px) × 0.665`. `anchors_uv` — доли ширины и высоты острова. `sprite_px` соответствует `size`, `footprint_px` — следу на земле; `e0` хранит отдельные значения E0.
 
-Документ фиксирует геометрию стартового острова и канонические позиции покупок. Машиночитаемый источник геометрии — `art/placeables/BASE_ISLAND_LAYOUT.json` (version 3); при расхождении геометрических чисел прав JSON.
+Выгрузка из корня production проверяет ветку `main` и совпадение файла с HEAD:
 
-## Остров
+```powershell
+python tools/hd_pixel/export_island_layout.py ../vn-clean/game/src/render/manifest.js --markdown art/docs/BASE_ISLAND_LAYOUT.md
+```
 
-Production/reference asset — `art/gen/environment/start_island_hd.png` (`1916×821`). Он **утверждён пользователем**, exact SHA-256 `2b85ea5b4bd17506eb9a3c8abc3594c42c4070b1f21948ac01447b0c67364997`, Git blob SHA-1 `382ab3fb2906152e2bc2a2616d794192904e7d68`. Approval: `art/gen/environment/start_island_hd.approval.json`; metadata: `art/gen/environment/start_island_hd.meta.json`; projection measurement: `art/gen/environment/start_island_hd.projection.json`.
+Изометрическая база имеет собственную раскладку [локальный base-iso.json в vn-slice](../../../vn-slice/game/assets/shared/island/base-iso.json). На 2026-11-11 этот файл и iso/ — незакоммиченный кандидат в рабочем дереве `slice/e0-hd-pixel`, а не содержимое HEAD ветки. Ссылка доступна при соседнем размещении рабочих копий. Приёмка владельцем не подтверждена; изометрические координаты не подменяют сцену полёта.
 
-Clean runtime path lives separately in `main`: `game/assets/shared/island/start-island.png`. The approved production reference and the verified runtime blob are byte-identical at the recorded evidence baseline. Production `art/gen/...` must not be described as the runtime path under the current branch contract.
-
-Запечённая башня обслуживания удалена из HD reference; стартовая сцена содержит чистый пусковой стол, а покупаемая инфраструктура добавляется отдельно. Старый `start_island_e0.png` может оставаться только как production/history evidence; он не является второй active runtime copy or rollback mechanism.
-
-- Система координат раскладки: пиксели HD-острова, начало слева сверху, Y вниз; placement anchor — низ спрайта по центру.
-- Мировые единицы: `1 ед. = 10 м`; origin `(388,375)`; `units_per_px=0.665`.
-- Остров: `1916×821 px`.
-- Море вокруг острова рисует код; бирюзовая кайма мелководья входит в art.
-- Маска суши: `art/gen/environment/start_island_hd.land.json`, cell 8 px.
-- `sprite_px` — целевой видимый размер на острове; layout использует приблизительное соотношение `1 LP ≈ 1.45 island px`.
-
-## Проекция
-
-Camera family для наземных покупок — `island_top_3_4` по exact approved reference.
-
-Число **47° не подтверждено** и не используется как факт. Реальный исходный 3D camera angle остаётся `UNKNOWN`.
-
-Из жёлтой пунктирной окружности площадки измерен только generation proxy:
-
-- ground-circle compression `0.958515`;
-- orthographic-equivalent elevation `73.4386°`, production control `73.44°`;
-- tilt from straight top-down `16.5614°`, production control `16.56°`.
-
-Это proxy для генерации, а не восстановленный угол камеры. Exact SHA-bound reference имеет приоритет. Любой generated ground asset должен дополнительно пройти visual source/scene QA; если он визуально читается ниже/front-side, numeric prompt сам по себе не считается доказательством совпадения.
-
-## Зоны и покупки
-
-| Покупка | Ключ | Зона | Якорь (px острова) | Мир (ед.) | Спрайт (px) | След (px) |
+| Постройка | Якоря | size | footprint | Якоря E0 | size E0 | footprint E0 |
 | --- | --- | --- | --- | --- | --- | --- |
-| Стартовые маяки | `beacons` | `launch_core` | `(283,395)`; `(493,395)` | `(-69.83,13.3)`; `(69.83,13.3)` | `100×77` | `90×26` |
-| Башня обслуживания | `gantry` | `launch_core` | `(480,305)` | `(61.18,-46.55)` | `113×190` | `102×34` |
-| Охлаждение площадки | `deluge` | `launch_core` | `(492,452)` | `(69.16,51.21)` | `130×118` | `117×32` |
-| Сервисная команда | `service` | `service_central` | `(640,395)` | `(167.58,13.3)` | `120×102` | `108×30` |
-| Спасательная станция | `rescue` | `service_central` | `(740,340)` | `(234.08,-23.28)` | `125×115` | `112×30` |
-| Топливный комплекс | `fuel` | `fuel_east` | `(870,470)` | `(320.53,63.18)` | `170×93` | `153×32` |
-| Логистический терминал | `logistics` | `logistics_east` | `(1200,470)` | `(539.98,63.18)` | `190×105` | `171×34` |
-| Производственный цех | `factory` | `industrial_east` | `(920,255)` | `(353.78,-79.8)` | `190×145` | `171×34` |
-| Метеостанция | `weather` | `command_north` | `(1000,350)` | `(406.98,-16.62)` | `142×180` | `100×28` |
-| Центр управления | `control` | `command_north` | `(1320,250)` | `(619.78,-83.12)` | `170×135` | `153×34` |
-| Радар слежения | `radar` | `command_north` | `(860,170)` | `(313.88,-136.33)` | `170×190` | `140×34` |
-| Энергетический узел | `energy` | `utility_east` | `(1500,380)` | `(739.48,3.33)` | `200×115` | `180×36` |
-| Наблюдательный комплекс | `observation` | `perimeter_east` | `(1380,320)` | `(659.68,-36.58)` | `150×175` | `120×34` |
-| Система возврата | `recovery` | `recovery_east` | `(1610,478)` | `(812.63,68.5)` | `200×112` | `180×34` |
-
-Reason/UV values are machine-readable in `BASE_ISLAND_LAYOUT.json` and are not duplicated here as an independent source of truth.
-
-## Объекты-входы
-
-| Объект | Ключ | Якорь (px) | Мир (ед.) | Спрайт (px) | След (px) |
-| --- | --- | --- | --- | --- | --- |
-| Мастерская | `workshop` | `(330,262)` | `(-38.57,-75.15)` | `130×157` | `114×28` |
-| Памятник эпох | `monument` | `(232,276)` | `(-103.74,-65.84)` | `50×120` | `44×22` |
-| Доска контрактов | `board` | `(210,352)` | `(-118.37,-15.3)` | `78×72` | `60×20` |
-| Лавка | `shop` | `(578,352)` | `(126.35,-15.3)` | `120×98` | `110×30` |
-
-## Связь с asset families
-
-| Семейство | Purchase key | Зона |
-| --- | --- | --- |
-| `B01_weather_complex` | `weather` | `command_north` |
-| `B02_tracking_radar` | `radar` | `command_north` |
-| `B03_landing_guidance` | `beacons` | `launch_core` |
-| `B04_recovery_complex` | `recovery` | `recovery_east` |
-| `B05_fuel_depot` | `fuel` | `fuel_east` |
-| `B06_deep_comms` | `control` | `command_north` |
-| `B07_cargo_terminal` | `logistics` | `logistics_east` |
-
-Placement rule: у каждой покупки зарезервирован anchor на суше; footprint не должен выходить за остров, пересекать ракету/пламенный канал или конфликтовать с другими объектами.
-
-## Проверка сцены
-
-`BASE_ISLAND_LAYOUT.json` задаёт геометрию, но сам по себе не доказывает текущий runtime render/interaction behavior.
-
-Старые документы ссылались на `game/test/render.island.test.mjs`. На проверенном текущем `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721` каталога `game/test` **нет**, поэтому этот test path нельзя называть текущим пройденным gate. Текущий `Game runtime build` проверяет clean runtime tree, разрешение manifest assets и standalone build/checksum; asset-specific island/B03 scene regression нужно выполнять отдельно, когда такой test/QA path реально существует.
-
-## Портретный режим
-
-Любые утверждения о конкретном runtime zoom/pan/hit-test поведении проверяются по коду на pinned `main` commit. Layout geometry не пересчитывается между layout modes; если runtime реализует иное, код на pinned commit имеет приоритет над этим design/layout документом.
+| `beacons` | [[284, 396], [492, 396]] | [44, 89] | [40, 16] | [[284, 396], [492, 396]] | [4, 7] | [4, 3.5] |
+| `gantry` | [[484, 267]] | [125, 190] | [108, 32] | [[458, 330]] | [56, 32] | [56, 30] |
+| `deluge` | [[526, 528]] | [122, 150] | [105, 30] | [[542, 461]] | [58, 58] | [58, 32] |
+| `service` | [[660, 451]] | [140, 96] | [120, 28] | [[623, 381]] | [71, 62] | [68, 31] |
+| `rescue` | [[740, 340]] | [139, 84] | [120, 26] | [[830, 501]] | [47, 60] | [45, 53] |
+| `fuel` | [[870, 470]] | [160, 82] | [138, 26] | [[870, 470]] | [23, 15] | [23, 11] |
+| `logistics` | [[1200, 470]] | [141, 125] | [121, 30] | [[1200, 470]] | [44, 18] | [44, 18] |
+| `factory` | [[920, 255]] | [190, 145] | [171, 34] | [[920, 255]] | [70, 51] | [68, 43] |
+| `weather` | [[1000, 350]] | [140, 171] | [100, 28] | [[1060, 280]] | [7, 13] | [7, 5] |
+| `control` | [[1320, 250]] | [170, 135] | [153, 34] | [[1320, 250]] | [44, 37] | [43, 30] |
+| `radar` | [[798, 174]] | [150, 88] | [92, 24] | [[830, 265]] | [27, 16] | [11, 9] |
+| `energy` | [[1500, 380]] | [139, 125] | [120, 30] | [[1535, 403]] | [34, 22] | [32, 18] |
+| `observation` | [[1378, 378]] | [138, 150] | [119, 30] | [[1420, 273]] | [24, 25] | [24, 23] |
+| `recovery` | [[1610, 478]] | [140, 95] | [120, 28] | [[1505, 440]] | [41, 17] | [41, 17] |

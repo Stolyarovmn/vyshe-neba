@@ -5,7 +5,7 @@
 
 Этот документ фиксирует production-процесс 2D-ассетов проекта и правила, которые дали наиболее качественный и воспроизводимый результат. Он обязателен для workshop/base placeables и используется вместе с `ref2game` при каждом запросе по игре и ассетам.
 
-**Текущий нормативный слой после migration production/runtime:** branch/storage/publication semantics определяет [`RUNTIME_BRANCH_CONTRACT.md`](RUNTIME_BRANCH_CONTRACT.md), tracker order — `art/placeables/PIPELINE_CONFIG.json` version 3, а исполнимый imagegen порядок — [`ASSET_GENERATION_RUNBOOK.md`](ASSET_GENERATION_RUNBOOK.md). Поэтому более старые примеры ниже, где `art/gen` называется runtime-геометрией, упоминаются build-time `outputs/rocket` mirror, production-side `game-ci.yml`, обновление `runtime-assets.json` внутри `promote` или единая граница `promotion → game-ci`, являются **historical pre-split notes**, а не текущей публикационной схемой. Канонически: `promote` создаёт production PR только в `game-production`; отдельный `publish_runtime` заменяет exact approved bytes в существующем `main:game/assets/...` path; rollback runtime идёт через Git history/revert, без backup-копий. Для receipt-based generation фактический request собирает `build_generation_request.py`; его порядок `scope → canonical asset prompt → art/style_bible.txt verbatim` имеет приоритет над иллюстративным prompt formatting в старых секциях. Перед каждым действием branch SHA и runtime paths проверяются заново.
+**Текущий нормативный слой, 2026-11-11:** ветки, хранение и публикацию определяет [`RUNTIME_BRANCH_CONTRACT.md`](RUNTIME_BRANCH_CONTRACT.md), порядок технических стадий — `art/placeables/PIPELINE_CONFIG.json` версии 3, исполнимый порядок генерации — [`ASSET_GENERATION_RUNBOOK.md`](ASSET_GENERATION_RUNBOOK.md). Публикация в игру — обычный PR в `main` с перечнем путей `game/assets/...`, скриншотом из игры и строкой «байты = SHA». Два workflow публикации удалены; командные ветки и обязательная запись в `RUNTIME_EXPORTS.json` не требуются. Старые схемы двух границ, зеркалирования `outputs/rocket`, `runtime-assets.json` внутри `promote` и производственного `game-ci.yml` ниже — история процесса. Имена `promote` и `publish_runtime` сохранены для совместимости трекера и не требуют двух workflow. Откат runtime — история Git без резервных копий. Для генерации с квитанцией фактический запрос собирает `build_generation_request.py`; порядок `scope → canonical asset prompt → art/style_bible.txt verbatim` имеет приоритет над старыми иллюстративными схемами. Перед действием SHA веток и пути runtime проверяются заново.
 
 **Совместимое нормативное расширение:** [`PRODUCTION_CONTRACT_V2.md`](PRODUCTION_CONTRACT_V2.md) добавляет design/era/projection/runtime preflight и QA gates. Шаблон паспорта: [`ASSET_BRIEF_TEMPLATE.md`](ASSET_BRIEF_TEMPLATE.md); инструкции для ChatGPT Project «Games»: [`GAMES_PROJECT_INSTRUCTIONS.md`](GAMES_PROJECT_INSTRUCTIONS.md).
 
@@ -13,9 +13,9 @@
 
 1. **`ref2game`** — обязательный workflow для каждого запроса по 2D-игре и ассетам.
 2. **`art/style_bible.txt`** — канонический визуальный язык. Он добавляется к каждому production generation prompt без пересказа.
-3. **`art/placeables/PRODUCTION_MANIFEST.md`** — gameplay role, footprint, sockets, parts, motion contract и era lineage.
+3. **Роли и эффекты** — `main:game/src/data/buildings.js` и `main:game/docs/DESIGN.md` §4.4; **геометрия** — `main:game/src/render/manifest.js`. `art/placeables/IDEA_BANK_PLACEABLES.md` хранит идеи, правила rig/состояний и родословные, не задаёт реализованные механики и размеры.
 4. **Google Drive `vyshe-neba/art-originals/`** — канонический архив нетронутых полноразмерных image-generation originals.
-5. **Утверждённый art в `art/gen/`** — канонический production art/history; active runtime bytes публикуются отдельно в `main:game/assets/...` через Boundary B.
+5. **Утверждённый art в `art/gen/`** — каноническое производство и его история; активные runtime-байты публикуются PR в `main:game/assets/...` по `RUNTIME_BRANCH_CONTRACT.md`.
 6. **Runtime metadata** — только измеренные по утверждённому art anchor/pivot. Координаты не угадываются заранее.
 
 При конфликте технического шаблона и явно более сильного художественного решения допускается осознанное отклонение, но artistic freedom нельзя использовать для маскировки технических дефектов, случайной механики, плохой читаемости или нарушения lineage.
@@ -159,13 +159,13 @@ W03 и W05 high-quality originals уже архивированы. Для W04 у
 
 - `game-production` хранит production instructions, reproducibility metadata, QA и canonical approved production art под `art/gen/...`;
 - `main` хранит clean runtime/build tree и active runtime assets только по canonical `game/assets/...` paths;
-- `art/runtime/RUNTIME_EXPORTS.json` описывает явное production source → runtime target mapping для Boundary B;
+- `art/runtime/RUNTIME_EXPORTS.json` — справочная карта production-source → runtime-target; не обязательна для публикации;
 - `outputs/rocket/*` ниже является **legacy pre-split example** и не должно приниматься за текущий `main` runtime без отдельной проверки.
 
 ```text
 art/docs/ASSET_PRODUCTION_PIPELINE.md
 art/style_bible.txt
-art/placeables/PRODUCTION_MANIFEST.md
+art/placeables/IDEA_BANK_PLACEABLES.md
 art/placeables/PIPELINE_CONFIG.json
 art/prompts/<asset>_eN.*
 art/raw/placeables/<zone>/<asset>/eN_YEAR_presnap.json
@@ -378,27 +378,9 @@ Visual verdict обязан быть **hash-bound**: `visual_qa.json` долже
 
 ## 12. GitHub CI
 
-Canonical automation после production/runtime split разделена минимум на четыре ответственности:
+**Решение 2026-11-11:** прежняя автоматизация Boundary A/B — историческая схема. `.github/workflows/asset-promote.yml` и `.github/workflows/asset-publish-runtime.yml` удалены; командные ветки для публикации не нужны. Производственные проверки кандидата и проверки игры остаются разными проверками.
 
-```text
-Candidate (read-only)
-.github/workflows/asset-candidate.yml
-art/placeables/PIPELINE_CONFIG.json
-tools/art_pipeline/process_asset.py
-
-Production promotion / Boundary A
-.github/workflows/asset-promote.yml
-tools/art_pipeline/verify_visual_gate.py
-tools/art_pipeline/promote_asset.py
-
-Runtime publication / Boundary B
-.github/workflows/asset-publish-runtime.yml
-art/runtime/RUNTIME_EXPORTS.json
-tools/art_pipeline/publish_runtime_asset.py
-
-Runtime build gate (clean main)
-main:.github/workflows/game-ci.yml
-```
+Кандидат готовят `.github/workflows/asset-candidate.yml`, `tools/art_pipeline/process_asset.py` и настройки `art/placeables/PIPELINE_CONFIG.json`. Проверки чистой игры запускаются в `main`, включая `main:.github/workflows/game-ci.yml`.
 
 `art-pipeline.yml` (W04) и asset-specific trigger wrappers остаются trigger wrappers, а не отдельными processing implementations.
 
@@ -410,29 +392,15 @@ Candidate workflow:
 - не пишет production/runtime;
 - публикует Actions artifact для QA/review.
 
-Production promotion:
+При сохранении утверждённого результата в производстве проверяют точный кандидат и SHA, сохраняют арт и происхождение в `game-production`; это не публикует его в игру.
 
-- rebuild/verify exact candidate;
-- требует hash-bound approval;
-- переносит approved files только в canonical `game-production:art/gen` + allowed provenance/QA;
-- создаёт PR targeting `game-production`;
-- не обновляет `main` runtime paths.
-
-Runtime publication:
-
-- pins exact production commit + exact runtime base;
-- requires explicit `RUNTIME_EXPORTS.json` mapping, approved SHA and semantics compatibility;
-- replaces only declared existing `main:game/assets/...` targets;
-- rejects unrelated files/history copies;
-- runs available runtime build/checks;
-- creates separate PR targeting `main`;
-- is not final until merge/resulting runtime SHA is confirmed.
+Публикация в `main` выполняется PR по [`RUNTIME_BRANCH_CONTRACT.md`](RUNTIME_BRANCH_CONTRACT.md): закрепить исходный и runtime-коммиты, проверить исходник и потребителя, перечислить заменённые пути `game/assets/...`, приложить скриншот из игры и строку «байты = SHA», запустить применимые проверки. `RUNTIME_EXPORTS.json` можно использовать как справочник, но запись в нём не обязательна. `publish_runtime_asset.py` остаётся локальным помощником. Публикация подтверждается слиянием и SHA результата, приёмка — владельцем по скриншоту из игры.
 
 `pipeline.json` фиксирует source gen id/SHA, Drive source reference, Pixel Snapper revision, Aseprite version, pixel size, palette limit, canvas, registration target, output SHA и reproducibility hashes.
 
 Failed candidate никогда не становится runtime asset только потому, что pipeline технически смог его обработать.
 
-На проверенном текущем `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721` каталога `game/test` нет. `Game runtime build` проверяет clean-tree policy, manifest resolution, standalone build/checksum и отсутствие tracked mutation; это не full B03 gameplay regression.
+Историческая сверка `main@af80ce810fbdc5088cfa01d8a193f94ddbcd2721`: тогда каталога `game/test` не было, а `Game runtime build` проверял чистоту дерева, разрешение манифеста и сборку. Это не описание текущего `main`: набор проверок сверяют заново на закреплённом SHA.
 
 ## 13. W04 / flight_simulator reference lineage
 
@@ -476,12 +444,14 @@ prompt/preflight saved and valid
 
 ```text
 verified runtime logical name / consumer / semantics
-+ explicit RUNTIME_EXPORTS mapping
++ declared source/target paths and exact SHA-256
 + existing canonical main:game/assets target
 + publish_runtime replacement PR merged to main
 + resulting runtime SHA confirmed
 + applicable runtime build/tests passed
 ```
+
+В PR также обязательны скриншот из игры и строка «байты = SHA»; приёмка — скриншот из игры принят владельцем. Запись в справочнике `RUNTIME_EXPORTS.json` не обязательна.
 
 Rigged object дополнительно требует:
 
@@ -496,7 +466,7 @@ part sheet approved
 
 ## 15. Обязательное правило для всех следующих ассетов
 
-Любой новый workshop/base asset начинается с `ref2game`, contracts/checkpoint, `art/style_bible.txt` и `PRODUCTION_MANIFEST.md`, генерируется по одной эпохе/одному asset за call, **сразу сохраняет нетронутый high-quality original в Google Drive**, затем проходит SpriteFusion Pixel Snapper → normalize → Aseprite → automatic QA → candidate → hash-bound visual/scene QA → production promotion → measured rig when applicable → separate runtime publication/integration.
+Любой новый workshop/base asset начинается с `ref2game`, паспорта и проверки роли/эффектов по `buildings.js` и `DESIGN.md` §4.4, геометрии по `main:manifest.js`, затем contracts/checkpoint и `art/style_bible.txt`. `IDEA_BANK_PLACEABLES.md` используется для идей, rig и родословной. Генерация — по одной эпохе/одному asset за call, **нетронутый high-quality original сразу сохраняется в Google Drive**, затем SpriteFusion Pixel Snapper → normalize → Aseprite → automatic QA → candidate → hash-bound visual/scene QA → production promotion → measured rig when applicable → runtime publication/integration через PR.
 
 Нельзя:
 

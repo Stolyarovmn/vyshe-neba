@@ -10,7 +10,7 @@
 | `reference_specs/`, `references/eras/` | машинные спецификации и утверждённые наборы era-reference листов E0–E4 |
 | `gen/` | обработанный утверждённый арт и provenance (`*.json`, `*.md`); бинарники только там, где это production-source |
 | `raw/`, `requests/`, `logs/`, `qa/`, `review/` | свидетельства: сырые метаданные, запросы, журналы импорта, QA-отчёты, ревью |
-| `placeables/` | `PRODUCTION_MANIFEST.md` (роли и части), `PIPELINE_CONFIG.json` (порядок трекера и пины инструментов), `BASE_ISLAND_LAYOUT.json` (историческая выгрузка раскладки v3; источник истины — `main:game/src/render/manifest.js`) |
+| `placeables/` | `IDEA_BANK_PLACEABLES.md` (банк идей, правила rig/состояний и родословные), `PIPELINE_CONFIG.json` (порядок трекера и пины инструментов), `BASE_ISLAND_LAYOUT.json` (воспроизводимая выгрузка раскладки v4 из `main:game/src/render/manifest.js`) |
 | `runtime/RUNTIME_EXPORTS.json` | карта production-source → runtime-target для публикации |
 | `aircraft/`, `infrastructure/`, `*.json` | метаданные старых потоков (самолёты, инфраструктура, шары, спутник); актуальные размеры — в `manifest.js` на `main` |
 

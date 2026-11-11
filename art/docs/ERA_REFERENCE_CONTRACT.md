@@ -4,13 +4,13 @@
 
 This document defines the **single canonical visual-reference format** for E0–E5. It is not a versioned alternative and must not coexist with legacy/application reference schemes.
 
-Era references are a **visual-engineering vocabulary**, not concept art for whole game objects. They exist to show reusable primitives that future assets may combine according to `PRODUCTION_MANIFEST.md` and the asset brief.
+Era references are a **visual-engineering vocabulary**, not concept art for whole game objects. They exist to show reusable primitives that future assets may combine according to `IDEA_BANK_PLACEABLES.md` and the asset brief.
 
 The canonical sources remain:
 
 - `art/docs/ERA_DESIGN_MATRIX.md` — era engineering/visual language;
 - `art/style_bible.txt` — shared rendering language;
-- `art/placeables/PRODUCTION_MANIFEST.md` — gameplay role, physical parts and object lineage;
+- `main:game/src/data/buildings.js` и `main:game/docs/DESIGN.md` §4.4 — роли и эффекты; паспорт — физические части; `art/placeables/IDEA_BANK_PLACEABLES.md` — идеи и родословные;
 - this document — how era visual evidence must be represented.
 
 ## Canonical reference-set shape

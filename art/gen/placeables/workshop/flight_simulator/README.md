@@ -1,6 +1,6 @@
 # W04 — Пилотажный тренажёр (`flight_simulator`)
 
-Шесть эпохальных anchor-спрайтов покупаемого объекта мастерской, подготовленных по `art/style_bible.txt`, `art/placeables/PRODUCTION_MANIFEST.md` и `ref2game`.
+Шесть эпохальных anchor-спрайтов покупаемого объекта мастерской, подготовленных по `art/style_bible.txt`, `art/placeables/IDEA_BANK_PLACEABLES.md` и `ref2game`.
 
 ## Соответствие эпох
 

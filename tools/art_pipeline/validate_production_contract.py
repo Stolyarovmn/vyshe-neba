@@ -21,7 +21,7 @@ REQUIRED = [
     "art/docs/ASSET_TASK_TRACKER.md",
     "art/docs/EXECUTION_TIMEOUT_POLICY.md",
     "art/style_bible.txt",
-    "art/placeables/PRODUCTION_MANIFEST.md",
+    "art/placeables/IDEA_BANK_PLACEABLES.md",
     "art/placeables/PIPELINE_CONFIG.json",
     "art/placeables/BASE_ISLAND_LAYOUT.json",
 ]

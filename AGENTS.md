@@ -23,7 +23,7 @@
 | Любая картинка в игре | `art/docs/ART_DIRECTION_HD_PIXEL.md` (камеры, палитра, рецепт), `art/docs/templates/SPRITE_REQUEST.md`, `art/style_bible.txt`, `art/docs/ERA_DESIGN_MATRIX.md` (язык эпохи), `art/docs/ASSET_STATE_SPEC.md` (состояния PRESS/ON/BLOCKED/DENIED), паспорт объекта `art/docs/ASSET_BRIEF_TEMPLATE.md` |
 | Сопутствующие объекты на карте | `art/docs/E0_SCENERY_RULES.md` (тест допуска: функция, покупка, эпоха, размер, ответ «зачем») |
 | Era-reference листы (атомарный словарь эпох) | `art/docs/ERA_REFERENCE_CONTRACT.md`, `skills/vyshe-neba-production-guard/SKILL.md`, `art/reference_specs/`, `art/references/eras/` |
-| Перенос арта в игру, provenance, Drive | `art/docs/RUNTIME_BRANCH_CONTRACT.md` (две границы promote → publish_runtime), `art/docs/PRODUCTION_CONTRACT_V2.md` (gates G0–G7), `ASSET_PRODUCTION_PIPELINE.md` §5–§6 (оригиналы на Drive), `ASSET_GENERATION_RUNBOOK.md`, поток world-спрайтов — ref2game (`tools/ref2game/`) |
+| Перенос арта в игру, provenance, Drive | `art/docs/RUNTIME_BRANCH_CONTRACT.md` (PR в main: пути, скриншот из игры, «байты = SHA»; RUNTIME_EXPORTS — справочная карта, workflow публикации удалены 2026-11-11), `art/docs/PRODUCTION_CONTRACT_V2.md` (gates G0–G7), `ASSET_PRODUCTION_PIPELINE.md` §5–§6 (оригиналы на Drive), `ASSET_GENERATION_RUNBOOK.md`, поток world-спрайтов — ref2game (`tools/ref2game/`) |
 
 ## 3. Правила, которые не обсуждаются
 

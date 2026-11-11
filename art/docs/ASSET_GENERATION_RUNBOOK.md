@@ -9,7 +9,7 @@ This runbook is the execution layer for `PRODUCTION_CONTRACT_V2.md`. Branch/stor
 
 Before **every** production image generation:
 
-1. Read `AGENTS.md`, `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `art/docs/PRODUCTION_CONTRACT_V2.md`, `art/docs/RUNTIME_BRANCH_CONTRACT.md`, this runbook, `art/docs/ASSET_TASK_TRACKER.md`, `art/docs/EXECUTION_TIMEOUT_POLICY.md`, `art/docs/ERA_DESIGN_MATRIX.md`, `art/references/eras/README.md`, `art/style_bible.txt`, `art/placeables/PRODUCTION_MANIFEST.md`, `art/placeables/PIPELINE_CONFIG.json`, and the current `studioigor/ref2game/codex/SKILL.md`. For island/placeables also read `art/placeables/BASE_ISLAND_LAYOUT.json`.
+1. Read `AGENTS.md`, `art/docs/ASSET_PRODUCTION_PIPELINE.md`, `art/docs/PRODUCTION_CONTRACT_V2.md`, `art/docs/RUNTIME_BRANCH_CONTRACT.md`, this runbook, `art/docs/ASSET_TASK_TRACKER.md`, `art/docs/EXECUTION_TIMEOUT_POLICY.md`, `art/docs/ERA_DESIGN_MATRIX.md`, `art/references/eras/README.md`, `art/style_bible.txt`, `art/placeables/IDEA_BANK_PLACEABLES.md`, `art/placeables/PIPELINE_CONFIG.json`, and the current `studioigor/ref2game/codex/SKILL.md`. For island/placeables also read `art/placeables/BASE_ISLAND_LAYOUT.json`.
 2. Pin the **current** production `game-production` SHA and current runtime `main` SHA. Read `main:game/src/render/manifest.js` at the pinned runtime SHA. Never treat a dated SHA in a document as a permanent branch pointer.
 3. Recover the durable tracker/checkpoint first. Never restart a successful step unless its fingerprint/output SHA proves reuse is invalid.
 4. Create/update the asset brief from `ASSET_BRIEF_TEMPLATE.md`. Unknown facts remain `UNKNOWN`; critical missing facts become `BLOCKED`.
@@ -27,7 +27,7 @@ PASS of generation preflight authorizes only the isolated generation stage. It d
 Before each imagegen call verify:
 
 - selected era/year is explicit;
-- object gameplay role and physical parts come from `PRODUCTION_MANIFEST.md`/brief;
+- object gameplay role and physical parts come from `IDEA_BANK_PLACEABLES.md`/brief;
 - era language comes from `ERA_DESIGN_MATRIX.md`;
 - an approved era reference set, when present, is included as SHA-bound visual evidence and its relevant sheets are used by role;
 - era-specific materials, mechanics/drive, UI, lighting, infrastructure, autonomy and silhouette are named where applicable;
