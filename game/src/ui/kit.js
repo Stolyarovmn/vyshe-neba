@@ -1383,7 +1383,11 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     const forced = o.side && o.side !== 'auto';
     const order = forced ? [o.side] : L.portrait ? ['above', 'below', 'left', 'right'] : ['right', 'left', 'above', 'below'];
     const cy0 = T.y + T.h / 2;
-    let side = order.find((s) => fits(place[s]())) || (forced ? o.side : cy0 > b.y + b.h / 2 ? 'above' : 'below');
+    // высокий щиток в альбомной раскладке: лучше сбоку с прижатием по высоте, чем сверху поверх самого объекта
+    const fitsX = (p) => p.x >= b.x + m && p.x + w <= b.x + b.w - m;
+    let side = order.find((s) => fits(place[s]()))
+      || (!forced && !L.portrait ? ['right', 'left'].find((s) => fitsX(place[s]())) : null)
+      || (forced ? o.side : cy0 > b.y + b.h / 2 ? 'above' : 'below');
     const raw = place[side]();
     const r = {
       x: Math.round(clamp(raw.x, b.x + m, b.x + b.w - m - w)),

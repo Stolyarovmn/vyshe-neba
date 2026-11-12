@@ -66,7 +66,16 @@ export function tiltFrames(assets) {
     isoBuildings[key] = Array.isArray(b.anchors) ? b.anchors : [b.anchor];
     isoSize[key] = b.size;
   }
-  const frames = [{ asset: base, size: iso.size, pad: [iso.pad.x, iso.pad.y], buildings: isoBuildings, isoSize }];
+  // объекты-входы базы есть только в изометрии: в остальных кадрах их место — по аффинному приближению якорей построек
+  const isoEntries = {};
+  const entrySize = {};
+  for (const [key, e] of Object.entries(iso.entries || {})) {
+    if (Array.isArray(e.anchor) && Array.isArray(e.size) && assets.has?.(`iso_entry_${key}_1978`)) {
+      isoEntries[key] = [e.anchor];
+      entrySize[key] = e.size;
+    }
+  }
+  const frames = [{ asset: base, size: iso.size, pad: [iso.pad.x, iso.pad.y], buildings: isoBuildings, isoSize, entries: isoEntries, entrySize }];
   for (const f of [...(tilt.frames || [])].sort((a, b) => a.elev - b.elev)) {
     const asset = assets.get(f.asset);
     if (asset && Array.isArray(f.size) && Array.isArray(f.pad)) frames.push({ asset, size: f.size, pad: f.pad, buildings: f.buildings || {} });
@@ -74,7 +83,46 @@ export function tiltFrames(assets) {
   const plan = {};
   for (const [key, spec] of Object.entries(BUILDING_ANCHORS)) plan[key] = (spec.e0 || spec).anchors;
   frames.push({ asset: start, size: [ISLAND.width, ISLAND.height], pad: ISLAND.launchOrigin, buildings: plan });
+  for (const fr of frames.slice(1)) {
+    const map = fitAffine(isoBuildings, fr.buildings);
+    fr.entries = {};
+    if (map) for (const [key, list] of Object.entries(isoEntries)) fr.entries[key] = list.map(map);
+  }
   return frames.length >= 3 ? frames : null;
+}
+
+/**
+ * Аффинное приближение «точка изометрии → точка кадра» методом наименьших квадратов по общим якорям построек
+ * (from, to: { key: [[x, y], ...] }). null — если общих якорей меньше трёх или они на одной прямой.
+ */
+export function fitAffine(from, to) {
+  const m = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  const bx = [0, 0, 0];
+  const by = [0, 0, 0];
+  let n = 0;
+  for (const [key, list] of Object.entries(from)) {
+    const other = to[key];
+    if (!other) continue;
+    list.forEach((p, i) => {
+      const q = other[i];
+      if (!q) return;
+      const v = [p[0], p[1], 1];
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) m[r][c] += v[r] * v[c];
+        bx[r] += v[r] * q[0];
+        by[r] += v[r] * q[1];
+      }
+      n++;
+    });
+  }
+  const det3 = (a) => a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) - a[0][1] * (a[1][0] * a[2][2] - a[1][2] * a[2][0])
+    + a[0][2] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
+  const d = det3(m);
+  if (n < 3 || Math.abs(d) < 1e-9) return null;
+  const solve = (b) => [0, 1, 2].map((col) => det3(m.map((row, r) => row.map((val, c) => (c === col ? b[r] : val)))) / d);
+  const ax = solve(bx);
+  const ay = solve(by);
+  return ([x, y]) => [ax[0] * x + ax[1] * y + ax[2], ay[0] * x + ay[1] * y + ay[2]];
 }
 
 /** Прозрачность облака-тумана над сушей острова. */
@@ -547,8 +595,24 @@ export function createFlightRenderer(painter, shared) {
         items.push({ key, level, sx: px0 + x * sImg, sy: py0 + y * sImg });
       }
     }
+    // объекты-входы базы (ангар, лавка, доска, памятник) гаснут вместе с изометрическими спрайтами построек
+    if (w < 0.999) {
+      for (const key of Object.keys(frames[0].entries || {})) {
+        const p0 = lo.entries?.[key]?.[0];
+        const p1 = hi.entries?.[key]?.[0];
+        if (!p0 || !p1) continue;
+        const x = lerp(p0[0] - lo.pad[0], p1[0] - hi.pad[0], b);
+        const y = lerp(p0[1] - lo.pad[1], p1[1] - hi.pad[1], b);
+        items.push({ key, entry: true, sx: px0 + x * sImg, sy: py0 + y * sImg });
+      }
+    }
     items.sort((p, q) => p.sy - q.sy);
     for (const it of items) {
+      if (it.entry) {
+        const size = frames[0].entrySize[it.key];
+        painter.spriteScreen(ctx, view, `iso_entry_${it.key}_1978`, it.sx, it.sy, size[1] * sImg, { ax: 0.5, ay: 1, alpha: 1 - w, smooth: true });
+        continue;
+      }
       const isoName = `iso_${it.key}_1978`;
       const isoSize = frames[0].isoSize[it.key];
       if (w < 0.999 && isoSize && painter.has(isoName)) {

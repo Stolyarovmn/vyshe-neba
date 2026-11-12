@@ -265,6 +265,10 @@ export const ASSET_FILES = {
   ...Object.fromEntries(BUILDING_KEYS.map((key) => [
     `iso_${key}_1978`, { file: `${eraFolder(0)}iso/${key}.png`, optional: true },
   ])),
+  // Объекты-входы изометрической базы (ангар, доска, лавка, памятник) — те же ключи, что ENTRY_KEYS ниже.
+  ...Object.fromEntries(['workshop', 'board', 'shop', 'monument'].map((key) => [
+    `iso_entry_${key}_1978`, { file: `${eraFolder(0)}iso/entry_${key}.png`, optional: true },
+  ])),
   // Изометрические клипы используют только свои кадры, никогда кадры старой камеры.
   ...Object.fromEntries(Object.entries(E0_BUILDING_CLIPS).flatMap(([key, clip]) =>
     Array.from({ length: clip.frames - 1 }, (_, i) => [

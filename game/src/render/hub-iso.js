@@ -1,7 +1,8 @@
 // Изометрический хаб: координаты карты — пиксели PNG, ракета сохраняет свои мировые единицы.
 // Старые якоря, декор, тени и маршруты сюда не передаются.
-import { BUILDING_KEYS, E0_BUILDING_CLIPS } from './manifest.js';
+import { BUILDING_KEYS, E0_BUILDING_CLIPS, ENTRY_KEYS } from './manifest.js';
 import { createMapView, drawSea } from './islandmap.js';
+import { drawEntryHint } from './entries.js';
 import { createRocketPose, drawRocket, nozzleOffset, stackHeight } from './rocket.js';
 import { BUILD_DURATION, createHubFx, drawScaffold } from './hubfx.js';
 import { dayOverlay, daylightAt, drawGlowScreen, drawVehicles, drawHeadlights, lightsAt } from './life.js';
@@ -26,6 +27,10 @@ export const ISO_LAMPS = {
   radar: [[0.51, 0.73, 8]],
   factory: [[0.49, 0.39, 18], [0.16, 0.58, 12], [0.84, 0.58, 12]],
   logistics: [[0.5, 0.5, 18], [0.29, 0.24, 12], [0.66, 0.24, 12]],
+  // объекты-входы: фонарь над воротами ангара, над прилавком лавки, на козырьке доски
+  workshop: [[0.5, 0.3, 14]],
+  shop: [[0.53, 0.35, 12]],
+  board: [[0.51, 0.13, 8]],
 };
 
 const pair = (v) => Array.isArray(v) && v.length === 2 && v.every(Number.isFinite);
@@ -43,6 +48,12 @@ export function isoLayout(assets) {
     const b = data.buildings[key];
     if (b && pair(b.anchor) && positivePair(b.size)) buildings[key] = b;
   }
+  // объекты-входы: ангар, доска контрактов, лавка, памятник эпох (не покупаются, есть всегда)
+  const entries = {};
+  for (const key of ENTRY_KEYS) {
+    const e = data.entries?.[key];
+    if (e && pair(e.anchor) && positivePair(e.size)) entries[key] = e;
+  }
   const roads = (Array.isArray(data.roads) ? data.roads : [])
     .filter((points) => Array.isArray(points) && points.length >= 2 && points.every(pair))
     .map((points) => ({ points }))
@@ -50,20 +61,24 @@ export function isoLayout(assets) {
   // Полоса застройки: все спрайты построек и стол; стартовый вид на широком экране показывает её целиком.
   const xs = [data.pad.x];
   const ys = [data.pad.y];
-  for (const b of Object.values(buildings)) {
+  for (const b of [...Object.values(buildings), ...Object.values(entries)]) {
     for (const a of [b.anchor, ...(Array.isArray(b.anchors) ? b.anchors.slice(1).filter(pair) : [])]) {
       xs.push(a[0] - b.size[0] / 2, a[0] + b.size[0] / 2);
       ys.push(a[1] - b.size[1], a[1]);
     }
   }
   const strip = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
-  return { size: data.size, pad: data.pad, buildings, roads, camera: data.camera || {}, strip };
+  return { size: data.size, pad: data.pad, buildings, entries, roads, camera: data.camera || {}, strip };
 }
 
-/** Собирает общую очередь: глубина здания и ракеты определяется низом спрайта. */
+/** Собирает общую очередь: глубина здания, входа и ракеты определяется низом спрайта. */
 export function isoDrawItems(layout, owned, assets) {
   const items = BUILDING_KEYS.filter((key) => owned[key] > 0 && layout.buildings[key] && assets.has(`iso_${key}_1978`))
     .map((key) => ({ key, y: layout.buildings[key].anchor[1] }));
+  for (const key of ENTRY_KEYS) {
+    const e = layout.entries?.[key];
+    if (e && assets.has(`iso_entry_${key}_1978`)) items.push({ key, y: e.anchor[1], entry: true });
+  }
   items.push({ key: 'rocket', y: layout.pad.y });
   return items.sort((a, b) => a.y - b.y);
 }
@@ -75,8 +90,9 @@ export function isoDrawItems(layout, owned, assets) {
 export function drawLamps(ctx, mv, layout, owned, profile, time, strength, reveal = () => 1) {
   let drawn = 0;
   for (const [key, lamps] of Object.entries(ISO_LAMPS)) {
-    const b = layout.buildings[key];
-    if (!b || !(owned[key] > 0) || reveal(key) < 1) continue;
+    const entry = layout.entries?.[key];
+    const b = layout.buildings[key] || entry;
+    if (!b || (!entry && !(owned[key] > 0)) || reveal(key) < 1) continue;
     const power = key === 'beacons' ? powerBalance(profile).ratio : 1;
     const anchors = [b.anchor, ...(Array.isArray(b.anchors) ? b.anchors.slice(1).filter(pair) : [])];
     anchors.forEach(([ax, ay], n) => {
@@ -123,7 +139,7 @@ export function createIsoHub(painter, shared, layout) {
     ? center((strip.x0 + strip.x1) / 2, home[1]) : center(...home));
   const routes = { roads: layout.roads, origin: [0, 0], unitsPerPx: 1 };
   const state = { ready: false, cx: home[0], cy: home[1], tx: home[0], ty: home[1], zoom: 1, tz: 1,
-    fit: 1, devW: 1, devH: 1, dpr: 1, time: null, selected: null, daylight: null, pending: null };
+    fit: 1, devW: 1, devH: 1, dpr: 1, time: null, selected: null, daylight: null, pending: null, hints: null };
   const zoomLimit = (z) => clamp(z, minZoom, maxZoom);
   const center = (x, y) => [clamp(x, 0, width), clamp(y, 0, height)];
   const scale = () => state.fit * state.zoom;
@@ -158,7 +174,8 @@ export function createIsoHub(painter, shared, layout) {
     get animating() { return clips.size > 0 || fx.active; },
     get selected() { return state.selected; },
     get view() { return { zoom: state.zoom, cx: state.cx, cy: state.cy, scale: scale() }; },
-    setHints() {}, // Для объектов-входов пока нет изометрической раскладки.
+    /** Пульсирующие уголки вокруг объектов-входов (обучение); null — по флагу обучения в профиле. */
+    setHints(on) { state.hints = on == null ? null : !!on; },
     /** Праздник новой эпохи: фейерверк над видимой частью карты и вспышка всех ламп. */
     playEra() { fx.playEra(); },
     /** Стройка: здание вырастает из лесов с пылью и искрами; клип ON — после того, как оно достроено. */
@@ -212,7 +229,14 @@ export function createIsoHub(painter, shared, layout) {
       if (!state.ready) { state.pending = { target, immediate }; return; }
       let point = target;
       const building = layout.buildings[target];
-      if (building) {
+      const entry = layout.entries[target];
+      if (entry) {
+        // как в прежнем хабе: в кадре ~380 ед. мира, чтобы рядом с объектом оставалось место для щитка
+        const zoom = zoomLimit(Math.max(state.tz, state.devW / (380 * unit) / state.fit));
+        // в портрете щиток встаёт над объектом: сам объект — ниже середины кадра
+        const lift = state.devH > state.devW ? state.devH * 0.2 / (state.fit * zoom) : 0;
+        point = { x: entry.anchor[0], y: entry.anchor[1] - entry.size[1] * 0.4 - lift, zoom };
+      } else if (building) {
         point = { x: building.anchor[0], y: building.anchor[1] - building.size[1] * 0.4,
           zoom: Math.min(state.devW * 0.45 / building.size[0], state.devH * 0.55 / building.size[1]) / state.fit };
       } else if (target === 'rocket') {
@@ -305,6 +329,10 @@ export function createIsoHub(painter, shared, layout) {
           drawRocket(ctx, painter, rocketView, pose, time);
           const h = stackHeight(pose.kind, painter.assets, era) + feet;
           addRect(key, pad.x, pad.y + 4 * pad.rocketScale, 36 * pad.rocketScale, (h + 4) * pad.rocketScale);
+        } else if (item.entry) {
+          const e = layout.entries[key];
+          painter.sprite(ctx, mv, `iso_entry_${key}_1978`, ...e.anchor, { w: e.size[0], h: e.size[1], ax: 0.5, ay: 1, smooth: true });
+          addRect(key, ...e.anchor, ...e.size);
         } else {
           const b = layout.buildings[key];
           let name = `iso_${key}_1978`;
@@ -355,11 +383,21 @@ export function createIsoHub(painter, shared, layout) {
       if (lightStrength > 0.03) {
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
-        drawLamps(ctx, mv, layout, owned, profile, time, lightStrength, (key) => fx.buildState(key, reduce)?.reveal ?? 1);
+        drawLamps(ctx, mv, layout, owned, profile, time, lightStrength, (key) => (layout.entries[key]
+          ? (painter.has(`iso_entry_${key}_1978`) ? 1 : 0)
+          : fx.buildState(key, reduce)?.reveal ?? 1));
         ctx.restore();
       }
       drawHeadlights(ctx, mv, time, count, 1 - daylight, routes);
       fx.draw(ctx, fxView, 1);
+      const hints = state.hints ?? !!(profile?.settings?.tutorial && !profile.settings.tutorial.done);
+      if (hints) {
+        for (const r of rects) {
+          if (!layout.entries[r.key]) continue;
+          const d = state.dpr;
+          drawEntryHint(ctx, { x0: r.x0 * d, y0: r.y0 * d, x1: r.x1 * d, y1: r.y1 * d }, time, mv.s);
+        }
+      }
       const selected = rects.find((r) => r.key === state.selected);
       if (selected) {
         ctx.strokeStyle = '#efc263';

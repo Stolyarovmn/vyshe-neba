@@ -5,9 +5,9 @@ import { createPainter } from '../src/render/painter.js';
 import { createHub } from '../src/render/hub.js';
 import { ISO_LAMPS, drawLamps, isoDrawItems, isoLayout } from '../src/render/hub-iso.js';
 import { createMapView } from '../src/render/islandmap.js';
-import { LIFT_TIME, createFlightRenderer, liftBlend, tiltFrames } from '../src/render/flight.js';
+import { LIFT_TIME, createFlightRenderer, fitAffine, liftBlend, tiltFrames } from '../src/render/flight.js';
 import { computeLayout } from '../src/render/layout.js';
-import { BUILDING_ANCHORS, BUILDING_KEYS, ISLAND } from '../src/render/manifest.js';
+import { BUILDING_ANCHORS, BUILDING_KEYS, ENTRY_KEYS, ISLAND } from '../src/render/manifest.js';
 import { createFlight, startRocket } from '../src/sim/index.js';
 import { fakeAssets, makeStubCanvas, stubContext } from './render-helpers.mjs';
 
@@ -37,7 +37,8 @@ test('изометрия: очередь отрисовки по низу спр
   const assets = fakeAssets({ iso: true });
   const layout = isoLayout(assets);
   const items = isoDrawItems(layout, allBuilt().buildings, assets);
-  assert.equal(items.length, BUILDING_KEYS.length + 1);
+  assert.equal(items.length, BUILDING_KEYS.length + ENTRY_KEYS.length + 1);
+  assert.equal(isoDrawItems(layout, {}, assets).length, ENTRY_KEYS.length + 1, 'входы есть и без построек');
   for (let i = 1; i < items.length; i++) assert.ok(items[i].y >= items[i - 1].y);
   assert.equal(items.find((it) => it.key === 'rocket').y, layout.pad.y);
 });
@@ -56,6 +57,54 @@ test('изометрия: хаб рисуется, все постройки —
     assert.ok(BUILDING_KEYS.includes(hub.hitTest(pos.x, pos.y)), `${key}: нажатие в центре`);
   }
   assert.ok(hub.hitTest(hub.screenPos('rocket').x, hub.screenPos('rocket').y), 'ракета — цель нажатия');
+});
+
+test('изометрия: ангар, лавка, доска и памятник стоят на карте и открываются нажатием', () => {
+  const assets = fakeAssets({ iso: true });
+  const layout = isoLayout(assets);
+  assert.deepEqual(Object.keys(layout.entries).sort(), [...ENTRY_KEYS].sort());
+  const [w, h] = layout.size;
+  for (const [key, e] of Object.entries(layout.entries)) {
+    assert.ok(e.anchor[0] > 0 && e.anchor[0] < w && e.anchor[1] > 0 && e.anchor[1] < h, `${key}: якорь на карте`);
+    // вход не заслоняет постройки: рамки спрайтов не пересекаются
+    const [x0, x1, y0, y1] = [e.anchor[0] - e.size[0] / 2, e.anchor[0] + e.size[0] / 2, e.anchor[1] - e.size[1], e.anchor[1]];
+    for (const [bk, b] of Object.entries(layout.buildings)) {
+      for (const a of b.anchors || [b.anchor]) {
+        const overlapX = Math.min(x1, a[0] + b.size[0] / 2) - Math.max(x0, a[0] - b.size[0] / 2);
+        const overlapY = Math.min(y1, a[1]) - Math.max(y0, a[1] - b.size[1]);
+        assert.ok(overlapX <= 2 || overlapY <= 2, `${key} не налезает на ${bk}`);
+      }
+    }
+  }
+  const painter = createPainter(assets, makeStubCanvas);
+  const hub = createHub(painter, { profile: null });
+  const screen = computeLayout(1920, 1080, 1);
+  hub.draw(stubContext(1920, 1080), { profile: { era: 0, parts: {}, buildings: {} }, time: 0, layout: screen });
+  for (const key of ENTRY_KEYS) {
+    const pos = hub.screenPos(key);
+    assert.ok(pos && pos.x > 0 && pos.x < 1920 && pos.y > 0 && pos.y < 1080, `${key}: в кадре`);
+    assert.equal(hub.hitTest(pos.x, pos.y), key, `${key}: нажатие`);
+  }
+  hub.focus('monument', true);
+  hub.draw(stubContext(1920, 1080), { profile: { era: 0, parts: {}, buildings: {} }, time: 0.1, layout: screen });
+  const m = hub.screenPos('monument');
+  assert.ok(Math.abs(m.x - 960) < 80 && Math.abs(m.y - 540) < 200, 'камера подводит к памятнику');
+});
+
+test('подъём камеры: входы есть в кадрах подъёма по приближению якорей построек', () => {
+  const frames = tiltFrames(fakeAssets({ iso: true }));
+  const iso = frames[0];
+  for (const key of ENTRY_KEYS) assert.ok(iso.entries[key]?.length === 1 && iso.entrySize[key], key);
+  const last = frames[frames.length - 1];
+  // на карте полёта место входа — рядом с прежним планом (в пределах острова, с правильной стороны от стола)
+  for (const key of ENTRY_KEYS) {
+    const [x, y] = last.entries[key][0];
+    assert.ok(x > 0 && x < ISLAND.width && y > 0 && y < ISLAND.height, `${key}: на острове (${x.toFixed(0)}, ${y.toFixed(0)})`);
+    assert.equal(Math.sign(x - last.pad[0]), Math.sign(iso.entries[key][0][0] - iso.pad[0]), `${key}: та же сторона от стола`);
+  }
+  const map = fitAffine({ a: [[0, 0], [10, 0], [0, 10]] }, { a: [[1, 2], [21, 2], [1, 32]] });
+  assert.deepEqual(map([5, 5]), [11, 17]);
+  assert.equal(fitAffine({ a: [[0, 0], [1, 1]] }, { a: [[0, 0], [1, 1]] }), null);
 });
 
 test('изометрия: matchPad ставит стол в заданную точку экрана в масштабе полёта', () => {
@@ -79,7 +128,7 @@ test('изометрия: ночью горят лампы построек, д�
   const owned = allBuilt().buildings;
   const mv = createMapView().set(0, 0, 1, 2000, 700);
   const expected = Object.entries(ISO_LAMPS)
-    .reduce((n, [key, lamps]) => n + lamps.length * (layout.buildings[key].anchors?.length || 1), 0);
+    .reduce((n, [key, lamps]) => n + lamps.length * ((layout.buildings[key] || layout.entries[key]).anchors?.length || 1), 0);
   assert.equal(drawLamps(stubContext(), mv, layout, owned, allBuilt(), 0, 1), expected, 'каждая лампа каждого якоря');
   assert.equal(drawLamps(stubContext(), mv, layout, owned, allBuilt(), 0, 1, (key) => (key === 'control' ? 0.5 : 1)),
     expected - ISO_LAMPS.control.length, 'пульт в стройке не светится');
