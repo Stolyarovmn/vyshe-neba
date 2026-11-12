@@ -142,6 +142,13 @@ export function islandFog(cloud, h) {
   return lerp(ISLAND_FOG_ALPHA, 1, smoothstep(edge - 20, edge + 40, north));
 }
 
+/**
+ * Окно смены изометрических спрайтов построек на спрайты карты по ходу подъёма u. Пока идёт смена, видны оба спрайта
+ * (двойной контур), поэтому окно узкое: ~0,2 с из 1,3 с. Сжимать изометрию по высоте не нужно: спрайты карты нарисованы
+ * под ~50–55° и по высоте близки к изометрическим.
+ */
+export const SPRITE_SWAP = [0.47, 0.6];
+
 /** Положение в ряду кадров по ходу подъёма u (0..1): индекс нижнего кадра и доля следующего. */
 export function liftBlend(u, count) {
   const n = Math.max(1, count - 1);
@@ -574,7 +581,11 @@ export function createFlightRenderer(painter, shared) {
     blit(lo, 1);
     if (b > 0.001) blit(hi, b);
     ctx.imageSmoothingEnabled = was;
-    const w = smoothstep(0.35, 0.7, u);
+    const w = smoothstep(SPRITE_SWAP[0], SPRITE_SWAP[1], u);
+    const isoBlit = (name, sx, sy, size, alpha) => {
+      const asset = painter.assets.get(name);
+      if (asset) painter.blitDev(ctx, asset, sx, sy, size[0] * sImg, size[1] * sImg, 0.5, 1, { alpha, smooth: true });
+    };
     if (w > 0.001) {
       ctx.globalAlpha = prev * w;
       drawLaunchMount(ctx, mapView, state.era, time);
@@ -609,15 +620,12 @@ export function createFlightRenderer(painter, shared) {
     items.sort((p, q) => p.sy - q.sy);
     for (const it of items) {
       if (it.entry) {
-        const size = frames[0].entrySize[it.key];
-        painter.spriteScreen(ctx, view, `iso_entry_${it.key}_1978`, it.sx, it.sy, size[1] * sImg, { ax: 0.5, ay: 1, alpha: 1 - w, smooth: true });
+        isoBlit(`iso_entry_${it.key}_1978`, it.sx, it.sy, frames[0].entrySize[it.key], 1 - w);
         continue;
       }
       const isoName = `iso_${it.key}_1978`;
       const isoSize = frames[0].isoSize[it.key];
-      if (w < 0.999 && isoSize && painter.has(isoName)) {
-        painter.spriteScreen(ctx, view, isoName, it.sx, it.sy, isoSize[1] * sImg, { ax: 0.5, ay: 1, alpha: 1 - w, smooth: true });
-      }
+      if (w < 0.999 && isoSize && painter.has(isoName)) isoBlit(isoName, it.sx, it.sy, isoSize, 1 - w);
       const topName = buildingSpriteName(it.key, it.level);
       if (w > 0.001 && painter.has(topName)) {
         const [, h] = buildingSize(painter, it.key, it.level);

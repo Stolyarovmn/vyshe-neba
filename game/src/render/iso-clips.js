@@ -16,7 +16,7 @@ export const ISO_PART_CLIPS = {
     hole: '#1d1915',
     holes: [[44, 62, 28, 38], [100, 62, 29, 38]],
     parts: [{ rect: [44, 62, 28, 38], move: [-14, 0] }, { rect: [100, 62, 29, 38], move: [14, 0] }],
-    glow: [86, 82, 20],
+    glow: [86, 66, 26],
   },
   rescue: {
     time: 3,
@@ -118,13 +118,29 @@ export function drawIsoClip(ctx, painter, mv, key, name, ax, ay, w, h, u, reduce
     for (const [x, y, rw, rh] of spec.holes) ctx.fillRect(sx(x), sy(y), sx(x + rw) - sx(x), sy(y + rh) - sy(y));
   }
   if (spec.glow) {
+    // свет цеха изнутри (кодом): лампа под потолком и освещённый пол у порога, глубина к верху темнеет
     const [gx, gy, r] = spec.glow;
-    const g = ctx.createRadialGradient(sx(gx), sy(gy), 0, sx(gx), sy(gy), r * mv.s);
-    g.addColorStop(0, `rgba(255,190,110,${(0.75 * e).toFixed(3)})`);
-    g.addColorStop(0.6, `rgba(200,130,60,${(0.3 * e).toFixed(3)})`);
-    g.addColorStop(1, 'rgba(255,190,110,0)');
-    ctx.fillStyle = g;
-    for (const [x, y, rw, rh] of spec.holes) ctx.fillRect(sx(x), sy(y), sx(x + rw) - sx(x), sy(y + rh) - sy(y));
+    for (const [x, y, rw, rh] of spec.holes) {
+      const x0 = sx(x);
+      const y0 = sy(y);
+      const w0 = sx(x + rw) - x0;
+      const h0 = sy(y + rh) - y0;
+      const floor = ctx.createLinearGradient(0, y0, 0, y0 + h0);
+      floor.addColorStop(0, 'rgba(255,170,90,0)');
+      floor.addColorStop(0.55, `rgba(255,170,90,${(0.12 * e).toFixed(3)})`);
+      floor.addColorStop(0.86, `rgba(255,190,110,${(0.5 * e).toFixed(3)})`);
+      floor.addColorStop(1, `rgba(120,80,40,${(0.6 * e).toFixed(3)})`);
+      ctx.fillStyle = floor;
+      ctx.fillRect(x0, y0, w0, h0);
+      const lamp = ctx.createRadialGradient(sx(gx), sy(gy), 0, sx(gx), sy(gy), r * mv.s);
+      lamp.addColorStop(0, `rgba(255,200,120,${(0.55 * e).toFixed(3)})`);
+      lamp.addColorStop(1, 'rgba(255,200,120,0)');
+      ctx.fillStyle = lamp;
+      ctx.fillRect(x0, y0, w0, h0);
+      // кромка пола внутри — тёмная линия на 0,86 высоты проёма
+      ctx.fillStyle = `rgba(30,22,16,${(0.8 * e).toFixed(3)})`;
+      ctx.fillRect(x0, Math.round(y0 + h0 * 0.84), w0, Math.max(1, Math.round(mv.s * 0.6)));
+    }
   }
   for (const part of spec.parts || []) {
     const dx = Math.round(part.move[0] * e);
