@@ -96,6 +96,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     iconNames: ICON_NAMES,
     hudTargets: {},
     hubSelected: null,
+    hubEvents: [], // события для клипов ON базы: играют при следующем входе в хаб (screens/hub.js)
   };
 
   // ---------- размеры ----------
@@ -266,6 +267,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     app.commit(res.profile);
     sfx('buy');
     app.haptic(12);
+    // цех выдаёт модуль: ворота откроются, когда игрок вернётся на базу
+    app.hubEvents.push('factory');
     return res;
   };
 
@@ -374,6 +377,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       const f = renderer.flight.restFraming(app.layout, canvas.width, canvas.height, kind, app.profile.era | 0);
       renderer.hub.matchPad(f.ax, f.feetY, f.pxPerUnit);
     }
+    // ферма на отсчёте открывает вентиль подачи (клип ON виден, пока камера подходит к столу)
+    renderer.hub.playEvent?.('gantry');
     return true;
   };
 
@@ -626,6 +631,9 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       console.error('[app] settleFlight:', err);
     }
     app.commit(settled.profile);
+    // клипы базы после полёта: спасатели выезжают после аварии, склад грузит по выполненному контракту
+    if (result.outcome === 'crashed') app.hubEvents.push('rescue');
+    if (settled.report?.awarded?.contracts?.length) app.hubEvents.push('logistics');
     if (!app.settings.tutorial?.done && (result.outcome === 'landed' || result.outcome === 'crashed')) app.setSetting('tutorial', { done: true, step: 99 });
     app.results = { result, report: settled.report || {}, before, after: settled.profile, config: s.config, destination: s.destination, consumables: s.consumables };
     app.session = null;

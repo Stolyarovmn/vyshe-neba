@@ -5,6 +5,7 @@ import { createPainter } from '../src/render/painter.js';
 import { createHub } from '../src/render/hub.js';
 import { ISO_LAMPS, drawLamps, isoDrawItems, isoLayout } from '../src/render/hub-iso.js';
 import { createMapView } from '../src/render/islandmap.js';
+import { ISO_PART_CLIPS, clipOpen } from '../src/render/iso-clips.js';
 import { LIFT_TIME, createFlightRenderer, fitAffine, liftBlend, tiltFrames } from '../src/render/flight.js';
 import { computeLayout } from '../src/render/layout.js';
 import { BUILDING_ANCHORS, BUILDING_KEYS, ENTRY_KEYS, ISLAND } from '../src/render/manifest.js';
@@ -173,6 +174,51 @@ test('изометрия: стройка — здание растёт в лес
   assert.equal(hub.animating, true);
   frame(6.25);
   assert.ok((frame(6.3).createRadialGradient || 0) > day, 'днём в праздник горят лампы');
+});
+
+test('клипы ON: части вырезаны в пределах спрайта, клип играет по событию, гаснет и не играет у некупленной постройки', () => {
+  const assets = fakeAssets({ iso: true });
+  const layout = isoLayout(assets);
+  assert.deepEqual(Object.keys(ISO_PART_CLIPS).sort(), ['factory', 'gantry', 'logistics', 'rescue'], '§6: механика только у четырёх');
+  for (const [key, spec] of Object.entries(ISO_PART_CLIPS)) {
+    const [w, h] = layout.buildings[key].size;
+    assert.ok(spec.time > 0 && spec.time <= 3, `${key}: не дольше 3 с`);
+    for (const [x, y, rw, rh] of [...(spec.holes || []), ...(spec.parts || []).map((p) => p.rect)]) {
+      assert.ok(x >= 0 && y >= 0 && x + rw <= w && y + rh <= h, `${key}: часть в спрайте ${w}×${h}`);
+    }
+    if (spec.spin) {
+      const { center: [cx, cy], radius } = spec.spin;
+      assert.ok(cx - radius >= 0 && cx + radius <= w && cy - radius >= 0 && cy + radius <= h, `${key}: вентиль в спрайте`);
+    }
+  }
+  assert.equal(clipOpen(0), 0);
+  assert.equal(clipOpen(0.5), 1);
+  assert.equal(clipOpen(1), 0);
+
+  const painter = createPainter(assets, makeStubCanvas);
+  const hub = createHub(painter, { profile: null });
+  const screen = computeLayout(1920, 1080, 1);
+  const frame = (profile, time) => {
+    const ctx = stubContext(1920, 1080);
+    hub.draw(ctx, { profile, time, layout: screen, daylight: 1 });
+    return ctx.calls;
+  };
+  const built = allBuilt();
+  frame(built, 0);
+  hub.playEvent('factory');
+  assert.equal(hub.animating, true);
+  frame(built, 0.05);
+  const mid = frame(built, 1.2);
+  assert.ok((mid.clip || 0) >= 2, 'обе створки ворот нарисованы со смещением');
+  assert.ok((mid.createRadialGradient || 0) > 0, 'днём горят лампы цеха и свет внутри');
+  for (let t = 1.3; t < 7; t += 0.1) frame(built, t);
+  assert.equal(hub.animating, false, 'клип и дым закончились');
+
+  const empty = { era: 0, parts: {}, buildings: {} };
+  hub.playEvent('rescue');
+  frame(empty, 7.1);
+  frame(empty, 7.2);
+  assert.equal(hub.animating, false, 'нет спасателей — нет клипа');
 });
 
 test('подъём камеры: кадры от изометрии к карте полёта, у каждого стол и все постройки', () => {

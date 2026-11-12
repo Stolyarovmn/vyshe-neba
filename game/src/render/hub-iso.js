@@ -1,6 +1,7 @@
 // Изометрический хаб: координаты карты — пиксели PNG, ракета сохраняет свои мировые единицы.
 // Старые якоря, декор, тени и маршруты сюда не передаются.
-import { BUILDING_KEYS, E0_BUILDING_CLIPS, ENTRY_KEYS } from './manifest.js';
+import { BUILDING_KEYS, ENTRY_KEYS } from './manifest.js';
+import { ISO_PART_CLIPS, ISO_VENTS, clipOpen, clipTime, drawIsoClip } from './iso-clips.js';
 import { createMapView, drawSea } from './islandmap.js';
 import { drawEntryHint } from './entries.js';
 import { createRocketPose, drawRocket, nozzleOffset, stackHeight } from './rocket.js';
@@ -87,12 +88,14 @@ export function isoDrawItems(layout, owned, assets) {
  * Лампы построек ISO_LAMPS: тёплые горят ровно, красные мигалки мигают; маяки слабеют при нехватке энергии.
  * Недостроенная постройка (reveal(key) < 1) не светится.
  */
-export function drawLamps(ctx, mv, layout, owned, profile, time, strength, reveal = () => 1) {
+export function drawLamps(ctx, mv, layout, owned, profile, time, base, reveal = () => 1, boost = () => 0) {
   let drawn = 0;
   for (const [key, lamps] of Object.entries(ISO_LAMPS)) {
     const entry = layout.entries?.[key];
     const b = layout.buildings[key] || entry;
     if (!b || (!entry && !(owned[key] > 0)) || reveal(key) < 1) continue;
+    const strength = Math.max(base, boost(key));
+    if (strength <= 0.03) continue;
     const power = key === 'beacons' ? powerBalance(profile).ratio : 1;
     const anchors = [b.anchor, ...(Array.isArray(b.anchors) ? b.anchors.slice(1).filter(pair) : [])];
     anchors.forEach(([ax, ay], n) => {
@@ -113,7 +116,8 @@ export function createIsoHub(painter, shared, layout) {
   const rocketView = createMapView();
   const pose = createRocketPose();
   const rects = [];
-  const clips = new Map();
+  // клипы ON (iso-clips.js): ключ → { start, u, vents }; start = null — начнётся с ближайшего кадра базы
+  const events = new Map();
   // Эффекты стройки и праздника считаются в единицах ракеты (как в прежнем хабе): 1 ед. = rocketScale px карты.
   const fx = createHubFx();
   const fxView = createMapView();
@@ -149,11 +153,9 @@ export function createIsoHub(painter, shared, layout) {
       x1: mv.sx(x + w / 2) / state.dpr, y1: mv.sy(y) / state.dpr });
   }
 
+  /** Клип ON постройки или вспышка лампы входа; повтор во время клипа его не перезапускает. */
   function startClip(key) {
-    const spec = E0_BUILDING_CLIPS[key];
-    if (spec && spec.sequence.every((i) => painter.has(`iso_${key}_1978${i > 0 ? `_on${i}` : ''}`))) {
-      clips.set(key, state.time);
-    }
+    if ((layout.buildings[key] || layout.entries[key]) && !events.has(key)) events.set(key, { start: null, u: 0 });
   }
 
   /** Все места постройки на карте (пара маяков — два якоря). */
@@ -171,7 +173,12 @@ export function createIsoHub(painter, shared, layout) {
   const hub = {
     mode: () => 'iso',
     buildDuration: BUILD_DURATION,
-    get animating() { return clips.size > 0 || fx.active; },
+    get animating() { return events.size > 0 || fx.active; },
+    /**
+     * Событие игры для клипа ON: 'factory' — куплен модуль ракеты, 'rescue' — авария, 'logistics' — выполнен контракт,
+     * 'gantry' — пуск. Клип играет с ближайшего кадра базы, если постройка куплена.
+     */
+    playEvent(key) { startClip(key); },
     get selected() { return state.selected; },
     get view() { return { zoom: state.zoom, cx: state.cx, cy: state.cy, scale: scale() }; },
     /** Пульсирующие уголки вокруг объектов-входов (обучение); null — по флагу обучения в профиле. */
@@ -307,6 +314,19 @@ export function createIsoHub(painter, shared, layout) {
         const reveal = fx.buildState(key, reduce)?.reveal ?? 1;
         if (before < 1 && reveal >= 1) { startClip(key); lastReveal.delete(key); } else lastReveal.set(key, reveal);
       }
+      // клипы ON: ход по времени, дым и пар из труб, пока клип в первой половине
+      for (const [key, ev] of events) {
+        const b = layout.buildings[key];
+        if (ev.start == null) ev.start = time;
+        ev.u = (time - ev.start) / clipTime(key);
+        if (ev.u >= 1 || (b && !(owned[key] > 0))) { events.delete(key); continue; }
+        if (b && !reduce && ev.u < 0.6 && ISO_VENTS[key]) {
+          ev.vents ||= anchorsOf(b).flatMap(([x, y]) => ISO_VENTS[key].map(([fx0, fy0, steam]) => ({
+            x: (x - b.size[0] / 2 + fx0 * b.size[0]) / unit, y: (y - b.size[1] + fy0 * b.size[1]) / unit, rate: 18, smoke: !steam,
+          })));
+          fx.steam(dt, ev.vents, 1);
+        }
+      }
       rects.length = 0;
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -335,23 +355,14 @@ export function createIsoHub(painter, shared, layout) {
           addRect(key, ...e.anchor, ...e.size);
         } else {
           const b = layout.buildings[key];
-          let name = `iso_${key}_1978`;
-          const start = clips.get(key);
-          const clip = E0_BUILDING_CLIPS[key];
-          if (clips.has(key)) {
-            const frame = Math.floor((time - (start ?? time)) * clip.fps);
-            if (reduce || owned[key] !== 1 || frame >= clip.sequence.length) clips.delete(key);
-            else {
-              if (start == null) clips.set(key, time);
-              const i = clip.sequence[Math.max(0, frame)];
-              // без изометрического кадра клипа остаётся статичный спрайт (иначе здание мигало бы пустотой)
-              if (i > 0 && painter.assets.has(`${name}_on${i}`)) name += `_on${i}`;
-            }
-          }
+          const name = `iso_${key}_1978`;
           const build = fx.buildState(key, reduce);
+          const ev = events.get(key);
           // повторы того же объекта (пара маяков по сторонам стола): anchors[1..]
           for (const [x, y] of anchorsOf(b)) {
-            if (build && build.reveal < 1) {
+            if (ev && !build && ISO_PART_CLIPS[key]) {
+              drawIsoClip(ctx, painter, mv, key, name, x, y, b.size[0], b.size[1], ev.u, reduce);
+            } else if (build && build.reveal < 1) {
               // стройка: здание вырастает снизу вверх — видна только нижняя часть спрайта
               ctx.save();
               ctx.beginPath();
@@ -380,12 +391,14 @@ export function createIsoHub(painter, shared, layout) {
       }
       // ночью и в праздник эпохи загораются лампы построек (аддитивно поверх затемнения)
       const lightStrength = Math.max(lightsAt(daylight), fx.eraPulse * 0.9);
-      if (lightStrength > 0.03) {
+      if (lightStrength > 0.03 || events.size > 0) {
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
         drawLamps(ctx, mv, layout, owned, profile, time, lightStrength, (key) => (layout.entries[key]
           ? (painter.has(`iso_entry_${key}_1978`) ? 1 : 0)
-          : fx.buildState(key, reduce)?.reveal ?? 1));
+          : fx.buildState(key, reduce)?.reveal ?? 1),
+        // клип ON зажигает лампы своей постройки и днём
+        (key) => (events.has(key) ? 0.95 * clipOpen(events.get(key).u ?? 0) : 0));
         ctx.restore();
       }
       drawHeadlights(ctx, mv, time, count, 1 - daylight, routes);
@@ -405,7 +418,6 @@ export function createIsoHub(painter, shared, layout) {
         ctx.strokeRect(selected.x0 * state.dpr - 4, selected.y0 * state.dpr - 4,
           (selected.x1 - selected.x0) * state.dpr + 8, (selected.y1 - selected.y0) * state.dpr + 8);
       }
-      for (const key of clips.keys()) if (!(owned[key] > 0) || !layout.buildings[key]) clips.delete(key);
       ctx.restore();
     },
   };
