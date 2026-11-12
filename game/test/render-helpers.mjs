@@ -16,7 +16,12 @@ export function stubContext(width = 800, height = 600) {
   const ctx = new Proxy(state, {
     get(target, prop) {
       if (prop in target) return target[prop];
-      if (prop === 'createLinearGradient' || prop === 'createRadialGradient') return () => gradient;
+      if (prop === 'createLinearGradient' || prop === 'createRadialGradient') {
+        return () => {
+          calls[prop] = (calls[prop] || 0) + 1;
+          return gradient;
+        };
+      }
       if (prop === 'getContext') return () => ctx;
       return (...args) => {
         calls[prop] = (calls[prop] || 0) + 1;

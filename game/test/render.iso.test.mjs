@@ -3,7 +3,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPainter } from '../src/render/painter.js';
 import { createHub } from '../src/render/hub.js';
-import { isoDrawItems, isoLayout } from '../src/render/hub-iso.js';
+import { ISO_LAMPS, drawLamps, isoDrawItems, isoLayout } from '../src/render/hub-iso.js';
+import { createMapView } from '../src/render/islandmap.js';
 import { LIFT_TIME, createFlightRenderer, liftBlend, tiltFrames } from '../src/render/flight.js';
 import { computeLayout } from '../src/render/layout.js';
 import { BUILDING_ANCHORS, BUILDING_KEYS, ISLAND } from '../src/render/manifest.js';
@@ -70,6 +71,59 @@ test('изометрия: matchPad ставит стол в заданную т�
   hub.draw(ctx, { profile: allBuilt(), time: 0.01, layout });
   const iso = isoLayout(painter.assets);
   assert.ok(Math.abs(hub.view.scale * iso.pad.rocketScale - f.pxPerUnit) < 1e-6, 'масштаб стола = масштаб полёта');
+});
+
+test('изометрия: ночью горят лампы построек, днём нет; недостроенная постройка тёмная', () => {
+  const assets = fakeAssets({ iso: true });
+  const layout = isoLayout(assets);
+  const owned = allBuilt().buildings;
+  const mv = createMapView().set(0, 0, 1, 2000, 700);
+  const expected = Object.entries(ISO_LAMPS)
+    .reduce((n, [key, lamps]) => n + lamps.length * (layout.buildings[key].anchors?.length || 1), 0);
+  assert.equal(drawLamps(stubContext(), mv, layout, owned, allBuilt(), 0, 1), expected, 'каждая лампа каждого якоря');
+  assert.equal(drawLamps(stubContext(), mv, layout, owned, allBuilt(), 0, 1, (key) => (key === 'control' ? 0.5 : 1)),
+    expected - ISO_LAMPS.control.length, 'пульт в стройке не светится');
+  for (const [key, lamps] of Object.entries(ISO_LAMPS)) {
+    for (const [fx, fy] of lamps) assert.ok(fx >= 0 && fx <= 1 && fy >= 0 && fy <= 1, `${key}: лампа на спрайте`);
+  }
+
+  const painter = createPainter(assets, makeStubCanvas);
+  const hub = createHub(painter, { profile: null });
+  const screen = computeLayout(1920, 1080, 1);
+  const gradients = (daylight) => {
+    const ctx = stubContext(1920, 1080);
+    hub.draw(ctx, { profile: allBuilt(), time: 0, layout: screen, daylight });
+    return ctx.calls.createRadialGradient || 0;
+  };
+  assert.ok(gradients(0) - gradients(1) >= expected, 'ночью добавились огни всех ламп');
+});
+
+test('изометрия: стройка — здание растёт в лесах, затем анимация гаснет; праздник эпохи зажигает лампы днём', () => {
+  const painter = createPainter(fakeAssets({ iso: true }), makeStubCanvas);
+  const hub = createHub(painter, { profile: null });
+  const screen = computeLayout(1920, 1080, 1);
+  const profile = allBuilt();
+  const frame = (time, daylight = 1) => {
+    const ctx = stubContext(1920, 1080);
+    hub.draw(ctx, { profile, time, layout: screen, daylight });
+    return ctx.calls;
+  };
+  frame(0);
+  assert.equal(hub.animating, false, 'в покое анимации нет');
+  hub.playBuild('control');
+  assert.equal(hub.animating, true);
+  frame(0.05);
+  const growing = frame(0.4);
+  assert.ok((growing.clip || 0) >= 1, 'спрайт обрезан по высоте стройки');
+  for (let t = 0.5; t < 6; t += 0.1) frame(t);
+  assert.equal(hub.animating, false, 'стройка и искры закончились');
+  assert.equal(frame(6.1).clip || 0, 0, 'достроенное здание целиком');
+
+  const day = frame(6.2).createRadialGradient || 0;
+  hub.playEra();
+  assert.equal(hub.animating, true);
+  frame(6.25);
+  assert.ok((frame(6.3).createRadialGradient || 0) > day, 'днём в праздник горят лампы');
 });
 
 test('подъём камеры: кадры от изометрии к карте полёта, у каждого стол и все постройки', () => {

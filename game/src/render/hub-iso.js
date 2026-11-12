@@ -3,10 +3,30 @@
 import { BUILDING_KEYS, E0_BUILDING_CLIPS } from './manifest.js';
 import { createMapView, drawSea } from './islandmap.js';
 import { createRocketPose, drawRocket, nozzleOffset, stackHeight } from './rocket.js';
-import { BUILD_DURATION } from './hubfx.js';
-import { dayOverlay, daylightAt, drawVehicles, drawHeadlights } from './life.js';
+import { BUILD_DURATION, createHubFx, drawScaffold } from './hubfx.js';
+import { dayOverlay, daylightAt, drawGlowScreen, drawVehicles, drawHeadlights, lightsAt } from './life.js';
+import { powerBalance } from '../rules/base.js';
 import { clamp, damp } from './util.js';
 import { weatherMood } from './weather.js';
+
+const WARM = '255,206,120';
+const RED = '255,90,70';
+
+/**
+ * Физические лампы изометрических спрайтов E0 (найдены по кадрам iso/<key>.png): [доля ширины, доля высоты от верха,
+ * радиус свечения px карты, красная мигалка]. Окна светятся тёплым изнутри. Без лампы на спрайте постройка ночью тёмная.
+ */
+export const ISO_LAMPS = {
+  beacons: [[0.5, 0.18, 9, true]],
+  gantry: [[0.55, 0.28, 16], [0.55, 0.49, 16], [0.83, 0.02, 8, true]],
+  service: [[0.24, 0.47, 18], [0.74, 0.47, 18]],
+  rescue: [[0.07, 0.6, 14], [0.92, 0.6, 14]],
+  recovery: [[0.15, 0.55, 12]],
+  control: [[0.25, 0.6, 18], [0.76, 0.6, 18]],
+  radar: [[0.51, 0.73, 8]],
+  factory: [[0.49, 0.39, 18], [0.16, 0.58, 12], [0.84, 0.58, 12]],
+  logistics: [[0.5, 0.5, 18], [0.29, 0.24, 12], [0.66, 0.24, 12]],
+};
 
 const pair = (v) => Array.isArray(v) && v.length === 2 && v.every(Number.isFinite);
 const positivePair = (v) => pair(v) && v.every((n) => n > 0);
@@ -48,12 +68,42 @@ export function isoDrawItems(layout, owned, assets) {
   return items.sort((a, b) => a.y - b.y);
 }
 
+/**
+ * Лампы построек ISO_LAMPS: тёплые горят ровно, красные мигалки мигают; маяки слабеют при нехватке энергии.
+ * Недостроенная постройка (reveal(key) < 1) не светится.
+ */
+export function drawLamps(ctx, mv, layout, owned, profile, time, strength, reveal = () => 1) {
+  let drawn = 0;
+  for (const [key, lamps] of Object.entries(ISO_LAMPS)) {
+    const b = layout.buildings[key];
+    if (!b || !(owned[key] > 0) || reveal(key) < 1) continue;
+    const power = key === 'beacons' ? powerBalance(profile).ratio : 1;
+    const anchors = [b.anchor, ...(Array.isArray(b.anchors) ? b.anchors.slice(1).filter(pair) : [])];
+    anchors.forEach(([ax, ay], n) => {
+      for (const [fx, fy, radius, red] of lamps) {
+        const on = !red || Math.floor(time * 1.4 + n * 0.5 + key.length * 0.37) % 2 === 0;
+        const x = mv.sx(ax - b.size[0] / 2 + fx * b.size[0]);
+        const y = mv.sy(ay - b.size[1] + fy * b.size[1]);
+        drawGlowScreen(ctx, x, y, radius * mv.s, red ? RED : WARM, strength * (on ? 0.9 : 0.25) * power);
+        drawn++;
+      }
+    });
+  }
+  return drawn;
+}
+
 export function createIsoHub(painter, shared, layout) {
   const mv = createMapView();
   const rocketView = createMapView();
   const pose = createRocketPose();
   const rects = [];
   const clips = new Map();
+  // Эффекты стройки и праздника считаются в единицах ракеты (как в прежнем хабе): 1 ед. = rocketScale px карты.
+  const fx = createHubFx();
+  const fxView = createMapView();
+  const skyView = { left: 0, right: 0, top: 0, bottom: 0 };
+  const unit = layout.pad.rocketScale;
+  const lastReveal = new Map();
   const mood = {};
   const overlay = {};
   const [width, height] = layout.size;
@@ -90,15 +140,31 @@ export function createIsoHub(painter, shared, layout) {
     }
   }
 
+  /** Все места постройки на карте (пара маяков — два якоря). */
+  function anchorsOf(b) {
+    return [b.anchor, ...(Array.isArray(b.anchors) ? b.anchors.slice(1).filter(pair) : [])];
+  }
+
+  /** Рамки постройки для пыли и искр стройки, в единицах эффектов (y — низ спрайта). */
+  function buildBoxes(key) {
+    const b = layout.buildings[key];
+    if (!b) return null;
+    return anchorsOf(b).map(([x, y]) => ({ x: x / unit, y: y / unit, w: b.size[0] * 0.9 / unit, h: b.size[1] / unit }));
+  }
+
   const hub = {
     mode: () => 'iso',
     buildDuration: BUILD_DURATION,
-    get animating() { return clips.size > 0; },
+    get animating() { return clips.size > 0 || fx.active; },
     get selected() { return state.selected; },
     get view() { return { zoom: state.zoom, cx: state.cx, cy: state.cy, scale: scale() }; },
     setHints() {}, // Для объектов-входов пока нет изометрической раскладки.
-    playEra() {},
-    playBuild(key) { startClip(key); },
+    /** Праздник новой эпохи: фейерверк над видимой частью карты и вспышка всех ламп. */
+    playEra() { fx.playEra(); },
+    /** Стройка: здание вырастает из лесов с пылью и искрами; клип ON — после того, как оно достроено. */
+    playBuild(key) {
+      if (layout.buildings[key]) { fx.playBuild(key); lastReveal.set(key, 0); } else startClip(key);
+    },
     setDaylight(value) { state.daylight = value == null ? null : clamp(value, 0, 1); },
     setSelected(key) {
       if (key && key !== state.selected) startClip(key);
@@ -206,6 +272,17 @@ export function createIsoHub(painter, shared, layout) {
       const reduce = !!params.settings?.reduceMotion;
       const owned = profile?.buildings || {};
       const era = clamp(profile?.era | 0, 0, 5);
+      fxView.set(mv.ox, mv.oy, mv.s * unit, state.devW, state.devH);
+      // залпы фейерверка — ниже верхней панели интерфейса
+      skyView.left = fxView.left;
+      skyView.right = fxView.right;
+      skyView.bottom = fxView.bottom;
+      skyView.top = fxView.top + (fxView.bottom - fxView.top) * 0.12;
+      fx.update(dt, reduce, buildBoxes, skyView);
+      for (const [key, before] of lastReveal) {
+        const reveal = fx.buildState(key, reduce)?.reveal ?? 1;
+        if (before < 1 && reveal >= 1) { startClip(key); lastReveal.delete(key); } else lastReveal.set(key, reveal);
+      }
       rects.length = 0;
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -243,24 +320,46 @@ export function createIsoHub(painter, shared, layout) {
               if (i > 0 && painter.assets.has(`${name}_on${i}`)) name += `_on${i}`;
             }
           }
-          painter.sprite(ctx, mv, name, ...b.anchor, { w: b.size[0], h: b.size[1], ax: 0.5, ay: 1, smooth: true });
-          addRect(key, ...b.anchor, ...b.size);
+          const build = fx.buildState(key, reduce);
           // повторы того же объекта (пара маяков по сторонам стола): anchors[1..]
-          if (Array.isArray(b.anchors)) {
-            for (const extra of b.anchors.slice(1)) {
-              if (!pair(extra)) continue;
-              painter.sprite(ctx, mv, name, ...extra, { w: b.size[0], h: b.size[1], ax: 0.5, ay: 1, smooth: true });
-              addRect(key, ...extra, ...b.size);
+          for (const [x, y] of anchorsOf(b)) {
+            if (build && build.reveal < 1) {
+              // стройка: здание вырастает снизу вверх — видна только нижняя часть спрайта
+              ctx.save();
+              ctx.beginPath();
+              const top = mv.sy(y - b.size[1] * build.reveal);
+              ctx.rect(mv.sx(x - b.size[0]), top, mv.sx(x + b.size[0]) - mv.sx(x - b.size[0]), mv.sy(y) + 8 - top);
+              ctx.clip();
+              painter.sprite(ctx, mv, name, x, y, { w: b.size[0], h: b.size[1], ax: 0.5, ay: 1, smooth: true });
+              ctx.restore();
+            } else {
+              painter.sprite(ctx, mv, name, x, y, { w: b.size[0], h: b.size[1], ax: 0.5, ay: 1, smooth: true });
             }
+            if (build) {
+              drawScaffold(ctx, fxView, { x: x / unit, y: y / unit, w: b.size[0] * 0.9 / unit, h: b.size[1] / unit },
+                build.reveal, build.scaffold, time);
+            }
+            addRect(key, x, y, ...b.size);
           }
         }
       }
-      dayOverlay(params.daylight ?? state.daylight ?? daylightAt(time), overlay);
+      fx.draw(ctx, fxView, 0);
+      const daylight = params.daylight ?? state.daylight ?? daylightAt(time);
+      dayOverlay(daylight, overlay);
       if (overlay.a > 0.01) {
         ctx.fillStyle = `rgba(${overlay.r},${overlay.g},${overlay.b},${overlay.a})`;
         ctx.fillRect(0, 0, state.devW, state.devH);
       }
-      drawHeadlights(ctx, mv, time, count, 1 - (params.daylight ?? state.daylight ?? daylightAt(time)), routes);
+      // ночью и в праздник эпохи загораются лампы построек (аддитивно поверх затемнения)
+      const lightStrength = Math.max(lightsAt(daylight), fx.eraPulse * 0.9);
+      if (lightStrength > 0.03) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        drawLamps(ctx, mv, layout, owned, profile, time, lightStrength, (key) => fx.buildState(key, reduce)?.reveal ?? 1);
+        ctx.restore();
+      }
+      drawHeadlights(ctx, mv, time, count, 1 - daylight, routes);
+      fx.draw(ctx, fxView, 1);
       const selected = rects.find((r) => r.key === state.selected);
       if (selected) {
         ctx.strokeStyle = '#efc263';
