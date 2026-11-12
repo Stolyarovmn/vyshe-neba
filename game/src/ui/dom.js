@@ -18,6 +18,26 @@ export function downloadText(filename, text) {
   }
 }
 
+/**
+ * Сохранить текстовый файл. В просмотрщике артефактов Claude обычная ссылка-скачивание не работает: там файл
+ * отдаётся через его возможность downloads (зритель подтверждает сохранение). Вне просмотрщика — ссылкой.
+ */
+export async function saveTextFile(filename, text) {
+  const host = typeof window !== 'undefined' ? window.claude : null;
+  if (host && typeof host.use === 'function') {
+    try {
+      const downloads = await host.use('downloads');
+      if (downloads) {
+        await downloads.save({ filename, data: text });
+        return true;
+      }
+    } catch (err) {
+      if (err && err.code === 'declined') return false;
+    }
+  }
+  return downloadText(filename, text);
+}
+
 export async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
