@@ -22,6 +22,16 @@ for key, p in pts.items():
     extra = [v for k, v in pts.items() if k.startswith(key + '_')]
     if extra:
         buildings[key]['anchors'] = [p] + extra
+# Объекты-входы базы (2026-11-12, спрайты iso/entry_<ключ>.png): места выбраны на карте изометрии вручную, низ по центру
+# в px карты — ангар в конце бетонного съезда между сервисом и спасателями, памятник и доска по краям площадки у стола,
+# лавка у дороги южнее пульта. При перерендере острова под другим углом их нужно переставить заново.
+ENTRIES = {'workshop': [767, 300], 'board': [490, 384], 'shop': [1405, 372], 'monument': [372, 386]}
+entries = {}
+for key, p in ENTRIES.items():
+    f = iso_dir / f'entry_{key}.png'
+    if f.exists():
+        w, h = Image.open(f).size
+        entries[key] = {'anchor': p, 'size': [w, h]}
 layout = {
     'size': proj['size'],
     'elev': proj['elev'],
@@ -30,6 +40,7 @@ layout = {
     # на узком — стол и ближние поляны крупно (portraitZoom 2.2, как прежний хаб)
     'camera': {'home': [pts['pad'][0] + 330, pts['pad'][1] - 20], 'minZoom': 1.3, 'portraitZoom': 2.2, 'maxZoom': 7},
     'buildings': buildings,
+    'entries': entries,
 }
 out = root / 'game/assets/shared/island/base-iso.json'
 json.dump(layout, open(out, 'w', encoding='utf-8'), indent=1, ensure_ascii=False)
