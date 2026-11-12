@@ -128,13 +128,17 @@ export const PROCEDURAL_BUILDINGS = ['logistics', 'radar', 'energy', 'observatio
  */
 export const E0_BUILDING_SIZES = {
   // Срез HD-пикселя: PNG запечены 1:1 с пикселем острова (размер PNG = e0.size), палитра острова, альфа 0/255.
-  beacons: [319, 644], gantry: [122, 70], deluge: [104, 104], service: [114, 99], rescue: [80, 102], fuel: [68, 45],
-  logistics: [123, 50], radar: [72, 78], energy: [89, 62], observation: [59, 60], recovery: [106, 44],
+  // 2026-11-11: постройки перерисованы для камеры полёта (tools/hd_pixel/bake_top.py); ширина = ширине iso-спрайта той же постройки.
+  beacons: [319, 644], gantry: [90, 208], deluge: [100, 180], service: [110, 140], rescue: [110, 155], fuel: [110, 108],
+  logistics: [120, 150], radar: [70, 107], energy: [95, 91], observation: [60, 90], recovery: [110, 110],
 };
 /**
- * ON-клипы построек E0 (art/gen/placeables/base/<asset>/animation.json): кадр 0 — обычный спрайт, кадры 1..N-1 — файлы
- * base/anim/<ключ>_on<i>.png того же размера и с той же привязкой. sequence — порядок кадров за один показ, fps — частота.
- * Клип играет один раз по событию хаба (завершение стройки, нажатие на постройку) и не зацикливается; при «меньше движения» не играет.
+ * ON-клипы построек E0: кадр 0 — обычный спрайт, кадры 1..N-1 того же размера и с той же привязкой.
+ * sequence — порядок кадров за один показ, fps — частота. Клип играет один раз по событию хаба (завершение стройки,
+ * нажатие на постройку) и не зацикливается; при «меньше движения» не играет.
+ * Кадры есть только у изометрии (iso/anim/<ключ>_on<i>.png, необязательные). Кадры вида сверху (base/anim/) сняты
+ * 2026-11-11 вместе с перерисовкой построек для камеры полёта: к новым спрайтам они не подходят; без кадров
+ * рисуется статичный спрайт (drawBuilding берёт базовое имя, если кадра нет).
  */
 export const E0_BUILDING_CLIPS = {
   control: { frames: 4, fps: 8, sequence: [0, 1, 2, 3, 3, 3, 2, 1, 0] },
@@ -248,14 +252,6 @@ function buildAssetFiles() {
   return files;
 }
 
-function buildClipFrameFiles() {
-  const files = {};
-  for (const [key, clip] of Object.entries(E0_BUILDING_CLIPS)) {
-    for (let i = 1; i < clip.frames; i++) files[buildingClipFrameName(key, i)] = `${eraFolder(0)}base/anim/${key}_on${i}.png`;
-  }
-  return files;
-}
-
 export const ASSET_FILES = {
   ...buildAssetFiles(),
   island_base_iso: { file: `${SHARED}island/base-iso.png`, optional: true },
@@ -295,7 +291,6 @@ export const ASSET_FILES = {
   feeder_pole_1978: `${eraFolder(0)}base/feeder-pole.png`,
   entry_shop_1978: `${eraFolder(0)}base/entry-shop.png`,
   entry_board_1978: `${eraFolder(0)}base/entry-contract-board.png`,
-  ...buildClipFrameFiles(),
   trench_plate_h_1978: `${eraFolder(0)}base/trench-plate-h.png`,
   trench_plate_v_1978: `${eraFolder(0)}base/trench-plate-v.png`,
   trench_plate_corner_1978: `${eraFolder(0)}base/trench-plate-corner.png`,
@@ -461,55 +456,55 @@ export const BUILDING_ANCHORS = {
   },
   gantry: {
     zone: 'launch_core', anchors: [[484, 267]], size: [125, 190], footprint: [108, 32],
-    e0: { anchors: [[458, 330]], size: [122, 70], footprint: [123, 66] },
+    e0: { anchors: [[458, 330]], size: [90, 208], footprint: [90, 66] },
   },
   deluge: {
     zone: 'launch_core', anchors: [[526, 528]], size: [122, 150], footprint: [105, 30],
-    e0: { anchors: [[542, 461]], size: [104, 104], footprint: [104, 58] },
+    e0: { anchors: [[542, 461]], size: [100, 180], footprint: [100, 58] },
   },
   service: {
     zone: 'service_central', anchors: [[660, 451]], size: [140, 96], footprint: [120, 28],
-    e0: { anchors: [[623, 381]], size: [114, 99], footprint: [109, 50] },
+    e0: { anchors: [[623, 381]], size: [110, 140], footprint: [109, 50] },
   },
   rescue: {
     zone: 'service_central', anchors: [[740, 340]], size: [139, 84], footprint: [120, 26],
-    e0: { anchors: [[830, 501]], size: [80, 102], footprint: [76, 90] },
+    e0: { anchors: [[830, 501]], size: [110, 155], footprint: [76, 90] },
   },
   fuel: {
     zone: 'fuel_east', anchors: [[870, 470]], size: [160, 82], footprint: [138, 26],
-    e0: { anchors: [[870, 470]], size: [68, 45], footprint: [69, 33] },
+    e0: { anchors: [[960, 457]], size: [110, 108], footprint: [69, 33] },
   },
   logistics: {
     zone: 'logistics_east', anchors: [[1200, 470]], size: [141, 125], footprint: [121, 30],
-    e0: { anchors: [[1200, 470]], size: [123, 50], footprint: [123, 50] },
+    e0: { anchors: [[1200, 470]], size: [120, 150], footprint: [120, 50] },
   },
   factory: {
     zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34],
-    e0: { anchors: [[920, 255]], size: [175, 128], footprint: [170, 108] },
+    e0: { anchors: [[920, 255]], size: [175, 166], footprint: [170, 108] },
   },
   weather: {
     zone: 'command_north', anchors: [[1000, 350]], size: [140, 171], footprint: [100, 28],
-    e0: { anchors: [[1060, 280]], size: [64, 67], footprint: [64, 36], smooth: false },
+    e0: { anchors: [[1060, 280]], size: [60, 82], footprint: [60, 36], smooth: false },
   },
   control: {
     zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34],
-    e0: { anchors: [[1320, 250]], size: [125, 104], footprint: [120, 84] },
+    e0: { anchors: [[1320, 250]], size: [120, 141], footprint: [120, 84] },
   },
   radar: {
     zone: 'command_north', anchors: [[798, 174]], size: [150, 88], footprint: [92, 24],
-    e0: { anchors: [[830, 265]], size: [72, 78], footprint: [72, 40], smooth: false },
+    e0: { anchors: [[830, 265]], size: [70, 107], footprint: [70, 40], smooth: false },
   },
   energy: {
     zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30],
-    e0: { anchors: [[1535, 403]], size: [89, 62], footprint: [90, 50] },
+    e0: { anchors: [[1615, 376]], size: [95, 91], footprint: [90, 50] },
   },
   observation: {
     zone: 'perimeter_east', anchors: [[1378, 378]], size: [138, 150], footprint: [119, 30],
-    e0: { anchors: [[1420, 273]], size: [59, 60], footprint: [58, 55] },
+    e0: { anchors: [[1420, 273]], size: [60, 90], footprint: [58, 55] },
   },
   recovery: {
     zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28],
-    e0: { anchors: [[1505, 440]], size: [106, 44], footprint: [107, 44] },
+    e0: { anchors: [[1485, 463]], size: [110, 110], footprint: [107, 44] },
   },
 };
 

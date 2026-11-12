@@ -54,14 +54,21 @@ for (const [key, sizes] of Object.entries(ERA_SPRITE_SIZES)) {
   const file = worldSpriteFile(key === 'pad_moon' || key === 'pad_mars' ? `${key}_early` : name);
   await compare('ERA_SPRITE_SIZES[0]', name, file, sizes[0]);
 }
-const animDir = `${eraFolder(0)}base/anim/`;
-const frameFiles = new Set((await readdir(resolve(root, animDir))).filter((name) => /^[a-z]+_on\d+\.png$/.test(name)));
-for (const [key, clip] of Object.entries(E0_BUILDING_CLIPS)) for (let i = 1; i < clip.frames; i++) frameFiles.add(`${key}_on${i}.png`);
-for (const name of [...frameFiles].sort()) {
-  counts.clips++;
+// ON-кадры есть только у изометрии (iso/anim/, необязательные); кадры вида сверху сняты 2026-11-11.
+// Сверяются только существующие кадры: каждый обязан совпадать по размеру с iso/<ключ>.png.
+const animDir = `${eraFolder(0)}iso/anim/`;
+let frameFiles = [];
+try {
+  frameFiles = (await readdir(resolve(root, animDir))).filter((name) => /^[a-z]+_on\d+\.png$/.test(name));
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
+for (const name of frameFiles.sort()) {
   const key = name.split('_on')[0];
+  if (!E0_BUILDING_CLIPS[key]) { rows.push(['ON-кадр', name, animDir + name, 'клип в E0_BUILDING_CLIPS', 'нет клипа']); continue; }
+  counts.clips++;
   let base;
-  try { base = await pngSize(`${eraFolder(0)}base/${key}.png`); } catch { /* ошибка будет в таблице */ }
+  try { base = await pngSize(`${eraFolder(0)}iso/${key}.png`); } catch { /* ошибка будет в таблице */ }
   await compare('ON-кадр', name, animDir + name, base);
 }
 const stacks = [];
