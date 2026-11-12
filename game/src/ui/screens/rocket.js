@@ -1,5 +1,7 @@
-// Мастерская: интерьер эпохи, ракета на подъёмнике по центру, станции вокруг. Девять модулей — физические узлы-таблички
-// у своих частей ракеты; тап по узлу открывает щиток с уровнем, «было → станет», ценой и причиной блокировки.
+// Мастерская: интерьер эпохи и ракета на подъёмнике по центру. Девять модулей — физические узлы-таблички у своих частей
+// ракеты; тап по узлу открывает щиток с уровнем, «было → станет», ценой и причиной блокировки.
+// Станции мастерской (стенд двигателя, подъёмник, диагностика корпуса) убраны 2026-11-12 по решению владельца: они висели
+// поверх нарисованного фона без опоры, а их нажатия дублировали значки модулей на ракете.
 
 import { t } from '../../i18n/index.js';
 import { rocketLayout } from '../layout.js';
@@ -8,7 +10,6 @@ import { clamp } from '../format.js';
 import { drawChrome, infoCallout, isFundsReason, partIcon, partShort, deltaRows, PART_KEYS } from './common.js';
 
 const STAND = { ramp: 0.5, hold: 1.4, fall: 0.7 };
-const STATION_MODULES = ['engine', 'hull', 'avionics'];
 
 function state(app) {
   return ((app.ui ||= {}).rocket ||= { selected: null, stand: -1, flash: 0, lastLevels: null });
@@ -73,16 +74,7 @@ export default {
     }
     app.standFrame = st.stand >= 0 ? { throttle: thr } : null;
 
-    const stations = drawScene(app, kit, L, G, st, thr);
-    if (stations) {
-      for (const id of STATION_MODULES) {
-        const box = stations.modules?.[id];
-        if (box && box.source === 'station') {
-          kit.hit(`station-${id}`, box, {});
-          if (kit.clicked === `station-${id}`) st.selected = st.selected === id ? null : id;
-        }
-      }
-    }
+    drawScene(app, kit, L, G, st, thr);
     drawNodes(app, kit, L, G, st);
 
     const standOn = st.stand >= 0;
@@ -102,23 +94,15 @@ export default {
 
 // ---------- сцена ----------
 
-/** Станции эпохи, ракета настоящими спрайтами (render/rocket-view.js), подсветка выбранного модуля, вспышка улучшения. */
+/** Ракета настоящими спрайтами (render/rocket-view.js), подсветка выбранного модуля, вспышка улучшения. */
 function drawScene(app, kit, L, G, st, thr) {
   const ctx = kit.S.ctx;
   const c = kit.c;
   const p = app.profile;
   const r = G.rocket;
-  let stations = null;
-  // станции и сборка — арт рендера (свечение пламени и т. п.), а не слой интерфейса: тест-страж их не считает
+  // сборка — арт рендера (свечение пламени и т. п.), а не слой интерфейса: тест-страж её не считает
   app.uiDrawing = false;
   try {
-    if (app.backdropOn && app.renderer.workshop?.drawStations) {
-      try {
-        stations = app.renderer.workshop.drawStations(ctx, { era: p.era, rect: G.body, time: app.time, rocket: r });
-      } catch (err) {
-        console.warn('[rocket] drawStations:', err);
-      }
-    }
     const shake = thr > 0 && !app.settings.reduceMotion ? Math.sin(app.time * 90) * thr * 1.2 : 0;
     drawAssembly(ctx, app.renderer.painter, {
       era: p.era,
@@ -160,7 +144,6 @@ function drawScene(app, kit, L, G, st, thr) {
     ctx.fillRect(r.x - 4, r.y, r.w + 8, r.h);
     ctx.restore();
   }
-  return stations;
 }
 
 // ---------- узлы-таблички ----------
