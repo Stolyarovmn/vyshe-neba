@@ -15,10 +15,14 @@
 | `bake_icons.py` | иконки 96×96 (монета 64×64) из ряда ячеек | `python bake_icons.py <root> sheet.png <outdir> <coin.png> key1,key2,…` |
 | `bake_items.py` | парашют, бонусы и иконки расходников из одного листа | `python bake_items.py <root> sheet.png` |
 | `bake_map.py` | радар и метеостанция для карты полёта | `python bake_map.py <root> sheet.png` |
-| `bake_buildings.py` | пересборка старых зданий 73° крупнее (×1,6–3) 1:1 с пикселем острова, с ON-кадрами; печатает новые `e0.size/footprint` | `python bake_buildings.py <root> <ref_root>` |
+| `bake_top.py` | постройки E0 для карты полёта из листа генератора: ширина = ширине `iso/<key>.png`, палитра острова; печатает `e0.size` для `manifest.js` (так сделаны все 13 построек 2026-11-11) | `python bake_top.py <root> sheet.png gantry,deluge,…` |
+| `bake_buildings.py` | устарел 2026-11-11 (заменён `bake_top.py`): пересборка старых зданий 73° крупнее 1:1 с пикселем острова, с ON-кадрами | `python bake_buildings.py <root> <ref_root>` |
 | `heightmap.py` | карта высот острова из `start-island.png` (море, пляж, плато, скалы) | `python heightmap.py start-island.png <outdir>` |
 | `iso_render.py` | Blender: рельеф + текстура острова, ортокамера под углом ELEV, прозрачное поле; проекция якорей → `layout_proj.json` | `blender -b -P iso_render.py -- island_alpha.png height.npy anchors.json <outdir> 40` |
 | `write_layout.py` | `base-iso.json` из проекции якорей и размеров `iso/<key>.png`; ручные поправки — `OVERRIDES` | `python write_layout.py <root> layout_proj.json` |
 | `composite.py` | примерка: остров изометрии + постройки + ракета-стек по `base-iso.json` | `python composite.py <root> out.png` |
+| `bake_tilt.py` | кадры подъёма камеры база → полёт: рендеры `iso_render.py` под 52°, 64°, 73,44° → `shared/island/tilt-*.webp` + `tilt.json` (стол и якоря каждого кадра) | `python bake_tilt.py <root> <dir52> <dir64> <dir73>` |
 
-Порядок для новой постройки E0: запрос по `art/docs/templates/SPRITE_REQUEST.md` в двух камерах → `bake_seq.py` в `base/` (полёт) и `iso/` (база) → иконка через `bake_icons.py` → `write_layout.py` → `composite.py` → размеры в `manifest.js` → сборка и скриншоты.
+Порядок для новой постройки E0: запрос по `art/docs/templates/SPRITE_REQUEST.md` в двух камерах → `bake_seq.py` в `iso/` (база) → `bake_top.py` в `base/` (полёт, ширина как в `iso/`) → иконка через `bake_icons.py` → `write_layout.py` → `composite.py` → размеры в `manifest.js` → сборка и скриншоты.
+
+Якоря для Blender (`anchors.json` для `iso_render.py`) берутся из `BUILDING_ANCHORS[key].e0.anchors` в `manifest.js`. С 2026-11-11 поправки `OVERRIDES` для fuel, energy, recovery перенесены в сам манифест (высокие спрайты карты полёта иначе закрывали друг друга); при следующем рендере изометрии и кадров подъёма эти три поправки в `write_layout.py` не нужны, а `tilt.json` до перерендера поправлен вручную тем же сдвигом.
