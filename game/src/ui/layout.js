@@ -405,11 +405,13 @@ export function launchLayout(L) {
 /**
  * Лист итогов. opts.inset {x, y} — добавочные поля носителя (перфорация, рамка экрана эпохи); opts.height — нужная высота листа
  * по содержимому: лист ниже максимума не растягивается и стоит чуть выше середины, а не тянется на весь экран.
+ * Кнопки «Ещё раз» / «На базу» — под листом, а не на нём: на бумаге и на экране нет нарисованных кнопок (2026-11-12).
  */
 export function resultsLayout(L, opts = {}) {
   const a = L.area;
   const top = a.y + L.gap * 2 + headerHeight(L);
-  const area = rect(a.x + L.gap, top, a.w - L.gap * 2, bottom(a) - L.gap - top);
+  const btnH = L.portrait || L.h >= 460 ? L.touch(56) : MIN_TOUCH;
+  const area = rect(a.x + L.gap, top, a.w - L.gap * 2, bottom(a) - L.gap * 2 - btnH - L.gap - top);
   const full = centerCard(L, area, 600, 780);
   let card = full;
   if (opts.height && opts.height < full.h) {
@@ -418,9 +420,9 @@ export function resultsLayout(L, opts = {}) {
   }
   const px = L.pad + (opts.inset?.x || 0);
   const py = L.pad + (opts.inset?.y || 0);
-  const btnH = L.portrait || L.h >= 460 ? L.touch(56) : MIN_TOUCH;
-  const buttons = rect(card.x + px, bottom(card) - py - btnH, card.w - px * 2, btnH);
-  return { card, buttons, content: rect(card.x + px, card.y + py, card.w - px * 2, buttons.y - L.gap - card.y - py), pad: { x: px, y: py } };
+  const bw = Math.min(card.w, R(560 * L.ui));
+  const buttons = rect(card.x + (card.w - bw) / 2, bottom(card) + L.gap * 1.5, bw, btnH);
+  return { card, buttons, content: rect(card.x + px, card.y + py, card.w - px * 2, bottom(card) - py - card.y - py), pad: { x: px, y: py } };
 }
 
 // --- HUD полёта ---
@@ -489,7 +491,8 @@ export function hudLayout(L, opts = {}) {
     instruments.vspeed = rect(left, bottom(instruments.alt) + g * 0.5, R(140 * iu), R(34 * iu));
     instruments.coins = rect(pause.x - g - R(104 * iu), a.y + g, R(104 * iu), rowH);
     const barW = R(18 * iu);
-    const barsTop = bottom(instruments.vspeed) + g * 2;
+    // над шкалами — табличка со значком (≈ 22 px): шкалы начинаются ниже, чтобы табличка не наезжала на вариометр
+    const barsTop = bottom(instruments.vspeed) + g + R(30 * iu);
     const barsH = Math.max(R(60 * iu), disc.cy - slotR - g * 2 - barsTop);
     instruments.fuel = rect(left, barsTop, barW, barsH);
     instruments.hull = rect(left + barW + g * 2, barsTop, barW, barsH);
@@ -514,7 +517,7 @@ export function hudLayout(L, opts = {}) {
   // значок активного магнита — слева от радара (и в портрете, и в ландшафте); показывается, только пока магнит действует
   const msize = R(30 * iu);
   const magnet = rect(radar.cx - radar.r - g - msize, radar.cy - msize / 2, msize, msize);
-  return { instruments, buttons, disc, lever, steer, magnet, strip, radar, hint, instrumentArea, instrumentShare: instrumentArea / (L.w * L.h) };
+  return { instruments, buttons, disc, lever, steer, magnet, strip, radar, hint, instrumentArea, instrumentShare: instrumentArea / (L.w * L.h), mirrored: !!opts.mirror };
 }
 
 /** Все интерактивные прямоугольники HUD (для проверки размера целей нажатия). Наклон жестом — весь экран, отдельной цели нет. */

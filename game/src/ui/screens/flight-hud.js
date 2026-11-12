@@ -120,24 +120,39 @@ function drawInstruments(app, kit, L, s, f, hud) {
   const fuel01 = f.maxFuel > 0 ? f.fuel / f.maxFuel : 0;
   const hull01 = f.maxHp > 0 ? f.hp / f.maxHp : 0;
   const st = f.stages?.length > 1 ? `${f.stageIndex + 1}/${f.stages.length}` : '';
+  // E0: над шкалой — оливковая табличка с гравированным значком (как подписи на пульте); ниже порога на ней мигает лампа
+  const plated = kit.S.skin.instr === 'analog';
+  const cc = kit.cell();
+  const label = (cx, cy, size, iconName, low, color) => {
+    if (plated) {
+      const pw = Math.round(size * 1.35);
+      const ph = Math.round(size * 1.15);
+      kit.nine('plateTag', Math.round(cx - pw / 2), Math.round(cy - ph / 2), pw, ph);
+      if (low) kit.lamp(cx, cy, Math.round(size * 0.8), c.red, true, true);
+      else kit.icon(`vec:${iconName}`, cx, cy, Math.round(size * 0.78), c.ink);
+      return;
+    }
+    if (low) kit.lamp(cx, cy, Math.round(size * 0.9), c.red, true, true);
+    else kit.icon(iconName, cx, cy, size, color);
+  };
   const bar = (r, v, color, iconName, caption, lowAt) => {
     const vertical = r.h > r.w;
     const low = v <= lowAt;
     if (vertical) {
-      inst.gauge(kit, r, v, color, lowAt);
-      const iy = r.y - Math.round(13 * u);
-      if (low) kit.lamp(r.x + r.w / 2, iy, Math.round(16 * u), c.red, true, true);
-      else kit.icon(iconName, r.x + r.w / 2, iy, Math.round(18 * u), color);
-      if (caption) kit.drawText(caption, r.x, r.y + r.h + Math.round(10 * u), { size: kit.fs(10), color: c.textDim });
+      // подпись ступени (1/3) — под шкалой, внутри отведённой полосы: шкала укорачивается, а не наезжает на указатель крена
+      const capH = caption ? Math.round(kit.fs(10) * 1.5) : 0;
+      inst.gauge(kit, { x: r.x, y: r.y, w: r.w, h: r.h - capH }, v, color, lowAt);
+      const size = Math.round(18 * u);
+      label(r.x + r.w / 2, r.y - Math.round(size * 0.6) - cc * 2, size, iconName, low, color);
+      if (caption) kit.drawText(caption, r.x + r.w / 2, r.y + r.h - capH / 2, { size: kit.fs(10), color: c.textDim, align: 'center', shadow: true });
     } else {
-      const shift = Math.round(r.h * 1.5);
+      const shift = Math.round(r.h * 1.6);
       inst.gauge(kit, { x: r.x + shift, y: r.y, w: r.w - shift, h: r.h }, v, color, lowAt);
-      if (low) kit.lamp(r.x + shift / 2, r.y + r.h / 2, Math.round(r.h * 0.9), c.red, true, true);
-      else kit.icon(iconName, r.x + shift / 2, r.y + r.h / 2, Math.round(r.h * 1.1), color);
+      label(r.x + shift / 2 - cc, r.y + r.h / 2, Math.round(r.h * 1.05), iconName, low, color);
     }
   };
   bar(I.fuel, fuel01, c.green, 'fuel', st, 0.2);
-  bar(I.hull, hull01, c.cyan, 'shield', '', 0.3);
+  bar(I.hull, hull01, c.cyan, 'hull', '', 0.3);
 }
 
 /** Горизонтальная лента от нуля: вправо — набор высоты, влево — спуск; белая риска — допуск посадки. */
@@ -201,8 +216,11 @@ function drawStrip(app, kit, L, f, hud, radar) {
     const tw = Math.min(kit.text.measure(name, size), r.x - L.gap * 2 - L.area.x);
     let ly = Math.max(r.y + 8, pos(next.from) - 8);
     if (radar) {
-      const hitsRadar = ly > radar.cy - radar.r - 8 && ly < radar.cy + radar.r + 8 && r.x - L.gap - tw < radar.cx + radar.r + 4;
-      if (hitsRadar) ly = radar.cy + radar.r + 14;
+      // у радара эпох ЭЛТ есть корпус шире круга (рамка экрана и крашеная сталь): обходим весь корпус, а не только круг
+      const body = radar.r + cc * 6;
+      const half = size * 0.8;
+      const hitsRadar = ly + half > radar.cy - body && ly - half < radar.cy + body && r.x - L.gap - cc * 4 - tw < radar.cx + body;
+      if (hitsRadar) ly = radar.cy + body + half + L.gap * 0.5;
     }
     if (ly < r.y + r.h - 4) kit.drawText(name, r.x - L.gap - cc * 4, ly, { size, color: c.textDim, align: 'right', shadow: true, maxWidth: tw });
   }
@@ -414,9 +432,32 @@ function hudButton(app, kit, L, name, r, o) {
   if (o.heat > 0.02) kit.ledBar({ x: r.x + cc * 4, y: r.y + r.h - cc * 9, w: r.w - cc * 8, h: cc * 4 }, { value: o.heat, color: o.heat > 0.8 ? c.red : c.amber, segments: 6 });
 }
 
+/**
+ * Кнопки расходников без сенсорного управления: рычага тяги и форсажа на экране нет (клавиши), поэтому парашют, канистра
+ * и ремкомплект встают одним рядом в правый нижний угол, а не висят посреди места рычага.
+ */
+export function desktopButtons(L, hud) {
+  const B = hud.buttons;
+  if (L.portrait || !B.repair) return B;
+  const a = L.area;
+  const g = L.gap;
+  const bw = B.repair.w;
+  const y = a.y + a.h - g - bw;
+  const right = (k) => a.x + a.w - g - bw - k * (bw + g);
+  const flip = !!hud.mirrored;
+  const at = (k) => (flip ? a.x + g + k * (bw + g) : right(k));
+  return {
+    ...B,
+    repair: { x: at(0), y, w: bw, h: bw },
+    canister: { x: at(1), y, w: bw, h: bw },
+    parachute: { x: at(2), y, w: bw, h: bw },
+    transfer: { x: flip ? at(0) : right(2), y: y - g - bw, w: bw * 3 + g * 2, h: bw },
+  };
+}
+
 function drawControls(app, kit, L, s, f, hud, touch) {
   const c = kit.c;
-  const B = hud.buttons;
+  const B = touch ? hud.buttons : desktopButtons(L, hud);
   const mode = app.settings.controlMode;
   const cc = kit.cell();
 
@@ -564,7 +605,8 @@ function drawLegend(app, kit, L, s, hud) {
   const capH = Math.round(22 * L.ui);
   let total = 0;
   // подсказка не должна заезжать на кнопки справа: берём столько пунктов, сколько помещается
-  const avail = (L.portrait ? L.area.w : Math.min(hud.buttons.canister?.x ?? L.area.w, hud.buttons.repair?.x ?? L.area.w, hud.buttons.parachute?.x ?? L.area.w) - L.area.x) - L.gap * 2;
+  const B = desktopButtons(L, hud);
+  const avail = (L.portrait ? L.area.w : Math.min(B.canister?.x ?? L.area.w, B.repair?.x ?? L.area.w, B.parachute?.x ?? L.area.w) - L.area.x) - L.gap * 2;
   const parts = [];
   for (const e of KEY_LEGEND) {
     const label = t(e.label);

@@ -167,15 +167,24 @@ function drawStormRain(ctx, view, cloud, wind, time) {
 /**
  * Рисует облака одного прохода: pass 0 — позади ракеты, 1 — поверх (с прозрачностью).
  * flash — вспышка молнии (0..1, weather.flash/0.08), wind — ед./с для наклона дождя.
+ * fade — общая прозрачность или функция облака → множитель прозрачности (туман над островом, flight.js).
  */
 export function drawCloudField(ctx, painter, view, clouds, pass, time, flash, wind, fade = 1) {
-  if (!clouds || !clouds.length || fade <= 0.01) return;
+  const perCloud = typeof fade === 'function' ? fade : null;
+  if (!clouds || !clouds.length || (!perCloud && fade <= 0.01)) return;
   ctx.save();
-  if (fade < 1) ctx.globalAlpha *= fade;
+  if (!perCloud && fade < 1) ctx.globalAlpha *= fade;
+  const base = ctx.globalAlpha;
   for (const cloud of clouds) {
     if (cloudPass(cloud) !== pass) continue;
+    if (perCloud) {
+      const k = perCloud(cloud);
+      if (k <= 0.01) continue;
+      ctx.globalAlpha = base * k;
+    }
     drawOne(ctx, painter, view, cloud, flash);
   }
+  ctx.globalAlpha = base;
   if (pass === 0) {
     ctx.strokeStyle = 'rgba(190,206,226,0.34)';
     ctx.lineWidth = Math.max(1, view.px * 0.9);

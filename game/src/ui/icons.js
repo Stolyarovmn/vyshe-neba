@@ -134,7 +134,7 @@ const SPRITE_OF = {
 
 // Явные item:<id> сохраняют прежний вид лавки без PNG, включая прицел магнитного импульса.
 const ITEM_FALLBACK = { chute: 'chute', repair: 'repair', canister: 'canister', magnet: 'target' };
-const fallbackName = (name) => name.startsWith('item:') ? ITEM_FALLBACK[name.slice(5)] || 'info' : name;
+const fallbackName = (name) => name.startsWith('vec:') ? name.slice(4) : name.startsWith('item:') ? ITEM_FALLBACK[name.slice(5)] || 'info' : name;
 
 // запасные векторные иконки построек, пока для них нет спрайта эпохи
 const BUILDING_FALLBACK = {
@@ -143,7 +143,9 @@ const BUILDING_FALLBACK = {
 };
 
 export const ICON_NAMES = Object.keys(ICONS);
-export const hasIcon = (name) => name in ICONS || name.startsWith('bld:') || name.startsWith('ui_') || (name.startsWith('item:') && E0_ITEM_ICON_IDS.includes(name.slice(5)));
+// vec:<имя> — всегда векторная иконка одним цветом (гравировка на табличке), даже если у эпохи есть цветной PNG
+export const hasIcon = (name) => name in ICONS || name.startsWith('bld:') || name.startsWith('ui_') || (name.startsWith('vec:') && name.slice(4) in ICONS)
+  || (name.startsWith('item:') && E0_ITEM_ICON_IDS.includes(name.slice(5)));
 
 const FIXED = { gold: '#ffd23f', cyan: '#52d8ff', red: '#f0584a', amber: '#e6a020', green: '#3aa860', w: '#f6f1e4', k: '#0b0f1a' };
 
@@ -265,7 +267,7 @@ export function createIcons() {
   }
 
   function spriteFor(name) {
-    if (!painter) return null;
+    if (!painter || name.startsWith('vec:')) return null;
     // Модули запрашиваются по id через partIcon(); расходники — по id или item:<id>.
     if (era === 0) {
       const itemId = name.startsWith('item:') ? name.slice(5) : name;

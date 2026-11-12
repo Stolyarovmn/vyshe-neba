@@ -20,6 +20,8 @@ export const E0_ITEM_ICON_IDS = SHOP.map((item) => item.id);
 //   aircraft, aerostats, orbital (спутники), pickups (монеты, топливо, ремкомплекты, магниты, кольца), environment.
 export const ASSET_ROOT = 'game/assets/';
 const SHARED = `${ASSET_ROOT}shared/`;
+/** Ракурсы подъёма камеры база → полёт (градусы над горизонтом), файлы shared/island/tilt-<угол>.webp, раскладка tilt.json. */
+export const TILT_ANGLES = [44, 48, 52, 56, 60, 64, 68, 73];
 export const eraFolder = (eraIndex) => `${ASSET_ROOT}eras/e${eraIndex}-${ERA_YEARS[eraIndex]}/`;
 
 /** Тема и файл спрайта эпохи по базовому имени: имя_ГОД -> eras/e<N>-<год>/<тема>/<файл>.png */
@@ -257,9 +259,8 @@ export const ASSET_FILES = {
   island_base_iso: { file: `${SHARED}island/base-iso.png`, optional: true },
   base_iso_layout: { file: `${SHARED}island/base-iso.json`, kind: 'json', optional: true },
   // Подъём камеры база → полёт: промежуточные ракурсы острова (tools/hd_pixel/bake_tilt.py), кадры в tilt.json.
-  island_tilt_52: { file: `${SHARED}island/tilt-52.webp`, optional: true },
-  island_tilt_64: { file: `${SHARED}island/tilt-64.webp`, optional: true },
-  island_tilt_73: { file: `${SHARED}island/tilt-73.webp`, optional: true },
+  // 8 ракурсов через 4° (2026-11-12): соседние кадры почти совпадают, растворение одного в другом не «двоит» остров.
+  ...Object.fromEntries(TILT_ANGLES.map((a) => [`island_tilt_${a}`, { file: `${SHARED}island/tilt-${a}.webp`, optional: true }])),
   island_tilt_layout: { file: `${SHARED}island/tilt.json`, kind: 'json', optional: true },
   ...Object.fromEntries(BUILDING_KEYS.map((key) => [
     `iso_${key}_1978`, { file: `${eraFolder(0)}iso/${key}.png`, optional: true },

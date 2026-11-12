@@ -188,7 +188,9 @@ test('пульт запуска, итоги, доска, лавка, настр�
     assert.ok(!overlaps(l.start, l.cons) && !overlaps(l.start, l.destArea), `${w}x${h}: ПУСК перекрывает пульт`);
     const r = resultsLayout(L);
     const rs = resultsLayout(L, { height: Math.round(r.card.h * 0.7), inset: { x: 10, y: 8 } });
-    assert.ok(rs.card.h <= r.card.h * 0.7 + 1 && inside(rs.card, L.area) && rs.buttons.h >= MIN_TOUCH && inside(rs.buttons, rs.card), `${w}x${h}: лист по высоте содержимого`);
+    // кнопки — под листом, вне его, и тоже в безопасной зоне
+    assert.ok(rs.card.h <= r.card.h * 0.7 + 1 && inside(rs.card, L.area) && rs.buttons.h >= MIN_TOUCH && !overlaps(rs.buttons, rs.card) && rs.buttons.y >= rs.card.y + rs.card.h && inside(rs.buttons, L.area), `${w}x${h}: лист по высоте содержимого`);
+    assert.ok(!overlaps(r.buttons, r.card) && inside(r.buttons, L.area), `${w}x${h}: кнопки итогов под листом`);
     const chrome = chromeLayout(L, {});
     assert.ok(r.buttons.h >= MIN_TOUCH && inside(r.card, L.area), `${w}x${h}: итоги`);
     assert.ok(r.card.y >= chrome.y + chrome.h, `${w}x${h}: бланк итогов не закрывает таблички`);

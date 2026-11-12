@@ -59,11 +59,13 @@ export default {
     const stampH = Math.round(7 * kit.text.stepFor(stampSize).css + cc * 12);
     const G0 = resultsLayout(L, { inset });
     const nameMax = G0.card.w * 0.34;
-    const nameW = Math.round(42 * U(L)) + (bodyName ? Math.min(kit.text.measure(bodyName, kit.fs(16)), nameMax) : 0);
+    // на бумажном бланке в шапке — «Отчёт о полёте № N»: если он не помещается рядом со штампом, штамп уходит на вторую строку
+    const formTitle = isPaper(M) ? t('results.form.title', { n: app.profile?.stats?.flights || 1 }) : '';
+    const nameW = Math.round(42 * U(L)) + (isPaper(M) ? kit.text.measure(formTitle, kit.fs(14)) : bodyName ? Math.min(kit.text.measure(bodyName, kit.fs(16)), nameMax) : 0);
     const stackStamp = nameW + stampW + L.gap * 2 > G0.card.w - G0.pad.x * 2;
     const rowH = Math.round((compact ? 44 : 56) * U(L));
     const hdrH = rowH + (stackStamp ? stampH + Math.round(L.gap * 0.5) : 0);
-    const need = st.contentH == null ? 0 : L.pad * 2 + inset.y * 2 + hdrH + L.gap * 2 + st.contentH + G0.buttons.h;
+    const need = st.contentH == null ? 0 : L.pad * 2 + inset.y * 2 + hdrH + L.gap * 2 + st.contentH;
     const G = resultsLayout(L, { inset, height: need });
 
     // таблички: число монет догоняет итог по мере прилёта монет
@@ -83,7 +85,12 @@ export default {
     const hx = card.x + G.pad.x;
     const hy = card.y + G.pad.y + rowH / 2;
     kit.icon(bodyId === 'moon' || bodyId === 'mars' ? bodyId : 'earth', hx + Math.round(18 * U(L)), hy, Math.round(36 * U(L)), M.ink);
-    if (bodyName) kit.drawText(bodyName, hx + Math.round(42 * U(L)), hy, { size: kit.fs(16), color: M.ink, maxWidth: nameMax });
+    if (isPaper(M)) {
+      // шапка бланка: номер отчёта и куда летали, как на печатной форме
+      const titleMax = stackStamp ? G.card.w - G.pad.x * 2 - Math.round(42 * U(L)) : nameMax;
+      kit.drawText(formTitle, hx + Math.round(42 * U(L)), hy - kit.fs(8), { size: kit.fs(14), color: M.ink, maxWidth: titleMax });
+      if (bodyName) kit.drawText(bodyName, hx + Math.round(42 * U(L)), hy + kit.fs(10), { size: kit.fs(12), color: M.dim, maxWidth: titleMax });
+    } else if (bodyName) kit.drawText(bodyName, hx + Math.round(42 * U(L)), hy, { size: kit.fs(16), color: M.ink, maxWidth: nameMax });
     const stampColor = landed ? M.good : crashed ? M.bad : M.dim;
     if (elapsed > 0.5) {
       const k = clamp((elapsed - 0.5) / 0.18, 0, 1);
@@ -103,13 +110,14 @@ export default {
     const bodyTop = card.y + G.pad.y + hdrH + L.gap;
     const body = { x: G.content.x, y: bodyTop, w: G.content.w, h: G.content.y + G.content.h - bodyTop - drop * 0 };
     const wide = !L.portrait && body.w > 520 * U(L);
+    const paper = isPaper(M);
     kit.scrollArea('results-scroll', { x: body.x, y: body.y - drop, w: body.w, h: body.h }, undefined, (top) => {
       const w = body.w - cc * 4;
-      const colW = wide ? Math.floor((w - L.gap * 2) / 2) : w;
+      const colW = wide ? Math.floor((w - L.gap * 3) / 2) : w;
       const left = { x: body.x, w: colW };
-      const right = wide ? { x: body.x + colW + L.gap * 2, w: colW } : left;
-      const y1 = drawFlightColumn(app, kit, L, left, top, res, elapsed);
-      const y2 = drawRewardsColumn(app, kit, L, right, wide ? top : y1, res, st, elapsed, dt);
+      const right = wide ? { x: body.x + colW + L.gap * 3, w: colW } : left;
+      const y1 = paper ? drawPaperFlight(app, kit, L, left, top, res, elapsed) : drawFlightColumn(app, kit, L, left, top, res, elapsed);
+      const y2 = paper ? drawPaperRewards(app, kit, L, right, wide ? top : y1 + L.gap, res, st, elapsed) : drawRewardsColumn(app, kit, L, right, wide ? top : y1, res, st, elapsed, dt);
       st.contentH = Math.max(y1, y2) - top + L.gap;
       return st.contentH;
     });
@@ -129,6 +137,185 @@ export default {
     }
   },
 };
+
+// ---------- бумажный бланк (E0 перфобумага, E1 термолента) ----------
+//
+// На бумаге нет экранов и кнопок: всё напечатано строками «название …… значение» и разделами, как в отчёте с телетайпа.
+// Числа набираются (печатаются) по очереди; переходы «что улучшить» — подчёркнутые строки, нажимаются целиком.
+
+const isPaper = (M) => M.kind === 'perf' || M.kind === 'thermal';
+
+/** Заголовок раздела: короткая строка тёмной краской и пунктир под ней. Возвращает высоту. */
+function formHeading(kit, x, y, w, text, k = 1) {
+  const M = reportOf(kit);
+  const cc = kit.cell();
+  const size = kit.fs(11);
+  const h = Math.round(size * 1.9);
+  if (k <= 0) return h;
+  kit.S.ctx.globalAlpha = k;
+  kit.drawText(text, x, y + size * 0.75, { size, color: M.dim });
+  for (let xx = 0; xx < w; xx += cc * 3) kit.rect(Math.round(x + xx), Math.round(y + size * 1.45), Math.min(cc * 2, w - xx), cc, M.dim);
+  kit.S.ctx.globalAlpha = 1;
+  return h;
+}
+
+/**
+ * Печатная строка: подпись слева, отточие, значение справа. Длинная подпись переносится, значение стоит на последней
+ * строке. o: size, color, value color, k (появление 0..1), icon. Возвращает высоту строки.
+ */
+function formRow(kit, x, y, w, label, value, o = {}) {
+  const M = reportOf(kit);
+  const cc = kit.cell();
+  const size = o.size || kit.fs(12);
+  const step = kit.text.lineStep(size, 1.3);
+  const iconW = o.icon ? Math.round(size * 1.6) : 0;
+  const vw = value ? kit.text.measure(value, size) : 0;
+  const lines = kit.text.wrap(label, Math.max(size * 4, w - iconW - vw - cc * 8), size);
+  const h = Math.max(o.minH || 0, lines.length * step + cc * 2);
+  const k = o.k ?? 1;
+  if (k <= 0) return h;
+  kit.S.ctx.globalAlpha = k;
+  const y0 = y + cc + step / 2;
+  if (o.icon) kit.icon(o.icon, x + iconW * 0.4, y0, Math.round(size * 1.25), o.iconColor || M.ink);
+  lines.forEach((ln, i) => kit.drawText(ln, x + iconW, y0 + i * step, { size, color: o.color || M.ink }));
+  if (value) {
+    const ly = y0 + (lines.length - 1) * step;
+    const lastW = kit.text.measure(lines[lines.length - 1] || '', size);
+    const dotY = Math.round(ly + kit.text.stepFor(size).css * 2.5);
+    for (let dx = x + iconW + lastW + cc * 3; dx < x + w - vw - cc * 3; dx += cc * 3) kit.rect(Math.round(dx), dotY, cc, cc, M.dim);
+    kit.drawText(value, x + w, ly, { size, color: o.valueColor || o.color || M.ink, align: 'right' });
+  }
+  kit.S.ctx.globalAlpha = 1;
+  return h;
+}
+
+/** Левая колонка бланка: полёт, причина аварии, касание, рекомендации. Возвращает нижнюю границу. */
+function drawPaperFlight(app, kit, L, col, top, res, elapsed) {
+  const M = reportOf(kit);
+  const cc = kit.cell();
+  const { result, report } = res;
+  const landed = result.outcome === 'landed';
+  const crashed = result.outcome === 'crashed';
+  const { x, w } = col;
+  let y = top;
+  const rowK = (i) => easeOutCubic(clamp((elapsed - 0.35 - i * 0.18) / 0.4, 0, 1));
+  y += formHeading(kit, x, y, w, t('results.form.flight'));
+  const alt = fmtAlt(result.maxAlt);
+  const dist = fmtAlt(result.distance);
+  const unit = (u) => t(u === 'km' ? 'unit.km' : 'unit.m');
+  const rows = [
+    [t('results.row.alt'), `${countStr(alt.value.replace(' ', ''), rowK(0))} ${unit(alt.unit)}`],
+    [t('results.row.dist'), `${countStr(dist.value.replace(' ', ''), rowK(1))} ${unit(dist.unit)}`],
+    [t('results.row.time'), fmtClock(result.time * rowK(2))],
+  ];
+  rows.forEach(([label, value], i) => { y += formRow(kit, x, y, w, label, value, { k: Math.min(1, rowK(i) * 3) }); });
+  y += L.gap * 0.5;
+  if (crashed && report.hint) {
+    y += kit.paragraph(report.hint.text, x, y, w, { size: kit.fs(12), color: M.ink, lineHeight: 1.3 }) + L.gap * 0.5;
+    if (report.hint.savedIfLanded !== undefined) y += kit.paragraph(t('results.savedIfLanded', { n: fmtInt(report.hint.savedIfLanded) }), x, y, w, { size: kit.fs(12), color: M.bad, lineHeight: 1.3 }) + L.gap * 0.5;
+  }
+  const lg = result.landing;
+  if ((crashed || landed) && lg && lg.vTol) {
+    y += formHeading(kit, x, y, w, t('results.form.touch'));
+    const deg = (r) => `${Math.round((r * 180) / Math.PI)}°`;
+    for (const [key, v, tol, vs, ts] of [['v', lg.v, lg.vTol, fmtSpeed(lg.v), fmtSpeed(lg.vTol)], ['h', lg.h, lg.hTol, fmtSpeed(lg.h), fmtSpeed(lg.hTol)], ['ang', lg.ang, lg.angTol, deg(lg.ang), deg(lg.angTol)]]) {
+      const bad = v > tol;
+      y += formRow(kit, x, y, w, t(`results.row.${key}`), t('results.row.tol', { v: vs, tol: ts }), { valueColor: bad ? M.bad : M.ink, icon: bad ? 'close' : 'check', iconColor: bad ? M.bad : M.good });
+    }
+    y += L.gap * 0.5;
+  }
+  if (crashed && report.hint) {
+    const links = [];
+    const part = report.hint.part;
+    if (part && part !== 'parachute') {
+      const name = part === 'fins' ? t('results.fins') : partShort(app, part);
+      const label = report.reason === 'lost-in-space' ? t('results.spaceFins') : t('results.upgrade', { part: name, level: report.hint.level ?? Math.min(18, res.before.parts[part] + 1) });
+      links.push({ id: 'results-goto-part', label, go: () => app.go('rocket', { select: part }, { push: true }) });
+    }
+    if (report.hint.shop === 'chute') links.push({ id: 'results-goto-shop', label: t('cons.chute'), go: () => app.go('shop', {}, { push: true }) });
+    if (report.hint.building) links.push({ id: 'results-goto-building', label: buildingShort(app, report.hint.building), go: () => app.go('base', { select: report.hint.building }, { push: true }) });
+    if (links.length) {
+      y += formHeading(kit, x, y, w, t('results.form.todo'));
+      const size = kit.fs(13);
+      const rh = Math.max(L.touch(40), Math.round(size * 2.4));
+      for (const ln of links) {
+        const r = { x, y, w, h: rh };
+        kit.hit(ln.id, r, { focusable: true });
+        const hot = kit.S.hover === ln.id;
+        if (hot) kit.S.cursor = 'pointer';
+        if (kit.S.focusVisible && kit.S.focusId === ln.id) kit.focusRing(r);
+        // строка-ссылка: стрелка и подчёркнутое название, при наведении — пометка карандашом слева
+        if (hot) kit.rect(x, y + cc * 2, cc, rh - cc * 4, M.amber);
+        kit.icon('arrow', x + size * 0.9, y + rh / 2, Math.round(size * 1.2), M.cyan);
+        const tw = kit.drawText(ln.label, x + size * 2.2, y + rh / 2, { size, color: M.cyan, maxWidth: w - size * 2.4 }).w;
+        kit.rect(Math.round(x + size * 2.2), Math.round(y + rh / 2 + kit.text.stepFor(size).css * 4.5), Math.round(tw), cc, M.cyan);
+        if (kit.clicked === ln.id) ln.go();
+        y += rh;
+      }
+    }
+  }
+  return y;
+}
+
+/** Правая колонка бланка: начислено, списано, итог, отметки, что дальше. Возвращает нижнюю границу. */
+function drawPaperRewards(app, kit, L, col, top, res, st, elapsed) {
+  const M = reportOf(kit);
+  const { report } = res;
+  const { x, w } = col;
+  let y = top;
+  const coin = report.coins || {};
+  const coinsDelta = (res.after.coins || 0) - (res.before.coins || 0);
+  const dataDelta = (res.after.data || 0) - (res.before.data || 0);
+  const lines = Object.keys(CHIP_ICON).map((k) => [k.replace('results.c.', ''), coin[k.replace('results.c.', '')]]).filter(([, v]) => v);
+  if (lines.length) y += formHeading(kit, x, y, w, t('results.form.paid'));
+  lines.forEach(([key, value], i) => {
+    const k = easeOutCubic(clamp((elapsed - 0.6 - i * 0.22) / 0.4, 0, 1));
+    if (k > 0 && i >= st.ticked) {
+      st.ticked = i + 1;
+      app.sfx('coin');
+    }
+    y += formRow(kit, x, y, w, t(`results.p.${key}`, { count: res.result.rings ?? 0 }), `+${fmtInt(value)}`, { k });
+  });
+  if (coin.saved) y += kit.paragraph(t('results.saved', { n: fmtInt(coin.saved) }), x, y, w, { size: kit.fs(12), color: M.good, lineHeight: 1.3 }) + L.gap * 0.4;
+  if (coin.charged) y += formRow(kit, x, y, w, t('results.row.charged'), `−${fmtInt(coin.charged)}`, { color: M.bad });
+  y += L.gap * 0.5;
+
+  // итог: крупнее остальных строк; монеты летят в табличку, когда итог напечатан
+  const totalK = easeOutCubic(clamp((elapsed - 0.8 - lines.length * 0.22) / 0.9, 0, 1));
+  y += formHeading(kit, x, y, w, t('results.form.total'));
+  const big = kit.fs(16);
+  const coinsY = y;
+  const shownC = Math.round(Math.abs(coinsDelta) * totalK);
+  y += formRow(kit, x, y, w, t('results.row.coins'), `${coinsDelta < 0 ? '−' : '+'}${fmtInt(shownC)}`, { size: big, icon: 'coin', iconColor: M.amber, valueColor: coinsDelta < 0 ? M.bad : M.ink });
+  if (dataDelta) y += formRow(kit, x, y, w, t('results.row.data'), `+${fmtInt(Math.round(dataDelta * totalK))}`, { size: big, icon: 'data', iconColor: M.cyan });
+  if (!st.fly && totalK >= 1 && coinsDelta > 0 && app.plateRects?.coins) {
+    st.fly = Array.from({ length: FLY_COINS }, (_, i) => ({ t: -i * 0.09, x0: x + w - big * 2, y0: coinsY + big }));
+    st.arrived = 0;
+  }
+  y += L.gap * 0.5;
+
+  const news = collectNews(app, res).slice(0, 5);
+  if (news.length) {
+    const nk = (i) => easeOutCubic(clamp((elapsed - 1.4 - i * 0.2) / 0.35, 0, 1));
+    y += formHeading(kit, x, y, w, t('results.form.news'), nk(0));
+    news.forEach((n, i) => {
+      y += formRow(kit, x, y, w, n.text, n.reward ? `+${fmtInt(n.reward)}` : '', { k: nk(i), icon: n.icon, iconColor: M[n.tone] || M.amber });
+    });
+    y += L.gap * 0.5;
+  }
+
+  const steps = nextSummary(app, 2).steps.slice(0, 2);
+  if (steps.length) {
+    const sk = easeOutCubic(clamp((elapsed - 1.6 - news.length * 0.2) / 0.4, 0, 1));
+    y += formHeading(kit, x, y, w, t('next.title'), sk);
+    for (const step of steps) {
+      const ready = step.affordable && step.kind !== 'fly';
+      const name = { 'buy-building': buildingIcon(step.id, 1), 'buy-part': partIcon(step.id), era: 'era', fly: 'launch', wait: 'check' }[step.kind] || 'target';
+      y += formRow(kit, x, y, w, step.text, '', { k: sk, icon: name, iconColor: ready ? M.good : M.amber, color: ready ? M.good : M.ink });
+    }
+  }
+  return y;
+}
 
 function again(app, res) {
   const inv = app.profile.inventory;

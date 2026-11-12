@@ -6,8 +6,9 @@ import { createCamera, createView } from './camera.js';
 import { applyEvents, createScreenFx } from './events.js';
 import { drawTerrain } from './ground.js';
 import {
-  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundTransform,
+  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundScale, groundTransform,
 } from './islandmap.js';
+import { islandNorthEdge } from '../sim/island-sky.js';
 import { drawCloudField, fallbackClouds } from './clouds.js';
 import { buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
 import { drawLaunchMount, drawPadRing, MOUNT_RADIUS } from './launchpad.js';
@@ -42,8 +43,11 @@ const BODY_GRAVITY = { earth: 45, moon: 9, mars: 20 };
 const PIECE_COUNT = 10;
 const CAMERA_JUMP = 1500;
 const HAZE_COLOR = [150, 205, 236];
-/** Подъём камеры после старта: изометрия базы (40°) → промежуточные ракурсы → карта полёта, секунд. */
-export const LIFT_TIME = 0.9;
+/**
+ * Подъём камеры после старта: изометрия базы (40°) → 8 ракурсов через 4° → карта полёта, секунд.
+ * Ход сглажен (медленно трогается и мягко встаёт), чтобы смена ракурсов читалась как движение камеры, а не как перещёлкивание.
+ */
+export const LIFT_TIME = 1.3;
 
 /**
  * Кадры подъёма камеры: [изометрия базы, ракурсы из tilt.json по возрастанию угла, карта полёта].
@@ -71,6 +75,23 @@ export function tiltFrames(assets) {
   for (const [key, spec] of Object.entries(BUILDING_ANCHORS)) plan[key] = (spec.e0 || spec).anchors;
   frames.push({ asset: start, size: [ISLAND.width, ISLAND.height], pad: ISLAND.launchOrigin, buildings: plan });
   return frames.length >= 3 ? frames : null;
+}
+
+/** Прозрачность облака-тумана над сушей острова. */
+export const ISLAND_FOG_ALPHA = 0.38;
+
+/**
+ * Множитель прозрачности облака при камере на высоте h (ед.): 1 над морем и высоко, ISLAND_FOG_ALPHA, пока под нижней
+ * кромкой облака на карте суша. Точка карты под предметом на высоте A уходит на север как A·(1 + (h/250)²)
+ * (islandmap.groundScale), поэтому с подъёмом облака плавно «густеют» обратно.
+ */
+export function islandFog(cloud, h) {
+  const w = cloud.w || 200;
+  const bottom = Math.max(0, (cloud.alt || 0) - (cloud.h || 60) * 0.4);
+  const north = bottom / groundScale(h);
+  const edge = islandNorthEdge(cloud.x - w / 2, cloud.x + w / 2);
+  if (edge <= 0) return 1;
+  return lerp(ISLAND_FOG_ALPHA, 1, smoothstep(edge - 20, edge + 40, north));
 }
 
 /** Положение в ряду кадров по ходу подъёма u (0..1): индекс нижнего кадра и доля следующего. */
@@ -476,7 +497,8 @@ export function createFlightRenderer(painter, shared) {
   function liftProgress(time) {
     if (!state.tilt) return 1;
     if (state.liftStart === null) state.liftStart = time;
-    return clamp((time - state.liftStart) / LIFT_TIME, 0, 1);
+    const t = clamp((time - state.liftStart) / LIFT_TIME, 0, 1);
+    return t * t * (3 - 2 * t);
   }
 
   /**
@@ -644,7 +666,9 @@ export function createFlightRenderer(painter, shared) {
     if (body !== 'earth') drawFlatShadow(ctx, view, flight);
     const clouds = cloudsFor(flight, camAlt);
     const flashPower = clamp((mood.flash || 0) / 0.08, 0, 1);
-    drawCloudField(ctx, painter, view, clouds, 0, time, flashPower, mood.wind);
+    // над сушей острова облако — только туман: полупрозрачное, пока под ним на карте видна земля
+    const fog = body === 'earth' ? (cloud) => islandFog(cloud, Math.max(0, flight.alt ?? -flight.y)) : 1;
+    drawCloudField(ctx, painter, view, clouds, 0, time, flashPower, mood.wind, fog);
     if (mood.rain > 0.05 && camAlt < 2400) drawRain(ctx, view, time, mood.rain, mood.wind);
     drawPredict(
       ctx, view, flight.predict, time, flight.liftedOff === false ? 0 : smoothstep(8, 45, flight.alt ?? 0), body === 'earth' ? mapView : view,
@@ -659,7 +683,7 @@ export function createFlightRenderer(painter, shared) {
     drawChute(ctx, painter, view, pose, time);
     particles.draw(ctx, view, 1);
     drawObjectsFront(ctx, painter, view, flight.objects, state.era, ringFx, time);
-    drawCloudField(ctx, painter, view, clouds, 1, time, flashPower, mood.wind);
+    drawCloudField(ctx, painter, view, clouds, 1, time, flashPower, mood.wind, fog);
 
     drawSpeedLines(ctx, view, flight.vx || 0, flight.vy || 0, flight.atmo ?? 1, time);
     if (mood.dust > 0.05 && body === 'mars') {
