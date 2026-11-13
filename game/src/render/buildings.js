@@ -4,7 +4,8 @@
 // Все функции рисуют в единицах мира через view; (wx, wy) — точка опоры (низ по центру).
 
 import {
-  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, E0_CRATE_PALLET, E0_DELUGE_NOZZLES, E0_TRENCH_ROUTES, ISLAND, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, buildingSpriteName,
+  ART_BUILDINGS, BUILDING_ANCHORS, BUILDING_KEYS, E0_CRATE_PALLET, E0_DELUGE_NOZZLES, E0_TRENCH_ROUTES, HD_LEVEL_SIZES, ISLAND, PLACEABLE_BUILDINGS,
+  PROCEDURAL_BUILDINGS, buildingArtLevel, buildingSpriteName,
 } from './manifest.js';
 import { clamp, hash2 } from './util.js';
 import { fillWorldRect } from './painter.js';
@@ -76,7 +77,12 @@ export function buildingSize(painter, key, level) {
 
 export function buildingLayout(key, level) {
   const layout = BUILDING_ANCHORS[key];
-  return level === 1 && layout?.e0 ? layout.e0 : layout;
+  const art = buildingArtLevel(key, level);
+  if (art === 1 && layout?.e0) return layout.e0;
+  // HD-постройка старшего уровня стоит на месте ур.1 (как на изометрической базе), со своим размером спрайта
+  const size = HD_LEVEL_SIZES[art]?.[key];
+  if (Array.isArray(size) && layout?.e0) return { ...layout.e0, size, lamp: undefined, smooth: true };
+  return layout;
 }
 
 /**
@@ -87,7 +93,8 @@ export function drawBuilding(ctx, painter, view, key, level, wx, wy, time, opts 
   const lv = clamp(level | 0, 1, 6);
   const [width, height] = buildingSize(painter, key, lv);
   const layout = buildingLayout(key, lv);
-  drawShadow(ctx, view, wx, wy, layout, width, lv === 1 && !!BUILDING_ANCHORS[key]?.e0);
+  // HD-постройки (ур.1 и HD старших уровней) стоят на якоре переднего края: тень по следу
+  drawShadow(ctx, view, wx, wy, layout, width, !!BUILDING_ANCHORS[key]?.e0 && (lv === 1 || layout === buildingLayout(key, 1) || !!HD_LEVEL_SIZES[buildingArtLevel(key, lv)]?.[key]));
   const baseName = buildingSpriteName(key, lv);
   const name = opts.frameName && painter.has(opts.frameName) ? opts.frameName : baseName;
   const building = opts.reveal !== undefined && opts.reveal < 1;

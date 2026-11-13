@@ -185,9 +185,30 @@ export function spriteName(base, era) {
   return `${base}_${eraYear(era)}`;
 }
 
+/**
+ * HD-постройки старших уровней для карты полёта (уровень → ключ → размер PNG [w, h] в px острова, 1:1).
+ * Стоят на местах ур.1 (BUILDING_ANCHORS[key].e0.anchors), запечены tools/hd_pixel/bake_top.py --era N.
+ * `reuse: 1` — у уровня нет своего спрайта на карте, берётся спрайт и раскладка ур.1 (маяк — крошечная лампа).
+ */
+export const HD_LEVEL_SIZES = {
+  // E1 / 1986 (2026-11-14): ширина = ширине ур.1 на карте, высота по пропорции листа
+  2: {
+    beacons: { reuse: 1 },
+    gantry: [90, 167], deluge: [100, 132], service: [110, 127], rescue: [110, 111], fuel: [110, 93],
+    logistics: [120, 140], factory: [175, 172], weather: [60, 87], control: [120, 158], radar: [70, 110],
+    energy: [95, 86], observation: [60, 116], recovery: [110, 103],
+  },
+};
+
+/** Уровень, чей спрайт рисуется на карте для постройки key уровня level (reuse → младший). */
+export function buildingArtLevel(key, level) {
+  const spec = HD_LEVEL_SIZES[level | 0]?.[key];
+  return spec?.reuse ?? (level | 0);
+}
+
 /** Имя спрайта постройки: buildingSpriteName('gantry', 3) -> 'bld_gantry_2015' (уровень 1..6 = эпоха 0..5). */
 export function buildingSpriteName(key, level) {
-  return `bld_${key}_${eraYear((level | 0) - 1)}`;
+  return `bld_${key}_${eraYear(buildingArtLevel(key, level) - 1)}`;
 }
 
 /**
@@ -196,7 +217,6 @@ export function buildingSpriteName(key, level) {
  */
 export const BROKEN_PLACEABLE_ERAS = {
   'workshop/service-lift': [2, 3, 5],
-  'base/factory': [1],
   'base/control': [2],
 };
 
@@ -240,6 +260,13 @@ function buildAssetFiles() {
     ERA_YEARS.forEach((year, i) => {
       files[`bld_${key}_${year}`] = placeableFile(place, i);
     });
+  }
+  // HD-постройки старших уровней (HD_LEVEL_SIZES) перекрывают прежние пути: e<уровень−1>/base/<ключ>.png, у метео — weather-complex
+  for (const [level, keys] of Object.entries(HD_LEVEL_SIZES)) {
+    for (const [key, size] of Object.entries(keys)) {
+      if (!Array.isArray(size)) continue;
+      files[`bld_${key}_${ERA_YEARS[level - 1]}`] = `${eraFolder(level - 1)}base/${key === 'weather' ? 'weather-complex' : key}.png`;
+    }
   }
   for (const [id, place] of Object.entries(STATION_DIRS)) {
     ERA_YEARS.forEach((year, i) => {
@@ -368,6 +395,11 @@ export function spriteSize(name) {
   if (FLAT_SPRITE_SIZES[name]) return FLAT_SPRITE_SIZES[name];
   const building = /^bld_([a-z]+)_1978$/.exec(name);
   if (building && E0_BUILDING_SIZES[building[1]]) return E0_BUILDING_SIZES[building[1]];
+  const hd = /^bld_([a-z]+)_(\d{4})$/.exec(name);
+  if (hd) {
+    const size = HD_LEVEL_SIZES[ERA_YEARS.indexOf(Number(hd[2])) + 1]?.[hd[1]];
+    if (Array.isArray(size)) return size;
+  }
   const part = /^balloon_(\d{4})_(envelope|pod)$/.exec(name);
   if (part) {
     const era = ERA_YEARS.indexOf(Number(part[1]));

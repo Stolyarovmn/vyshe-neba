@@ -4,11 +4,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   ART_BUILDINGS, ASSET_FILES, BUILDING_ANCHORS, BUILDING_KEYS, ENTRY_KEYS, ERA_SPRITE_SIZES, ERA_YEARS,
-  FLAT_SPRITE_SIZES, ISLAND, ISLAND_ROADS, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, WORLD_ENTRIES, buildingSpriteName, eraYear,
+  FLAT_SPRITE_SIZES, HD_LEVEL_SIZES, ISLAND, ISLAND_ROADS, PLACEABLE_BUILDINGS, PROCEDURAL_BUILDINGS, WORLD_ENTRIES, buildingSpriteName, eraYear,
   spriteAnchor, spriteName, spriteSize,
 } from '../src/render/manifest.js';
 import { BUILDING_KEYS as DATA_BUILDING_KEYS } from '../src/data/buildings.js';
 import { pngProblem, pngSize, repoRoot } from './render-helpers.mjs';
+import { buildingLayout } from '../src/render/buildings.js';
 
 const fileOf = (spec) => (typeof spec === 'string' ? spec : spec.file);
 
@@ -169,6 +170,28 @@ test('постройки E0: PNG существуют, пиксельные ра
     });
   }
   for (const key of PROCEDURAL_BUILDINGS) {
-    for (const year of ERA_YEARS.slice(1)) assert.equal(ASSET_FILES[`bld_${key}_${year}`], undefined, `${key} ${year}: программный силуэт`);
+    for (const [i, year] of ERA_YEARS.entries()) {
+      if (i === 0) continue;
+      // HD-постройка старшего уровня (HD_LEVEL_SIZES) — свой спрайт; иначе программный силуэт
+      if (Array.isArray(HD_LEVEL_SIZES[i + 1]?.[key])) assert.equal(fileOf(ASSET_FILES[`bld_${key}_${year}`]), `game/assets/eras/e${i}-${year}/base/${key}.png`);
+      else assert.equal(ASSET_FILES[`bld_${key}_${year}`], undefined, `${key} ${year}: программный силуэт`);
+    }
+  }
+});
+
+test('HD-постройки ур.2 (E1): PNG точного размера, на месте ур.1, маяк берёт спрайт ур.1', () => {
+  for (const [key, size] of Object.entries(HD_LEVEL_SIZES[2])) {
+    const layout = buildingLayout(key, 2);
+    assert.deepEqual(layout.anchors, BUILDING_ANCHORS[key].e0.anchors, `${key}: место ур.1`);
+    if (!Array.isArray(size)) {
+      assert.equal(buildingSpriteName(key, 2), `bld_${key}_1978`, `${key}: спрайт ур.1`);
+      continue;
+    }
+    const name = buildingSpriteName(key, 2);
+    assert.equal(name, `bld_${key}_1986`);
+    const file = path.join(repoRoot, fileOf(ASSET_FILES[name]));
+    assert.deepEqual(pngSize(file), size, `${key}: размер PNG`);
+    assert.deepEqual(layout.size, size);
+    assert.equal(pngProblem(file), null, name);
   }
 });
