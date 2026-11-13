@@ -11,7 +11,7 @@ import { mix } from '../theme.js';
 import * as inst from '../skin/instruments.js';
 import { magnetActive } from '../../render/magnet.js';
 import { kmText } from '../../rules/next-steps.js';
-import { PAYOUT } from '../../data/economy.js';
+import { flightBonus } from '../../data/economy.js';
 
 const DANGER_WARNS = ['brake', 'tilt', 'drift', 'hazard', 'chute-air', 'overheat', 'hull', 'space-turn', 'space-fins', 'space-brake'];
 const WARN_KEYS = { brake: 'hint.brake', tilt: 'hint.tilt', drift: 'hint.drift', hazard: 'hint.hazard', 'chute-air': 'hint.chuteAir', overheat: 'hint.overheat', hull: 'hint.hull', 'space-turn': 'hint.spaceTurn', 'space-fins': 'hint.spaceFins', 'space-brake': 'hint.spaceBrake' };
@@ -320,7 +320,7 @@ function pickHint(app, s, f, tut) {
   const goal = f.cfg.goalAlt;
   if (goal > 0) {
     if (f.maxAlt * 10 >= goal && s.goalDoneAt === undefined) s.goalDoneAt = now;
-    const bonus = Math.round(PAYOUT.goalBonus * (1 + PAYOUT.eraScale * f.cfg.era));
+    const bonus = Math.round(flightBonus('goal', f.cfg.era));
     if (s.goalDoneAt !== undefined && now - s.goalDoneAt < 2.4) {
       out.push({ pri: 2.6, key: 'goalDone', text: t('hint.goalDone', { bonus }), icon: 'check', kind: 'good' });
     } else if (s.goalDoneAt === undefined && f.climb >= 0) {

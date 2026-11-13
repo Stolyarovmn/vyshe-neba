@@ -38,8 +38,8 @@ test('makeFlightConfig follows ARCHITECTURE 6.1 and survives the simulation norm
 
 test('the stock rocket matches the reference stages of the simulation', () => {
   const stages = makeFlightConfig(makeProfile()).stages;
-  assert.deepEqual(stages[0], { id: 'core', thrust: 72, fuel: 175, burnRate: 9, mass: 1, turn: 1.1 });
-  assert.deepEqual(stages[1], { id: 'capsule', thrust: 61, fuel: 45, burnRate: 3.15, mass: 0.35, turn: 1.4 });
+  assert.deepEqual(stages[0], { id: 'core', thrust: 72, fuel: 130, burnRate: 9, mass: 1, turn: 1.1 });
+  assert.deepEqual(stages[1], { id: 'capsule', thrust: 61, fuel: 5, burnRate: 3.15, mass: 0.35, turn: 1.4 });
 });
 
 test('stages come in separation order, booster first', () => {
@@ -274,7 +274,7 @@ test('settleFlight: nonsense results do not break the profile', () => {
 test('listContracts: opened by era and by the base, slots grow with logistics', () => {
   const start = listContracts(makeProfile());
   assert.equal(start.length, 3);
-  assert.ok(start.every((c) => c.reward >= 15 && c.name && c.desc));
+  assert.ok(start.every((c) => c.reward === CONTRACT_TEMPLATES.find((t) => t.id === c.id).reward && c.name && c.desc));
   const allIds = new Set();
   let profile = makeProfile();
   for (let i = 0; i < 40; i++) {

@@ -21,6 +21,8 @@ export const BASE_POWER_SUPPLY = 12;
 // Base prices of modules and buildings are multiplied by these before rounding.
 export const PART_PRICE_SCALE = 0.8;
 export const BUILDING_PRICE_SCALE = 0.93;
+// E2: подготовка к возвращению со 100 км требует большего набора улучшений.
+export const E2_PRICE_SCALE = 0.75;
 
 // The sum of all discounts (era, factory, service) never exceeds this share of the price.
 export const MAX_DISCOUNT = 0.5;
@@ -33,6 +35,11 @@ export const PAYOUT = {
   distanceK: 0.2,
   landingBonus: 40, // Мягкая посадка, до множителя эпохи
   perfectBonus: 60, // Доплата за идеальную посадку с множителем маяков
+  earlyLandingBonus: 20, // E0: короткий вылет оставляет покупки на следующие запуски
+  earlyPerfectBonus: 20,
+  earlyGoalBonus: 10,
+  earlyTravelPerKm: 0.3, // E0: рост пути от 1 до 6 км компенсирует более сдержанный старт
+  earlyTravelMax: 2.5,
   crashTravelShare: 0.5, // share of the path payout kept after a crash
   ringBonus: 8,
   nearBonus: 5,
@@ -48,6 +55,13 @@ export const PAYOUT = {
     mars: { mult: 1.6, expedition: 1000 },
   },
 };
+
+// Одна формула для расчёта и показа бонусов на пульте и в полёте.
+export function flightBonus(kind, era) {
+  const key = `${kind}Bonus`;
+  const earlyKey = `early${kind[0].toUpperCase()}${kind.slice(1)}Bonus`;
+  return (era === 0 ? PAYOUT[earlyKey] : PAYOUT[key]) * (1 + PAYOUT.eraScale * era);
+}
 
 // Crash loss: a share of everything ever spent on rocket modules, never more than half of the purse.
 export const CRASH_LOSS = { partValueShare: 0.12, minimum: 20, purseShare: 0.5 };

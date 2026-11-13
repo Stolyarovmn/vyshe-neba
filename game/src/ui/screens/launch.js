@@ -7,7 +7,7 @@ import { drawChrome, lockRows, isFundsReason, partIcon } from './common.js';
 import { mix } from '../theme.js';
 import * as inst from '../skin/instruments.js';
 import { flightGoal, kmText } from '../../rules/next-steps.js';
-import { PAYOUT } from '../../data/economy.js';
+import { flightBonus } from '../../data/economy.js';
 
 const DEST_ICON = { earth: 'earth', moon: 'moon', mars: 'mars' };
 const CONS = ['chute', 'repair', 'canister', 'magnet'];
@@ -40,7 +40,7 @@ export default {
 
     // корпус пульта
     kit.panel(G.panel, { variant: 'raised', pad: 0 });
-    kit.paragraph(t('launch.goal', { alt: kmText(flightGoal(p)), bonus: Math.round(PAYOUT.goalBonus * (1 + PAYOUT.eraScale * p.era)) }), G.goal.x, G.goal.y, G.goal.w, { size: kit.fs(12), color: c.text, lineHeight: 1.25, align: 'center' });
+    kit.paragraph(t('launch.goal', { alt: kmText(flightGoal(p)), bonus: Math.round(flightBonus('goal', p.era)) }), G.goal.x, G.goal.y, G.goal.w, { size: kit.fs(12), color: c.text, lineHeight: 1.25, align: 'center' });
 
     // лампы готовности: ключевые модули установлены, цель открыта
     const lampSize = Math.round(18 * L.ui);

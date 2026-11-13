@@ -1,5 +1,6 @@
 // Achievements ported from the previous edition (outputs/rocket/dist/content.js). Rewards are one-time and
 // scaled like the old file did at its end: max(10, round(reward * 0.45)).
+// Проход 2 задаёт отдельные небольшие награды четырём стартовым достижениям.
 // `cond` is declarative; rules/goals.js evaluates it against the profile.
 
 const scale = (reward) => Math.max(10, Math.round(reward * 0.45));
@@ -7,7 +8,8 @@ const stat = (key, min) => ({ type: 'stat', key, min });
 const alt = (min) => ({ type: 'maxAlt', min });
 
 function ach(id, name, desc, reward, cond) {
-  return { id, name, desc, reward: scale(reward), cond };
+  const starter = { first: 4, land1: 6, perfect1: 12, alt1: 4 };
+  return { id, name, desc, reward: starter[id] ?? scale(reward), cond };
 }
 
 export const ACHIEVEMENTS = [

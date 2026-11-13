@@ -173,9 +173,14 @@ function controlGoals(profile) {
   const { landAlt } = milestoneInfo(profile);
   const freeLevel = Array.from({ length: 19 }, (_, level) => level).find((level) => finsTilt(level) >= TILT_FREE);
   const level = landAlt?.min >= SPACE_ALT * 10 ? Math.max(FINS_BY_ERA[profile.era], freeLevel) : FINS_BY_ERA[profile.era];
-  if (profile.parts.fins >= level) return [];
-  const chain = planChain(profile, 'part', 'fins', level);
-  return chain ? [{ kind: 'part', id: 'fins', level, cost: chain.cost }] : [];
+  const required = [['fins', level]];
+  // Возвращению из невесомости нужны управление и отдельный запас капсулы.
+  if (landAlt?.min >= SPACE_ALT * 10) required.push(['capsule', 7]);
+  return required.flatMap(([id, target]) => {
+    if (profile.parts[id] >= target) return [];
+    const chain = planChain(profile, 'part', id, target);
+    return chain ? [{ kind: 'part', id, level: target, cost: chain.cost }] : [];
+  });
 }
 
 const goalCache = new Map();
@@ -217,6 +222,10 @@ function estimateRate(profile, config, destination, target, skill) {
   return { rate: expected / seconds, seconds };
 }
 
+function canReturnFromSpace(profile, config) {
+  return config.fins.maxTilt >= TILT_FREE && profile.parts.capsule >= 7;
+}
+
 function bestPlan(profile, skill, caution = 1) {
   let best = null;
   for (const destination of R.availableDestinations(profile).filter((d) => d.ok).map((d) => d.id)) {
@@ -224,7 +233,8 @@ function bestPlan(profile, skill, caution = 1) {
     if (destination === 'earth') {
       const reach = safeReach(config) * SAFETY_FRACTION * caution;
       for (const fraction of [0.45, 0.7, 1]) {
-        const ceiling = config.fins.maxTilt >= TILT_FREE ? SPACE_ALT * 1.02 : NO_FLIP_CEILING;
+        // Слабая капсула требует запаса на спуск: оценщик переоценивает высокие прыжки.
+        const ceiling = canReturnFromSpace(profile, config) ? SPACE_ALT * 1.02 : NO_FLIP_CEILING * 0.7;
         const target = Math.max(40, Math.min(reach * fraction, ceiling));
         const { rate } = estimateRate(profile, config, destination, target, skill);
         if (!best || rate > best.rate) best = { destination, target, rate };
@@ -247,13 +257,13 @@ function choosePlan(profile, skill, caution = 1) {
   if (landAlt && profile.milestones.maxLandAlt < landAlt.min) {
     const config = configOf(profile);
     const need = unitsOf(landAlt) * 1.03;
-    const ready = need < SPACE_ALT || config.fins.maxTilt >= TILT_FREE;
+    const ready = need < SPACE_ALT || canReturnFromSpace(profile, config);
     if (ready && safeReach(config) >= need) return { destination: 'earth', target: Math.min(need, SPACE_ALT * 1.03), reason: 'landAlt' };
   }
   if (altitude && profile.milestones.maxAlt < altitude.min) {
     const config = configOf(profile);
     const need = unitsOf(altitude) * MILESTONE_MARGIN;
-    if ((need < SPACE_ALT || config.fins.maxTilt >= TILT_FREE) && safeReach(config) >= need) return { destination: 'earth', target: Math.min(need, SPACE_ALT * 1.03), reason: 'milestone' };
+    if ((need < SPACE_ALT || canReturnFromSpace(profile, config)) && safeReach(config) >= need) return { destination: 'earth', target: Math.min(need, SPACE_ALT * 1.03), reason: 'milestone' };
   }
   if (!altitude && !body && profile.milestones.softLandings === 0) return { destination: 'earth', target: 120, reason: 'first-landing' };
   const best = bestPlan(profile, skill, caution);

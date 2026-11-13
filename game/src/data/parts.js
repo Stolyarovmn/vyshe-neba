@@ -3,7 +3,7 @@
 // The requirements of every module follow the table in DESIGN.md section 4.3.
 
 import { STAGE_DEFAULTS } from '../sim/config.js';
-import { MAX_PART_LEVEL, PART_LEVELS_PER_ERA, PART_PRICE_SCALE } from './economy.js';
+import { E2_PRICE_SCALE, MAX_PART_LEVEL, PART_LEVELS_PER_ERA, PART_PRICE_SCALE } from './economy.js';
 
 const core = STAGE_DEFAULTS.core;
 const capsule = STAGE_DEFAULTS.capsule;
@@ -27,7 +27,8 @@ const DATA_CURVE = [0, 0, 0, 0, 0, 0, 2, 3, 5, 8, 12, 18, 26, 38, 55, 80, 115, 1
 function costs(base, growth) {
   const out = [];
   for (const level of LEVELS) {
-    const value = nice(PART_PRICE_SCALE * base * growth ** (level - 1));
+    const eraScale = level >= 7 && level <= 9 ? E2_PRICE_SCALE : 1;
+    const value = nice(PART_PRICE_SCALE * eraScale * base * growth ** (level - 1));
     out.push(out.length && value <= out[out.length - 1] ? out[out.length - 1] + 5 : value);
   }
   return out;
@@ -59,7 +60,7 @@ function buildPart(spec) {
 // `factor` converts the stored value to the displayed one (radians -> degrees).
 const stat = (key, label, unit, dir, digits = 0, factor = 1) => ({ key, label, unit, dir, digits, factor });
 
-// Линейная интерполяция между заданными уровнями стабилизаторов.
+// Линейная интерполяция между опорными уровнями модулей.
 function finsCurve(level, points) {
   for (let i = 1; i < points.length; i++) {
     const [hi, value] = points[i];
@@ -68,6 +69,9 @@ function finsCurve(level, points) {
   }
   return points.at(-1)[1];
 }
+
+// Ранняя тяга капсулы; с уровня 7 возвращается исходная кривая.
+const propulsionLevel = (level) => finsCurve(level, [[0, 0], [3, 0.15], [6, 2.8], [7, 7], [18, 18]]);
 
 export function finsTilt(level) {
   if (level >= 9) return Math.PI;
@@ -87,9 +91,9 @@ export const PARTS = {
     cost: { base: 150, growth: 1.34 },
     dataWeight: 1,
     stats: (level) => ({
-      thrust: round(core.thrust * (1 + level / 12), 1),
-      burnRate: round(core.burnRate / (1 + 0.045 * level), 2),
-      speed: Math.min(190, round(68 + 5.5 * level)),
+      thrust: finsCurve(level, [[0, core.thrust], [1, 86], [2, 106], [3, 126], [9, 126], [18, 180]]),
+      burnRate: level >= 7 ? round(core.burnRate / (1 + 0.045 * level), 2) : finsCurve(level, [[0, 9], [1, 9], [2, 9], [3, 9], [6, 6.9], [7, 6.84], [18, 4.97]]),
+      speed: round(finsCurve(level, [[0, 55], [1, 57], [2, 61], [3, 72], [6, 85], [7, 106.5], [18, 167]])),
     }),
     statInfo: [stat('thrust', 'Тяга', 'ед./с²', 1, 0), stat('speed', 'Предел скорости', 'ед./с', 1, 0), stat('burnRate', 'Расход', 'ед./с', -1, 1)],
     requires: (level) => [
@@ -104,7 +108,7 @@ export const PARTS = {
     need: 'Нужен топливный бак',
     cost: { base: 70, growth: 1.33 },
     dataWeight: 0.8,
-    stats: (level) => ({ fuel: round(core.fuel * (1 + 0.16 * level)) }),
+    stats: (level) => ({ fuel: finsCurve(level, [[0, 130], [1, 165], [2, 198], [3, 235], [6, 253], [7, 371], [18, 679]]) }),
     statInfo: [stat('fuel', 'Топливо', 'ед.', 1, 0)],
     requires: (level) => [{ building: 'fuel', level: ceilDiv(level, 3) }],
   }),
@@ -127,7 +131,8 @@ export const PARTS = {
     cost: { base: 190, growth: 1.34 },
     dataWeight: 1.1,
     stats: (level) => ({
-      fuel: level === 0 ? 0 : booster.fuel + 18 * level,
+      // Первый бак выдерживает полный шаг аналитического оценщика (0,2 с с запасом расхода).
+      fuel: finsCurve(level, [[0, 0], [1, 20], [2, 55], [3, 100], [6, 110], [7, booster.fuel + 18 * 7], [18, booster.fuel + 18 * 18]]),
       thrustRatio: level === 0 ? 0 : round(booster.thrust / core.thrust + 0.012 * level, 3),
     }),
     statInfo: [stat('fuel', 'Топливо блока', 'ед.', 1, 0), stat('thrustRatio', 'Тяга блока', '×', 1, 2)],
@@ -141,8 +146,8 @@ export const PARTS = {
     cost: { base: 110, growth: 1.34 },
     dataWeight: 1,
     stats: (level) => ({
-      fuel: capsule.fuel + 7 * level,
-      thrustRatio: round(Math.min(1, capsule.thrust / core.thrust + 0.0085 * level), 3),
+      fuel: finsCurve(level, [[0, 5], [3, 5.3], [6, 64.6], [7, 94], [18, 171]]),
+      thrustRatio: round(Math.min(1, capsule.thrust / core.thrust + 0.0085 * propulsionLevel(level)), 3),
     }),
     statInfo: [stat('fuel', 'Запас капсулы', 'ед.', 1, 0), stat('thrustRatio', 'Тяга капсулы', '×', 1, 2)],
     requires: (level) => [{ building: 'rescue', level: ceilDiv(level, 3) }],
@@ -167,10 +172,11 @@ export const PARTS = {
     name: 'Стабилизаторы и РСУ',
     desc: 'Маневровые двигатели и стабилизаторы: шире угол наклона и быстрее поворот.',
     need: 'Нужны стабилизаторы',
-    // Cheap early levels: without them the rocket barely steers, so players buy the first ones at once.
+    // Дешёвое управление; первый модуль требует сервиса, входная цена которого задана в buildings.js.
     cost: { base: 35, growth: 1.32 },
     dataWeight: 0.6,
-    stats: (level) => ({ maxTilt: finsTilt(level), turn: finsTurn(level), dragCut: round(1 - 1 / (1 + 0.06 * level), 3) }),
+    stats: (level) => ({ maxTilt: finsTilt(level), turn: finsTurn(level),
+      dragCut: round(1 - 1 / (1 + 0.06 * finsCurve(level, [[0, 0], [3, 0.5], [6, 4], [7, 7], [18, 18]])), 3) }),
     statInfo: [stat('maxTilt', 'Угол наклона', '°', 1, 0, 180 / Math.PI), stat('turn', 'Поворот', '×', 1, 2), stat('dragCut', 'Меньше сноса', '%', 1, 3)],
     requires: (level) => [{ building: 'service', level: ceilDiv(level, 4) }],
   }),

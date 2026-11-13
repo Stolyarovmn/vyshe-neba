@@ -13,7 +13,7 @@ import { landedResult, crashedResult, makeProfile } from './rules-helpers.mjs';
 test('Проход 1: точные точки кривых рулёжки и цены первых уровней', () => {
   for (const [level, turn] of [[0, 0.22], [3, 0.55], [6, 1], [9, 1.5], [12, 2], [18, 2.4]]) assert.equal(finsTurn(level), turn);
   for (const [level, tilt] of [[0, 0.12], [3, 0.45], [6, 0.9], [9, Math.PI], [18, Math.PI]]) assert.equal(finsTilt(level), tilt);
-  // Цены ×1,6 (PART_PRICE_SCALE 0,8): первые три уровня стабилизаторов 30/35/50.
+  // Проход 2: первый модуль вместе с сервисом покупается после второго вылета.
   assert.deepEqual(PARTS.fins.levels.slice(0, 3).map((l) => l.cost), [30, 35, 50]);
   assert.equal(finsTurn(1), 0.33);
   assert.equal(finsTilt(1), 0.23);
@@ -41,7 +41,7 @@ test('Стартовый корпус ограничен 7°, скорость �
 });
 
 test('Вехи требуют три посадки и подтверждённую посадкой высоту', () => {
-  assert.deepEqual(ERAS[0].advance.milestone.items, [{ type: 'maxAlt', min: 6000 }, { type: 'softLandings', min: 3 }]);
+  assert.deepEqual(ERAS[0].advance.milestone.items, [{ type: 'maxAlt', min: 6000 }, { type: 'landAlt', min: 6000 }, { type: 'softLandings', min: 3 }]);
   for (const [era, altitude, landAltitude] of [[1, 30000, 20000], [2, 100000, 100000]]) {
     const profile = makeProfile({ era, milestones: { maxAlt: altitude, maxLandAlt: landAltitude - 1 } });
     const milestone = getEraState(profile).conditions.find((c) => c.kind === 'milestone');
@@ -89,7 +89,7 @@ test('Доход: кольца и центры, пролёты с потолко
   assert.equal(crash.rings, coin.rings);
   assert.equal(settleFlight(profile, { ...result, outcome: 'abandoned' }).report.coins.rings, 0);
   assert.equal(settleFlight(profile, { ...result, ringsCenter: undefined, ringsCentered: 1 }).report.coins.rings, coin.rings);
-  assert.equal(settleFlight(fresh(), landedResult({ perfect: true })).report.coins.perfect, 60);
+  assert.equal(settleFlight(fresh(), landedResult({ perfect: true })).report.coins.perfect, 20);
 });
 
 test('Авария: 12 % стоимости, минимум 20, половина добычи и подсказка о сохранённых монетах', () => {
@@ -145,5 +145,5 @@ test('Что дальше: приоритет эффекта перед цено
 
 test('Постройки: рост 2,6 и данные с четвёртого уровня', () => {
   assert.deepEqual(BUILDINGS.service.levels.map((l) => l.data), [0, 0, 0, 2, 6, 12]);
-  assert.deepEqual(BUILDINGS.beacons.levels.map((l) => l.cost), [35, 95, 250, 650, 1700, 4420]);
+  assert.deepEqual(BUILDINGS.beacons.levels.map((l) => l.cost), [65, 95, 190, 650, 1700, 4420]);
 });
