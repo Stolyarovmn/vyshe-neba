@@ -29,7 +29,8 @@ for y, key, x in sorted(items):
         by = cy + ims[1].height - round(36 * k)
         canvas.alpha_composite(ims[2], (round(x - ims[2].width / 2), by))
         continue
-    sp = Image.open(era / f'iso/{key}.png').convert('RGBA')
+    sp_file = next((era / f'iso/{key}{ext}' for ext in ('.webp', '.png') if (era / f'iso/{key}{ext}').exists()), era / f'iso/{key}.webp')
+    sp = Image.open(sp_file).convert('RGBA')
     # iso-спрайты плотнее карты (ISO_DENSITY в write_layout.py): размер на карте — из base-iso.json
     w, h = lay['buildings'][key]['size']
     if sp.size != (w, h):

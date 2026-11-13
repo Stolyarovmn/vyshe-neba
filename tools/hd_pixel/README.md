@@ -1,4 +1,4 @@
-# tools/hd_pixel — перевод картинок в стиль HD-острова
+﻿# tools/hd_pixel — перевод картинок в стиль HD-острова
 
 Скрипты, которыми в ноябре 2026 сделаны все спрайты E0 ветки `slice/e0-hd-pixel`. Правила — `art/docs/ART_DIRECTION_HD_PIXEL.md`. Зависимости: Python 3.11, numpy, Pillow; для изометрии — Blender 5.2 (`iso_render.py` запускается внутри Blender).
 
@@ -22,6 +22,8 @@
 | `write_layout.py` | `base-iso.json` из проекции якорей и размеров `iso/<key>.png`; ручные поправки — `OVERRIDES` | `python write_layout.py <root> layout_proj.json` |
 | `composite.py` | примерка: остров изометрии + постройки + ракета-стек по `base-iso.json` | `python composite.py <root> out.png` |
 | `bake_tilt.py` | кадры подъёма камеры база → полёт: рендеры `iso_render.py` под 52°, 64°, 73,44° → `shared/island/tilt-*.webp` + `tilt.json` (стол и якоря каждого кадра) | `python bake_tilt.py <root> <dir52> <dir64> <dir73>` |
+
+Формат базы (с 2026-11-13): изометрические спрайты лежат в WebP без потерь (`iso/<ключ>.webp`, те же пиксели, ~36 % веса PNG). `bake_seq.py` пишет PNG — после запекания перевести: `python tools/hd_pixel/to_webp.py <папка iso>` (проверяет совпадение пикселей и удаляет PNG); `write_layout.py`, `bake_top.py`, `composite.py` читают и `.webp`, и `.png`.
 
 Плотность базы (с 2026-11-13): `iso/` запекается в 3 раза плотнее карты — ширина для `bake_seq.py` = 3 × ширина на карте (например, ферма `iso/gantry.png:270` при 90 px на карте); `write_layout.py` и `bake_top.py` делят размер PNG на `ISO_DENSITY = 3`, `composite.py` ужимает спрайт до размера из `base-iso.json`. Листы-источники 2026-11 (A: gantry…fuel, B: logistics…radar, C: energy, observation, recovery, beacons; входы — `art/review/entries/LOG.md`) лежат в библиотеке изображений ChatGPT; запекание прежними ширинами даёт прежние спрайты бит в бит.
 

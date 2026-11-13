@@ -32,7 +32,8 @@ out_dir = root / 'game/assets/eras/e0-1978/base'
 for key, bb in zip(keys, parts):
     c = img.crop(bb)
     # iso-спрайты с 2026-11-13 запечены в ISO_DENSITY раз плотнее карты: ширина на карте = ширина PNG / ISO_DENSITY
-    w = round(Image.open(iso_dir / f'{key}.png').width / ISO_DENSITY)
+    iso_file = next((iso_dir / f'{key}{ext}' for ext in ('.webp', '.png') if (iso_dir / f'{key}{ext}').exists()), iso_dir / f'{key}.png')
+    w = round(Image.open(iso_file).width / ISO_DENSITY)
     h = max(1, round(c.height * w / c.width))
     out = hp.remap(hp.resize_premul(c, (w, h)), full)
     if not dry:

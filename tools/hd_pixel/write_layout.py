@@ -16,6 +16,15 @@ def map_size(png):
     w, h = Image.open(png).size
     return [round(w / ISO_DENSITY), round(h / ISO_DENSITY)]
 
+
+def iso_file(name):
+    """iso-спрайт хранится в WebP без потерь (с 2026-11-13); старые PNG тоже читаются."""
+    for ext in ('.webp', '.png'):
+        f = iso_dir / f'{name}{ext}'
+        if f.exists():
+            return f
+    return iso_dir / f'{name}.webp'
+
 buildings = {}
 # ручные поправки после примерки: крупные здания в изометрии наезжали друг на друга
 OVERRIDES = {'fuel': [1000, 352], 'energy': [1655, 300], 'recovery': [1525, 356]}
@@ -23,7 +32,7 @@ pts = {k: OVERRIDES.get(k, v) for k, v in pts.items()}
 for key, p in pts.items():
     if key == 'pad' or '_' in key:
         continue
-    f = iso_dir / f'{key}.png'
+    f = iso_file(key)
     if not f.exists():
         continue
     buildings[key] = {'anchor': p, 'size': map_size(f)}
@@ -36,7 +45,7 @@ for key, p in pts.items():
 ENTRIES = {'workshop': [767, 300], 'board': [490, 384], 'shop': [1405, 372], 'monument': [372, 386]}
 entries = {}
 for key, p in ENTRIES.items():
-    f = iso_dir / f'entry_{key}.png'
+    f = iso_file(f'entry_{key}')
     if f.exists():
         entries[key] = {'anchor': p, 'size': map_size(f)}
 layout = {
