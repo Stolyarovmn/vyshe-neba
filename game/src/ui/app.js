@@ -19,6 +19,7 @@ import results from './screens/results.js';
 import settings from './screens/settings.js';
 import { drawFallbackBackground, buildingShort, buildingIcon, ERA_YEARS } from './screens/common.js';
 import { drawNewCard } from './screens/newcards.js';
+import { LAUNCH_AT, launchTransitionAlpha } from './launch-transition.js';
 
 export const DT = 1 / 120;
 const MAX_FRAME = 0.1;
@@ -95,6 +96,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     iconNames: ICON_NAMES,
     hudTargets: {},
     hubSelected: null,
+    hubEvents: [], // события для клипов ON базы: играют при следующем входе в хаб (screens/hub.js)
   };
 
   // ---------- размеры ----------
@@ -265,6 +267,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     app.commit(res.profile);
     sfx('buy');
     app.haptic(12);
+    // цех выдаёт модуль: ворота откроются, когда игрок вернётся на базу
+    app.hubEvents.push('factory');
     return res;
   };
 
@@ -367,6 +371,14 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     }
     app.countdown = { t: 0, n: 3, config, destination, consumables };
     app.go('launch', { countdown: true });
+    // Изометрическая база за отсчёт подводит камеру к кадру полёта: стык без скачка, затем подъём камеры в полёте.
+    if (renderer.hub.mode?.() === 'iso' && renderer.hub.matchPad && renderer.flight?.restFraming) {
+      const kind = (app.profile.parts?.booster | 0) > 0 ? 'booster' : 'core';
+      const f = renderer.flight.restFraming(app.layout, canvas.width, canvas.height, kind, app.profile.era | 0);
+      renderer.hub.matchPad(f.ax, f.feetY, f.pxPerUnit);
+    }
+    // ферма на отсчёте открывает вентиль подачи (клип ON виден, пока камера подходит к столу)
+    renderer.hub.playEvent?.('gantry');
     return true;
   };
 
@@ -378,7 +390,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     c.t += dt;
     c.n = 3 - Math.floor(c.t / step);
     if (c.n !== prevN && c.n > 0) sfx('tick');
-    if (c.t >= step * 3 + 0.35) {
+    if (c.t >= LAUNCH_AT) {
       sfx('go');
       app.countdown = null;
       beginFlight(c.config, c);
@@ -399,6 +411,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       destination: c.destination,
       consumables: c.consumables,
       startedAt: app.time,
+      isoLaunch: renderer.hub.mode?.() === 'iso',
       hint: null,
       hintUntil: 0,
       shake: 0,
@@ -444,16 +457,19 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     parachute: { key: 'cue.parachute', icon: 'chute', kind: 'good' },
     'fuel-empty': { key: 'cue.fuelEmpty', icon: 'fuel', kind: 'bad' },
     hit: { key: 'cue.hit', icon: 'warn', kind: 'bad', pri: 3 },
+    'pad-blast': { key: 'cue.padBlast', icon: 'flame', kind: 'tip' },
     'transfer-start': { key: 'cue.transferStart', icon: 'transfer', kind: 'good' },
     'transfer-done': { key: 'cue.transferDone', icon: 'transfer', kind: 'good' },
     touch: { key: 'cue.touch', icon: 'down', kind: 'tip' },
     storm: { key: 'cue.storm', icon: 'wind', kind: 'bad' },
   };
   function visualCue(s, e) {
-    const cue = CUES[e.type];
-    if (cue) s.cues[e.type] = { ...cue, text: t(cue.key), at: app.time };
+    // ожог обшивки стартовой струёй (стол без охлаждения) — не столкновение: своя спокойная подпись, без тревоги и «Удар!»
+    const padBlast = e.type === 'hit' && e.kind === 'pad-blast';
+    const cue = padBlast ? CUES['pad-blast'] : CUES[e.type];
+    if (cue) s.cues[padBlast ? 'pad-blast' : e.type] = { ...cue, text: t(cue.key), at: app.time };
     if (e.type === 'thrust-cut' && e.reason === 'fuel') s.cues['fuel-empty'] = { ...CUES['fuel-empty'], text: t('cue.fuelEmpty'), at: app.time };
-    const alarm = e.type === 'low-fuel' || e.type === 'hit' || (e.type === 'warn' && (e.kind === 'hull' || e.kind === 'hazard' || e.kind === 'brake'));
+    const alarm = e.type === 'low-fuel' || (e.type === 'hit' && !padBlast) || (e.type === 'warn' && (e.kind === 'hull' || e.kind === 'hazard' || e.kind === 'brake'));
     if (alarm) s.alarmUntil = app.time + (e.type === 'low-fuel' ? 2.4 : 1.2);
   }
 
@@ -598,6 +614,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
   };
 
   app.finishFlight = () => {
+    renderer.hub.reset?.();
     const s = app.session;
     if (!s || s.finished) return;
     s.finished = true;
@@ -617,6 +634,9 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
       console.error('[app] settleFlight:', err);
     }
     app.commit(settled.profile);
+    // клипы базы после полёта: спасатели выезжают после аварии, склад грузит по выполненному контракту
+    if (result.outcome === 'crashed') app.hubEvents.push('rescue');
+    if (settled.report?.awarded?.contracts?.length) app.hubEvents.push('logistics');
     if (!app.settings.tutorial?.done && (result.outcome === 'landed' || result.outcome === 'crashed')) app.setSetting('tutorial', { done: true, step: 99 });
     app.results = { result, report: settled.report || {}, before, after: settled.profile, config: s.config, destination: s.destination, consumables: s.consumables };
     app.session = null;
@@ -692,7 +712,6 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     L.hud.touchVisible = app.touchUi;
     kit.icons.setEra(app.profile.era);
     kit.icons.setPainter(renderer.painter);
-    kit.setToastAnchor(...toastAnchor(L));
     if (app.countdown) tickCountdown(dt);
     if (app.screen === 'flight') flightTick(dt);
     else if (app.standFrame) {
@@ -710,6 +729,8 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     if (!app.refit) app.skinEra = app.profile.era;
     kit.S.auditScreen = app.screen;
     kit.begin(ctx, { L, settings: app.settings, time: app.time, dt, events, era: app.skinEra ?? app.profile.era });
+    // fs() читает раскладку и настройки текущего кадра: до begin() они ещё могут отсутствовать.
+    kit.setToastAnchor(...toastAnchor(L));
     try {
       const t0 = performance.now();
       drawBackground(app.screen);
@@ -737,6 +758,19 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     drawIris(dt);
     kit.end();
     app.uiDrawing = false;
+    // Без кадров подъёма камеры стык проекций закрыт цветом неба; с ними полёт сам поднимает камеру.
+    if (renderer.hub.mode?.() === 'iso' && !renderer.flight?.hasTilt?.()) {
+      const alpha = launchTransitionAlpha(app.countdown?.t,
+        app.screen === 'flight' && app.session?.isoLaunch ? app.time - app.session.startedAt : null);
+      if (alpha > 0) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#162c46';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+    }
     canvas.style.cursor = kit.cursor;
 
     if (!app.session && app.screen !== 'flight') {
@@ -856,6 +890,7 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     const r = { x: L.w / 2 - L.touch(70), y: L.h - L.area.y - L.touch(64) - L.gap, w: L.touch(140), h: L.touch(48) };
     if (kit.button('countdown-cancel', r, { label: t('common.cancel'), variant: 'btn' })) {
       app.countdown = null;
+      renderer.hub.reset?.();
       app.go('launch', {});
     }
   }

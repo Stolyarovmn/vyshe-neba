@@ -23,7 +23,7 @@ const soft = (min) => ({ type: 'softLandings', min });
 export const ERAS = [
   era(0, 1978, 'Гаражная мечта', 'Ручная сборка. Сарай, бетон и мечта.',
     { fuel: 0, income: 0, discount: 0 },
-    { coins: 560, data: 8, buildings: { count: 8, level: 1 }, milestone: { text: 'Высота 6 км и 3 мягкие посадки', items: [alt(6000), soft(3)] } }),
+    { coins: 560, data: 8, buildings: { count: 8, level: 1 }, milestone: { text: 'Высота 6 км, возврат и 3 мягкие посадки', items: [alt(6000), landAlt(6000), soft(3)] } }),
   era(1, 1986, 'Своя мастерская', 'Подъёмник, бак и первые станки.',
     { fuel: 0.04, income: 0.05, discount: 0.02 },
     { coins: 2140, data: 40, buildings: { count: 8, level: 2 }, milestone: { text: 'Высота 30 км и посадка с 20 км', items: [alt(30000), landAlt(20000)] } }),

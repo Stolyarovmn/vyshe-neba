@@ -52,17 +52,19 @@ jobs:
           import { ASSET_FILES } from './game/src/render/manifest.js';
 
           const missing = [];
+          let optional = 0;
           for (const [logicalName, entry] of Object.entries(ASSET_FILES)) {
             const file = typeof entry === 'string' ? entry : entry?.file;
-            if (typeof file !== 'string' || !fs.existsSync(file)) {
-              missing.push(`${logicalName}: ${String(file)}`);
-            }
+            if (typeof file === 'string' && fs.existsSync(file)) continue;
+            // Необязательные записи (арт, которого ещё нет) сборка пропускает — tools/build.mjs; здесь так же.
+            if (typeof file === 'string' && entry?.optional === true) { optional++; continue; }
+            missing.push(`${logicalName}: ${String(file)}`);
           }
           if (missing.length) {
             console.error('Missing runtime assets from manifest:\n' + missing.join('\n'));
             process.exit(1);
           }
-          console.log(`PASS: ${Object.keys(ASSET_FILES).length} manifest entries resolve to existing runtime files`);
+          console.log(`PASS: ${Object.keys(ASSET_FILES).length} manifest entries resolve to existing runtime files (${optional} optional not present)`);
           NODE
 
       - name: Install runtime build dependency

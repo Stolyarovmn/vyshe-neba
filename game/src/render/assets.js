@@ -65,6 +65,14 @@ export async function loadAssets(manifest, options = {}) {
   const loadOne = async ([name, spec]) => {
     const file = typeof spec === 'string' ? spec : spec.file;
     const kind = typeof spec === 'string' ? 'image' : spec.kind || 'image';
+    // В собранном файле сборщик не встраивает отсутствующий необязательный арт: не запрашиваем его по сети,
+    // иначе каждая эпоха без иконок даёт десятки 404 в консоли.
+    const embedded = globalThis.__GAME_ASSETS__;
+    if (spec.optional && embedded && !options.resolveUrl && !(file in embedded)) {
+      done++;
+      if (options.onProgress) options.onProgress(done, entries.length);
+      return;
+    }
     try {
       const url = resolveUrl(file);
       if (kind === 'json') {
@@ -76,7 +84,7 @@ export async function loadAssets(manifest, options = {}) {
         images.set(name, { name, img, w, h, anchor: spriteAnchor(name) });
       }
     } catch (error) {
-      errors.push(`${name}: ${error.message}`);
+      if (!spec.optional) errors.push(`${name}: ${error.message}`);
     }
     done++;
     if (options.onProgress) options.onProgress(done, entries.length);

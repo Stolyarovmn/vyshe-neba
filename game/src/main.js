@@ -99,6 +99,7 @@ async function boot() {
 /** Тестовый хук: включён всегда (см. game/test/browser.cjs). */
 function installTestHook(app) {
   globalThis.__VN_TEST__ = {
+    renderer: app.renderer,
     screen: () => app.screen,
     target: (id) => app.target(id),
     profile: () => structuredClone(app.profile),

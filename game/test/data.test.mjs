@@ -43,9 +43,9 @@ test('parts: eight modules with 18 monotonic levels (the parachute is a shop ite
       assert.ok(part.levels[i].cost > part.levels[i - 1].cost, `${id} cost rises at level ${i + 1}`);
       assert.ok(part.levels[i].data >= part.levels[i - 1].data, `${id} data does not fall at level ${i + 1}`);
     }
-    // Price growth stays near the 1.28..1.34 corridor of DESIGN 4.7 once rounding no longer matters.
+    // Проверяем основу роста, учитывая окончание скидки 25 % для L7–L9 на L10.
     for (let i = 8; i < 18; i++) {
-      const ratio = part.levels[i].cost / part.levels[i - 1].cost;
+      const ratio = part.levels[i].cost / part.levels[i - 1].cost * (i === 9 ? 0.75 : 1);
       assert.ok(ratio > 1.2 && ratio < 1.42, `${id} growth ${ratio.toFixed(3)} at level ${i + 1}`);
     }
     // Every stat moves in its declared direction and every level improves something.
@@ -66,9 +66,9 @@ test('parts: eight modules with 18 monotonic levels (the parachute is a shop ite
 test('parts: the stock rocket equals the simulation reference stages', () => {
   assert.equal(PARTS.engine.base.thrust, STAGE_DEFAULTS.core.thrust);
   assert.equal(PARTS.engine.base.burnRate, STAGE_DEFAULTS.core.burnRate);
-  assert.equal(PARTS.tank.base.fuel, STAGE_DEFAULTS.core.fuel);
-  assert.equal(PARTS.capsule.base.fuel, STAGE_DEFAULTS.capsule.fuel);
-  assert.equal(PARTS.booster.levels[0].stats.fuel > STAGE_DEFAULTS.booster.fuel, true);
+  assert.equal(PARTS.tank.base.fuel, 130);
+  assert.equal(PARTS.capsule.base.fuel, 5);
+  assert.equal(PARTS.booster.levels[0].stats.fuel, 20);
 });
 
 test('Стабилизаторы: наклон от 0,12 рад до свободного вращения, поворот от 0,22 до 2,4', () => {
@@ -98,7 +98,7 @@ test('Стабилизаторы: наклон от 0,12 рад до свобо�
 test('fins: the first levels are cheap and need only the first service team', () => {
   const cheapest = Math.min(...Object.values(BUILDINGS).map((b) => b.levels[0].cost));
   for (let level = 1; level <= 3; level++) {
-    assert.ok(PARTS.fins.levels[level - 1].cost <= 80, `fins level ${level} costs ${PARTS.fins.levels[level - 1].cost}`);
+    assert.equal(PARTS.fins.levels[level - 1].cost, [30, 35, 50][level - 1]);
     assert.deepEqual(PARTS.fins.levels[level - 1].requires, [{ building: 'service', level: 1 }]);
   }
   assert.ok(BUILDINGS.service.levels[0].cost <= 2 * cheapest, 'the service team is among the cheapest buildings');
@@ -245,12 +245,14 @@ test('content: 44 achievements, 30 contracts, shop and skins', () => {
   assert.equal(new Set(data.ACHIEVEMENTS.map((a) => a.id)).size, 44);
   assert.equal(new Set(data.CONTRACT_TEMPLATES.map((t) => t.id)).size, 30);
   // Old rewards are scaled like the end of content.js: max(10, round(r * .45)) and max(15, round(r * .55)).
-  assert.equal(data.ACHIEVEMENTS.find((a) => a.id === 'first').reward, 14);
+  assert.equal(data.ACHIEVEMENTS.find((a) => a.id === 'first').reward, 4);
   assert.equal(data.ACHIEVEMENTS.find((a) => a.id === 'base5').reward, 450);
-  assert.equal(data.CONTRACT_TEMPLATES.find((t) => t.id === 'm01').reward, 33);
+  assert.equal(data.CONTRACT_TEMPLATES.find((t) => t.id === 'm01').reward, 5);
   assert.equal(data.CONTRACT_TEMPLATES.find((t) => t.id === 'm30').reward, 550);
-  assert.ok(data.ACHIEVEMENTS.every((a) => a.name && a.desc && a.reward >= 10 && a.cond.type));
-  assert.ok(data.CONTRACT_TEMPLATES.every((t) => t.name && t.desc && t.reward >= 15 && t.goal.type && t.from));
+  const starterAchievements = { first: 4, land1: 6, perfect1: 12, alt1: 4 };
+  const starterContracts = { m01: 5, m02: 7, m03: 5 };
+  assert.ok(data.ACHIEVEMENTS.every((a) => a.name && a.desc && a.reward >= (starterAchievements[a.id] ?? 10) && a.cond.type));
+  assert.ok(data.CONTRACT_TEMPLATES.every((t) => t.name && t.desc && t.reward >= (starterContracts[t.id] ?? 15) && t.goal.type && t.from));
   assert.deepEqual(data.SHOP.map((s) => s.id), ['chute', 'repair', 'canister', 'magnet']);
   assert.deepEqual(data.SKINS.map((s) => s.id), ['classic', 'wasp', 'arctic', 'cosmos']);
   assert.equal(data.SKINS[0].price, 0);

@@ -7,7 +7,7 @@ import { skinItems, shopItems } from '../bridge.js';
 import { drawChrome, infoCallout } from './common.js';
 import { mix } from '../theme.js';
 
-const CONSUMABLE_ICON = { chute: 'chute', repair: 'repair', canister: 'canister', magnet: 'target' };
+const CONSUMABLE_ICON = { chute: 'item:chute', repair: 'item:repair', canister: 'item:canister', magnet: 'item:magnet' };
 const STOCK_MAX = 9;
 
 function state(app) {

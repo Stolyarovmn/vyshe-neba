@@ -15,11 +15,12 @@ import {
   dayOverlay, daylightAt, drawBirds, drawFoam, drawGlow, drawGlowScreen, drawHeadlights, drawVehicles, lightsAt, shorePoints,
 } from './life.js';
 import { MOUNT_RADIUS, drawLaunchMount } from './launchpad.js';
-import { createRocketPose, drawRocket, stackHeight } from './rocket.js';
+import { createRocketPose, drawRocket, stackHeight, stackGeometry } from './rocket.js';
 import { drawAircraft, drawDrone } from './traffic.js';
 import { drawRain } from './sky.js';
 import { clamp, damp, hash2, smoothstep } from './util.js';
 import { weatherMood } from './weather.js';
+import { createIsoHub, isoLayout } from './hub-iso.js';
 
 const MIN_TOUCH_CSS = 48;
 const VIEW_RATE = 7;
@@ -52,6 +53,11 @@ export function clampCenter(cx, cy, s, devW, devH) {
 }
 
 export function createHub(painter, shared) {
+  const layout = isoLayout(painter.assets);
+  return layout ? createIsoHub(painter, shared, layout) : createTopHub(painter, shared);
+}
+
+function createTopHub(painter, shared) {
   const mv = createMapView();
   const pose = createRocketPose();
   const rects = new Map();
@@ -165,6 +171,7 @@ export function createHub(painter, shared) {
   }
 
   const hub = {
+    mode: () => 'top',
     /** Сдвиг вида на экранные пиксели CSS (перетаскивание): мир едет за пальцем. */
     pan(dxCss, dyCss = 0) {
       if (!state.ready) return;
@@ -429,7 +436,7 @@ export function createHub(painter, shared) {
         y: 0,
         draw() {
           drawLaunchMount(ctx, mv, era, time);
-          if ((parts.capsule | 0) > 0) drawCapsuleOnCart(ctx, painter, mv, era);
+          if ((parts.capsule | 0) > 0 && !stackGeometry(painter.assets, era)) drawCapsuleOnCart(ctx, painter, mv, era);
           pose.x = 0;
           pose.y = 0;
           pose.angle = 0;
@@ -440,7 +447,7 @@ export function createHub(painter, shared) {
           pose.skin = (profile && profile.skin) || 'classic';
           pose.visible = true;
           drawRocket(ctx, painter, mv, pose, time);
-          const height = stackHeight(pose.kind);
+          const height = stackHeight(pose.kind, painter.assets, era);
           addRect('rocket', mv.sx(-18), mv.sy(-height), mv.sx(18), mv.sy(4));
         },
       };

@@ -113,6 +113,8 @@ export default {
     const st = state(app);
     st.era = false;
     st.hintOff = false;
+    // клипы ON по событиям, случившимся вне базы (покупка модуля, авария, контракт)
+    for (const key of (app.hubEvents || []).splice(0)) app.renderer.hub.playEvent?.(key);
     if (params?.select) st.sel = params.select;
     if (params?.era) {
       st.era = true;

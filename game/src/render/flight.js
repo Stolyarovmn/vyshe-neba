@@ -6,10 +6,11 @@ import { createCamera, createView } from './camera.js';
 import { applyEvents, createScreenFx } from './events.js';
 import { drawTerrain } from './ground.js';
 import {
-  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundTransform,
+  createMapView, drawGroundShadow, drawIslandHd, drawSea, groundScale, groundTransform,
 } from './islandmap.js';
+import { islandNorthEdge } from '../sim/island-sky.js';
 import { drawCloudField, fallbackClouds } from './clouds.js';
-import { drawPlacedBuildings, islandToWorld } from './buildings.js';
+import { buildingSize, drawPlacedBuildings, islandToWorld } from './buildings.js';
 import { drawLaunchMount, drawPadRing, MOUNT_RADIUS } from './launchpad.js';
 import { drawObjects, drawObjectsFront, drawRadarMarks, warmRings } from './objects.js';
 import { createRingFx } from './rings.js';
@@ -21,13 +22,13 @@ import {
 } from './overlays.js';
 import { PALETTE_VARIANT, PARTICLE, createParticles } from './particles.js';
 import {
-  ROCKET_SIZE, createRocketPose, drawChute, drawRocket, nozzleOffset, stackHeight,
+  ROCKET_SIZE, createRocketPose, drawChute, drawRocket, nozzleOffset, stackHeight, stackGeometry,
 } from './rocket.js';
 import {
   drawLimb, drawRain, drawSky, drawSkyBodies, drawStars, drawSun,
 } from './sky.js';
 import { ensureWorld } from './layout.js';
-import { E0_DELUGE_NOZZLES, ISLAND, spriteName } from './manifest.js';
+import { BUILDING_ANCHORS, E0_DELUGE_NOZZLES, ISLAND, buildingSpriteName, spriteName } from './manifest.js';
 
 const DELUGE_SOURCES_E0 = E0_DELUGE_NOZZLES.map(([px, py, direction]) =>
   [...islandToWorld(px, py), direction]);
@@ -42,6 +43,122 @@ const BODY_GRAVITY = { earth: 45, moon: 9, mars: 20 };
 const PIECE_COUNT = 10;
 const CAMERA_JUMP = 1500;
 const HAZE_COLOR = [150, 205, 236];
+/**
+ * Подъём камеры после старта: изометрия базы (40°) → 8 ракурсов через 4° → карта полёта, секунд.
+ * Ход сглажен (медленно трогается и мягко встаёт), чтобы смена ракурсов читалась как движение камеры, а не как перещёлкивание.
+ */
+export const LIFT_TIME = 1.3;
+
+/**
+ * Кадры подъёма камеры: [изометрия базы, ракурсы из tilt.json по возрастанию угла, карта полёта].
+ * У каждого: asset, size [w, h] px кадра, pad [x, y] px стола, buildings { ключ: [[x, y], ...] } px якорей.
+ * null, если изометрии или кадров нет: тогда полёт начинается сразу с карты.
+ */
+export function tiltFrames(assets) {
+  const iso = assets.json?.('base_iso_layout');
+  const tilt = assets.json?.('island_tilt_layout');
+  const start = assets.get('island_start');
+  const base = assets.get('island_base_iso');
+  if (!iso || !tilt || !start || !base || !iso.pad || !iso.buildings) return null;
+  const isoBuildings = {};
+  const isoSize = {};
+  for (const [key, b] of Object.entries(iso.buildings)) {
+    isoBuildings[key] = Array.isArray(b.anchors) ? b.anchors : [b.anchor];
+    isoSize[key] = b.size;
+  }
+  // объекты-входы базы есть только в изометрии: в остальных кадрах их место — по аффинному приближению якорей построек
+  const isoEntries = {};
+  const entrySize = {};
+  for (const [key, e] of Object.entries(iso.entries || {})) {
+    if (Array.isArray(e.anchor) && Array.isArray(e.size) && assets.has?.(`iso_entry_${key}_1978`)) {
+      isoEntries[key] = [e.anchor];
+      entrySize[key] = e.size;
+    }
+  }
+  const frames = [{ asset: base, size: iso.size, pad: [iso.pad.x, iso.pad.y], buildings: isoBuildings, isoSize, entries: isoEntries, entrySize }];
+  for (const f of [...(tilt.frames || [])].sort((a, b) => a.elev - b.elev)) {
+    const asset = assets.get(f.asset);
+    if (asset && Array.isArray(f.size) && Array.isArray(f.pad)) frames.push({ asset, size: f.size, pad: f.pad, buildings: f.buildings || {} });
+  }
+  const plan = {};
+  for (const [key, spec] of Object.entries(BUILDING_ANCHORS)) plan[key] = (spec.e0 || spec).anchors;
+  frames.push({ asset: start, size: [ISLAND.width, ISLAND.height], pad: ISLAND.launchOrigin, buildings: plan });
+  for (const fr of frames.slice(1)) {
+    const map = fitAffine(isoBuildings, fr.buildings);
+    fr.entries = {};
+    if (map) for (const [key, list] of Object.entries(isoEntries)) fr.entries[key] = list.map(map);
+  }
+  return frames.length >= 3 ? frames : null;
+}
+
+/**
+ * Аффинное приближение «точка изометрии → точка кадра» методом наименьших квадратов по общим якорям построек
+ * (from, to: { key: [[x, y], ...] }). null — если общих якорей меньше трёх или они на одной прямой.
+ */
+export function fitAffine(from, to) {
+  const m = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  const bx = [0, 0, 0];
+  const by = [0, 0, 0];
+  let n = 0;
+  for (const [key, list] of Object.entries(from)) {
+    const other = to[key];
+    if (!other) continue;
+    list.forEach((p, i) => {
+      const q = other[i];
+      if (!q) return;
+      const v = [p[0], p[1], 1];
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) m[r][c] += v[r] * v[c];
+        bx[r] += v[r] * q[0];
+        by[r] += v[r] * q[1];
+      }
+      n++;
+    });
+  }
+  const det3 = (a) => a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) - a[0][1] * (a[1][0] * a[2][2] - a[1][2] * a[2][0])
+    + a[0][2] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
+  const d = det3(m);
+  if (n < 3 || Math.abs(d) < 1e-9) return null;
+  const solve = (b) => [0, 1, 2].map((col) => det3(m.map((row, r) => row.map((val, c) => (c === col ? b[r] : val)))) / d);
+  const ax = solve(bx);
+  const ay = solve(by);
+  return ([x, y]) => [ax[0] * x + ax[1] * y + ax[2], ay[0] * x + ay[1] * y + ay[2]];
+}
+
+/** Прозрачность облака-тумана над сушей острова. */
+export const ISLAND_FOG_ALPHA = 0.38;
+
+/**
+ * Множитель прозрачности облака при камере на высоте h (ед.): 1 над морем и высоко, ISLAND_FOG_ALPHA, пока под нижней
+ * кромкой облака на карте суша. Точка карты под предметом на высоте A уходит на север как A·(1 + (h/250)²)
+ * (islandmap.groundScale), поэтому с подъёмом облака плавно «густеют» обратно.
+ */
+export function islandFog(cloud, h) {
+  const w = cloud.w || 200;
+  const bottom = Math.max(0, (cloud.alt || 0) - (cloud.h || 60) * 0.4);
+  const north = bottom / groundScale(h);
+  const edge = islandNorthEdge(cloud.x - w / 2, cloud.x + w / 2);
+  if (edge <= 0) return 1;
+  return lerp(ISLAND_FOG_ALPHA, 1, smoothstep(edge - 20, edge + 40, north));
+}
+
+/**
+ * Окно смены изометрических спрайтов построек на спрайты карты по ходу подъёма u. Пока идёт смена, видны оба спрайта
+ * (двойной контур), поэтому окно узкое: ~0,2 с из 1,3 с. Сжимать изометрию по высоте не нужно: спрайты карты нарисованы
+ * под ~50–55° и по высоте близки к изометрическим.
+ */
+export const SPRITE_SWAP = [0.47, 0.6];
+
+/** Высота раскрытия посадочных опор на снижении, ед. мира (×10 м). */
+const LEG_DEPLOY_ALT = 40;
+
+/** Положение в ряду кадров по ходу подъёма u (0..1): индекс нижнего кадра и доля следующего. */
+export function liftBlend(u, count) {
+  const n = Math.max(1, count - 1);
+  const f = Math.min(n - 1e-6, Math.max(0, u) * n);
+  const i = Math.floor(f);
+  return { i, b: f - i };
+}
 
 function activeStageId(flight) {
   const stages = flight.stages;
@@ -91,6 +208,8 @@ export function createFlightRenderer(painter, shared) {
     crashY: 0,
     crashT: 0,
     acc: { flame: 0, smoke: 0, ground: 0, damage: 0, water: 0 },
+    tilt: null,
+    liftStart: null,
   };
 
   function resetState(flight) {
@@ -103,6 +222,8 @@ export function createFlightRenderer(painter, shared) {
     state.crashT = 0;
     state.body = flight && flight.body ? flight.body : 'earth';
     state.acc.flame = state.acc.smoke = state.acc.ground = state.acc.damage = state.acc.water = 0;
+    state.tilt = flight ? tiltFrames(painter.assets) : null;
+    state.liftStart = null;
     particles.clear();
     delugeParticles.clear();
     for (const piece of pieces) piece.active = false;
@@ -145,14 +266,15 @@ export function createFlightRenderer(painter, shared) {
   function spawnPiece(e) {
     const piece = pieces.find((p) => !p.active) || pieces[0];
     const base = e.stage === 'capsule' ? 'capsule' : e.stage === 'booster' ? 'booster' : 'core';
-    const h = base === 'booster' ? ROCKET_SIZE.boosterH : base === 'capsule' ? ROCKET_SIZE.capsuleH : ROCKET_SIZE.coreH;
+    const stack = stackGeometry(painter.assets, state.era);
+    const h = stack ? stack[base].h : base === 'booster' ? ROCKET_SIZE.boosterH : base === 'capsule' ? ROCKET_SIZE.capsuleH : ROCKET_SIZE.coreH;
     const angle = e.angle || 0;
     const flight = state.flight;
     const x = e.x !== undefined ? e.x : flight ? flight.x : 0;
     const y = e.y !== undefined ? e.y : flight ? flight.y : 0;
     // Центр отделившейся ступени; её опора — исходная точка ракеты.
     piece.active = true;
-    piece.base = base;
+    piece.base = stack ? `stack_${base}` : base;
     piece.era = state.era;
     piece.h = h;
     piece.hue = 0;
@@ -223,7 +345,7 @@ export function createFlightRenderer(painter, shared) {
     const reduce = state.reduce ? 0.6 : 1;
     const sin = Math.sin(pose.angle);
     const cos = Math.cos(pose.angle);
-    const off = nozzleOffset(pose.kind) + 1;
+    const off = nozzleOffset(pose.kind, painter.assets, pose.era) + 1;
     const nx = pose.x - sin * off;
     const ny = pose.y + cos * off;
     const dirX = -sin;
@@ -317,7 +439,7 @@ export function createFlightRenderer(painter, shared) {
     state.acc.damage += dt * (1 - hpFrac * 2) * 22;
     while (state.acc.damage >= 1) {
       state.acc.damage -= 1;
-      const h = stackHeight(pose.kind);
+      const h = stackHeight(pose.kind, painter.assets, pose.era);
       const sin = Math.sin(pose.angle);
       const cos = Math.cos(pose.angle);
       const along = h * (0.2 + rng() * 0.5);
@@ -347,6 +469,12 @@ export function createFlightRenderer(painter, shared) {
     pose.rcsLeft = flight.rcs ? flight.rcs.left : 0;
     pose.rcsRight = flight.rcs ? flight.rcs.right : 0;
     pose.visible = !(state.crashed || flight.phase === 'crashed');
+    // опоры: на столе и в подъёме сложены, на снижении у земли раскрываются (событие посадки), после посадки стоят
+    pose.legs = state.legs || 0;
+    if (state.legFlight !== flight) { state.legFlight = flight; state.legDeploy = 0; }
+    const legTarget = flight.phase === 'landed' || (flight.liftedOff && (flight.vy || 0) > 0 && -flight.y < LEG_DEPLOY_ALT) ? 1 : 0;
+    state.legDeploy = state.reduce ? legTarget : state.legDeploy + (legTarget - state.legDeploy) * Math.min(1, (dt || 0) * 2.5);
+    pose.legDeploy = state.legDeploy;
 
     const ended = flight.phase === 'landed' || flight.phase === 'crashed';
     if (flight.chute && flight.chute.deployed && !ended) {
@@ -365,7 +493,7 @@ export function createFlightRenderer(painter, shared) {
 
   function updateCamera(flight, dt, layout, reduce) {
     target.x = flight.x;
-    target.y = flight.y - stackHeight(pose.kind) * 0.5;
+    target.y = flight.y - stackHeight(pose.kind, painter.assets, pose.era) * 0.5;
     target.vx = flight.vx || 0;
     target.vy = flight.vy || 0;
     target.alt = flight.alt ?? -flight.y;
@@ -410,7 +538,11 @@ export function createFlightRenderer(painter, shared) {
     const previous = ctx.globalAlpha;
     ctx.globalAlpha = previous * seaAlpha;
     drawSea(ctx, mapView, time, mood, smoothstep(120, 1400, altitude) * 0.8, HAZE_COLOR);
-    if (landAlpha > 0.01) {
+    const lift = liftProgress(time);
+    if (landAlpha > 0.01 && lift < 1) {
+      ctx.globalAlpha = previous * landAlpha;
+      drawTilt(ctx, lift, profile, time);
+    } else if (landAlpha > 0.01) {
       ctx.globalAlpha = previous * landAlpha;
       drawIslandHd(ctx, painter, mapView);
       // тень видна только ниже shadowRange (400 м), размер и смещение соответствуют высоте 1:1
@@ -423,6 +555,93 @@ export function createFlightRenderer(painter, shared) {
       delugeParticles.draw(ctx, mapView, 1);
     }
     ctx.globalAlpha = previous;
+  }
+
+  /** Ход подъёма камеры 0..1 от первого кадра полёта; 1, если кадров подъёма нет. */
+  function liftProgress(time) {
+    if (!state.tilt) return 1;
+    if (state.liftStart === null) state.liftStart = time;
+    const t = clamp((time - state.liftStart) / LIFT_TIME, 0, 1);
+    return t * t * (3 - 2 * t);
+  }
+
+  /**
+   * Подъём камеры: соседние кадры ряда растворяются один в другой, стол каждого кадра стоит в мировом нуле,
+   * масштаб кадра равен масштабу карты полёта. Постройки едут между якорями кадров; на середине подъёма
+   * изометрический спрайт сменяется спрайтом карты.
+   */
+  function drawTilt(ctx, u, profile, time) {
+    const frames = state.tilt;
+    const { i, b } = liftBlend(u, frames.length);
+    const lo = frames[i];
+    const hi = frames[i + 1];
+    // px кадра = px карты острова; экранных px на px кадра = px на единицу * единиц на px карты
+    const sImg = mapView.s * ISLAND.unitsPerPx;
+    const px0 = mapView.sx(0);
+    const py0 = mapView.sy(0);
+    const prev = ctx.globalAlpha;
+    const was = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    const blit = (fr, alpha) => {
+      ctx.globalAlpha = prev * alpha;
+      ctx.drawImage(fr.asset.img, px0 - fr.pad[0] * sImg, py0 - fr.pad[1] * sImg, fr.size[0] * sImg, fr.size[1] * sImg);
+    };
+    blit(lo, 1);
+    if (b > 0.001) blit(hi, b);
+    ctx.imageSmoothingEnabled = was;
+    const w = smoothstep(SPRITE_SWAP[0], SPRITE_SWAP[1], u);
+    const isoBlit = (name, sx, sy, size, alpha) => {
+      const asset = painter.assets.get(name);
+      if (asset) painter.blitDev(ctx, asset, sx, sy, size[0] * sImg, size[1] * sImg, 0.5, 1, { alpha, smooth: true });
+    };
+    if (w > 0.001) {
+      ctx.globalAlpha = prev * w;
+      drawLaunchMount(ctx, mapView, state.era, time);
+    }
+    ctx.globalAlpha = prev;
+    const owned = profile?.buildings || {};
+    const items = [];
+    for (const key of Object.keys(frames[0].buildings)) {
+      const level = owned[key] | 0;
+      const a0 = lo.buildings[key];
+      const a1 = hi.buildings[key];
+      if (level <= 0 || !a0 || !a1) continue;
+      for (let k = 0; k < a0.length; k++) {
+        const p0 = a0[k];
+        const p1 = a1[k] || a1[0];
+        const x = lerp(p0[0] - lo.pad[0], p1[0] - hi.pad[0], b);
+        const y = lerp(p0[1] - lo.pad[1], p1[1] - hi.pad[1], b);
+        items.push({ key, level, sx: px0 + x * sImg, sy: py0 + y * sImg });
+      }
+    }
+    // объекты-входы базы (ангар, лавка, доска, памятник) гаснут вместе с изометрическими спрайтами построек
+    if (w < 0.999) {
+      for (const key of Object.keys(frames[0].entries || {})) {
+        const p0 = lo.entries?.[key]?.[0];
+        const p1 = hi.entries?.[key]?.[0];
+        if (!p0 || !p1) continue;
+        const x = lerp(p0[0] - lo.pad[0], p1[0] - hi.pad[0], b);
+        const y = lerp(p0[1] - lo.pad[1], p1[1] - hi.pad[1], b);
+        items.push({ key, entry: true, sx: px0 + x * sImg, sy: py0 + y * sImg });
+      }
+    }
+    items.sort((p, q) => p.sy - q.sy);
+    for (const it of items) {
+      if (it.entry) {
+        isoBlit(`iso_entry_${it.key}_1978`, it.sx, it.sy, frames[0].entrySize[it.key], 1 - w);
+        continue;
+      }
+      const isoName = `iso_${it.key}_1978`;
+      const isoSize = frames[0].isoSize[it.key];
+      if (w < 0.999 && isoSize && painter.has(isoName)) isoBlit(isoName, it.sx, it.sy, isoSize, 1 - w);
+      const topName = buildingSpriteName(it.key, it.level);
+      if (w > 0.001 && painter.has(topName)) {
+        const [, h] = buildingSize(painter, it.key, it.level);
+        painter.spriteScreen(ctx, view, topName, it.sx, it.sy, h * mapView.s, { ax: 0.5, ay: 1, alpha: w, smooth: true });
+      }
+    }
+    ctx.globalAlpha = prev;
   }
 
   function drawGround(ctx, flight, profile, time) {
@@ -456,6 +675,7 @@ export function createFlightRenderer(painter, shared) {
     env.era = state.era;
     state.skin = cfg.skin || 'classic';
     const profile = params.profile || (shared && shared.profile) || null;
+    state.legs = (cfg.parts?.legs ?? profile?.parts?.legs ?? 0) | 0;
 
     const world = ensureWorld(layout);
     const canvas = ctx.canvas;
@@ -528,7 +748,9 @@ export function createFlightRenderer(painter, shared) {
     if (body !== 'earth') drawFlatShadow(ctx, view, flight);
     const clouds = cloudsFor(flight, camAlt);
     const flashPower = clamp((mood.flash || 0) / 0.08, 0, 1);
-    drawCloudField(ctx, painter, view, clouds, 0, time, flashPower, mood.wind);
+    // над сушей острова облако — только туман: полупрозрачное, пока под ним на карте видна земля
+    const fog = body === 'earth' ? (cloud) => islandFog(cloud, Math.max(0, flight.alt ?? -flight.y)) : 1;
+    drawCloudField(ctx, painter, view, clouds, 0, time, flashPower, mood.wind, fog);
     if (mood.rain > 0.05 && camAlt < 2400) drawRain(ctx, view, time, mood.rain, mood.wind);
     drawPredict(
       ctx, view, flight.predict, time, flight.liftedOff === false ? 0 : smoothstep(8, 45, flight.alt ?? 0), body === 'earth' ? mapView : view,
@@ -543,7 +765,7 @@ export function createFlightRenderer(painter, shared) {
     drawChute(ctx, painter, view, pose, time);
     particles.draw(ctx, view, 1);
     drawObjectsFront(ctx, painter, view, flight.objects, state.era, ringFx, time);
-    drawCloudField(ctx, painter, view, clouds, 1, time, flashPower, mood.wind);
+    drawCloudField(ctx, painter, view, clouds, 1, time, flashPower, mood.wind, fog);
 
     drawSpeedLines(ctx, view, flight.vx || 0, flight.vy || 0, flight.atmo ?? 1, time);
     if (mood.dust > 0.05 && body === 'mars') {
@@ -574,6 +796,23 @@ export function createFlightRenderer(painter, shared) {
     /** Начало полёта: сбрасывает камеру, частицы и отделённые ступени. */
     start(flight) {
       resetState(flight || null);
+    },
+
+    /** Есть ли кадры подъёма камеры (тогда стык база → полёт идёт без затемнения). */
+    hasTilt() {
+      return !!tiltFrames(painter.assets);
+    },
+
+    /**
+     * Кадр покоя на столе: экранный якорь ракеты, экранная y её опорной точки и px устройства на единицу мира.
+     * База подводит к нему камеру во время отсчёта, чтобы первый кадр полёта совпал с последним кадром базы.
+     */
+    restFraming(layout, devW, devH, kind = 'core', era = 0) {
+      const world = ensureWorld(layout);
+      const devPerCss = devW / layout.w;
+      const anchor = layout.rocketAnchor || { x: layout.w * 0.5, y: layout.h * 0.62 };
+      const h = stackHeight(kind, painter.assets, era);
+      return { ax: anchor.x * devPerCss, feetY: anchor.y * devPerCss + h * 0.5 * world.px, pxPerUnit: world.px };
     },
 
     reset() {

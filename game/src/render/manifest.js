@@ -6,18 +6,29 @@
 // (проверено: размер файла == w,h для всех спрайтов, scale == 1 везде).
 // Единицы мира: 1 ед. = 10 м; размеры отрисовки (в единицах мира) лежат в sizes.js.
 
+import { SHOP } from '../data/shop.js';
+
 export const ERA_YEARS = [1978, 1986, 1998, 2015, 2035, 2060];
+
+/** Девять модулей ракеты в порядке сборки снизу вверх; общий список мастерской и иконок. */
+export const MODULE_IDS = ['engine', 'tank', 'hull', 'booster', 'capsule', 'legs', 'fins', 'parachute', 'avionics'];
+/** Необязательные иконки расходников E0 используют реальные id лавки. */
+export const E0_ITEM_ICON_IDS = SHOP.map((item) => item.id);
 
 // Раскладка game/assets: shared/ — общее для всех эпох; eras/e<N>-<год>/ — по эпохам, внутри эпохи по темам:
 //   rocket (ядро, ступень, капсула, parachute), base (постройки базы), workshop (станции мастерской),
 //   aircraft, aerostats, orbital (спутники), pickups (монеты, топливо, ремкомплекты, магниты, кольца), environment.
 export const ASSET_ROOT = 'game/assets/';
 const SHARED = `${ASSET_ROOT}shared/`;
+/** Ракурсы подъёма камеры база → полёт (градусы над горизонтом), файлы shared/island/tilt-<угол>.webp, раскладка tilt.json. */
+export const TILT_ANGLES = [44, 48, 52, 56, 60, 64, 68, 73];
 export const eraFolder = (eraIndex) => `${ASSET_ROOT}eras/e${eraIndex}-${ERA_YEARS[eraIndex]}/`;
 
 /** Тема и файл спрайта эпохи по базовому имени: имя_ГОД -> eras/e<N>-<год>/<тема>/<файл>.png */
 const ERA_SPRITE_PLACE = {
   core: 'rocket/core', booster: 'rocket/booster', capsule: 'rocket/capsule',
+  stack_booster: 'rocket/stack_booster', stack_core: 'rocket/stack_core', stack_capsule: 'rocket/stack_capsule',
+  ring_h_back: 'pickups/ring_h_back', ring_h_front: 'pickups/ring_h_front',
   canopy: 'rocket/parachute/canopy', pack: 'rocket/parachute/pack',
   low_primary: 'aircraft/low-primary', low_multiwing: 'aircraft/low-multiwing',
   medium_passenger: 'aircraft/medium-passenger', medium_cargo: 'aircraft/medium-cargo',
@@ -77,6 +88,8 @@ export const FLAT_SPRITES = [
 ];
 /** Шары собираются из двух частей: оболочка и гондола (balloon_ГОД_envelope / balloon_ГОД_pod). */
 export const BALLOON_PARTS = ['envelope', 'pod'];
+/** Необязательный арт: отсутствие файла сохраняет прежнюю отрисовку. */
+export const OPTIONAL_ERA_SPRITES = ['stack_booster', 'stack_core', 'stack_capsule', 'ring_h_back', 'ring_h_front'];
 /** Постройки с готовым артом: infrastructure/<ключ>/<год>.png. */
 export const ART_BUILDINGS = ['beacons', 'gantry', 'deluge', 'service', 'rescue', 'fuel'];
 /** Постройки базы: ключ -> файл в eras/e<N>-<год>/base/<ключ>.png. */
@@ -116,13 +129,19 @@ export const PROCEDURAL_BUILDINGS = ['logistics', 'radar', 'energy', 'observatio
  * Размеры [w, h] PNG. Для остальных эпох остаются прежние файлы infrastructure/ и программные силуэты.
  */
 export const E0_BUILDING_SIZES = {
-  beacons: [319, 644], gantry: [340, 516], deluge: [421, 516], service: [516, 354], rescue: [516, 312], fuel: [516, 264],
-  logistics: [516, 458], radar: [644, 379], energy: [516, 463], observation: [473, 516], recovery: [516, 349],
+  // Срез HD-пикселя: PNG запечены 1:1 с пикселем острова (размер PNG = e0.size), палитра острова, альфа 0/255.
+  // 2026-11-11: постройки перерисованы для камеры полёта (tools/hd_pixel/bake_top.py); ширина = ширине iso-спрайта той же постройки.
+  beacons: [319, 644], gantry: [90, 208], deluge: [100, 180], service: [110, 140], rescue: [110, 155], fuel: [110, 108],
+  logistics: [120, 150], radar: [70, 107], energy: [95, 91], observation: [60, 90], recovery: [110, 110],
 };
 /**
- * ON-клипы построек E0 (art/gen/placeables/base/<asset>/animation.json): кадр 0 — обычный спрайт, кадры 1..N-1 — файлы
- * base/anim/<ключ>_on<i>.png того же размера и с той же привязкой. sequence — порядок кадров за один показ, fps — частота.
- * Клип играет один раз по событию хаба (завершение стройки, нажатие на постройку) и не зацикливается; при «меньше движения» не играет.
+ * ON-клипы построек E0: кадр 0 — обычный спрайт, кадры 1..N-1 того же размера и с той же привязкой.
+ * sequence — порядок кадров за один показ, fps — частота. Клип играет один раз по событию хаба (завершение стройки,
+ * нажатие на постройку) и не зацикливается; при «меньше движения» не играет.
+ * С 2026-11-12 изометрическая база играет клипы из частей самих спрайтов (render/iso-clips.js, ASSET_STATE_SPEC §6) и эту
+ * покадровую спеку не использует; она остаётся для прежнего хаба сверху. Кадры вида сверху (base/anim/) сняты
+ * 2026-11-11 вместе с перерисовкой построек для камеры полёта: к новым спрайтам они не подходят; без кадров
+ * рисуется статичный спрайт (drawBuilding берёт базовое имя, если кадра нет).
  */
 export const E0_BUILDING_CLIPS = {
   control: { frames: 4, fps: 8, sequence: [0, 1, 2, 3, 3, 3, 2, 1, 0] },
@@ -236,16 +255,43 @@ function buildAssetFiles() {
   return files;
 }
 
-function buildClipFrameFiles() {
-  const files = {};
-  for (const [key, clip] of Object.entries(E0_BUILDING_CLIPS)) {
-    for (let i = 1; i < clip.frames; i++) files[buildingClipFrameName(key, i)] = `${eraFolder(0)}base/anim/${key}_on${i}.png`;
-  }
-  return files;
-}
-
 export const ASSET_FILES = {
   ...buildAssetFiles(),
+  island_base_iso: { file: `${SHARED}island/base-iso.png`, optional: true },
+  base_iso_layout: { file: `${SHARED}island/base-iso.json`, kind: 'json', optional: true },
+  // Подъём камеры база → полёт: промежуточные ракурсы острова (tools/hd_pixel/bake_tilt.py), кадры в tilt.json.
+  // 8 ракурсов через 4° (2026-11-12): соседние кадры почти совпадают, растворение одного в другом не «двоит» остров.
+  ...Object.fromEntries(TILT_ANGLES.map((a) => [`island_tilt_${a}`, { file: `${SHARED}island/tilt-${a}.webp`, optional: true }])),
+  island_tilt_layout: { file: `${SHARED}island/tilt.json`, kind: 'json', optional: true },
+  ...Object.fromEntries(BUILDING_KEYS.map((key) => [
+    `iso_${key}_1978`, { file: `${eraFolder(0)}iso/${key}.png`, optional: true },
+  ])),
+  // Детали ракеты E0 (2026-11-13): посадочные опоры трёх уровней (левая; правая — зеркально) и сопло кабины.
+  rocket_leg1_1978: { file: `${eraFolder(0)}rocket/leg1.png`, optional: true },
+  rocket_leg2_1978: { file: `${eraFolder(0)}rocket/leg2.png`, optional: true },
+  rocket_leg3_1978: { file: `${eraFolder(0)}rocket/leg3.png`, optional: true },
+  rocket_nozzle_capsule_1978: { file: `${eraFolder(0)}rocket/nozzle_capsule.png`, optional: true },
+  // Объекты-входы изометрической базы (ангар, доска, лавка, памятник) — те же ключи, что ENTRY_KEYS ниже.
+  ...Object.fromEntries(['workshop', 'board', 'shop', 'monument'].map((key) => [
+    `iso_entry_${key}_1978`, { file: `${eraFolder(0)}iso/entry_${key}.png`, optional: true },
+  ])),
+  // Изометрические клипы используют только свои кадры, никогда кадры старой камеры.
+  ...Object.fromEntries(Object.entries(E0_BUILDING_CLIPS).flatMap(([key, clip]) =>
+    Array.from({ length: clip.frames - 1 }, (_, i) => [
+      `iso_${key}_1978_on${i + 1}`, { file: `${eraFolder(0)}iso/anim/${key}_on${i + 1}.png`, optional: true },
+    ]))),
+  ...Object.fromEntries(OPTIONAL_ERA_SPRITES.flatMap((base) => ERA_YEARS.map((year, era) => [
+    `${base}_${year}`, { file: worldSpriteFile(spriteName(base, era)), optional: true },
+  ]))),
+  ...Object.fromEntries(BUILDING_KEYS.map((key) => [
+    `icon_${key}_1978`, { file: `${eraFolder(0)}icons/${key}.png`, optional: true },
+  ])),
+  ...Object.fromEntries(MODULE_IDS.map((id) => [
+    `icon_module_${id}_1978`, { file: `${eraFolder(0)}icons/module_${id}.png`, optional: true },
+  ])),
+  ...Object.fromEntries(E0_ITEM_ICON_IDS.map((id) => [
+    `icon_item_${id}_1978`, { file: `${eraFolder(0)}icons/item_${id}.png`, optional: true },
+  ])),
   deluge_nozzle_1978: `${eraFolder(0)}base/deluge-nozzle.png`,
   pad_gate_pedestal_1978: `${eraFolder(0)}base/pad-gate-pedestal.png`,
   pad_gate_receiver_1978: `${eraFolder(0)}base/pad-gate-receiver.png`,
@@ -256,7 +302,6 @@ export const ASSET_FILES = {
   feeder_pole_1978: `${eraFolder(0)}base/feeder-pole.png`,
   entry_shop_1978: `${eraFolder(0)}base/entry-shop.png`,
   entry_board_1978: `${eraFolder(0)}base/entry-contract-board.png`,
-  ...buildClipFrameFiles(),
   trench_plate_h_1978: `${eraFolder(0)}base/trench-plate-h.png`,
   trench_plate_v_1978: `${eraFolder(0)}base/trench-plate-v.png`,
   trench_plate_corner_1978: `${eraFolder(0)}base/trench-plate-corner.png`,
@@ -268,23 +313,23 @@ export const ERA_SPRITE_SIZES = {
   core: [[206, 425], [223, 426], [197, 435], [197, 437], [202, 440], [205, 441]],
   booster: [[218, 221], [230, 222], [228, 222], [229, 222], [219, 224], [244, 224]],
   capsule: [[167, 211], [166, 212], [178, 216], [179, 216], [186, 216], [186, 222]],
-  canopy: [[252, 192], [251, 194], [243, 195], [249, 195], [248, 193], [257, 198]],
-  pack: [[218, 176], [211, 176], [207, 177], [211, 178], [213, 180], [223, 179]],
-  coin: [[153, 156], [157, 157], [157, 157], [157, 157], [158, 159], [156, 160]],
-  fuel: [[167, 195], [158, 193], [157, 199], [164, 190], [167, 200], [165, 203]],
-  repair: [[200, 159], [197, 156], [190, 162], [203, 166], [207, 162], [208, 164]],
+  canopy: [[264, 122], [251, 194], [243, 195], [249, 195], [248, 193], [257, 198]],
+  pack: [[72, 53], [211, 176], [207, 177], [211, 178], [213, 180], [223, 179]],
+  coin: [[64, 64], [157, 157], [157, 157], [157, 157], [158, 159], [156, 160]],
+  fuel: [[77, 96], [158, 193], [157, 199], [164, 190], [167, 200], [165, 203]],
+  repair: [[96, 78], [197, 156], [190, 162], [203, 166], [207, 162], [208, 164]],
   ring: [[175, 222], [168, 219], [167, 219], [185, 219], [171, 219], [178, 219]],
   satellite: [[222, 258], [203, 273], [214, 270], [166, 215], [250, 303], [251, 265]],
   panel: [[164, 92], [214, 108], [241, 131], [282, 132], [282, 161], [240, 169]],
   pad_moon: [[246, 123], [235, 123], [231, 125], [233, 123], [239, 132], [242, 132]],
   pad_mars: [[246, 123], [235, 123], [232, 125], [233, 125], [239, 132], [242, 134]],
-  low_primary: [[247, 177], [236, 178], [247, 187], [226, 177], [248, 177], [245, 155]],
-  low_multiwing: [[262, 189], [232, 189], [247, 189], [256, 190], [272, 211], [261, 199]],
-  medium_passenger: [[740, 327], [251, 147], [255, 160], [261, 133], [249, 167], [259, 135]],
-  medium_cargo: [[741, 363], [650, 333], [274, 169], [264, 142], [312, 157], [252, 138]],
-  high_fighter: [[233, 141], [250, 141], [224, 166], [253, 146], [253, 143], [279, 181]],
-  high_experimental: [[238, 130], [228, 115], [256, 135], [268, 114], [262, 113], [276, 93]],
-  magnet: [[161, 171], [173, 178], [165, 182], [172, 177], [194, 180], [195, 178]],
+  low_primary: [[224, 105], [236, 178], [247, 187], [226, 177], [248, 177], [245, 155]],
+  low_multiwing: [[258, 127], [232, 189], [247, 189], [256, 190], [272, 211], [261, 199]],
+  medium_passenger: [[487, 167], [251, 147], [255, 160], [261, 133], [249, 167], [259, 135]],
+  medium_cargo: [[477, 168], [650, 333], [274, 169], [264, 142], [312, 157], [252, 138]],
+  high_fighter: [[233, 90], [250, 141], [224, 166], [253, 146], [253, 143], [279, 181]],
+  high_experimental: [[238, 84], [228, 115], [256, 135], [268, 114], [262, 113], [276, 93]],
+  magnet: [[70, 72], [173, 178], [165, 182], [172, 177], [194, 180], [195, 178]],
   outpost_moon: [[227, 233], [225, 309], [216, 209], [216, 271], [218, 281], [255, 281]],
   outpost_mars: [[232, 214], [222, 304], [207, 223], [224, 278], [233, 288], [250, 285]],
 };
@@ -370,7 +415,7 @@ export const STAGE_ANCHOR = [0.5, 1];
 
 /** Опорная точка спрайта в долях его размера: [ax, ay]. */
 export function spriteAnchor(name) {
-  if (/^(core|booster|capsule)_/.test(name) || name.startsWith('bld_')) return STAGE_ANCHOR;
+  if (/^(stack_)?(core|booster|capsule)_/.test(name) || name.startsWith('bld_')) return STAGE_ANCHOR;
   const pad = /^(pad_moon|pad_mars)_(\d{4})$/.exec(name);
   if (pad) return [0.5, PAD_LANDING_ANCHOR_Y[pad[1]][ERA_YEARS.indexOf(Number(pad[2]))]];
   const extreme = /^(pad_moon|pad_mars)_(early|future)$/.exec(name);
@@ -422,55 +467,55 @@ export const BUILDING_ANCHORS = {
   },
   gantry: {
     zone: 'launch_core', anchors: [[484, 267]], size: [125, 190], footprint: [108, 32],
-    e0: { anchors: [[458, 330]], size: [56, 32], footprint: [56, 30] },
+    e0: { anchors: [[458, 330]], size: [90, 208], footprint: [90, 66] },
   },
   deluge: {
     zone: 'launch_core', anchors: [[526, 528]], size: [122, 150], footprint: [105, 30],
-    e0: { anchors: [[542, 461]], size: [58, 58], footprint: [58, 32] },
+    e0: { anchors: [[542, 461]], size: [100, 180], footprint: [100, 58] },
   },
   service: {
     zone: 'service_central', anchors: [[660, 451]], size: [140, 96], footprint: [120, 28],
-    e0: { anchors: [[623, 381]], size: [71, 62], footprint: [68, 31] },
+    e0: { anchors: [[623, 381]], size: [110, 140], footprint: [109, 50] },
   },
   rescue: {
     zone: 'service_central', anchors: [[740, 340]], size: [139, 84], footprint: [120, 26],
-    e0: { anchors: [[830, 501]], size: [47, 60], footprint: [45, 53] },
+    e0: { anchors: [[830, 501]], size: [110, 155], footprint: [76, 90] },
   },
   fuel: {
     zone: 'fuel_east', anchors: [[870, 470]], size: [160, 82], footprint: [138, 26],
-    e0: { anchors: [[870, 470]], size: [23, 15], footprint: [23, 11] },
+    e0: { anchors: [[960, 457]], size: [110, 108], footprint: [69, 33] },
   },
   logistics: {
     zone: 'logistics_east', anchors: [[1200, 470]], size: [141, 125], footprint: [121, 30],
-    e0: { anchors: [[1200, 470]], size: [44, 18], footprint: [44, 18] },
+    e0: { anchors: [[1200, 470]], size: [120, 150], footprint: [120, 50] },
   },
   factory: {
     zone: 'industrial_east', anchors: [[920, 255]], size: [190, 145], footprint: [171, 34],
-    e0: { anchors: [[920, 255]], size: [70, 51], footprint: [68, 43] },
+    e0: { anchors: [[920, 255]], size: [175, 166], footprint: [170, 108] },
   },
   weather: {
     zone: 'command_north', anchors: [[1000, 350]], size: [140, 171], footprint: [100, 28],
-    e0: { anchors: [[1060, 280]], size: [7, 13], footprint: [7, 5], smooth: false },
+    e0: { anchors: [[1060, 280]], size: [60, 82], footprint: [60, 36], smooth: false },
   },
   control: {
     zone: 'command_north', anchors: [[1320, 250]], size: [170, 135], footprint: [153, 34],
-    e0: { anchors: [[1320, 250]], size: [44, 37], footprint: [43, 30] },
+    e0: { anchors: [[1320, 250]], size: [120, 141], footprint: [120, 84] },
   },
   radar: {
     zone: 'command_north', anchors: [[798, 174]], size: [150, 88], footprint: [92, 24],
-    e0: { anchors: [[830, 265]], size: [27, 16], footprint: [11, 9], smooth: false },
+    e0: { anchors: [[830, 265]], size: [70, 107], footprint: [70, 40], smooth: false },
   },
   energy: {
     zone: 'utility_east', anchors: [[1500, 380]], size: [139, 125], footprint: [120, 30],
-    e0: { anchors: [[1535, 403]], size: [34, 22], footprint: [32, 18] },
+    e0: { anchors: [[1615, 376]], size: [95, 91], footprint: [90, 50] },
   },
   observation: {
     zone: 'perimeter_east', anchors: [[1378, 378]], size: [138, 150], footprint: [119, 30],
-    e0: { anchors: [[1420, 273]], size: [24, 25], footprint: [24, 23] },
+    e0: { anchors: [[1420, 273]], size: [60, 90], footprint: [58, 55] },
   },
   recovery: {
     zone: 'recovery_east', anchors: [[1610, 478]], size: [140, 95], footprint: [120, 28],
-    e0: { anchors: [[1505, 440]], size: [41, 17], footprint: [41, 17] },
+    e0: { anchors: [[1485, 463]], size: [110, 110], footprint: [107, 44] },
   },
 };
 

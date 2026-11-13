@@ -158,3 +158,15 @@ test('DESIGN 4.5: three contracts plus one per logistics level up to five', () =
   assert.equal(BUILDINGS.logistics.levels[0].effects.contractSlots, 1);
   assert.equal(Math.min(5, 3 + BUILDINGS.logistics.levels[1].effects.contractSlots), 5);
 });
+
+test('DESIGN 4.3: характеристики ранних уровней совпадают с данными', () => {
+  const rows = tableAfter('Опорные значения до бонусов базы и эпохи:');
+  assert.equal(rows.length, 4);
+  for (const row of rows) {
+    const level = Number(/^\d+/.exec(row[0])[0]);
+    const at = (id) => level === 0 ? PARTS[id].base : PARTS[id].levels[level - 1].stats;
+    const expected = [at('engine').thrust, at('engine').speed, at('engine').burnRate,
+      at('tank').fuel, at('booster').fuel, at('capsule').fuel, at('capsule').thrustRatio];
+    assert.deepEqual(row.slice(1).map((value) => Number(value.replace(',', '.'))), expected, `Уровень ${level}`);
+  }
+});

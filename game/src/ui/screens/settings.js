@@ -8,7 +8,7 @@
 import { t } from '../../i18n/index.js';
 import { settingsLayout } from '../layout.js';
 import { clamp } from '../format.js';
-import { downloadText, copyText, pickTextFile, readClipboard } from '../dom.js';
+import { saveTextFile, copyText, pickTextFile, readClipboard } from '../dom.js';
 import { drawChrome } from './common.js';
 import { savePrefs } from '../bridge.js';
 
@@ -247,7 +247,7 @@ export default {
 async function exportSave(app, st) {
   const text = app.store.exportText(app.profile);
   const copied = await copyText(text);
-  const saved = downloadText('vyshe-neba-save.json', text);
+  const saved = await saveTextFile('vyshe-neba-save.json', text);
   st.note = copied || saved ? t('settings.exported') : t('settings.exportFail');
   st.noteKind = copied || saved ? 'good' : 'bad';
 }

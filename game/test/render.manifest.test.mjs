@@ -17,6 +17,8 @@ test('все файлы каталога существуют внутри game/
   assert.ok(Object.keys(ASSET_FILES).length > 150);
   for (const [name, spec] of Object.entries(ASSET_FILES)) {
     const file = fileOf(spec);
+    // Необязательные записи (новый арт, которого ещё нет) сборка пропускает — тест тоже.
+    if (spec.optional && !fs.existsSync(path.resolve(repoRoot, file))) continue;
     assert.ok(file.startsWith('game/assets/'), `${name}: ${file}`);
     const absolute = path.resolve(repoRoot, file);
     assert.ok(absolute.startsWith(path.join(repoRoot, 'game', 'assets') + path.sep), `${name}: выход из assets`);
@@ -30,7 +32,9 @@ test('все файлы каталога существуют внутри game/
 
 test('каждый PNG каталога цел: контрольные суммы и распаковка (битый файл браузер рисует пустым)', () => {
   const problems = [];
-  const files = new Set(Object.values(ASSET_FILES).map(fileOf).filter((file) => file.endsWith('.png')));
+  const files = new Set(Object.values(ASSET_FILES)
+    .filter((spec) => !(spec.optional && !fs.existsSync(path.join(repoRoot, fileOf(spec)))))
+    .map(fileOf).filter((file) => file.endsWith('.png')));
   for (const file of files) {
     const problem = pngProblem(path.join(repoRoot, file));
     if (problem) problems.push(`${file}: ${problem}`);

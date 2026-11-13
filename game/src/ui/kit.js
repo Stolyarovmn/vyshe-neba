@@ -966,13 +966,14 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     if (S.hover === id && !disabled) S.cursor = 'pointer';
     if (tip && S.hover === id) S.tipCandidate = { id, text: tip };
     const cc = cell();
-    const lip = cc * 2;
+    // o.flat: без нижнего «борта» (кнопки поверх сцены полёта: тёмная полоса под ними читалась как дефект)
+    const lip = o.flat ? 0 : cc * 2;
     const dim = disabled || locked;
     const pressed = a.press > 0.5;
     const shake = a.shake > 0 && !S.settings.reduceMotion ? Math.round(Math.sin(a.shake * 40) * cc * 2 * a.shake) : 0;
-    const body = { x: r.x + shake, y: r.y + (pressed ? lip : 0), w: r.w, h: r.h - lip };
+    const body = { x: r.x + shake, y: r.y + (pressed ? (o.flat ? cc : lip) : 0), w: r.w, h: r.h - lip };
     // нижний «борт» кнопки: пока кнопка не утоплена, виден под ней
-    rect(r.x + cc + shake, r.y + r.h - lip, r.w - cc * 2, lip, c.ink);
+    if (lip) rect(r.x + cc + shake, r.y + r.h - lip, r.w - cc * 2, lip, c.ink);
     const name = variantName(variant, a, dim);
     nine(name, body.x, body.y, body.w, body.h);
     const labelColor = dim ? c.textMute : o.color || S.th.labelColor(name);
@@ -1383,7 +1384,11 @@ export function createKit({ sfx = () => {}, exempt = null } = {}) {
     const forced = o.side && o.side !== 'auto';
     const order = forced ? [o.side] : L.portrait ? ['above', 'below', 'left', 'right'] : ['right', 'left', 'above', 'below'];
     const cy0 = T.y + T.h / 2;
-    let side = order.find((s) => fits(place[s]())) || (forced ? o.side : cy0 > b.y + b.h / 2 ? 'above' : 'below');
+    // высокий щиток в альбомной раскладке: лучше сбоку с прижатием по высоте, чем сверху поверх самого объекта
+    const fitsX = (p) => p.x >= b.x + m && p.x + w <= b.x + b.w - m;
+    let side = order.find((s) => fits(place[s]()))
+      || (!forced && !L.portrait ? ['right', 'left'].find((s) => fitsX(place[s]())) : null)
+      || (forced ? o.side : cy0 > b.y + b.h / 2 ? 'above' : 'below');
     const raw = place[side]();
     const r = {
       x: Math.round(clamp(raw.x, b.x + m, b.x + b.w - m - w)),

@@ -5,6 +5,7 @@ import {
 } from '../src/sim/index.js';
 import { ASTEROID_SIZES, collisionDamage, spawnHazards } from '../src/sim/hazards.js';
 import { spawnPickups } from '../src/sim/pickups.js';
+import { islandNorthEdge, overIsland } from '../src/sim/island-sky.js';
 import { createRngState, hashSeed } from '../src/sim/rng.js';
 
 const airborne = (extra = {}, config = {}) => createFlight(startRocket({ weather: 'clear', ...config, start: { body: 'earth', alt: 500, ...extra } }));
@@ -69,6 +70,25 @@ test('a huge rock is hit from farther away than a medium one, and hurts more', (
 
   const hurt = (size, damageScale) => collisionDamage({ kind: 'asteroid', size, damageScale }, 80, 0);
   assert.ok(hurt('huge', 1.35) > hurt('large', 1.15) && hurt('large', 1.15) > hurt('medium', 1));
+});
+
+// --- небо над островом ------------------------------------------------------------------------------------------------
+
+test('над сушей острова на Земле нет ни монет, ни колец, ни канистр, ни ремкомплектов; выше кромки и над морем — есть', () => {
+  const items = sampleCells(spawnPickups, 10, 3);
+  assert.ok(items.length > 50);
+  for (const o of items) {
+    const half = o.kind === 'ring' ? o.halfWidth : 0;
+    assert.ok(!overIsland(o.x, -o.y, half, o.r), `${o.kind} на (${Math.round(o.x)}, ${Math.round(-o.y)}) над островом`);
+  }
+  // самая высокая суша — 228 ед. над столом: в столбцах острова до неё предметов нет, выше они есть
+  const islandColumns = items.filter((o) => o.x > -200 && o.x < 950);
+  assert.ok(islandColumns.every((o) => -o.y > islandNorthEdge(o.x, o.x)), 'в столбцах острова все предметы севернее суши');
+  assert.ok(islandColumns.some((o) => -o.y < 400), 'в пределах 1,5 км за северной кромкой предметы уже появляются');
+  assert.ok(items.some((o) => o.x < -300 && -o.y < 150), 'над морем западнее острова низко висят предметы');
+  // на Луне правило не действует: там нет острова
+  const moon = sampleCells((rs, ctx) => spawnPickups(rs, { ...ctx, bodyId: 'moon' }), 2, 2);
+  assert.ok(moon.some((o) => -o.y < 150 && Math.abs(o.x) < 400));
 });
 
 // --- rings ---------------------------------------------------------------------------------------------------------

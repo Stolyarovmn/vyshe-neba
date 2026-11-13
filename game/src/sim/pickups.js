@@ -1,6 +1,7 @@
 // Collectibles: coins, fuel cans, repair kits and boost rings.
 
 import { chance, nextFloat, range } from './rng.js';
+import { overIsland } from './island-sky.js';
 
 export const COIN_VALUE = 4;
 export const PICKUP_RADIUS = { coin: 28, fuel: 29, repair: 29 }; // reach of the rocket around its centre
@@ -32,6 +33,8 @@ function coinTrail(rs, ctx, out) {
 }
 
 // ctx: { bodyId, ix, iy, x0, alt0, width, height, padX, fuelDropRate, nextId }
+// Над островом Земли предметов нет (sim/island-sky.js): на старте они выглядели бы лежащими на суше. Случайные числа
+// тянутся в прежнем порядке, поэтому остальной мир от этого правила не меняется.
 export function spawnPickups(rs, ctx) {
   const out = [];
   coinTrail(rs, ctx, out);
@@ -53,9 +56,6 @@ export function spawnPickups(rs, ctx) {
   const repairAlt = ctx.alt0 + range(rs, 50, ctx.height - 50);
   if (repairRoll < 0.13) out.push(makeItem(ctx, 'repair', repairX, repairAlt, ITEM_R));
 
-  // A few coins right above the pad so the very first hop already pays a little.
-  if (ctx.bodyId === 'earth' && ctx.ix === 0 && ctx.iy === 0) {
-    for (const alt of [70, 95, 120]) out.push(makeItem(ctx, 'coin', 6, alt, COIN_R));
-  }
-  return out;
+  if (ctx.bodyId !== 'earth') return out;
+  return out.filter((o) => !overIsland(o.x, -o.y, o.kind === 'ring' ? o.halfWidth : 0, o.r));
 }

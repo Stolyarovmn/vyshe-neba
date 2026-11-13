@@ -7,7 +7,7 @@
 // Effects are plain numbers: fractions, multipliers' bonus parts or counts. A power deficit scales the
 // continuous ones down; `discrete` ones (slots, free consumables) switch off below half power.
 
-import { MAX_BUILDING_LEVEL, BUILDING_PRICE_SCALE } from './economy.js';
+import { E2_PRICE_SCALE, MAX_BUILDING_LEVEL, BUILDING_PRICE_SCALE } from './economy.js';
 
 const LEVELS = Array.from({ length: MAX_BUILDING_LEVEL }, (_, i) => i + 1);
 
@@ -24,6 +24,8 @@ const POWER_CURVE = [2, 4, 7, 11, 16, 22];
 // Data needed from level 5 on, multiplied by the building weight.
 const DATA_CURVE = [0, 0, 0, 4, 10, 20];
 const COST_GROWTH = 2.6;
+// Входные цены удерживают первый модуль до второго вылета; следующие уровни не дорожают.
+const ENTRY_COST = { service: 85, beacons: 65, fuel: 60 };
 
 // Supply of the energy node per level; the launch table adds BASE_POWER_SUPPLY on top.
 const ENERGY_SUPPLY = [17, 48, 96, 162, 236, 330];
@@ -201,8 +203,9 @@ function levelRequirements(key, spec, level) {
 function buildBuilding(key, spec) {
   let previous = 0;
   const levels = LEVELS.map((level) => {
-    const raw = nice(BUILDING_PRICE_SCALE * spec.cost * COST_GROWTH ** (level - 1));
-    const cost = raw <= previous ? previous + 5 : raw;
+    const eraScale = level === 3 ? E2_PRICE_SCALE : 1;
+    const raw = nice(BUILDING_PRICE_SCALE * eraScale * spec.cost * COST_GROWTH ** (level - 1));
+    const cost = level === 1 && ENTRY_COST[key] ? ENTRY_COST[key] : raw <= previous ? previous + 5 : raw;
     previous = cost;
     const use = key === 'energy'
       ? [1, 1, 2, 2, 3, 3][level - 1]

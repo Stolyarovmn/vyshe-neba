@@ -85,12 +85,13 @@ export const VEHICLES = [
 const roadScratch = { x: 0, y: 0, dx: 1, dy: 0 };
 
 /** Положение машины в пикселях острова и знак движения (+1 вперёд по дороге, -1 назад). */
-export function vehiclePosition(vehicle, time, out = roadScratch) {
-  const length = ROAD_LENGTHS[vehicle.road];
+export function vehiclePosition(vehicle, time, out = roadScratch, routes = null) {
+  const road = routes ? routes.roads[vehicle.road % routes.roads.length] : ISLAND_ROADS[vehicle.road];
+  const length = routes ? roadLength(road) : ROAD_LENGTHS[vehicle.road];
   const raw = time * vehicle.speed + vehicle.offset;
   const d = pingPong(raw, length);
   const forward = (((raw % (length * 2)) + length * 2) % (length * 2)) <= length;
-  roadPoint(ISLAND_ROADS[vehicle.road], d, out);
+  roadPoint(road, d, out);
   if (!forward) {
     out.dx = -out.dx;
     out.dy = -out.dy;
@@ -99,13 +100,14 @@ export function vehiclePosition(vehicle, time, out = roadScratch) {
 }
 
 /** Рисует машины на дорогах: простые пиксельные грузовички; count — сколько из списка. */
-export function drawVehicles(ctx, mv, time, count) {
-  const k = ISLAND.unitsPerPx;
+export function drawVehicles(ctx, mv, time, count, routes = null) {
+  const k = routes ? routes.unitsPerPx : ISLAND.unitsPerPx;
+  const origin = routes ? routes.origin : ISLAND.launchOrigin;
   for (let i = 0; i < Math.min(count, VEHICLES.length); i++) {
     const v = VEHICLES[i];
-    const p = vehiclePosition(v, time);
-    const x = (p.x - ISLAND.launchOrigin[0]) * k;
-    const y = (p.y - ISLAND.launchOrigin[1]) * k;
+    const p = vehiclePosition(v, time, roadScratch, routes);
+    const x = (p.x - origin[0]) * k;
+    const y = (p.y - origin[1]) * k;
     if (x < mv.left - 30 || x > mv.right + 30 || y < mv.top - 30 || y > mv.bottom + 30) continue;
     const horizontal = Math.abs(p.dx) >= Math.abs(p.dy);
     const w = (horizontal ? v.length : 8) * k;
@@ -136,16 +138,17 @@ export function drawVehicles(ctx, mv, time, count) {
 }
 
 /** Фары машин ночью: тёплые пятна впереди по ходу. */
-export function drawHeadlights(ctx, mv, time, count, night) {
+export function drawHeadlights(ctx, mv, time, count, night, routes = null) {
   if (night <= 0.05) return;
-  const k = ISLAND.unitsPerPx;
+  const k = routes ? routes.unitsPerPx : ISLAND.unitsPerPx;
+  const origin = routes ? routes.origin : ISLAND.launchOrigin;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   for (let i = 0; i < Math.min(count, VEHICLES.length); i++) {
     const v = VEHICLES[i];
-    const p = vehiclePosition(v, time);
-    const x = (p.x - ISLAND.launchOrigin[0]) * k + p.dx * v.length * 0.5 * k;
-    const y = (p.y - ISLAND.launchOrigin[1]) * k + p.dy * v.length * 0.5 * k;
+    const p = vehiclePosition(v, time, roadScratch, routes);
+    const x = (p.x - origin[0]) * k + p.dx * v.length * 0.5 * k;
+    const y = (p.y - origin[1]) * k + p.dy * v.length * 0.5 * k;
     const r = 26 * k * mv.s;
     const cx = mv.sx(x + p.dx * 12 * k);
     const cy = mv.sy(y + p.dy * 12 * k);

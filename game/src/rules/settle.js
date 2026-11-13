@@ -2,7 +2,7 @@
 // contracts and achievements. Pure: the input profile is never modified.
 
 import { PARTS, PART_IDS } from '../data/index.js';
-import { CRASH_LOSS, DATA_GAIN, METERS_PER_UNIT, PAYOUT, ZONES } from '../data/economy.js';
+import { CRASH_LOSS, DATA_GAIN, METERS_PER_UNIT, PAYOUT, ZONES, flightBonus } from '../data/economy.js';
 import { deriveBase } from './base.js';
 import { produce } from './common.js';
 import { applyProgress } from './progress.js';
@@ -77,12 +77,13 @@ export function settleFlight(profile, result, config = null) {
 
   // Coins.
   let travel = outcome === 'abandoned' ? 0 : travelPay(altM, distM, body, base.flight.income);
+  if (era === 0) travel = Math.round(travel * Math.min(PAYOUT.earlyTravelMax, 1 + PAYOUT.earlyTravelPerKm * Math.max(0, altM / 1000 - 1)));
   if (crashed) travel = Math.round(travel * PAYOUT.crashTravelShare);
   const collected = Math.round(num(result.coinsPicked));
   const loot = crashed ? Math.round(collected * PAYOUT.crashLootShare) : collected;
   const eraScale = 1 + PAYOUT.eraScale * era;
-  const landing = landed ? Math.round(PAYOUT.landingBonus * eraScale) : 0;
-  const perfect = landed && result.perfect ? Math.round(PAYOUT.perfectBonus * eraScale * base.flight.perfectBonus) : 0;
+  const landing = landed ? Math.round(flightBonus('landing', era)) : 0;
+  const perfect = landed && result.perfect ? Math.round(flightBonus('perfect', era) * base.flight.perfectBonus) : 0;
   const expedition = landed && body !== 'earth' ? Math.round(PAYOUT.body[body].expedition * (1 + effects.expeditionPay)) : 0;
   const storm = landed && num(result.stormTime) > 0 ? Math.round(travel * effects.stormBonus * Math.min(1, num(result.stormTime) / 20)) : 0;
   const ringCount = Math.floor(num(result.rings));
@@ -91,7 +92,7 @@ export function settleFlight(profile, result, config = null) {
   const near = landed ? Math.min(PAYOUT.nearMax, PAYOUT.nearBonus * Math.floor(num(result.near))) : 0;
   const fuelSaving = landed && num(result.fuelLeft01) >= PAYOUT.fuelSavingThreshold ? Math.round(travel * PAYOUT.fuelSavingShare) : 0;
   const goalAlt = num(result.goalAlt);
-  const goal = landed && goalAlt > 0 && altM >= goalAlt ? Math.round(PAYOUT.goalBonus * eraScale) : 0;
+  const goal = landed && goalAlt > 0 && altM >= goalAlt ? Math.round(flightBonus('goal', era)) : 0;
   const gross = travel + loot + landing + perfect + expedition + storm + rings + near + fuelSaving + goal;
 
   // Data: lump sums for new altitude zones and first landings, a trickle for every landing.

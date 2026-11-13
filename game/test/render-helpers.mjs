@@ -16,7 +16,12 @@ export function stubContext(width = 800, height = 600) {
   const ctx = new Proxy(state, {
     get(target, prop) {
       if (prop in target) return target[prop];
-      if (prop === 'createLinearGradient' || prop === 'createRadialGradient') return () => gradient;
+      if (prop === 'createLinearGradient' || prop === 'createRadialGradient') {
+        return () => {
+          calls[prop] = (calls[prop] || 0) + 1;
+          return gradient;
+        };
+      }
       if (prop === 'getContext') return () => ctx;
       return (...args) => {
         calls[prop] = (calls[prop] || 0) + 1;
@@ -37,16 +42,36 @@ export function makeStubCanvas(w, h) {
   return { width: w, height: h, getContext: () => inner };
 }
 
+/** Ассеты изометрической базы и подъёма камеры: с ними createHub выбирает изометрию, а полёт начинается с подъёма. */
+export const ISO_ASSET = (name) => name.startsWith('iso_') || name === 'island_base_iso' || name === 'base_iso_layout'
+  || name.startsWith('island_tilt_');
+
 /**
  * Хранилище ассетов без картинок: у каждого логического имени есть запись нужного размера.
  * options.missing — имена, которых «нет» (чтобы проверить запасную отрисовку).
+ * options.iso — включить изометрию и кадры подъёма камеры (их размеры берутся из файлов). По умолчанию выключено:
+ * тесты прежнего хаба и полёта проверяют запасной вид, который игра показывает без этих необязательных ассетов.
  */
 export function fakeAssets(options = {}) {
   const missing = new Set(options.missing || []);
   const images = new Map();
   const jsons = new Map();
+  const tiltSizes = {};
+  if (options.iso) {
+    const tilt = JSON.parse(fs.readFileSync(path.join(repoRoot, ASSET_FILES.island_tilt_layout.file), 'utf8'));
+    for (const frame of tilt.frames) tiltSizes[frame.asset] = frame.size;
+  }
   for (const [name, spec] of Object.entries(ASSET_FILES)) {
     if (missing.has(name)) continue;
+    const file = typeof spec === 'string' ? spec : spec.file;
+    if (ISO_ASSET(name)) {
+      if (!options.iso || !fs.existsSync(path.join(repoRoot, file))) continue;
+      if (spec.kind !== 'json') {
+        const [w, h] = tiltSizes[name] || pngSize(path.join(repoRoot, file));
+        images.set(name, { name, img: { width: w, height: h }, w, h, anchor: [0.5, 1] });
+        continue;
+      }
+    }
     if (typeof spec !== 'string' && spec.kind === 'json') {
       jsons.set(name, JSON.parse(fs.readFileSync(path.join(repoRoot, spec.file), 'utf8')));
       continue;
