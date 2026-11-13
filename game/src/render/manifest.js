@@ -263,9 +263,11 @@ export const ASSET_FILES = {
   // 8 ракурсов через 4° (2026-11-12): соседние кадры почти совпадают, растворение одного в другом не «двоит» остров.
   ...Object.fromEntries(TILT_ANGLES.map((a) => [`island_tilt_${a}`, { file: `${SHARED}island/tilt-${a}.webp`, optional: true }])),
   island_tilt_layout: { file: `${SHARED}island/tilt.json`, kind: 'json', optional: true },
-  ...Object.fromEntries(BUILDING_KEYS.map((key) => [
-    `iso_${key}_1978`, { file: `${eraFolder(0)}iso/${key}.png`, optional: true },
-  ])),
+  // изометрия построек по уровню: ур.N — папка эпохи N−1 (ур.1 — e0-1978/iso, ур.2 — e1-1986/iso, …); без файла уровня
+  // хаб берёт младший уровень (hub-iso.js isoBuildingSprite)
+  ...Object.fromEntries(ERA_YEARS.flatMap((year, era) => BUILDING_KEYS.map((key) => [
+    `iso_${key}_${year}`, { file: `${eraFolder(era)}iso/${key}.png`, optional: true },
+  ]))),
   // Детали ракеты E0 (2026-11-13): посадочные опоры трёх уровней (левая; правая — зеркально) и сопло кабины.
   rocket_leg1_1978: { file: `${eraFolder(0)}rocket/leg1.png`, optional: true },
   rocket_leg2_1978: { file: `${eraFolder(0)}rocket/leg2.png`, optional: true },

@@ -28,6 +28,7 @@ import {
   drawLimb, drawRain, drawSky, drawSkyBodies, drawStars, drawSun,
 } from './sky.js';
 import { ensureWorld } from './layout.js';
+import { isoBuildingSprite, isoSpriteSize } from './hub-iso.js';
 import { BUILDING_ANCHORS, E0_DELUGE_NOZZLES, ISLAND, buildingSpriteName, spriteName } from './manifest.js';
 
 const DELUGE_SOURCES_E0 = E0_DELUGE_NOZZLES.map(([px, py, direction]) =>
@@ -632,9 +633,12 @@ export function createFlightRenderer(painter, shared) {
         isoBlit(`iso_entry_${it.key}_1978`, it.sx, it.sy, frames[0].entrySize[it.key], 1 - w);
         continue;
       }
-      const isoName = `iso_${it.key}_1978`;
-      const isoSize = frames[0].isoSize[it.key];
-      if (w < 0.999 && isoSize && painter.has(isoName)) isoBlit(isoName, it.sx, it.sy, isoSize, 1 - w);
+      // тот же изометрический спрайт уровня постройки, что на базе (без него — младший уровень)
+      const sprite = isoBuildingSprite(painter.assets, it.key, it.level);
+      const base = frames[0].isoSize[it.key];
+      if (w < 0.999 && base && sprite) {
+        isoBlit(sprite.name, it.sx, it.sy, isoSpriteSize(painter.assets, { size: base }, sprite), 1 - w);
+      }
       const topName = buildingSpriteName(it.key, it.level);
       if (w > 0.001 && painter.has(topName)) {
         const [, h] = buildingSize(painter, it.key, it.level);

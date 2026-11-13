@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPainter } from '../src/render/painter.js';
 import { createHub } from '../src/render/hub.js';
-import { ISO_LAMPS, drawLamps, isoDrawItems, isoLayout } from '../src/render/hub-iso.js';
+import { ISO_LAMPS, drawLamps, isoBuildingSprite, isoDrawItems, isoLayout } from '../src/render/hub-iso.js';
 import { createMapView } from '../src/render/islandmap.js';
 import { ISO_PART_CLIPS, clipOpen } from '../src/render/iso-clips.js';
 import { LIFT_TIME, createFlightRenderer, fitAffine, liftBlend, tiltFrames } from '../src/render/flight.js';
@@ -219,6 +219,23 @@ test('клипы ON: части вырезаны в пределах спрай�
   frame(empty, 7.1);
   frame(empty, 7.2);
   assert.equal(hub.animating, false, 'нет спасателей — нет клипа');
+});
+
+test('изометрия по уровню постройки: свой спрайт уровня, иначе младший; E1 рисует все постройки и цели нажатия', () => {
+  const assets = fakeAssets({ iso: true });
+  for (const key of BUILDING_KEYS) {
+    assert.equal(isoBuildingSprite(assets, key, 1)?.name, `iso_${key}_1978`);
+    const l2 = isoBuildingSprite(assets, key, 2);
+    assert.ok(l2, `${key}: ур.2 рисуется`);
+    if (!assets.has(`iso_${key}_1986`)) assert.equal(l2.name, `iso_${key}_1978`, `${key}: без спрайта ур.2 — ур.1`);
+  }
+  assert.equal(isoBuildingSprite(assets, 'gantry', 0)?.level, 1, 'уровень 0 не встречается, но не ломает выбор');
+  const painter = createPainter(assets, makeStubCanvas);
+  const hub = createHub(painter, { profile: null });
+  const screen = computeLayout(1920, 1080, 1);
+  const e1 = { era: 1, skin: 'classic', parts: { booster: 1, capsule: 1 }, buildings: Object.fromEntries(BUILDING_KEYS.map((k) => [k, 2])) };
+  hub.draw(stubContext(1920, 1080), { profile: e1, time: 0, layout: screen });
+  for (const key of BUILDING_KEYS) assert.ok(hub.screenPos(key), `${key}: на базе E1`);
 });
 
 test('подъём камеры: кадры от изометрии к карте полёта, у каждого стол и все постройки', () => {

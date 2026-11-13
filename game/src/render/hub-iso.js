@@ -1,6 +1,6 @@
 // Изометрический хаб: координаты карты — пиксели PNG, ракета сохраняет свои мировые единицы.
 // Старые якоря, декор, тени и маршруты сюда не передаются.
-import { BUILDING_KEYS, ENTRY_KEYS } from './manifest.js';
+import { BUILDING_KEYS, ENTRY_KEYS, ERA_YEARS } from './manifest.js';
 import { ISO_PART_CLIPS, ISO_VENTS, clipOpen, clipTime, drawIsoClip } from './iso-clips.js';
 import { createMapView, drawSea } from './islandmap.js';
 import { drawEntryHint } from './entries.js';
@@ -72,9 +72,31 @@ export function isoLayout(assets) {
   return { size: data.size, pad: data.pad, buildings, entries, roads, camera: data.camera || {}, strip };
 }
 
+/**
+ * Изометрический спрайт постройки key уровня level: уровень = эпоха постройки (ур.1 — 1978, ур.2 — 1986, …).
+ * Если спрайта этого уровня ещё нет, берётся ближайший младший. { name, level } или null.
+ */
+export function isoBuildingSprite(assets, key, level) {
+  for (let lv = Math.min(Math.max(level | 0, 1), ERA_YEARS.length); lv >= 1; lv--) {
+    const name = `iso_${key}_${ERA_YEARS[lv - 1]}`;
+    if (assets.has(name)) return { name, level: lv };
+  }
+  return null;
+}
+
+/**
+ * Размер спрайта на карте (px карты): ширина — из раскладки (место постройки), высота — по пропорциям PNG уровня
+ * (ур.1 совпадает с раскладкой; старший уровень может быть выше, низ остаётся на месте).
+ */
+export function isoSpriteSize(assets, b, sprite) {
+  if (!sprite || sprite.level === 1) return b.size;
+  const asset = assets.get(sprite.name);
+  return asset && asset.w > 0 ? [b.size[0], Math.round((b.size[0] * asset.h) / asset.w)] : b.size;
+}
+
 /** Собирает общую очередь: глубина здания, входа и ракеты определяется низом спрайта. */
 export function isoDrawItems(layout, owned, assets) {
-  const items = BUILDING_KEYS.filter((key) => owned[key] > 0 && layout.buildings[key] && assets.has(`iso_${key}_1978`))
+  const items = BUILDING_KEYS.filter((key) => owned[key] > 0 && layout.buildings[key] && isoBuildingSprite(assets, key, owned[key]))
     .map((key) => ({ key, y: layout.buildings[key].anchor[1] }));
   for (const key of ENTRY_KEYS) {
     const e = layout.entries?.[key];
@@ -356,30 +378,33 @@ export function createIsoHub(painter, shared, layout) {
           addRect(key, ...e.anchor, ...e.size);
         } else {
           const b = layout.buildings[key];
-          const name = `iso_${key}_1978`;
+          const sprite = isoBuildingSprite(painter.assets, key, owned[key]);
+          const name = sprite.name;
+          const [sw, sh] = isoSpriteSize(painter.assets, b, sprite);
           const build = fx.buildState(key, reduce);
           const ev = events.get(key);
           // повторы того же объекта (пара маяков по сторонам стола): anchors[1..]
           for (const [x, y] of anchorsOf(b)) {
-            if (ev && !build && ISO_PART_CLIPS[key]) {
-              drawIsoClip(ctx, painter, mv, key, name, x, y, b.size[0], b.size[1], ev.u, reduce);
+            // клипы ON вырезаны по геометрии спрайтов ур.1 (ISO_PART_CLIPS): у старших уровней — своя геометрия позже
+            if (ev && !build && ISO_PART_CLIPS[key] && sprite.level === 1) {
+              drawIsoClip(ctx, painter, mv, key, name, x, y, sw, sh, ev.u, reduce);
             } else if (build && build.reveal < 1) {
               // стройка: здание вырастает снизу вверх — видна только нижняя часть спрайта
               ctx.save();
               ctx.beginPath();
-              const top = mv.sy(y - b.size[1] * build.reveal);
-              ctx.rect(mv.sx(x - b.size[0]), top, mv.sx(x + b.size[0]) - mv.sx(x - b.size[0]), mv.sy(y) + 8 - top);
+              const top = mv.sy(y - sh * build.reveal);
+              ctx.rect(mv.sx(x - sw), top, mv.sx(x + sw) - mv.sx(x - sw), mv.sy(y) + 8 - top);
               ctx.clip();
-              painter.sprite(ctx, mv, name, x, y, { w: b.size[0], h: b.size[1], ax: 0.5, ay: 1, smooth: true });
+              painter.sprite(ctx, mv, name, x, y, { w: sw, h: sh, ax: 0.5, ay: 1, smooth: true });
               ctx.restore();
             } else {
-              painter.sprite(ctx, mv, name, x, y, { w: b.size[0], h: b.size[1], ax: 0.5, ay: 1, smooth: true });
+              painter.sprite(ctx, mv, name, x, y, { w: sw, h: sh, ax: 0.5, ay: 1, smooth: true });
             }
             if (build) {
-              drawScaffold(ctx, fxView, { x: x / unit, y: y / unit, w: b.size[0] * 0.9 / unit, h: b.size[1] / unit },
+              drawScaffold(ctx, fxView, { x: x / unit, y: y / unit, w: sw * 0.9 / unit, h: sh / unit },
                 build.reveal, build.scaffold, time);
             }
-            addRect(key, x, y, ...b.size);
+            addRect(key, x, y, sw, sh);
           }
         }
       }
@@ -395,9 +420,10 @@ export function createIsoHub(painter, shared, layout) {
       if (lightStrength > 0.03 || events.size > 0) {
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
+        // лампы ISO_LAMPS размечены по спрайтам ур.1; у спрайта старшего уровня их место другое — пока без ламп
         drawLamps(ctx, mv, layout, owned, profile, time, lightStrength, (key) => (layout.entries[key]
           ? (painter.has(`iso_entry_${key}_1978`) ? 1 : 0)
-          : fx.buildState(key, reduce)?.reveal ?? 1),
+          : isoBuildingSprite(painter.assets, key, owned[key])?.level !== 1 ? 0 : fx.buildState(key, reduce)?.reveal ?? 1),
         // клип ON зажигает лампы своей постройки и днём
         (key) => (events.has(key) ? 0.95 * clipOpen(events.get(key).u ?? 0) : 0));
         ctx.restore();
