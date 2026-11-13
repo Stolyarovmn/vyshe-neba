@@ -1,5 +1,6 @@
 // Contract templates ported from the 30 missions of the previous edition. Rewards are scaled like the
 // old file did at its end: max(15, round(reward * 0.55)). A template is offered when its `from` holds:
+// Проход 2 задаёт отдельные небольшие награды трём стартовым контрактам.
 //   { era }          minimum era id
 //   { destination }  the destination is open (Moon, Mars)
 //   { part, level }  the rocket module has at least this level
@@ -10,7 +11,8 @@
 const scale = (reward) => Math.max(15, Math.round(reward * 0.55));
 
 function template(tier, id, name, desc, reward, goal, from, extra = {}) {
-  return { id, tier, name, desc, reward: scale(reward), goal, from, ...extra };
+  const starter = { m01: 5, m02: 7, m03: 5 };
+  return { id, tier, name, desc, reward: starter[id] ?? scale(reward), goal, from, ...extra };
 }
 
 const era0 = { era: 0 };

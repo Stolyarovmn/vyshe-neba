@@ -162,7 +162,7 @@ function readyForEraZero(patch = {}) {
     coins: ERAS[0].advance.coins,
     data: ERAS[0].advance.data,
     buildings: { fuel: 1, beacons: 1, gantry: 1, deluge: 1, service: 1, rescue: 1, logistics: 1, factory: 1 },
-    milestones: { maxAlt: 6000, softLandings: 3 },
+    milestones: { maxAlt: 6000, maxLandAlt: 6000, softLandings: 3 },
     ...patch,
   });
 }
@@ -193,8 +193,9 @@ test('advanceEra: every condition blocks it', () => {
   const cases = {
     coins: readyForEraZero({ coins: 10 }),
     data: readyForEraZero({ data: 0 }),
-    'milestone altitude': readyForEraZero({ milestones: { maxAlt: 5999, softLandings: 3 } }),
-    'milestone landing': readyForEraZero({ milestones: { maxAlt: 6000, softLandings: 2 } }),
+    'milestone altitude': readyForEraZero({ milestones: { maxAlt: 5999, maxLandAlt: 6000, softLandings: 3 } }),
+    'milestone return': readyForEraZero({ milestones: { maxAlt: 6000, maxLandAlt: 5999, softLandings: 3 } }),
+    'milestone landing': readyForEraZero({ milestones: { maxAlt: 6000, maxLandAlt: 6000, softLandings: 2 } }),
     buildings: readyForEraZero({ buildings: { fuel: 1, beacons: 0 } }),
   };
   for (const [name, profile] of Object.entries(cases)) {
