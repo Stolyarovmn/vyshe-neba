@@ -265,8 +265,9 @@ export const ASSET_FILES = {
   island_tilt_layout: { file: `${SHARED}island/tilt.json`, kind: 'json', optional: true },
   // изометрия построек по уровню: ур.N — папка эпохи N−1 (ур.1 — e0-1978/iso, ур.2 — e1-1986/iso, …); без файла уровня
   // хаб берёт младший уровень (hub-iso.js isoBuildingSprite)
+  // изометрия хранится в WebP без потерь (те же пиксели, ~36 % веса PNG; 2026-11-13)
   ...Object.fromEntries(ERA_YEARS.flatMap((year, era) => BUILDING_KEYS.map((key) => [
-    `iso_${key}_${year}`, { file: `${eraFolder(era)}iso/${key}.png`, optional: true },
+    `iso_${key}_${year}`, { file: `${eraFolder(era)}iso/${key}.webp`, optional: true },
   ]))),
   // Детали ракеты E0 (2026-11-13): посадочные опоры трёх уровней (левая; правая — зеркально) и сопло кабины.
   rocket_leg1_1978: { file: `${eraFolder(0)}rocket/leg1.png`, optional: true },
@@ -275,7 +276,7 @@ export const ASSET_FILES = {
   rocket_nozzle_capsule_1978: { file: `${eraFolder(0)}rocket/nozzle_capsule.png`, optional: true },
   // Объекты-входы изометрической базы (ангар, доска, лавка, памятник) — те же ключи, что ENTRY_KEYS ниже.
   ...Object.fromEntries(['workshop', 'board', 'shop', 'monument'].map((key) => [
-    `iso_entry_${key}_1978`, { file: `${eraFolder(0)}iso/entry_${key}.png`, optional: true },
+    `iso_entry_${key}_1978`, { file: `${eraFolder(0)}iso/entry_${key}.webp`, optional: true },
   ])),
   // Изометрические клипы используют только свои кадры, никогда кадры старой камеры.
   ...Object.fromEntries(Object.entries(E0_BUILDING_CLIPS).flatMap(([key, clip]) =>

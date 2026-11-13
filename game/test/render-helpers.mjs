@@ -84,7 +84,19 @@ export function fakeAssets(options = {}) {
 
 export function pngSize(file) {
   const buffer = fs.readFileSync(file);
+  if (buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP') return webpSize(buffer);
   return [buffer.readUInt32BE(16), buffer.readUInt32BE(20)];
+}
+
+/** Размер WebP (VP8L — без потерь, VP8X — расширенный, VP8 — с потерями). */
+function webpSize(b) {
+  const chunk = b.toString('ascii', 12, 16);
+  if (chunk === 'VP8L') {
+    const bits = b.readUInt32LE(21);
+    return [(bits & 0x3fff) + 1, ((bits >> 14) & 0x3fff) + 1];
+  }
+  if (chunk === 'VP8X') return [b.readUIntLE(24, 3) + 1, b.readUIntLE(27, 3) + 1];
+  return [b.readUInt16LE(26) & 0x3fff, b.readUInt16LE(28) & 0x3fff];
 }
 
 /**
