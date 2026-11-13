@@ -54,8 +54,11 @@ export const ISO_VENTS = {
 
 const sampled = new Map();
 
-/** Цвет глубины помещения: пиксель самого спрайта в точке spec.sample (один раз), иначе spec.hole. */
-function holeColor(painter, name, spec) {
+/**
+ * Цвет глубины помещения: пиксель самого спрайта в точке spec.sample (px карты; PNG может быть плотнее — пересчёт через
+ * w, h спрайта на карте), один раз; иначе spec.hole.
+ */
+function holeColor(painter, name, spec, w, h) {
   if (!spec.sample) return spec.hole;
   if (sampled.has(name)) return sampled.get(name);
   let color = spec.hole;
@@ -67,7 +70,7 @@ function holeColor(painter, name, spec) {
       c.width = 1;
       c.height = 1;
       const x = c.getContext('2d', { willReadFrequently: true });
-      x.drawImage(img, -Math.round(spec.sample[0] * img.width / asset.w), -Math.round(spec.sample[1] * img.height / asset.h));
+      x.drawImage(img, -Math.round(spec.sample[0] * img.width / w), -Math.round(spec.sample[1] * img.height / h));
       const d = x.getImageData(0, 0, 1, 1).data;
       if (d[3] > 200) color = `rgb(${d[0]},${d[1]},${d[2]})`;
     }
@@ -114,7 +117,7 @@ export function drawIsoClip(ctx, painter, mv, key, name, ax, ay, w, h, u, reduce
       ctx.restore();
     }
   } else if (spec.holes) {
-    ctx.fillStyle = holeColor(painter, name, spec);
+    ctx.fillStyle = holeColor(painter, name, spec, w, h);
     for (const [x, y, rw, rh] of spec.holes) ctx.fillRect(sx(x), sy(y), sx(x + rw) - sx(x), sy(y + rh) - sy(y));
   }
   if (spec.glow) {
