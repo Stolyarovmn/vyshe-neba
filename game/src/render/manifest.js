@@ -266,6 +266,11 @@ export const ASSET_FILES = {
   ...Object.fromEntries(BUILDING_KEYS.map((key) => [
     `iso_${key}_1978`, { file: `${eraFolder(0)}iso/${key}.png`, optional: true },
   ])),
+  // Детали ракеты E0 (2026-11-13): посадочные опоры трёх уровней (левая; правая — зеркально) и сопло кабины.
+  rocket_leg1_1978: { file: `${eraFolder(0)}rocket/leg1.png`, optional: true },
+  rocket_leg2_1978: { file: `${eraFolder(0)}rocket/leg2.png`, optional: true },
+  rocket_leg3_1978: { file: `${eraFolder(0)}rocket/leg3.png`, optional: true },
+  rocket_nozzle_capsule_1978: { file: `${eraFolder(0)}rocket/nozzle_capsule.png`, optional: true },
   // Объекты-входы изометрической базы (ангар, доска, лавка, памятник) — те же ключи, что ENTRY_KEYS ниже.
   ...Object.fromEntries(['workshop', 'board', 'shop', 'monument'].map((key) => [
     `iso_entry_${key}_1978`, { file: `${eraFolder(0)}iso/entry_${key}.png`, optional: true },

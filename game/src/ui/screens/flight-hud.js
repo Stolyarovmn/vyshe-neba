@@ -125,11 +125,18 @@ function drawInstruments(app, kit, L, s, f, hud) {
   const cc = kit.cell();
   const label = (cx, cy, size, iconName, low, color) => {
     if (plated) {
-      const pw = Math.round(size * 1.35);
-      const ph = Math.round(size * 1.15);
-      kit.nine('plateTag', Math.round(cx - pw / 2), Math.round(cy - ph / 2), pw, ph);
-      if (low) kit.lamp(cx, cy, Math.round(size * 0.8), c.red, true, true);
-      else kit.icon(`vec:${iconName}`, cx, cy, Math.round(size * 0.78), c.ink);
+      // гравированная надпись на табличке («ТОПЛ», «КОРП») — пиктограммы капли и листа читались плохо (замечание владельца);
+      // ниже порога надпись мигает красным
+      const word = t(iconName === 'fuel' ? 'hud.plateFuel' : 'hud.plateHull');
+      // табличка не шире шага между шкалами топлива и корпуса (иначе соседние таблички налезают) и не выходит за край
+      const pitch = I.fuel && I.hull ? Math.abs(I.hull.x - I.fuel.x) : size * 3;
+      const pw = Math.round(Math.min(pitch - cc * 2, Math.max(size * 1.35, kit.text.measure(word, kit.fs(8)) + cc * 4)));
+      const ph = Math.round(size * 1.05);
+      const px = Math.max(L.area.x + cc, Math.round(cx - pw / 2));
+      kit.nine('plateTag', px, Math.round(cy - ph / 2), pw, ph);
+      const fit = kit.text.fitBox(word, pw - cc * 3, ph - cc * 2, kit.fs(8), 1);
+      const blink = low && (app.settings.reduceMotion || Math.floor(app.time * 4) % 2 === 0);
+      kit.drawText(word, px + pw / 2, cy, { ...fit, color: blink ? c.red : c.ink, align: 'center' });
       return;
     }
     if (low) kit.lamp(cx, cy, Math.round(size * 0.9), c.red, true, true);
@@ -413,15 +420,15 @@ function hudButton(app, kit, L, name, r, o) {
   const cc = kit.cell();
   const dim = o.disabled;
   if (touch) {
+    // плоская кнопка без нижнего «борта»: утапливание показывает сдвиг на клетку и вариант «нажата»
     const pressed = pressedRole(app, `button:${name}`);
-    const lip = cc * 2;
     const ctx = kit.S.ctx;
     ctx.globalAlpha = dim ? 0.6 : 1;
-    kit.rect(r.x + cc, r.y + r.h - lip, r.w - cc * 2, lip, c.ink);
-    kit.nine(dim ? 'disabled' : pressed ? (o.variant === 'primary' ? 'primaryPress' : o.variant === 'good' ? 'goodPress' : 'btnPress') : o.variant || 'hud', r.x, r.y + (pressed ? lip : 0), r.w, r.h - lip);
-    kit.icon(o.icon, r.x + r.w / 2, r.y + (r.h - lip) * 0.5 + (pressed ? lip : 0), Math.round(Math.min(r.w, r.h) * 0.46), dim ? c.textMute : o.iconColor || c.text);
+    const dy = pressed ? cc : 0;
+    kit.nine(dim ? 'disabled' : pressed ? (o.variant === 'primary' ? 'primaryPress' : o.variant === 'good' ? 'goodPress' : 'btnPress') : o.variant || 'hud', r.x, r.y + dy, r.w, r.h);
+    kit.icon(o.icon, r.x + r.w / 2, r.y + r.h * 0.5 + dy, Math.round(Math.min(r.w, r.h) * 0.46), dim ? c.textMute : o.iconColor || c.text);
     ctx.globalAlpha = 1;
-  } else if (kit.button(id, r, { icon: o.icon, label: o.wide ? o.label : undefined, variant: dim ? 'disabled' : o.variant === 'hud' ? 'btn' : o.variant || 'btn', disabled: dim, tip: o.label, iconSize: Math.round(Math.min(r.w, r.h) * 0.5), size: kit.fs(13) })) {
+  } else if (kit.button(id, r, { icon: o.icon, label: o.wide ? o.label : undefined, variant: dim ? 'disabled' : o.variant === 'hud' ? 'btn' : o.variant || 'btn', disabled: dim, tip: o.label, iconSize: Math.round(Math.min(r.w, r.h) * 0.5), size: kit.fs(13), flat: true })) {
     app.input.pulse(name);
   }
   if (o.count !== undefined) {
@@ -472,21 +479,35 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   // парашют — только расходник из лавки
   const hasChute = !!f.chute.consumable;
   const chuteBody = app.data.BODIES?.[f.body]?.parachute !== false;
-  hudButton(app, kit, L, 'parachute', B.parachute, { icon: 'chute', variant: f.chute.deployed ? 'good' : 'hud', disabled: !hasChute || !chuteBody || f.chute.deployed, label: t('hud.chute') });
-  hudButton(app, kit, L, 'canister', B.canister, { icon: 'canister', variant: 'hud', disabled: !(f.consumables.canister > 0), count: f.consumables.canister || undefined, label: t('hud.canister') });
-  hudButton(app, kit, L, 'repair', B.repair, { icon: 'repair', variant: 'hud', disabled: !(f.consumables.repair > 0), count: f.consumables.repair || undefined, label: t('hud.repair') });
-
-  // перелёт
-  if (f.canTransfer) {
-    const blink = app.settings.reduceMotion || Math.floor(app.time * 4) % 2 === 0;
-    hudButton(app, kit, L, 'transfer', B.transfer, { icon: 'transfer', variant: blink ? 'good' : 'primary', label: t('hud.transfer'), wide: true });
+  if (kit.S.skin.instr === 'analog') {
+    // E0: поворотный переключатель расходников вместо трёх кнопок (решение владельца 2026-11-13)
+    drawConsumableKnob(app, kit, L, f, B, touch, {
+      parachute: { icon: 'chute', ok: hasChute && chuteBody && !f.chute.deployed, count: hasChute && !f.chute.deployed ? 1 : 0 },
+      canister: { icon: 'canister', ok: f.consumables.canister > 0, count: f.consumables.canister || 0 },
+      repair: { icon: 'repair', ok: f.consumables.repair > 0, count: f.consumables.repair || 0 },
+    });
+  } else {
+    hudButton(app, kit, L, 'parachute', B.parachute, { icon: 'chute', variant: f.chute.deployed ? 'good' : 'hud', disabled: !hasChute || !chuteBody || f.chute.deployed, label: t('hud.chute') });
+    hudButton(app, kit, L, 'canister', B.canister, { icon: 'canister', variant: 'hud', disabled: !(f.consumables.canister > 0), count: f.consumables.canister || undefined, label: t('hud.canister') });
+    hudButton(app, kit, L, 'repair', B.repair, { icon: 'repair', variant: 'hud', disabled: !(f.consumables.repair > 0), count: f.consumables.repair || undefined, label: t('hud.repair') });
   }
 
-  // указатель крена на месте диска (небольшой, без стрелок): деления, зона допустимого отклонения fins.maxTilt, стрелка крена
+  // перелёт (в E0 пластина ручки расходников выше прежних кнопок — кнопка перелёта поднимается над ней)
+  if (f.canTransfer) {
+    const blink = app.settings.reduceMotion || Math.floor(app.time * 4) % 2 === 0;
+    const tr = kit.S.skin.instr === 'analog' && B.transfer && B.repair ? { ...B.transfer, y: B.transfer.y - Math.round(B.repair.h * 0.55) } : B.transfer;
+    hudButton(app, kit, L, 'transfer', tr, { icon: 'transfer', variant: blink ? 'good' : 'primary', label: t('hud.transfer'), wide: true });
+  }
+
+  // указатель крена на месте диска (небольшой, без стрелок): деления, зона допустимого отклонения fins.maxTilt, стрелка крена.
+  // E0: узкий профильный прибор «КРЕН» того же семейства, что топливо и вариометр (круглый диск выглядел чужим и громоздким)
   const lim = tiltLimit(f);
   const G = { cx: hud.disc.cx, cy: hud.disc.cy, r: hud.disc.r };
-  inst.wheel(kit, G, { finger: null, knobX: G.cx, kr: 0, hot: lim !== null && Math.abs(f.angle || 0) >= lim * 0.93 });
-  drawAttitude(app, kit, G, f, lim);
+  if (kit.S.skin.instr === 'analog') drawTiltMeter(app, kit, L, G, f, lim);
+  else {
+    inst.wheel(kit, G, { finger: null, knobX: G.cx, kr: 0, hot: lim !== null && Math.abs(f.angle || 0) >= lim * 0.93 });
+    drawAttitude(app, kit, G, f, lim);
+  }
   if (!touch) return;
 
   // наклон ведёт палец в любом месте экрана; пока палец ведёт — след жеста: кольцо в точке касания и линия по X
@@ -503,6 +524,109 @@ function drawControls(app, kit, L, s, f, hud, touch) {
   // подпись на самой рукоятке: «держи» в аркаде, процент в режиме «Пилот»
   kit.drawText(mode === 'arcade' ? t('hud.hold') : `${Math.round(lv.value * 100)}`, V.x + V.w / 2, lw.thumb.y + lw.thumb.h * 0.72, { size: kit.fs(10), color: lw.label, align: 'center', maxWidth: V.w - cc * 8 });
   kit.drawText(t('hud.thrust'), V.x + V.w / 2, V.y - kit.fs(8), { size: kit.fs(10), color: c.textMute, align: 'center' });
+}
+
+// ---------- поворотный переключатель расходников (E0) ----------
+
+const KNOB_ORDER = ['off', 'parachute', 'canister', 'repair'];
+// от вертикали, по часовой: все положения на верхней дуге над ручкой
+const KNOB_ANGLE = { off: (-75 * Math.PI) / 180, parachute: (-25 * Math.PI) / 180, canister: (25 * Math.PI) / 180, repair: (75 * Math.PI) / 180 };
+const KNOB_HOLD = 0.6; // с: ручка стоит в положении расходника, затем пружиной возвращается в «ВЫКЛ»
+
+/**
+ * Пластина с бакелитовой ручкой: положения по дуге над ручкой — «ВЫКЛ», парашют, канистра, ремкомплект (со счётчиками).
+ * Нажатие на положение поворачивает ручку туда, расходник срабатывает, ручка возвращается. Клавиши (и любое другое
+ * применение) тоже поворачивают ручку: расход виден по счётчикам. Цели нажатия — те же flight-parachute/-canister/-repair.
+ */
+function drawConsumableKnob(app, kit, L, f, B, touch, items) {
+  const c = kit.c;
+  const cc = kit.cell();
+  const ctx = kit.S.ctx;
+  const st = (app.ui.flightHud ||= {});
+  const k = (st.knob ||= { angle: KNOB_ANGLE.off, pos: 'off', hold: 0, last: null });
+  // расход заметен по счётчикам: ручка показывает, что сработало (клавиши X/C/V, сенсор, клик)
+  const now = { parachute: !!f.chute.deployed, canister: f.consumables.canister || 0, repair: f.consumables.repair || 0 };
+  if (k.last) {
+    if (now.parachute && !k.last.parachute) { k.pos = 'parachute'; k.hold = KNOB_HOLD; }
+    if (now.canister < k.last.canister) { k.pos = 'canister'; k.hold = KNOB_HOLD; }
+    if (now.repair < k.last.repair) { k.pos = 'repair'; k.hold = KNOB_HOLD; }
+  }
+  k.last = now;
+  const dt = Math.min(0.1, Math.max(0, app.time - (k.t ?? app.time)));
+  k.t = app.time;
+  k.hold = Math.max(0, k.hold - dt);
+  const target = KNOB_ANGLE[k.hold > 0 ? k.pos : 'off'];
+  k.angle = app.settings.reduceMotion ? target : k.angle + (target - k.angle) * Math.min(1, dt * 18);
+
+  // пластина: объединение мест трёх прежних кнопок, приподнятое вверх под дугу положений
+  const rs = [B.parachute, B.canister, B.repair].filter(Boolean);
+  const x0 = Math.min(...rs.map((r) => r.x));
+  const x1 = Math.max(...rs.map((r) => r.x + r.w));
+  const y1 = Math.max(...rs.map((r) => r.y + r.h));
+  const y0 = Math.min(...rs.map((r) => r.y));
+  const bw = Math.max(...rs.map((r) => Math.min(r.w, r.h)));
+  // компактная пластина у края экрана: ручка внизу по центру, положения веером над ней
+  const pw = Math.min(x1 - x0, Math.round(bw * 2.3));
+  const ph = Math.min(Math.round(bw * 1.45), Math.round(y1 - y0 + bw * 0.55));
+  const rightSide = x0 + (x1 - x0) / 2 >= L.area.x + L.area.w / 2;
+  const P = { x: rightSide ? x1 - pw : x0, y: y1 - ph, w: pw, h: ph };
+  kit.nine('raised', P.x, P.y, P.w, P.h);
+  const R = Math.round(P.h * 0.24);
+  const cx = Math.round(P.x + P.w / 2);
+  const cy = Math.round(P.y + P.h - R - cc * 4);
+  const ring = Math.min(P.w / 2 - cc * 8, P.h - R - cc * 14);
+  const isz = Math.round(Math.min(bw * 0.4, ring * 0.42));
+
+  // положения: значок, риска, счётчик; цели нажатия
+  for (const id of KNOB_ORDER) {
+    const a = KNOB_ANGLE[id];
+    const px = cx + Math.sin(a) * ring;
+    const py = cy - Math.cos(a) * ring;
+    const item = items[id];
+    const ok = id === 'off' || item.ok;
+    // риска от ручки к положению
+    kit.line(cx + Math.sin(a) * (R + cc * 2), cy - Math.cos(a) * (R + cc * 2), cx + Math.sin(a) * (R + cc * 5), cy - Math.cos(a) * (R + cc * 5), ok ? c.ink : mix(c.ink, c.steel2, 0.6));
+    if (id === 'off') {
+      kit.drawText(t('hud.knobOff'), px, py, { size: kit.fs(9), color: c.ink, align: 'center' });
+      continue;
+    }
+    const hs = Math.round(Math.min(bw, ring * 0.8)); // соседние положения на 50° дуги: цели не перекрываются
+    const hitR = { x: Math.round(px - hs / 2), y: Math.round(py - hs / 2), w: hs, h: hs };
+    const hid = `flight-${id}`;
+    app.hudTargets[hid] = hitR;
+    if (!touch) {
+      kit.hit(hid, hitR, {});
+      if (kit.S.hover === hid) kit.S.cursor = ok ? 'pointer' : 'default';
+      if (kit.clicked === hid) {
+        if (ok) { app.input.pulse(id); k.pos = id; k.hold = KNOB_HOLD; } else kit.sfx('deny');
+      }
+    }
+    const active = k.hold > 0 && k.pos === id;
+    kit.icon(id === 'parachute' ? 'chute' : item.icon, px, py, isz, active ? c.red : ok ? c.ink : mix(c.ink, c.steel2, 0.65));
+    if (id !== 'parachute' && item.count > 0) {
+      kit.drawText(String(item.count), px + isz * 0.62, py + isz * 0.42, { size: kit.fs(9), color: c.red, align: 'left' });
+    }
+  }
+
+  // ручка: тень, бакелитовый корпус с насечкой, светлая риска-указатель
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.beginPath(); ctx.arc(cx + cc, cy + cc * 2, R, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = mix(c.ink, c.steel0, 0.25);
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+  for (let i = 0; i < 16; i++) {
+    const a = k.angle + (i / 16) * Math.PI * 2;
+    kit.rect(Math.round(cx + Math.sin(a) * (R - cc * 2) - cc / 2), Math.round(cy - Math.cos(a) * (R - cc * 2) - cc / 2), cc, cc, c.ink);
+  }
+  ctx.fillStyle = mix(c.ink, c.steel1, 0.35);
+  ctx.beginPath(); ctx.arc(cx, cy, R * 0.62, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = mix(c.steel1, '#ffffff', 0.15);
+  ctx.beginPath(); ctx.arc(cx - R * 0.2, cy - R * 0.22, R * 0.22, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+  const tipX = cx + Math.sin(k.angle) * (R - cc);
+  const tipY = cy - Math.cos(k.angle) * (R - cc);
+  kit.line(cx, cy, tipX, tipY, c.paper2);
+  kit.line(cx + cc / 2, cy, tipX + cc / 2, tipY, c.paper2);
 }
 
 /** Магнит-расходник действует: маленький значок (спрайт эпохи) с пульсирующей подсветкой; над ракетой магнит не рисуется. */
@@ -550,6 +674,41 @@ const tiltLimit = (f) => {
   const m = f.cfg?.fins?.maxTilt;
   return typeof m === 'number' && m < TILT_FREE ? m : null;
 };
+
+/**
+ * E0: профильный прибор крена в нижней части места диска D. Шкала ±90°, ноль посередине, янтарная полоса — допустимый
+ * наклон стабилизаторов, красные упоры за ней; у упора стрелка мигает. Над прибором — табличка «КРЕН».
+ */
+function drawTiltMeter(app, kit, L, D, f, lim) {
+  const c = kit.c;
+  const cc = kit.cell();
+  const u = L.ui;
+  const w = Math.round(Math.min(D.r * 1.9, 230 * u) / cc) * cc;
+  const h = Math.round((24 * u) / cc) * cc;
+  const x = Math.round((D.cx - w / 2) / cc) * cc;
+  // по центру места диска: внизу экрана живёт подсказка клавиш первых полётов
+  const y = Math.round((D.cy - h / 2) / cc) * cc;
+  kit.nine('raised', x, y, w, h);
+  const win = { x: x + cc * 3, y: y + cc * 3, w: w - cc * 6, h: h - cc * 6 };
+  const ang = f.angle || 0;
+  const k = (a) => 0.5 + clamp(a, -Math.PI / 2, Math.PI / 2) / Math.PI;
+  const hot = lim !== null && Math.abs(ang) >= lim * 0.93;
+  const free = lim !== null && lim < Math.PI / 2;
+  inst.edgewise(kit, win, k(ang), {
+    zero: 0.5,
+    ticks: 18,
+    amber: free ? [k(-lim), k(lim)] : undefined,
+    reds: free ? [[0, k(-lim)], [k(lim), 1]] : [],
+    warn: hot,
+  });
+  const word = t('hud.plateTilt');
+  const fsz = kit.fs(9);
+  const pw = Math.round(kit.text.measure(word, fsz) + cc * 6);
+  const ph = Math.round(18 * u);
+  kit.nine('plateTag', Math.round(D.cx - pw / 2), y - ph - cc, pw, ph);
+  kit.drawText(word, D.cx, y - cc - ph / 2, { size: fsz, color: c.ink, align: 'center' });
+  void app;
+}
 
 /**
  * Указатель крена на круглом приборе D: деления через 10° от вертикали, зона допустимого отклонения — дуга из клеток

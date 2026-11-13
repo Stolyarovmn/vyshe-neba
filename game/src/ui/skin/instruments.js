@@ -190,10 +190,14 @@ function flipColors(kit) {
 }
 
 /** Одна карточка в (x, y, w, h): st — состояние, font — { size, minScale }. */
-function flipCell(kit, x, y, w, h, st, font) {
+function flipCell(kit, x, y, w, h, st, font, fraction = false) {
   const ctx = kit.S.ctx;
   const cc = kit.cell();
-  const col = flipColors(kit);
+  const base = flipColors(kit);
+  // карточка дробной части: тёмно-красная, цифра светлая — как десятые доли на механическом одометре
+  const col = fraction
+    ? { ...base, top: mix(kit.c.red, '#000000', 0.35), bottom: mix(kit.c.red, '#000000', 0.55), gloss: mix(kit.c.red, '#ffffff', 0.12) }
+    : base;
   const hy = y + Math.round(h / 2 / cc) * cc;
   const top = { x, y, w, h: hy - y };
   const bot = { x, y: hy, w, h: y + h - hy };
@@ -263,7 +267,8 @@ export function flipCounter(kit, r, str, o = {}) {
   for (let i = 0; i < n; i++) {
     const ch = i < pad ? '' : s[i - pad];
     const x = x0 + i * (cw + gap);
-    flipCell(kit, x, Math.round(r.y), cw, Math.round(r.h), flipState(kit, `${o.id || 'flip'}:${n - i}`, ch), font);
+    // o.tenths: последняя карточка — дробная часть (красная, как десятые у одометра)
+    flipCell(kit, x, Math.round(r.y), cw, Math.round(r.h), flipState(kit, `${o.id || 'flip'}:${n - i}`, ch), font, o.tenths && i === n - 1);
   }
   return { x: x0, w: total };
 }
@@ -291,15 +296,17 @@ export function edgewise(kit, r, value, o = {}) {
   kit.rect(s.x, s.y, cc, s.h, mix(face, '#000000', 0.18));
   const slen = (vertical ? s.h : s.w) - cc * 4;
   const at = (k) => Math.round((vertical ? s.y + s.h - cc * 2 - k * slen : s.x + cc * 2 + k * slen) / cc) * cc;
-  // красный сектор: тонкая полоса вдоль дальнего края шкалы
-  if (o.red) {
-    const a = at(o.red[0]);
-    const b = at(o.red[1]);
+  // красный сектор: тонкая полоса вдоль дальнего края шкалы (o.reds — несколько секторов, o.amber — разрешённая зона)
+  const band = (range, color) => {
+    const a = at(range[0]);
+    const b = at(range[1]);
     const lo = Math.min(a, b);
     const span = Math.max(cc, Math.abs(b - a));
-    if (vertical) kit.rect(s.x + s.w - cc * 2, lo, cc, span, c.red);
-    else kit.rect(lo, s.y + s.h - cc * 2, span, cc, c.red);
-  }
+    if (vertical) kit.rect(s.x + s.w - cc * 2, lo, cc, span, color);
+    else kit.rect(lo, s.y + s.h - cc * 2, span, cc, color);
+  };
+  if (o.amber) band(o.amber, c.amber);
+  for (const range of o.reds || (o.red ? [o.red] : [])) band(range, c.red);
   // деления у ближнего края: короткие, каждое пятое вдвое длиннее, нулевая риска во всю ширину
   const ticks = o.ticks || (slen > cc * 40 ? 20 : 10);
   for (let i = 0; i <= ticks; i++) {
@@ -327,6 +334,53 @@ export function edgewise(kit, r, value, o = {}) {
   }
   // блик стекла
   withAlpha(kit, 0.35, () => (vertical ? kit.rect(s.x + s.w - cc * 3, s.y + cc * 2, cc, Math.min(s.h - cc * 4, cc * 6), '#ffffff') : kit.rect(s.x + cc * 2, s.y + cc, Math.min(s.w - cc * 4, cc * 8), cc, '#ffffff')));
+}
+
+/**
+ * Тумблер E0: стальная накладка с двумя винтами, гайка и рычажок-«летучая мышь». on — рычажок вверх (включено).
+ * (cx, cy) — центр гайки, size — высота накладки.
+ */
+export function tumbler(kit, cx, cy, size, on) {
+  const c = kit.c;
+  const cc = kit.cell();
+  const ctx = kit.S.ctx;
+  const pw = Math.round((size * 0.62) / cc) * cc;
+  const ph = Math.round(size / cc) * cc;
+  const px = Math.round(cx - pw / 2);
+  const py = Math.round(cy - ph / 2);
+  kit.rect(px - cc, py - cc, pw + cc * 2, ph + cc * 2, c.ink);
+  kit.rect(px, py, pw, ph, mix(c.steel1, c.steel2, 0.4));
+  kit.rect(px, py, pw, cc, mix(c.steel2, '#ffffff', 0.25));
+  for (const sy of [py + cc * 2, py + ph - cc * 4]) {
+    kit.rect(Math.round(cx - cc), sy, cc * 2, cc * 2, c.steel0);
+    kit.rect(Math.round(cx - cc), sy + cc, cc * 2, Math.max(1, cc / 2), c.ink);
+  }
+  const nut = Math.max(cc * 3, Math.round(size * 0.2));
+  ctx.save();
+  ctx.fillStyle = c.ink;
+  ctx.beginPath(); ctx.arc(cx, cy, nut + cc, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = mix(c.steel1, '#000000', 0.2);
+  ctx.beginPath(); ctx.arc(cx, cy, nut, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+  // рычажок: от гайки вверх или вниз, светлая грань слева, шарик на конце
+  const len = Math.round(size * 0.42);
+  const lw = Math.max(cc * 2, Math.round(size * 0.12 / cc) * cc);
+  const dir = on ? -1 : 1;
+  const y0 = cy;
+  const y1 = cy + dir * len;
+  const top = Math.min(y0, y1);
+  kit.rect(Math.round(cx - lw / 2) - cc, top - cc, lw + cc * 2, Math.abs(y1 - y0) + cc * 2, c.ink);
+  kit.rect(Math.round(cx - lw / 2), top, lw, Math.abs(y1 - y0), mix(c.steel2, '#ffffff', 0.35));
+  kit.rect(Math.round(cx - lw / 2), top, Math.max(1, Math.round(lw / 3)), Math.abs(y1 - y0), mix(c.steel2, '#ffffff', 0.7));
+  const ball = Math.round(lw * 0.9);
+  ctx.save();
+  ctx.fillStyle = c.ink;
+  ctx.beginPath(); ctx.arc(cx, y1, ball + cc, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = mix(c.steel2, '#ffffff', 0.45);
+  ctx.beginPath(); ctx.arc(cx, y1, ball, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.arc(cx - ball * 0.35, y1 - ball * 0.35, Math.max(1, ball * 0.3), 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
 }
 
 // ---------- высота ----------
@@ -373,16 +427,18 @@ export function altitude(kit, r, f, o) {
   const lampX = r.x + lampW / 2 + cc;
   const lampColor = alarm ? c.red : c.green;
   if (kind === 'analog') {
+    // перекидной счётчик в километрах, как одометр: три белые карточки — целые км, четвёртая красная — сотни метров.
+    // Лампы тревоги нет: тревогу показывает красная рамка экрана, а лишняя лампа рядом с цифрами читалась как неисправность.
     kit.nine('raised', r.x, r.y, r.w, r.h);
-    kit.lamp(r.x + lampW * 0.55, r.y + r.h / 2, Math.round(r.h * 0.34), alarm ? c.red : c.amber, true, alarm);
-    // перекидные цифры всегда показывают метры: механический счётчик не умеет переключать единицы
-    const meterUnit = t('unit.m');
-    const unitW = kit.text.measure(meterUnit, kit.fs(10)) + cc * 5;
-    const digits = meters >= 99999.5 ? 6 : 5;
-    const win = { x: r.x + lampW, y: r.y + cc * 3, w: r.w - lampW - unitW, h: r.h - cc * 6 };
+    const kmUnit = t('unit.km');
+    const unitW = kit.text.measure(kmUnit, kit.fs(10)) + cc * 8;
+    const tenths = Math.floor(Math.max(0, meters) / 100);
+    const cells = tenths >= 10000 ? 5 : 4;
+    const win = { x: r.x + cc * 3, y: r.y + cc * 3, w: r.w - cc * 3 - unitW, h: r.h - cc * 6 };
     kit.rect(win.x - cc, win.y - cc, win.w + cc * 2, win.h + cc * 2, c.ink);
-    flipCounter(kit, win, String(Math.floor(Math.max(0, meters))).padStart(digits, '0'), { id: 'alt', cells: digits });
-    kit.drawText(meterUnit, r.x + r.w - cc * 3, r.y + r.h / 2, { size: kit.fs(10), color: c.amberLight, align: 'right' });
+    flipCounter(kit, win, String(tenths).padStart(cells, '0'), { id: 'altkm', cells, tenths: true });
+    kit.drawText(kmUnit, r.x + r.w - cc * 3, r.y + r.h / 2, { size: kit.fs(10), color: c.amberLight, align: 'right' });
+    void alarm;
     return;
   }
   if (kind === 'led') {
@@ -441,15 +497,13 @@ export function vspeed(kit, r, o) {
   if (kind === 'analog') {
     // профильный прибор вариометра: ноль посередине, вправо — набор, влево — спуск; красный сектор — спуск быстрее допуска
     kit.nine('raised', r.x, r.y, r.w, r.h);
+    // только стрелка (решение владельца 2026-11-13): цифровое окно у механического вариометра 1978 года лишнее
     const tolV = tol > 0 ? tol : 25;
-    const numW = Math.round(r.w * 0.36);
-    const win = { x: r.x + cc * 3, y: r.y + cc * 3, w: r.w - cc * 8 - numW, h: r.h - cc * 6 };
+    const win = { x: r.x + cc * 3, y: r.y + cc * 3, w: r.w - cc * 6, h: r.h - cc * 6 };
     const k = clamp(climb / full, -1, 1);
-    edgewise(kit, win, 0.5 + k * 0.5, { zero: 0.5, red: [0, 0.5 - clamp(tolV / full, 0, 1) * 0.5], ticks: 10, warn: vcol === c.red });
-    const box = { x: win.x + win.w + cc * 2, y: win.y, w: r.x + r.w - cc * 3 - (win.x + win.w + cc * 2), h: win.h };
-    kit.rect(box.x, box.y, box.w, box.h, c.ink);
-    kit.drawText(numStr, box.x + box.w - cc * 2, box.y + box.h / 2, { size: fitSize(box.h - cc * 2), color: vcol === c.green ? c.paper2 : vcol, align: 'right', maxWidth: box.w - cc * 3 });
+    edgewise(kit, win, 0.5 + k * 0.5, { zero: 0.5, red: [0, 0.5 - clamp(tolV / full, 0, 1) * 0.5], ticks: 20, warn: vcol === c.red });
     void iconName;
+    void numStr;
     return;
   }
   if (kind === 'led' || kind === 'digital') {

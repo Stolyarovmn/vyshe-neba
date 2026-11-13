@@ -3,7 +3,7 @@
 // Общие правила выбора: имя спрайта — spriteName(часть, эпоха); размеры частей — ROCKET_SIZE из rocket.js.
 
 import { spriteName } from './manifest.js';
-import { ROCKET_SIZE, SKIN_HUE, flameShape, stackParts } from './rocket.js';
+import { LEG_SPRITES, ROCKET_SIZE, SKIN_HUE, drawLegPair, flameShape, legSprite, stackParts } from './rocket.js';
 import { clamp } from './util.js';
 
 const GAP = 6; // зазор между ступенями на схеме, единицы мира
@@ -96,6 +96,19 @@ export function drawAssembly(ctx, painter, o) {
   const stack = layout.parts;
   const lowestOwned = stack.find((p) => p.owned);
   if ((o.throttle || 0) > 0.02 && lowestOwned) drawStandFlame(ctx, o.cx * dpr, (o.bottom - lowestOwned.bottom * scale) * dpr, scale * dpr, o.throttle, era, o.time || 0);
+  // посадочные опоры под низом ракеты (как в полёте: у среза сопла нижней ступени), раскрытые: видно, что модуль «Опоры»
+  // куплен и каким уровнем; без опор — бледный силуэт ур. 1
+  const foot = lowestOwned || stack[0];
+  const legLevel = (o.parts?.legs | 0);
+  const legs = stack[0].name && foot ? legSprite(Math.max(1, legLevel), painter?.assets) : null;
+  if (legs && LEG_SPRITES[Math.max(1, legLevel)]) {
+    const s = scale * dpr;
+    const ox = o.cx * dpr;
+    const oy = (o.bottom - foot.bottom * scale) * dpr;
+    drawLegPair(legs, painter.assets.get(legs.name), s, 1, (asset, sx, sy, w, h, ax, ay, opts) => {
+      painter.blitDev(ctx, asset, ox + sx, oy + sy, w * s, h * s, ax, ay, { ...opts, hue });
+    }, (legLevel > 0 ? 1 : 0.22) * (o.alpha ?? 1));
+  }
   for (const part of stack[0].name ? [...stack].reverse() : stack) {
     const asset = painter?.assets?.get(part.name || spriteName(part.base, era));
     const h = part.h * scale;

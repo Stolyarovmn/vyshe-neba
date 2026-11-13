@@ -457,16 +457,19 @@ export function createApp({ canvas, mods, store, prefs, savePrefs, input, render
     parachute: { key: 'cue.parachute', icon: 'chute', kind: 'good' },
     'fuel-empty': { key: 'cue.fuelEmpty', icon: 'fuel', kind: 'bad' },
     hit: { key: 'cue.hit', icon: 'warn', kind: 'bad', pri: 3 },
+    'pad-blast': { key: 'cue.padBlast', icon: 'flame', kind: 'tip' },
     'transfer-start': { key: 'cue.transferStart', icon: 'transfer', kind: 'good' },
     'transfer-done': { key: 'cue.transferDone', icon: 'transfer', kind: 'good' },
     touch: { key: 'cue.touch', icon: 'down', kind: 'tip' },
     storm: { key: 'cue.storm', icon: 'wind', kind: 'bad' },
   };
   function visualCue(s, e) {
-    const cue = CUES[e.type];
-    if (cue) s.cues[e.type] = { ...cue, text: t(cue.key), at: app.time };
+    // ожог обшивки стартовой струёй (стол без охлаждения) — не столкновение: своя спокойная подпись, без тревоги и «Удар!»
+    const padBlast = e.type === 'hit' && e.kind === 'pad-blast';
+    const cue = padBlast ? CUES['pad-blast'] : CUES[e.type];
+    if (cue) s.cues[padBlast ? 'pad-blast' : e.type] = { ...cue, text: t(cue.key), at: app.time };
     if (e.type === 'thrust-cut' && e.reason === 'fuel') s.cues['fuel-empty'] = { ...CUES['fuel-empty'], text: t('cue.fuelEmpty'), at: app.time };
-    const alarm = e.type === 'low-fuel' || e.type === 'hit' || (e.type === 'warn' && (e.kind === 'hull' || e.kind === 'hazard' || e.kind === 'brake'));
+    const alarm = e.type === 'low-fuel' || (e.type === 'hit' && !padBlast) || (e.type === 'warn' && (e.kind === 'hull' || e.kind === 'hazard' || e.kind === 'brake'));
     if (alarm) s.alarmUntil = app.time + (e.type === 'low-fuel' ? 2.4 : 1.2);
   }
 

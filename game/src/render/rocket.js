@@ -41,6 +41,55 @@ export function stackGeometry(assets, era = 0) {
 
 export const SKIN_HUE = Object.freeze({ classic: 0, wasp: 45, arctic: 170, cosmos: 270 });
 
+/**
+ * Посадочные опоры по уровню модуля «Опоры» (E0, спрайты rocket/leg1..3.png — левая опора; правая — зеркально).
+ * h — высота спрайта в единицах мира, hinge — шарнир (доли спрайта от левого верхнего угла). В раскрытом виде низ
+ * опоры стоит на уровне среза сопла (опорная точка ракеты), в сложенном — опора повёрнута вверх вдоль корпуса.
+ */
+export const LEG_SPRITES = Object.freeze([
+  null,
+  { name: 'rocket_leg1_1978', h: 16, hinge: [0.89, 0.08] },
+  { name: 'rocket_leg2_1978', h: 18, hinge: [0.86, 0.08] },
+  { name: 'rocket_leg3_1978', h: 22, hinge: [0.85, 0.09] },
+]);
+const LEG_STOW = (140 * Math.PI) / 180; // угол складывания вокруг шарнира
+const BODY_HALF = (STACK_W * 120) / 146 / 2; // половина ширины корпуса: холст 146 px, корпус 120 px
+
+/** Спрайт опор уровня level, если он есть в ассетах (иначе null — ракета садится на срез сопла, как прежде). */
+export function legSprite(level, assets) {
+  const spec = LEG_SPRITES[clamp(level | 0, 0, LEG_SPRITES.length - 1)];
+  return spec && assets?.get(spec.name) ? spec : null;
+}
+
+/**
+ * Пара опор у опорной точки (0, 0) текущей трансформации ctx; s — пикселей устройства на единицу, deploy 0..1.
+ * blit(asset, sx, sy, w, h, ax, ay, opts) рисует спрайт (у полёта — painter.blit с видом, у сборки — blitDev).
+ */
+export function drawLegPair(spec, asset, s, deploy, blit, alpha = 1) {
+  const h = spec.h;
+  const w = (h * asset.w) / asset.h;
+  const [hx, hy] = spec.hinge;
+  const e = clamp(deploy, 0, 1);
+  // сложенные опоры убраны за обшивку: видны только пока раскрываются и раскрытые
+  if (e < 0.04) return;
+  const k = e * e * (3 - 2 * e);
+  const hingeY = -h * (1 - hy);
+  for (const side of [-1, 1]) {
+    blit(asset, Math.round(side * (BODY_HALF - 0.6) * s), Math.round(hingeY * s), w, h, hx, hy, {
+      angle: -side * LEG_STOW * (1 - k), flipX: side > 0, alpha, smooth: false,
+    });
+  }
+}
+
+/** Сопло кабины для полёта одной кабиной (E0): спрайт rocket/nozzle_capsule.png, если есть. */
+function capsuleNozzle(assets, era) {
+  if ((era | 0) !== 0) return null;
+  const asset = assets?.get('rocket_nozzle_capsule_1978');
+  if (!asset || !(asset.w > 0)) return null;
+  const k = STACK_W / 146; // та же плотность, что у ступеней
+  return { name: 'rocket_nozzle_capsule_1978', w: asset.w * k, h: asset.h * k, joint: 1 };
+}
+
 /** Какая часть ракеты сейчас активна: 'booster' (разгонный блок + ядро), 'core' или 'capsule'. */
 export function activeKind(stageIds, stageIndex) {
   const id = stageIds && stageIds[Math.min(stageIndex | 0, stageIds.length - 1)];
@@ -54,12 +103,20 @@ export function stackParts(kind, assets, era = 0) {
   if (geometry) {
     const bases = kind === 'capsule' ? ['capsule'] : kind === 'core' ? ['core', 'capsule'] : ['booster', 'core', 'capsule'];
     let bottom = 0;
+    const out = [];
+    // кабина после отделения летит на своём сопле: оно внизу, кабина стоит на его фланце
+    const nozzle = kind === 'capsule' ? capsuleNozzle(assets, era) : null;
+    if (nozzle) {
+      out.push({ base: 'nozzle', ...nozzle, bottom });
+      bottom -= nozzle.h - nozzle.joint;
+    }
     // Без купленной кабины этот же нос служит обтекателем, поэтому он всегда виден.
-    return bases.map((base) => {
+    for (const base of bases) {
       const part = { base, ...geometry[base], bottom };
       bottom -= part.h - part.joint;
-      return part;
-    });
+      out.push(part);
+    }
+    return out;
   }
   if (kind === 'booster') {
     return [
@@ -117,6 +174,8 @@ export function createRocketPose() {
     boost: false,
     rcsLeft: 0,
     rcsRight: 0,
+    legs: 0, // уровень модуля «Опоры»
+    legDeploy: 0, // 0 — сложены вдоль корпуса, 1 — раскрыты (низ на уровне среза сопла)
     skin: 'classic',
     chute: 0, // 0..1 прогресс раскрытия
     chuteTime: 0, // секунды с момента раскрытия
@@ -133,6 +192,12 @@ export function drawRocket(ctx, painter, view, pose, time) {
   if (pose.angle) ctx.rotate(pose.angle);
   if (pose.throttle > 0.02) drawFlame(ctx, view, pose, time, painter.assets);
   const hue = SKIN_HUE[pose.skin] || 0;
+  // опоры за корпусом: шарниры прячутся под обшивкой
+  const legs = stackGeometry(painter.assets, pose.era) ? legSprite(pose.legs, painter.assets) : null;
+  if (legs) {
+    drawLegPair(legs, painter.assets.get(legs.name), S, pose.legDeploy,
+      (asset, sx, sy, w, h, ax, ay, opts) => painter.blit(ctx, view, asset, sx, sy, w, h, ax, ay, { ...opts, hue }));
+  }
   const parts = stackParts(pose.kind, painter.assets, pose.era);
   // Нижняя юбка перекрывает стык и сопло верхней части.
   if (parts[0].name) parts.reverse();
@@ -204,25 +269,31 @@ function drawFlame(ctx, view, pose, time, assets) {
   }
 }
 
-/** Струйки РСУ по бокам верхней части: короткие светлые клинья, мигающие по времени. */
+/**
+ * Рулевые (верньерные) струйки у низа активной ступени — там, где у ракеты сопла, а не на уровне окошка кабины
+ * (замечание владельца 2026-11-13). Короткие клинья цвета пламени эпохи, косо вниз и в сторону, мигают по времени.
+ */
 function drawRcs(ctx, view, pose, time, assets) {
   if (pose.rcsLeft <= 0 && pose.rcsRight <= 0) return;
   const S = view.S;
-  const h = stackHeight(pose.kind, assets, pose.era);
+  const palette = FLAME_PALETTES[clamp(pose.era | 0, 0, 5)];
   const geometry = stackGeometry(assets, pose.era);
-  const y = geometry ? -h + geometry.capsule.h * 0.55 : -(pose.kind === 'capsule' ? 0.62 : 0.6) * h + (pose.kind === 'core' ? ROCKET_SIZE.coreFeetDrop : 0);
-  const x = geometry ? STACK_W * 0.36 : pose.kind === 'capsule' ? 11 : 13;
-  const len = 5 + 3 * Math.sin(time * 32) ** 2;
-  ctx.fillStyle = '#bbf4ff';
+  // низ активной ступени: опорная точка 0, струйки чуть выше среза сопла, у края корпуса
+  const y = -(geometry ? 3 : 4) + (pose.kind === 'core' && !geometry ? ROCKET_SIZE.coreFeetDrop : 0);
+  const x = (geometry ? STACK_W : 26) * 0.42;
+  const len = 4 + 3 * Math.sin(time * 32) ** 2;
   for (const side of [-1, 1]) {
     const active = side < 0 ? pose.rcsLeft : pose.rcsRight;
     if (active <= 0) continue;
-    ctx.beginPath();
-    ctx.moveTo(side * x * S, (y - 1) * S);
-    ctx.lineTo(side * (x + len) * S, y * S);
-    ctx.lineTo(side * x * S, (y + 2) * S);
-    ctx.closePath();
-    ctx.fill();
+    for (const [color, k] of [[palette.outer, 1], [palette.core, 0.55]]) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(side * x * S, (y - 1.2 * k) * S);
+      ctx.lineTo(side * (x + len * k) * S, (y + len * 0.6 * k) * S);
+      ctx.lineTo(side * x * S, (y + 1.2 * k) * S);
+      ctx.closePath();
+      ctx.fill();
+    }
   }
 }
 

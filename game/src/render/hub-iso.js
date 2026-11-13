@@ -342,7 +342,8 @@ export function createIsoHub(painter, shared, layout) {
           const pad = layout.pad;
           rocketView.set(mv.sx(pad.x), mv.sy(pad.y), mv.s * pad.rocketScale, state.devW, state.devH);
           Object.assign(pose, { x: 0, y: 0, angle: 0, era, kind: profile?.parts?.booster > 0 ? 'booster' : 'core',
-            throttle: 0, atmo: 1, skin: profile?.skin || 'classic', visible: true });
+            throttle: 0, atmo: 1, skin: profile?.skin || 'classic', visible: true,
+            legs: profile?.parts?.legs | 0, legDeploy: 0 }); // на столе опоры сложены вдоль корпуса
           // У прежнего ядра опоры ниже опорной точки; нижний пиксель также ставим на стол.
           const feet = nozzleOffset(pose.kind, painter.assets, era);
           pose.y = -feet;

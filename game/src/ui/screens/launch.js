@@ -5,6 +5,7 @@ import { t } from '../../i18n/index.js';
 import { launchLayout } from '../layout.js';
 import { drawChrome, lockRows, isFundsReason, partIcon } from './common.js';
 import { mix } from '../theme.js';
+import * as inst from '../skin/instruments.js';
 import { flightGoal, kmText } from '../../rules/next-steps.js';
 import { PAYOUT } from '../../data/economy.js';
 
@@ -127,8 +128,27 @@ export default {
       const on = usable && (isFree || st.cons[id]);
       const pad = Math.round(L.gap * 0.5);
       const slot = { x: r.x + pad, y: r.y + pad, w: r.w - pad * 2, h: r.h - pad * 2 };
-      const clicked = kit.button(`cons-${id}`, slot, { variant: on ? 'cardOn' : 'card', icon: CONS_ICON[id], iconSize: Math.round(slot.h * 0.56), iconColor: usable ? c.text : c.textMute, tip: t(`cons.${id}`), lamp: on ? c.green : false });
-      kit.drawText(isFree ? t('cons.free') : `×${have}`, slot.x + slot.w - kit.cell() * 3, slot.y + slot.h - kit.cell() * 5, { size: kit.fs(11), color: kit.readable(isFree ? c.green : have ? c.amberLight : c.textMute, kit.frameMid(on ? 'cardOn' : 'card')), align: 'right', shadow: true });
+      let clicked;
+      if (kit.th.era === 'e0') {
+        // E0: гнездо — стальная панель со значком и тумблером «беру с собой» (решение владельца 2026-11-13); лампа рядом горит
+        const sid = `cons-${id}`;
+        kit.hit(sid, slot, { focusable: true });
+        if (kit.S.hover === sid) kit.S.cursor = 'pointer';
+        if (kit.S.focusVisible && kit.S.focusId === sid) kit.focusRing(slot);
+        if (kit.S.hover === sid) kit.S.tipCandidate = { id: sid, text: t(`cons.${id}`) };
+        clicked = kit.clicked === sid;
+        kit.nine('raised', slot.x, slot.y, slot.w, slot.h);
+        const isz = Math.round(Math.min(slot.h * 0.42, slot.w * 0.42));
+        const iconX = slot.x + slot.w * 0.33;
+        kit.icon(CONS_ICON[id], iconX, slot.y + slot.h * 0.42, isz, usable ? c.text : c.textMute);
+        const tsz = Math.round(Math.min(slot.h * 0.62, slot.w * 0.42));
+        const tx = slot.x + slot.w * 0.74;
+        inst.tumbler(kit, tx, slot.y + slot.h * 0.46, tsz, on);
+        kit.lamp(tx, slot.y + kit.cell() * 6, Math.round(tsz * 0.16), on ? c.green : c.navy2, on);
+      } else {
+        clicked = kit.button(`cons-${id}`, slot, { variant: on ? 'cardOn' : 'card', icon: CONS_ICON[id], iconSize: Math.round(slot.h * 0.56), iconColor: usable ? c.text : c.textMute, tip: t(`cons.${id}`), lamp: on ? c.green : false });
+      }
+      kit.drawText(isFree ? t('cons.free') : `×${have}`, kit.th.era === 'e0' ? slot.x + slot.w * 0.33 : slot.x + slot.w - kit.cell() * 3, slot.y + slot.h - kit.cell() * 5, { size: kit.fs(11), color: kit.readable(isFree ? c.green : have ? c.amberLight : c.textMute, kit.frameMid(on ? 'cardOn' : 'card')), align: kit.th.era === 'e0' ? 'center' : 'right', shadow: true });
       if (id === 'chute' && usable && st.dest !== 'earth') kit.icon('warn', slot.x + kit.cell() * 5, slot.y + slot.h - kit.cell() * 5, Math.round(14 * L.ui), c.amber);
       if (clicked) {
         if (!usable) {

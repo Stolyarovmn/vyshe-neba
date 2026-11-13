@@ -149,6 +149,9 @@ export function islandFog(cloud, h) {
  */
 export const SPRITE_SWAP = [0.47, 0.6];
 
+/** Высота раскрытия посадочных опор на снижении, ед. мира (×10 м). */
+const LEG_DEPLOY_ALT = 40;
+
 /** Положение в ряду кадров по ходу подъёма u (0..1): индекс нижнего кадра и доля следующего. */
 export function liftBlend(u, count) {
   const n = Math.max(1, count - 1);
@@ -466,6 +469,12 @@ export function createFlightRenderer(painter, shared) {
     pose.rcsLeft = flight.rcs ? flight.rcs.left : 0;
     pose.rcsRight = flight.rcs ? flight.rcs.right : 0;
     pose.visible = !(state.crashed || flight.phase === 'crashed');
+    // опоры: на столе и в подъёме сложены, на снижении у земли раскрываются (событие посадки), после посадки стоят
+    pose.legs = state.legs || 0;
+    if (state.legFlight !== flight) { state.legFlight = flight; state.legDeploy = 0; }
+    const legTarget = flight.phase === 'landed' || (flight.liftedOff && (flight.vy || 0) > 0 && -flight.y < LEG_DEPLOY_ALT) ? 1 : 0;
+    state.legDeploy = state.reduce ? legTarget : state.legDeploy + (legTarget - state.legDeploy) * Math.min(1, (dt || 0) * 2.5);
+    pose.legDeploy = state.legDeploy;
 
     const ended = flight.phase === 'landed' || flight.phase === 'crashed';
     if (flight.chute && flight.chute.deployed && !ended) {
@@ -666,6 +675,7 @@ export function createFlightRenderer(painter, shared) {
     env.era = state.era;
     state.skin = cfg.skin || 'classic';
     const profile = params.profile || (shared && shared.profile) || null;
+    state.legs = (cfg.parts?.legs ?? profile?.parts?.legs ?? 0) | 0;
 
     const world = ensureWorld(layout);
     const canvas = ctx.canvas;
