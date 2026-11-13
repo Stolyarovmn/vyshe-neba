@@ -570,18 +570,27 @@ function drawConsumableKnob(app, kit, L, f, B, touch, items) {
   const ph = Math.min(Math.round(bw * 1.45), Math.round(y1 - y0 + bw * 0.55));
   const rightSide = x0 + (x1 - x0) / 2 >= L.area.x + L.area.w / 2;
   const P = { x: rightSide ? x1 - pw : x0, y: y1 - ph, w: pw, h: ph };
+  // сенсорная раскладка: над пластиной может стоять кнопка форсажа — пластина не заходит под неё
+  const above = B.boost;
+  if (touch && above && above.x < P.x + P.w && above.x + above.w > P.x && above.y + above.h > P.y && above.y < y1) {
+    P.y = Math.min(y1 - Math.round(bw * 0.9), above.y + above.h + cc * 2);
+    P.h = y1 - P.y;
+  }
   kit.nine('raised', P.x, P.y, P.w, P.h);
-  const R = Math.round(P.h * 0.24);
+  const R = Math.round(Math.min(P.h * 0.26, P.w * 0.14));
   const cx = Math.round(P.x + P.w / 2);
   const cy = Math.round(P.y + P.h - R - cc * 4);
-  const ring = Math.min(P.w / 2 - cc * 8, P.h - R - cc * 14);
-  const isz = Math.round(Math.min(bw * 0.4, ring * 0.42));
+  const isz = Math.round(Math.min(bw * 0.4, P.h * 0.3));
+  // положения по эллиптической дуге: на низкой широкой пластине (сенсорный портрет) они расходятся в стороны
+  const ringY = Math.max(R + cc * 3, cy - P.y - cc * 3 - isz / 2);
+  const ringX = Math.max(R + cc * 4 + isz / 2, P.w / 2 - cc * 5 - isz * 0.6);
+  const ring = Math.min(ringX, ringY);
 
   // положения: значок, риска, счётчик; цели нажатия
   for (const id of KNOB_ORDER) {
     const a = KNOB_ANGLE[id];
-    const px = cx + Math.sin(a) * ring;
-    const py = cy - Math.cos(a) * ring;
+    const px = cx + Math.sin(a) * ringX;
+    const py = cy - Math.cos(a) * ringY;
     const item = items[id];
     const ok = id === 'off' || item.ok;
     // риска от ручки к положению
@@ -591,7 +600,11 @@ function drawConsumableKnob(app, kit, L, f, B, touch, items) {
       continue;
     }
     const hs = Math.round(Math.min(bw, ring * 0.8)); // соседние положения на 50° дуги: цели не перекрываются
-    const hitR = { x: Math.round(px - hs / 2), y: Math.round(py - hs / 2), w: hs, h: hs };
+    // под палец: на сенсорном экране пластина делится на три широкие зоны во всю высоту (парашют, канистра, ремкомплект)
+    const zone = KNOB_ORDER.indexOf(id) - 1;
+    const hitR = touch
+      ? { x: Math.round(P.x + (zone * P.w) / 3), y: P.y, w: Math.round(P.w / 3), h: P.h }
+      : { x: Math.round(px - hs / 2), y: Math.round(py - hs / 2), w: hs, h: hs };
     const hid = `flight-${id}`;
     app.hudTargets[hid] = hitR;
     if (!touch) {
@@ -702,11 +715,12 @@ function drawTiltMeter(app, kit, L, D, f, lim) {
     warn: hot,
   });
   const word = t('hud.plateTilt');
-  const fsz = kit.fs(9);
-  const pw = Math.round(kit.text.measure(word, fsz) + cc * 6);
+  const pw = Math.round(kit.text.measure(word, kit.fs(8)) + cc * 6);
   const ph = Math.round(18 * u);
   kit.nine('plateTag', Math.round(D.cx - pw / 2), y - ph - cc, pw, ph);
-  kit.drawText(word, D.cx, y - cc - ph / 2, { size: fsz, color: c.ink, align: 'center' });
+  // как у табличек «ТОПЛ»/«КОРП»: надпись вписана в табличку целым шагом пиксельного шрифта
+  const fit = kit.text.fitBox(word, pw - cc * 3, ph - cc * 2, kit.fs(8), 1);
+  kit.drawText(word, D.cx, y - cc - ph / 2, { ...fit, color: c.ink, align: 'center' });
   void app;
 }
 
