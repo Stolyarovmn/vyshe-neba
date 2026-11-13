@@ -30,6 +30,10 @@ for y, key, x in sorted(items):
         canvas.alpha_composite(ims[2], (round(x - ims[2].width / 2), by))
         continue
     sp = Image.open(era / f'iso/{key}.png').convert('RGBA')
+    # iso-спрайты плотнее карты (ISO_DENSITY в write_layout.py): размер на карте — из base-iso.json
+    w, h = lay['buildings'][key]['size']
+    if sp.size != (w, h):
+        sp = sp.resize((w, h), Image.LANCZOS)
     canvas.alpha_composite(sp, (round(x - sp.width / 2), round(y - sp.height)))
 canvas.convert('RGB').save(out)
 print('ok', canvas.size)

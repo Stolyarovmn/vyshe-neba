@@ -7,6 +7,15 @@ root = Path(sys.argv[1]); proj = json.load(open(sys.argv[2]))
 pts = proj['points']
 iso_dir = root / 'game/assets/eras/e0-1978/iso'
 UNITS_PER_PX = 0.665
+# Плотность iso-спрайтов (решение владельца 2026-11-13): PNG в 3 раза плотнее карты, чтобы база при увеличении
+# не мылилась. Размер в base-iso.json — в px карты: PNG / ISO_DENSITY.
+ISO_DENSITY = 3
+
+
+def map_size(png):
+    w, h = Image.open(png).size
+    return [round(w / ISO_DENSITY), round(h / ISO_DENSITY)]
+
 buildings = {}
 # ручные поправки после примерки: крупные здания в изометрии наезжали друг на друга
 OVERRIDES = {'fuel': [1000, 352], 'energy': [1655, 300], 'recovery': [1525, 356]}
@@ -17,8 +26,7 @@ for key, p in pts.items():
     f = iso_dir / f'{key}.png'
     if not f.exists():
         continue
-    w, h = Image.open(f).size
-    buildings[key] = {'anchor': p, 'size': [w, h]}
+    buildings[key] = {'anchor': p, 'size': map_size(f)}
     extra = [v for k, v in pts.items() if k.startswith(key + '_')]
     if extra:
         buildings[key]['anchors'] = [p] + extra
@@ -30,8 +38,7 @@ entries = {}
 for key, p in ENTRIES.items():
     f = iso_dir / f'entry_{key}.png'
     if f.exists():
-        w, h = Image.open(f).size
-        entries[key] = {'anchor': p, 'size': [w, h]}
+        entries[key] = {'anchor': p, 'size': map_size(f)}
 layout = {
     'size': proj['size'],
     'elev': proj['elev'],

@@ -19,6 +19,7 @@ import hdpixel as hp  # noqa: E402
 
 root = Path(sys.argv[1]); sheet = Path(sys.argv[2]); keys = sys.argv[3].split(','); dry = '--dry' in sys.argv
 FILE = {'weather': 'weather-complex'}
+ISO_DENSITY = 3  # px iso-спрайта на px карты изометрии (write_layout.py, README)
 iso_dir = root / 'game/assets/eras/e0-1978/iso'
 img = hp.key_out(Image.open(sheet))
 parts = hp.pieces(img, min_area=1500)
@@ -30,7 +31,8 @@ full = np.vstack([pal, acc]) if len(acc) else pal
 out_dir = root / 'game/assets/eras/e0-1978/base'
 for key, bb in zip(keys, parts):
     c = img.crop(bb)
-    w = Image.open(iso_dir / f'{key}.png').width
+    # iso-спрайты с 2026-11-13 запечены в ISO_DENSITY раз плотнее карты: ширина на карте = ширина PNG / ISO_DENSITY
+    w = round(Image.open(iso_dir / f'{key}.png').width / ISO_DENSITY)
     h = max(1, round(c.height * w / c.width))
     out = hp.remap(hp.resize_premul(c, (w, h)), full)
     if not dry:

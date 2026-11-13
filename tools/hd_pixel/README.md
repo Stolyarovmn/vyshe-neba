@@ -23,6 +23,8 @@
 | `composite.py` | примерка: остров изометрии + постройки + ракета-стек по `base-iso.json` | `python composite.py <root> out.png` |
 | `bake_tilt.py` | кадры подъёма камеры база → полёт: рендеры `iso_render.py` под 52°, 64°, 73,44° → `shared/island/tilt-*.webp` + `tilt.json` (стол и якоря каждого кадра) | `python bake_tilt.py <root> <dir52> <dir64> <dir73>` |
 
-Порядок для новой постройки E0: запрос по `art/docs/templates/SPRITE_REQUEST.md` в двух камерах → `bake_seq.py` в `iso/` (база) → `bake_top.py` в `base/` (полёт, ширина как в `iso/`) → иконка через `bake_icons.py` → `write_layout.py` → `composite.py` → размеры в `manifest.js` → сборка и скриншоты.
+Плотность базы (с 2026-11-13): `iso/` запекается в 3 раза плотнее карты — ширина для `bake_seq.py` = 3 × ширина на карте (например, ферма `iso/gantry.png:270` при 90 px на карте); `write_layout.py` и `bake_top.py` делят размер PNG на `ISO_DENSITY = 3`, `composite.py` ужимает спрайт до размера из `base-iso.json`. Листы-источники 2026-11 (A: gantry…fuel, B: logistics…radar, C: energy, observation, recovery, beacons; входы — `art/review/entries/LOG.md`) лежат в библиотеке изображений ChatGPT; запекание прежними ширинами даёт прежние спрайты бит в бит.
+
+Порядок для новой постройки E0: запрос по `art/docs/templates/SPRITE_REQUEST.md` в двух камерах → `bake_seq.py` в `iso/` (база, ширина ×3) → `bake_top.py` в `base/` (полёт, ширина как на карте базы) → иконка через `bake_icons.py` → `write_layout.py` → `composite.py` → размеры в `manifest.js` → сборка и скриншоты.
 
 Якоря для Blender (`anchors.json` для `iso_render.py`) берутся из `BUILDING_ANCHORS[key].e0.anchors` в `manifest.js`. С 2026-11-11 поправки `OVERRIDES` для fuel, energy, recovery перенесены в сам манифест (высокие спрайты карты полёта иначе закрывали друг друга); при следующем рендере изометрии и кадров подъёма эти три поправки в `write_layout.py` не нужны, а `tilt.json` до перерендера поправлен вручную тем же сдвигом.
